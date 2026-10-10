@@ -27,19 +27,34 @@ jobs:
       - uses: actions/checkout@v4
 
       # Rules that no stock lint can express (docs/Conventions.md §1, docs/Versions.md §4).
+      #
+      # NOTE: these are `grep` heuristics on source text, so they only consider
+      # *code* lines — doc comments and comments are stripped first, otherwise a
+      # comment that merely mentions `print()` or `StateNotifierProvider` (as the
+      # docs and this very workflow do) would fail the build.
       - name: Enforce project import policy
         run: |
           set -euo pipefail
           fail=0
 
+          # Matches are reported against code only: everything from the first `//`
+          # onward is stripped before grepping. Approximate (a `//` inside a string
+          # literal would be clipped) but the failure mode is a miss, not a false
+          # alarm, and `flutter analyze` catches the real cases anyway.
           check() {
             local label="$1" pattern="$2" path="$3"
-            # Exclude generated + tooling code.
-            if matches=$(grep -rInE "$pattern" "$path" \
-                 --include='*.dart' \
-                 --exclude='*.g.dart' \
-                 --exclude='*.freezed.dart' \
-                 --exclude='*.gr.dart' 2>/dev/null); then
+            local matches
+            matches=$(
+              find "$path" -name '*.dart' \
+                ! -name '*.g.dart' ! -name '*.freezed.dart' ! -name '*.gr.dart' \
+                -type f -print 2>/dev/null \
+                | sort \
+                | while IFS= read -r file; do
+                    sed 's://.*$::' "$file" | sed "s|^|$file:|"
+                  done \
+                | grep -E "$pattern" || true
+            )
+            if [ -n "$matches" ]; then
               echo "::error::$label"
               echo "$matches"
               fail=1
@@ -49,7 +64,7 @@ jobs:
           # 1. Legacy Riverpod providers are forbidden (use Notifier/AsyncNotifier/StreamNotifier).
           check \
             "Legacy Riverpod import. Use Notifier/AsyncNotifier/StreamNotifier (docs/Versions.md §4)." \
-            "flutter_riverpod/legacy\.dart|StateNotifierProvider|ChangeNotifierProvider\b" \
+            "flutter_riverpod/legacy\.dart|StateNotifierProvider|ChangeNotifierProvider" \
             "lib"
 
           # 2. Material/Cupertino must come from the standalone packages, not the SDK.
@@ -61,7 +76,7 @@ jobs:
           # 3. Web-unsafe libraries (docs/Platform.md §6).
           check \
             "dart:html / dart:js is not web-safe. Use package:web + dart:js_interop (docs/Platform.md §6)." \
-            "import 'dart:(html|js)'|import \"dart:(html|js)\"" \
+            "dart:(html|js)['\"]" \
             "lib"
 
           # 4. No print() — use AppLogger (docs/Conventions.md §4).
@@ -71,12 +86,10 @@ jobs:
             "lib"
 
           # 5. domain/ must stay pure Dart — no Flutter or data-layer packages (docs/Agent.md §3.1).
-          if [ -d lib/features ]; then
-            check \
-              "Forbidden import inside a feature's domain/ layer. domain must be pure Dart (docs/Architecture.md §1)." \
-              "package:flutter|package:drift|package:dio|package:firebase|package:supabase|package:get_it" \
-              "lib/features/*/domain"
-          fi
+          check \
+            "Forbidden import inside a feature's domain/ layer. domain must be pure Dart (docs/Architecture.md §1)." \
+            "package:flutter|package:drift|package:dio|package:firebase|package:supabase|package:get_it" \
+            "lib/features/*/domain"
 
           [ "$fail" -eq 0 ] && echo "Import policy OK."
           exit $fail
@@ -94,6 +107,23 @@ jobs:
       - run: flutter pub get
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
+      # Convenience escape hatch while local Flutter tooling is unavailable: if the
+      # check fails, download the "format-fix" artifact below, unzip it over the
+      # repo, and commit. Produced by `dart format .` — identical to running it
+      # locally.
+      - name: Produce formatting diff
+        if: failure()
+        run: |
+          dart format . > /dev/null
+          git diff --name-only
+          tar -czf format-fix.tar.gz $(git diff --name-only)
+      - name: Upload format-fix artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: format-fix
+          path: format-fix.tar.gz
+          retention-days: 7
 
   analyze:
     name: Analyze
