@@ -98,10 +98,7 @@ final class MoneyFormatter {
   /// Integer path is used for 0-exponent currencies so no float arithmetic is
   /// involved at all. For 2-exponent currencies the minor part is computed with
   /// integer division so cents are never at the mercy of `double` formatting.
-  String _formatMajorUnits(
-    Money money, {
-    required bool useCurrencySeparator,
-  }) {
+  String _formatMajorUnits(Money money, {required bool useCurrencySeparator}) {
     final absolute = money.amountMinor.abs();
     final exponent = money.currency.exponent;
 
@@ -117,8 +114,9 @@ final class MoneyFormatter {
     final major = absolute ~/ divisor;
     final minor = absolute % divisor;
     final minorPadded = minor.toString().padLeft(exponent, '0');
-    final separator =
-        useCurrencySeparator ? money.currency.decimalSeparator : _decimalSeparator;
+    final separator = useCurrencySeparator
+        ? money.currency.decimalSeparator
+        : _decimalSeparator;
 
     return '${_groupDigits(major.toString())}$separator$minorPadded';
   }

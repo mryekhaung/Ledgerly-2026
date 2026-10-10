@@ -36,7 +36,11 @@ void main() {
     test('should_store_cause_and_stack_trace_when_provided', () {
       final cause = StateError('boom');
       final trace = StackTrace.current;
-      final failure = UnexpectedFailure('oops', cause: cause, stackTrace: trace);
+      final failure = UnexpectedFailure(
+        'oops',
+        cause: cause,
+        stackTrace: trace,
+      );
 
       expect(failure.cause, cause);
       expect(failure.stackTrace, trace);
@@ -132,7 +136,9 @@ void main() {
     });
 
     test('should_expose_null_and_failure_when_failed', () {
-      final (value, failure) = const Err<int>(ParseFailure('bad row')).toRecord();
+      final (value, failure) = const Err<int>(
+        ParseFailure('bad row'),
+      ).toRecord();
 
       expect(value, isNull);
       expect(failure, isA<ParseFailure>());

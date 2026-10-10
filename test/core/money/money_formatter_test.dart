@@ -35,16 +35,22 @@ void main() {
     });
 
     test('should_render_minor_units_when_exponent_is_two', () {
-      final result = formatter.format(const Money.minor(1250, CurrencyCode.usd));
+      final result = formatter.format(
+        const Money.minor(1250, CurrencyCode.usd),
+      );
 
       expect(result, '\$\u200912.50');
     });
 
     test('should_pad_minor_units_when_below_ten_cents', () {
-      expect(formatter.format(const Money.minor(5, CurrencyCode.usd)),
-          contains('0.05'));
-      expect(formatter.format(const Money.minor(50, CurrencyCode.usd)),
-          contains('0.50'));
+      expect(
+        formatter.format(const Money.minor(5, CurrencyCode.usd)),
+        contains('0.05'),
+      );
+      expect(
+        formatter.format(const Money.minor(50, CurrencyCode.usd)),
+        contains('0.50'),
+      );
     });
 
     test('should_use_space_when_hair_space_disabled', () {

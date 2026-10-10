@@ -1,10 +1,12 @@
 /// ISO 4217 currency codes supported by the app.
 ///
 /// Deliberately a closed enum rather than a free-form string: it keeps
-/// [Money] type-safe, makes the supported set explicit, and lets the
+/// `Money` type-safe, makes the supported set explicit, and lets the
 /// formatter hold per-currency metadata (exponent, symbol) in one place.
 ///
 /// Myanmar Kyat is first because it is the primary market; JPY second.
+library;
+
 enum CurrencyCode {
   mmk(code: 'MMK', symbol: 'Ks', exponent: 0, decimalSeparator: '.'),
   jpy(code: 'JPY', symbol: '¥', exponent: 0, decimalSeparator: '.'),
@@ -34,7 +36,7 @@ enum CurrencyCode {
 
   /// Number of minor units per major unit. 0 for MMK/JPY/KRW, 2 for the rest.
   ///
-  /// This is why [Money] stores an integer: `amountMinor` is always whole units
+  /// This is why `Money` stores an integer: `amountMinor` is always whole units
   /// of the smallest denomination.
   final int exponent;
 

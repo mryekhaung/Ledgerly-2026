@@ -88,8 +88,7 @@ final class Money implements Comparable<Money> {
   Money operator -() => Money.minor(-amountMinor, currency);
 
   /// Scales by an integer factor (e.g. a quantity).
-  Money operator *(int factor) =>
-      Money.minor(amountMinor * factor, currency);
+  Money operator *(int factor) => Money.minor(amountMinor * factor, currency);
 
   /// The absolute value, keeping the sign-positive magnitude.
   Money abs() => Money.minor(amountMinor.abs(), currency);
@@ -130,7 +129,7 @@ final class Money implements Comparable<Money> {
     final major = absolute ~/ divisor;
     final minor = absolute % divisor;
     final padded = minor.toString().padLeft(currency.exponent, '0');
-    return '$sign$major.${padded} ${currency.code}';
+    return '$sign$major.$padded ${currency.code}';
   }
 
   void _assertSameCurrency(Money other) {

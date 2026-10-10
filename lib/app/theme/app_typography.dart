@@ -1,5 +1,3 @@
-import 'dart:ui' show FontFeature;
-
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -140,9 +138,7 @@ abstract final class AppTypography {
     TextStyle expand(TextStyle? style) {
       if (style == null) return const TextStyle();
       final height = style.height;
-      return style.copyWith(
-        height: height == null ? null : height + bump,
-      );
+      return style.copyWith(height: height == null ? null : height + bump);
     }
 
     return base.copyWith(

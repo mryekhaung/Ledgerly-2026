@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// M3 window size class (docs/Platform.md §5).

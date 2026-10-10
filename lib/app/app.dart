@@ -3,6 +3,7 @@ import 'package:ledgerly/app/router/app_router.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/adaptive_style.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:material_ui/material_ui.dart';
 

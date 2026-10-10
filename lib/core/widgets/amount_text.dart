@@ -82,7 +82,8 @@ class AmountText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final activeFormatter = formatter ?? MoneyFormatter(locale: _localeOf(context));
+    final activeFormatter =
+        formatter ?? MoneyFormatter(locale: _localeOf(context));
 
     final text = activeFormatter.format(
       money,

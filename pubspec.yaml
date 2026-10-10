@@ -12,26 +12,27 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # i18n delegates (en / my / ja)
+  flutter_localizations:
+    sdk: flutter
 
   # Flutter 3.47+: Material and Cupertino are standalone, independently released packages.
   # Import `package:material_ui/...` and `package:cupertino_ui/...`,
   # NEVER `package:flutter/material.dart` or `package:flutter/cupertino.dart`. See docs/Versions.md §2.
-  material_ui: any
-  cupertino_ui: any
+  cupertino_ui: ^1.1.2
+  material_ui: ^1.6.0
 
   # Presentation state (docs/Architecture.md §5). Riverpod 3.x only — no legacy providers.
-  flutter_riverpod: ^3.4.1
-
-  # Routing (docs/Architecture.md §9)
-  go_router: ^17.0.0
+  flutter_riverpod: ^3.4.3
 
   # Dependency wiring for data/domain (docs/Architecture.md §10)
-  get_it: any
+  get_it: ^9.3.0
 
-  # i18n (en / my / ja) and date/number formatting
-  intl: any
-  flutter_localizations:
-    sdk: flutter
+  # Routing (docs/Architecture.md §9)
+  go_router: ^17.5.0
+
+  # Date/number formatting
+  intl: ^0.20.3
 
 dev_dependencies:
   flutter_test:

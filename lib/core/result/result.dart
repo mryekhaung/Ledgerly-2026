@@ -37,11 +37,10 @@ sealed class Result<T> {
   };
 
   /// Chains another fallible operation, short-circuiting on [Err].
-  Result<R> flatMap<R>(Result<R> Function(T value) transform) =>
-      switch (this) {
-        Success<T>(:final value) => transform(value),
-        Err<T>(:final failure) => Err<R>(failure),
-      };
+  Result<R> flatMap<R>(Result<R> Function(T value) transform) => switch (this) {
+    Success<T>(:final value) => transform(value),
+    Err<T>(:final failure) => Err<R>(failure),
+  };
 
   /// Transforms the success value, leaving [Err] untouched.
   Result<R> map<R>(R Function(T value) transform) => switch (this) {
@@ -60,8 +59,7 @@ final class Success<T> extends Result<T> {
   final T value;
 
   @override
-  bool operator ==(Object other) =>
-      other is Success<T> && other.value == value;
+  bool operator ==(Object other) => other is Success<T> && other.value == value;
 
   @override
   int get hashCode => Object.hash(Success<T>, value);

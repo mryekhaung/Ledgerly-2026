@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Base app name. Each flavor overrides this via `resValue` in app/build.gradle.kts
+  (`dev` -> "Ledgerly Dev", `prod` -> "Ledgerly"). This default exists so the
+  `main` source set resolves `@string/app_name` even without a flavor applied.
+-->
+<resources>
+    <string name="app_name">Ledgerly</string>
+</resources>

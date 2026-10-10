@@ -1,5 +1,3 @@
-import 'dart:ui' show FontFeature;
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
@@ -61,10 +59,7 @@ void main() {
     testWidgets('should_use_primary_text_when_signed_is_false', (tester) async {
       await tester.pumpWidget(
         host(
-          const AmountText(
-            Money.minor(-3200, CurrencyCode.mmk),
-            signed: false,
-          ),
+          const AmountText(Money.minor(-3200, CurrencyCode.mmk), signed: false),
         ),
       );
 
@@ -100,8 +95,9 @@ void main() {
   });
 
   group('style slots', () {
-    testWidgets('should_use_display_style_when_style_is_display',
-        (tester) async {
+    testWidgets('should_use_display_style_when_style_is_display', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         host(
           const AmountText(
@@ -164,8 +160,9 @@ void main() {
       expect(text.data, 'Ks\u20091,250');
     });
 
-    testWidgets('should_render_iso_code_when_format_is_iso_code',
-        (tester) async {
+    testWidgets('should_render_iso_code_when_format_is_iso_code', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         host(
           const AmountText(
@@ -209,8 +206,9 @@ void main() {
       expect(text.semanticsLabel, isNot(startsWith('plus')));
     });
 
-    testWidgets('should_prefer_explicit_semantics_label_when_given',
-        (tester) async {
+    testWidgets('should_prefer_explicit_semantics_label_when_given', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         host(
           const AmountText(
@@ -229,9 +227,9 @@ void main() {
     testWidgets('should_not_overflow_when_text_scaled_to_two', (tester) async {
       await tester.pumpWidget(
         host(
-          MediaQuery(
-            data: const MediaQueryData(textScaler: TextScaler.linear(2)),
-            child: const AmountText(
+          const MediaQuery(
+            data: MediaQueryData(textScaler: TextScaler.linear(2)),
+            child: AmountText(
               Money.minor(1234567, CurrencyCode.mmk),
               style: AmountStyle.display,
             ),

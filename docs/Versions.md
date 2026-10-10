@@ -8,22 +8,23 @@
 > Flutter tool dies with
 > `ProcessException: All pipe instances are busy (at ../../runtime/bin/process_win.cc:742)`
 > — it cannot spawn *any* child process (`git`, `cmd`, `where`, `adb` all fail the same way).
-> Consequences:
+> Consequences for local work only:
 >
 > - `flutter create`, `flutter pub get`, `flutter pub add`, `flutter analyze`, `flutter test`
->   and `flutter gen-l10n` **have not been run**. No generated file (`pubspec.lock`,
->   `app_localizations.dart`, `.g.dart`, `.freezed.dart`) reflects this phase.
-> - **Nothing in the dependency tables below has been upgraded to "verified" by resolution.**
->   The versions that were already marked verified are unchanged and still come from the
->   docs/release notes, not from a local resolve.
-> - The installed SDK on this machine is **Flutter 3.38.2 / Dart 3.12.2**, which is *older*
->   than the 3.47.1 / 3.13.1 this project targets. `material_ui` and `cupertino_ui` (below)
->   appear to be Flutter 3.47 additions and **do not exist** for 3.38.2 — so `package:material_ui`
->   imports added in Phase 0 will not resolve until the pinned SDK is actually installed.
+>   and `flutter gen-l10n` cannot be run **on this machine**.
+> - The installed SDK here is **Flutter 3.38.2 / Dart 3.12.2**, older than the 3.47.1 / 3.13.1
+>   this project targets. `material_ui` / `cupertino_ui` do not resolve on 3.38.2.
+> - A standalone **Dart 3.13.5 SDK** *is* usable here (installed at
+>   `~/.workbuddy-ai/binaries/dart/versions/3.13.5/dart-sdk/bin/dart.exe`), which is enough for
+>   `dart format` and `dart analyze` once packages resolve. `dart pub get` alone cannot resolve
+>   Flutter SDK dependencies, so a full local analyze still requires CI.
 >
-> **Before doing anything else on a working machine:** install FVM, run `fvm use 3.47.1`
-> (or `fvm install`), then `fvm flutter pub get`, then `fvm flutter pub add` for each package in
-> §3, and only then move rows into "Verified". Record the real resolved versions here.
+> **CI is the verification channel.** GitHub Actions runs on Flutter 3.47.1 / Dart 3.13.1 and
+> *does* execute `pub get`, `analyze` and `test` successfully. `docs/Versions.md` §3 is therefore
+> populated from **CI-resolved versions**, not from local runs.
+>
+> **On a working machine:** install FVM, `fvm use 3.47.1`, then `fvm flutter pub get`. Commit
+> `pubspec.lock` — it is not generated here.
 
 ## 1. Toolchain
 | Item | Baseline | Status |
@@ -59,24 +60,30 @@
 `get_it`, `dio`, `pretty_dio_logger`, `fl_chart`, `intl`, `flutter_svg`, `dynamic_color`, `file_picker`, `share_plus`, `csv`, `path_provider`, `shared_preferences`, `flutter_secure_storage`, `local_auth`, `firebase_core`, `firebase_auth`, `cloud_firestore`, `google_sign_in`, `sign_in_with_apple`, `mocktail`, `leak_tracker`, `very_good_analysis`/`flutter_lints`.
 For each: confirm **iOS + Android + web** support (or wrap behind an interface with a stub), maintenance in the last 12 months, license, and Wasm compatibility (no `dart:html`/`dart:js`).
 
-### Phase 0 `pubspec.yaml` — provisional ranges awaiting a real resolve
-The Phase 0 scaffold declares the packages below. **These are *not* resolved versions**: the
-tool could not run (see the status block at the top), so each is written as a broad range and
-**must be replaced by the constraint `flutter pub add` actually writes**. Versions already
-documented above (`flutter_riverpod`, `go_router`) are quoted at their documented baseline.
+### Phase 0 dependencies — **resolved and pinned (10 Oct 2026)**
 
-| Package | Declared in `pubspec.yaml` | Documented baseline | Note |
+These are **real resolved versions**, taken from CI (`flutter pub get` on Flutter 3.47.1 /
+Dart 3.13.1, GitHub Actions run `38047092523`). `pubspec.yaml` now carries the caret
+constraints below rather than `any`.
+
+| Package | Resolved | Pinned as | Role |
 |---|---|---|---|
-| `material_ui` | `any` | 1.0 (§2) | ⚠ Flutter 3.47+ only — will not resolve on 3.38.2 |
-| `cupertino_ui` | `any` | 1.0 (§2) | ⚠ Flutter 3.47+ only |
-| `flutter_riverpod` | `^3.4.1` | ^3.4.1 | matches this file |
-| `go_router` | `^17.0.0` | 17.x | matches this file |
-| `get_it` | `any` | unknown | resolve required |
-| `intl` | `any` | unknown | resolve required |
-| `flutter_lints` | `^6.0.0` | unknown | dev dependency, was in the template |
+| `material_ui` | **1.6.0** | `^1.6.0` | Material 3 widgets — replaces `package:flutter/material.dart` |
+| `cupertino_ui` | **1.1.2** | `^1.1.2` | Cupertino widgets — replaces `package:flutter/cupertino.dart`; also supplies `CupertinoPageTransitionsBuilder` |
+| `flutter_riverpod` | **3.4.3** | `^3.4.3` | Presentation state (Riverpod 3 — see §4) |
+| `go_router` | **17.5.0** | `^17.5.0` | Routing |
+| `get_it` | **9.3.0** | `^9.3.0` | DI for data/domain |
+| `intl` | **0.20.3** | `^0.20.3` | Date/number formatting |
+| `flutter_lints` | template default | `^6.0.0` | Dev dependency |
+
+Gotcha worth recording: **`cupertino_ui` re-exports `package:flutter/widgets.dart`**, and both
+`material_ui` and `cupertino_ui` export `dart:ui`'s text primitives transitively (via
+`flutter/painting` → `basic_types.dart`). That means `FontFeature`, `FontWeight`, `Color`,
+`Offset`, etc. are available from `package:material_ui/material_ui.dart` alone — an explicit
+`import 'dart:ui'` is flagged `unnecessary_import`. Do **not** add one.
 
 `drift`, `freezed`, `dio` and the rest of §3 are **deliberately not declared yet** — they belong
-to the roadmap items that use them, and adding them here would put an unresolved dependency in
+to the roadmap items that use them, and adding them here would put an unused dependency in
 the build for no reason. Add each one in the PR that first needs it (`Agent.md` §3.14).
 
 

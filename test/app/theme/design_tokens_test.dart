@@ -203,7 +203,9 @@ void main() {
     });
 
     test('should_never_go_below_eleven_px', () {
-      const sizes = <double?>[
+      // Not const: reading an instance member off a const TextStyle is not
+      // allowed in a constant expression.
+      final sizes = <double?>[
         AppTypography.displayAmount.fontSize,
         AppTypography.amountLarge.fontSize,
         AppTypography.amount.fontSize,
@@ -216,13 +218,16 @@ void main() {
       ];
 
       for (final size in sizes) {
+        expect(size, isNotNull);
         expect(size, greaterThanOrEqualTo(11));
       }
     });
 
     test('should_never_use_a_thin_weight', () {
-      // Burmese and Japanese render poorly at w300 and lighter.
-      const weights = <FontWeight?>[
+      // Burmese and Japanese render poorly at w300 and lighter. `w400` and
+      // above map to 400/500/600 in FontWeight.value, which is the ordering
+      // the style guide cares about.
+      final weights = <FontWeight?>[
         AppTypography.displayAmount.fontWeight,
         AppTypography.amountLarge.fontWeight,
         AppTypography.amount.fontWeight,
@@ -235,7 +240,8 @@ void main() {
       ];
 
       for (final weight in weights) {
-        expect(weight!.index, greaterThanOrEqualTo(FontWeight.w400.index));
+        expect(weight, isNotNull);
+        expect(weight!.value, greaterThanOrEqualTo(FontWeight.w400.value));
       }
     });
 
@@ -249,10 +255,7 @@ void main() {
 
       final myanmar = AppTypography.textThemeFor(base, 'my');
 
-      expect(
-        myanmar.bodyMedium!.height,
-        greaterThan(base.bodyMedium!.height!),
-      );
+      expect(myanmar.bodyMedium!.height, greaterThan(base.bodyMedium!.height!));
     });
 
     test('should_leave_line_height_unchanged_for_latin_locales', () {
@@ -339,7 +342,10 @@ void main() {
 
     test('should_keep_rows_above_the_absolute_minimum', () {
       expect(AppRowHeight.absoluteMinimum, greaterThanOrEqualTo(56));
-      expect(AppRowHeight.singleLine, greaterThan(AppRowHeight.absoluteMinimum));
+      expect(
+        AppRowHeight.singleLine,
+        greaterThan(AppRowHeight.absoluteMinimum),
+      );
       expect(AppRowHeight.twoLine, greaterThan(AppRowHeight.singleLine));
     });
   });

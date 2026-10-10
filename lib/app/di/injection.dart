@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:ledgerly/app/di/app_environment.dart';
 
 /// The app-wide service locator.
 ///

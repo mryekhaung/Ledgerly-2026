@@ -1,3 +1,4 @@
+import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -40,7 +41,7 @@ abstract final class AppTheme {
         color: colors.surfaceRaised,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: AppRadius.borderLg),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderLg),
       ),
 
       dividerTheme: DividerThemeData(
@@ -90,11 +91,11 @@ abstract final class AppTheme {
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.lg,
         ),
-        border: OutlineInputBorder(
+        border: const OutlineInputBorder(
           borderRadius: AppRadius.borderMd,
           borderSide: BorderSide.none,
         ),
-        enabledBorder: OutlineInputBorder(
+        enabledBorder: const OutlineInputBorder(
           borderRadius: AppRadius.borderMd,
           borderSide: BorderSide.none,
         ),
@@ -138,9 +139,7 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: AppRadius.radiusXl,
-          ),
+          borderRadius: BorderRadius.vertical(top: AppRadius.radiusXl),
         ),
       ),
 
@@ -148,9 +147,7 @@ abstract final class AppTheme {
         backgroundColor: colors.surfaceRaised,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: AppRadius.borderXl,
-        ),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderXl),
         titleTextStyle: AppTypography.titleLarge.copyWith(
           color: colors.textPrimary,
         ),
@@ -160,9 +157,7 @@ abstract final class AppTheme {
         backgroundColor: colors.surfaceSubtle,
         selectedColor: colors.brandSubtle,
         side: BorderSide.none,
-        shape: const RoundedRectangleBorder(
-          borderRadius: AppRadius.borderFull,
-        ),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderFull),
         labelStyle: AppTypography.label.copyWith(color: colors.textPrimary),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
@@ -172,17 +167,17 @@ abstract final class AppTheme {
 
       snackBarTheme: SnackBarThemeData(
         backgroundColor: colors.textPrimary,
-        contentTextStyle: AppTypography.body.copyWith(
-          color: colors.surface,
-        ),
+        contentTextStyle: AppTypography.body.copyWith(color: colors.surface),
         behavior: SnackBarBehavior.floating,
-        shape: const RoundedRectangleBorder(
-          borderRadius: AppRadius.borderMd,
-        ),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
       ),
 
       // Motion: durations are read from AppMotion at call sites, but the
       // page-transition defaults are aligned here.
+      //
+      // Android uses the predictive-back transition so the platform swipe
+      // gesture previews the previous route (docs/Platform.md §6). iOS keeps the
+      // Cupertino slide, supplied by `cupertino_ui`.
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: <TargetPlatform, PageTransitionsBuilder>{
           TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
@@ -223,9 +218,7 @@ abstract final class AppTheme {
       surfaceContainerHighest: colors.surfaceRaised,
       outline: colors.border,
       outlineVariant: colors.border,
-      shadow: colors.isDark
-          ? const Color(0xFF000000)
-          : const Color(0xFF0F1720),
+      shadow: colors.isDark ? const Color(0xFF000000) : const Color(0xFF0F1720),
       scrim: colors.overlay,
       inverseSurface: colors.textPrimary,
       onInverseSurface: colors.surface,
@@ -243,11 +236,7 @@ abstract final class AppTheme {
 /// that keeps light/dark switching automatic and testable.
 class AppThemeColors extends InheritedWidget {
   /// Wraps [child] with the given [colors].
-  const AppThemeColors({
-    required this.colors,
-    required super.child,
-    super.key,
-  });
+  const AppThemeColors({required this.colors, required super.child, super.key});
 
   /// The active semantic color set.
   final AppColors colors;
@@ -255,8 +244,7 @@ class AppThemeColors extends InheritedWidget {
   /// Reads the nearest [AppColors], failing loudly when the widget is not
   /// wrapped in [AppThemeColors].
   static AppColors of(BuildContext context) {
-    final result =
-        context.dependOnInheritedWidgetOfExactType<AppThemeColors>();
+    final result = context.dependOnInheritedWidgetOfExactType<AppThemeColors>();
     assert(
       result != null,
       'AppThemeColors.of() called with a context that does not contain '

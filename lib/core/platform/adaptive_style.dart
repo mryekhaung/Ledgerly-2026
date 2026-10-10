@@ -55,7 +55,7 @@ class AdaptiveStyle extends InheritedWidget {
       reduceTransparency = false,
       reduceMotion = false,
       boldText = false,
-      child = const SizedBox.shrink();
+      super(child: const SizedBox.shrink());
 
   @override
   bool updateShouldNotify(AdaptiveStyle oldWidget) =>

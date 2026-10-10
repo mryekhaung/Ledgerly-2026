@@ -16,7 +16,8 @@ sealed class Failure {
 
   /// Technical, developer-facing description. NOT shown to users.
   ///
-  /// User-facing text is resolved from [kind] via l10n in the presentation layer.
+  /// User-facing text is resolved from the failure's runtime type via l10n in
+  /// the presentation layer (`AppLocalization.failureKeyFor`).
   final String message;
 
   /// The original error, kept for logging. Never surfaced in the UI.

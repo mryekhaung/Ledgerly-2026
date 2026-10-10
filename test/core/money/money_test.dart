@@ -24,10 +24,7 @@ void main() {
 
   group('Money.fromMajor', () {
     test('should_scale_by_currency_exponent_when_exponent_is_two', () {
-      expect(
-        Money.fromMajor(12.5, CurrencyCode.usd).amountMinor,
-        1250,
-      );
+      expect(Money.fromMajor(12.5, CurrencyCode.usd).amountMinor, 1250);
     });
 
     test('should_not_scale_when_exponent_is_zero', () {
@@ -46,7 +43,8 @@ void main() {
 
     test('should_be_exact_when_double_representation_would_drift', () {
       // 0.1 + 0.2 == 0.30000000000000004 as doubles; minor units must stay exact.
-      final sum = Money.fromMajor(0.1, CurrencyCode.usd) +
+      final sum =
+          Money.fromMajor(0.1, CurrencyCode.usd) +
           Money.fromMajor(0.2, CurrencyCode.usd);
 
       expect(sum.amountMinor, 30);
@@ -62,7 +60,10 @@ void main() {
 
     test('should_strip_grouping_separators_when_present', () {
       expect(Money.tryParse('1,234.56', CurrencyCode.usd)?.amountMinor, 123456);
-      expect(Money.tryParse('1,234,567', CurrencyCode.mmk)?.amountMinor, 1234567);
+      expect(
+        Money.tryParse('1,234,567', CurrencyCode.mmk)?.amountMinor,
+        1234567,
+      );
     });
 
     test('should_accept_leading_sign_when_provided', () {
@@ -82,14 +83,16 @@ void main() {
 
   group('arithmetic', () {
     test('should_add_when_currencies_match', () {
-      final result = const Money.minor(1000, CurrencyCode.mmk) +
+      final result =
+          const Money.minor(1000, CurrencyCode.mmk) +
           const Money.minor(250, CurrencyCode.mmk);
 
       expect(result.amountMinor, 1250);
     });
 
     test('should_subtract_when_currencies_match', () {
-      final result = const Money.minor(1000, CurrencyCode.mmk) -
+      final result =
+          const Money.minor(1000, CurrencyCode.mmk) -
           const Money.minor(250, CurrencyCode.mmk);
 
       expect(result.amountMinor, 750);
@@ -101,10 +104,7 @@ void main() {
     });
 
     test('should_scale_by_integer_factor_when_multiplied', () {
-      expect(
-        (const Money.minor(250, CurrencyCode.mmk) * 4).amountMinor,
-        1000,
-      );
+      expect((const Money.minor(250, CurrencyCode.mmk) * 4).amountMinor, 1000);
     });
 
     test('should_return_magnitude_when_abs_called', () {
@@ -114,22 +114,29 @@ void main() {
 
     test('should_throw_currency_mismatch_when_adding_different_currencies', () {
       expect(
-        () => const Money.minor(100, CurrencyCode.mmk) +
+        () =>
+            const Money.minor(100, CurrencyCode.mmk) +
             const Money.minor(100, CurrencyCode.usd),
         throwsA(isA<CurrencyMismatchError>()),
       );
     });
 
-    test('should_throw_currency_mismatch_when_comparing_different_currencies', () {
-      expect(
-        () => const Money.minor(100, CurrencyCode.mmk)
-            .compareTo(const Money.minor(100, CurrencyCode.usd)),
-        throwsA(isA<CurrencyMismatchError>()),
-      );
-    });
+    test(
+      'should_throw_currency_mismatch_when_comparing_different_currencies',
+      () {
+        expect(
+          () => const Money.minor(
+            100,
+            CurrencyCode.mmk,
+          ).compareTo(const Money.minor(100, CurrencyCode.usd)),
+          throwsA(isA<CurrencyMismatchError>()),
+        );
+      },
+    );
 
     test('should_keep_currency_when_arithmetic_applied', () {
-      final result = const Money.minor(100, CurrencyCode.jpy) +
+      final result =
+          const Money.minor(100, CurrencyCode.jpy) +
           const Money.minor(100, CurrencyCode.jpy);
 
       expect(result.currency, CurrencyCode.jpy);
@@ -182,10 +189,7 @@ void main() {
 
   group('toString', () {
     test('should_show_no_decimal_point_when_exponent_is_zero', () {
-      expect(
-        const Money.minor(1250, CurrencyCode.mmk).toString(),
-        '1250 MMK',
-      );
+      expect(const Money.minor(1250, CurrencyCode.mmk).toString(), '1250 MMK');
     });
 
     test('should_pad_minor_units_when_exponent_is_two', () {
@@ -195,7 +199,10 @@ void main() {
     });
 
     test('should_render_sign_before_major_units_when_negative', () {
-      expect(const Money.minor(-1250, CurrencyCode.usd).toString(), '-12.50 USD');
+      expect(
+        const Money.minor(-1250, CurrencyCode.usd).toString(),
+        '-12.50 USD',
+      );
     });
   });
 
