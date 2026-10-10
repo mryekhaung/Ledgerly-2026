@@ -21,6 +21,27 @@ sealed class Result<T> {
     Err<T>() => null,
   };
 
+  /// The value, or null when this is an [Err].
+  ///
+  /// Alias of [valueOrNull] for call sites that read more naturally with a
+  /// "maybe get" name (e.g. `result.getOrNull ?? fallback`).
+  T? get getOrNull => valueOrNull;
+
+  /// The value, or [fallback] when this is an [Err].
+  ///
+  /// Unlike [getOrNull] this hides the absence of a value behind a definite
+  /// result — use it only when a sensible default genuinely exists.
+  T getOrElse(T fallback) => valueOrNull ?? fallback;
+
+  /// The value, or the result of [onErr] when this is an [Err].
+  ///
+  /// [onErr] receives the [Failure] so callers can decide a default based on
+  /// *why* the operation failed.
+  T getOrElseLazy(T Function(Failure failure) onErr) => switch (this) {
+    Success<T>(:final value) => value,
+    Err<T>(:final failure) => onErr(failure),
+  };
+
   /// The failure, or null when this is a [Success].
   Failure? get failureOrNull => switch (this) {
     Success<T>() => null,
@@ -47,6 +68,33 @@ sealed class Result<T> {
     Success<T>(:final value) => Success<R>(transform(value)),
     Err<T>(:final failure) => Err<R>(failure),
   };
+
+  /// Transforms the failure, leaving [Success] untouched.
+  ///
+  /// The data layer uses this to enrich a low-level failure (e.g. attach a
+  /// status code) without disturbing a successful value. The return type stays
+  /// `Result<T>` because only the error channel changes.
+  Result<T> mapErr(Failure Function(Failure failure) transform) =>
+      switch (this) {
+        Success<T>() => this,
+        Err<T>(:final failure) => Err<T>(transform(failure)),
+      };
+
+  /// Runs [effect] for its side effect when this is a [Success], then returns
+  /// `this` unchanged so it can be chained.
+  ///
+  /// The effect must return void — this is a hook for logging, not a transform.
+  Result<T> onSuccess(void Function(T value) effect) {
+    if (this case Success<T>(:final value)) effect(value);
+    return this;
+  }
+
+  /// Runs [effect] for its side effect when this is an [Err], then returns
+  /// `this` unchanged so it can be chained.
+  Result<T> onErr(void Function(Failure failure) effect) {
+    if (this case Err<T>(:final failure)) effect(failure);
+    return this;
+  }
 
   /// Converts to a Dart record, convenient for destructuring at call sites.
   (T?, Failure?) toRecord() => (valueOrNull, failureOrNull);
