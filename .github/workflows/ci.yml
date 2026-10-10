@@ -2,9 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    # Long-lived branches only (docs/Conventions.md §7):
+    #   dev  = default working branch
+    #   main = stable integration line
+    #   prod = production release branch
+    branches: [dev, main, prod]
   pull_request:
-    branches: [main, develop]
+    branches: [dev, main, prod]
   workflow_dispatch:
 
 concurrency:

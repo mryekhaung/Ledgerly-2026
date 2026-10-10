@@ -60,11 +60,24 @@
 - CI must pass: format → analyze → test → (optional) build.
 
 ## 7. Git & CI
-- Branches: `main` (stable), `develop`, `feat/<name>`, `fix/<name>`.
+- Repository: `https://github.com/mryekhaung/Ledgerly-2026.git`
+- **Branch model — three long-lived branches:**
+
+  | Branch | Purpose | Receives |
+  |---|---|---|
+  | `dev` | **Default working branch.** All day-to-day work lands here. | `feat/*`, `fix/*` via PR |
+  | `main` | Stable, reviewable integration line. Nothing is released from here directly. | PR from `dev` when a milestone is ready |
+  | `prod` | **Production release branch — push/tag here = ship to stores.** | PR from `main` only, at release time |
+
+  Short-lived branches: `feat/<name>`, `fix/<name>` — cut from `dev`, merged back into `dev`.
+  Flow: `feat/* → dev → main → prod`. Never commit directly to `main` or `prod`.
 - **Conventional Commits:** `feat(calendar): add day capsule intensity`.
 - PRs small & focused; checklist = Definition of Done (`Agent.md`).
 - GitHub Actions: format check, analyze, test with coverage, build APK/IPA artifacts on tags.
 - Flavors: `dev` / `prod` (different bundle ids, remote adapters).
+  - ⚠ CI currently runs on `main` / `develop` pushes — **update the trigger list to `dev` / `main` / `prod`**
+    now that the branches are renamed (`docs/Roadmap.md` Phase 0 follow-up).
+
 
 ## 8. Security basics
 - No secrets in git. Obfuscate release builds (`--obfuscate --split-debug-info`).
