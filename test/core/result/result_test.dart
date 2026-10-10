@@ -136,9 +136,8 @@ void main() {
     });
 
     test('should_expose_null_and_failure_when_failed', () {
-      final (value, failure) = const Err<int>(
-        ParseFailure('bad row'),
-      ).toRecord();
+      const err = Err<int>(ParseFailure('bad row'));
+      final (value, failure) = err.toRecord();
 
       expect(value, isNull);
       expect(failure, isA<ParseFailure>());

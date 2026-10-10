@@ -1,4 +1,4 @@
-import 'dart:ui' show FontFeature;
+import 'dart:math' as math;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
@@ -15,10 +15,11 @@ void main() {
   group('color contrast (docs/Design.md §2)', () {
     /// WCAG relative luminance.
     ///
-    /// Uses `.r/.g/.b`, which are 0..1 in the current Flutter `Color` API.
+    /// `Color.r/.g/.b` are the floating-point channels, 0..1.
     double luminance(Color c) {
-      double channel(double v) =>
-          v <= 0.03928 ? v / 12.92 : _pow((v + 0.055) / 1.055, 2.4);
+      double channel(double v) => v <= 0.03928
+          ? v / 12.92
+          : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
       return 0.2126 * channel(c.r) +
           0.7152 * channel(c.g) +
           0.0722 * channel(c.b);
@@ -349,13 +350,4 @@ void main() {
       expect(AppRowHeight.twoLine, greaterThan(AppRowHeight.singleLine));
     });
   });
-}
-
-double _pow(double base, double exponent) {
-  // Small integer-ish power without importing dart:math for one call site.
-  var result = 1.0;
-  for (var i = 0; i < exponent.round(); i++) {
-    result *= base;
-  }
-  return result;
 }

@@ -49,7 +49,7 @@ class AdaptiveStyle extends InheritedWidget {
 
   /// A conservative default: material chrome, compact, no transparency
   /// reduction. Used only when no ancestor scope exists.
-  const AdaptiveStyle.fallback()
+  const AdaptiveStyle.fallback({super.key})
     : platform = AppPlatform.android,
       sizeClass = WindowSizeClass.compact,
       reduceTransparency = false,
