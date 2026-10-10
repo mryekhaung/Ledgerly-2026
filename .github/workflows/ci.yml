@@ -1,0 +1,130 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Must match .fvmrc and docs/Versions.md §1.
+  FLUTTER_VERSION: 3.47.1
+
+jobs:
+  banned-imports:
+    name: Banned imports
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Rules that no stock lint can express (docs/Conventions.md §1, docs/Versions.md §4).
+      - name: Enforce project import policy
+        run: |
+          set -euo pipefail
+          fail=0
+
+          check() {
+            local label="$1" pattern="$2" path="$3"
+            # Exclude generated + tooling code.
+            if matches=$(grep -rInE "$pattern" "$path" \
+                 --include='*.dart' \
+                 --exclude='*.g.dart' \
+                 --exclude='*.freezed.dart' \
+                 --exclude='*.gr.dart' 2>/dev/null); then
+              echo "::error::$label"
+              echo "$matches"
+              fail=1
+            fi
+          }
+
+          # 1. Legacy Riverpod providers are forbidden (use Notifier/AsyncNotifier/StreamNotifier).
+          check \
+            "Legacy Riverpod import. Use Notifier/AsyncNotifier/StreamNotifier (docs/Versions.md §4)." \
+            "flutter_riverpod/legacy\.dart|StateNotifierProvider|ChangeNotifierProvider\b" \
+            "lib"
+
+          # 2. Material/Cupertino must come from the standalone packages, not the SDK.
+          check \
+            "Import package:flutter/material.dart or cupertino.dart. Use material_ui / cupertino_ui (docs/Versions.md §2)." \
+            "package:flutter/(material|cupertino)\.dart" \
+            "lib"
+
+          # 3. Web-unsafe libraries (docs/Platform.md §6).
+          check \
+            "dart:html / dart:js is not web-safe. Use package:web + dart:js_interop (docs/Platform.md §6)." \
+            "import 'dart:(html|js)'|import \"dart:(html|js)\"" \
+            "lib"
+
+          # 4. No print() — use AppLogger (docs/Conventions.md §4).
+          check \
+            "print() found. Use AppLogger (docs/Conventions.md §4)." \
+            "(^|[^A-Za-z0-9_.])print\(" \
+            "lib"
+
+          # 5. domain/ must stay pure Dart — no Flutter or data-layer packages (docs/Agent.md §3.1).
+          if [ -d lib/features ]; then
+            check \
+              "Forbidden import inside a feature's domain/ layer. domain must be pure Dart (docs/Architecture.md §1)." \
+              "package:flutter|package:drift|package:dio|package:firebase|package:supabase|package:get_it" \
+              "lib/features/*/domain"
+          fi
+
+          [ "$fail" -eq 0 ] && echo "Import policy OK."
+          exit $fail
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    needs: [banned-imports]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # Zero warnings policy (docs/Conventions.md §1).
+      - run: flutter analyze --fatal-infos --fatal-warnings
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [banned-imports]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Run tests with coverage
+        run: flutter test --coverage --reporter expanded
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov.info
+          if-no-files-found: ignore
+          retention-days: 7

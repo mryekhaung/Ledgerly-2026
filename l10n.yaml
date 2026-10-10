@@ -1,0 +1,12 @@
+# l10n configuration — `flutter gen-l10n` reads this.
+#
+# Output goes to lib/l10n/generated/ (excluded from analysis and from the
+# banned-import CI job's scope). Regenerate with: flutter gen-l10n
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+output-dir: lib/l10n/generated
+synthetic-package: false
+nullable-getter: false
+untranslated-messages-file: l10n_untranslated.json

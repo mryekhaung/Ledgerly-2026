@@ -1,0 +1,35 @@
+{
+  "@@locale": "my",
+
+  "appTitle": "Ledgerly",
+
+  "navigation.calendar": "ပြက္ခဒိန်",
+  "navigation.insights": "သုံးသပ်ချက်",
+  "navigation.categories": "အမျိုးအစားများ",
+  "navigation.settings": "ဆက်တင်",
+
+  "state.empty.title": "ဒီနေရာမှာ ဘာမှ မရှိသေးပါ",
+  "state.empty.body": "ပထမဆုံး အသုံးစရိတ်ကို ထည့်ရန် + ကို နှိပ်ပါ။",
+  "state.error.title": "တစ်ခုခု မှားသွားပါတယ်",
+  "state.error.body": "ဒါကို ဖွင့်မရပါဘူး။ ထပ်ကြိုးစားကြည့်ပါ။",
+  "state.error.retry": "ထပ်ကြိုးစားပါ",
+
+  "failure.storage": "သိမ်းထားတဲ့ ဒေတာကို ဖတ်မရပါဘူး။ ထပ်ကြိုးစားကြည့်ပါ။",
+  "failure.network": "အင်တာနက် မရပါဘူး။ ချိတ်ဆက်မှုကို စစ်ပြီး ထပ်ကြိုးစားပါ။",
+  "failure.auth": "အကောင့်ဝင်ခြင်း မပြီးစီးပါဘူး။ ထပ်ကြိုးစားကြည့်ပါ။",
+  "failure.validation": "အထူပြတဲ့ ကွက်လပ်တွေကို စစ်ကြည့်ပါ။",
+  "failure.notFound": "ဒီအရာကို ရှာမတွေ့ပါဘူး။",
+  "failure.conflict": "သိမ်းထားပြီးသား အရာတစ်ခုနဲ့ ထပ်နေပါတယ်။",
+  "failure.parse": "ဒီဖိုင်ကို ဖတ်မရပါဘူး။ ဖော်မတ်ကို စစ်ပြီး ထပ်ကြိုးစားပါ။",
+  "failure.unexpected": "မမျှော်လင့်တဲ့ အမှားတစ်ခု ဖြစ်သွားပါတယ်။ ထပ်ကြိုးစားကြည့်ပါ။",
+
+  "calendar.spentToday": "ယနေ့ သုံးငွေ",
+  "calendar.income": "ဝင်ငွေ",
+  "calendar.expense": "အသုံးစရိတ်",
+  "calendar.net": "အသားတင်",
+  "calendar.today": "ယနေ့",
+  "calendar.emptyDay": "ဒီနေ့မှာ ဘာမှ မရှိပါ",
+  "calendar.selectDay": "ရက်တစ်ရက် ရွေးပါ",
+  "calendar.previousMonth": "ယခင်လ",
+  "calendar.nextMonth": "နောက်လ"
+}

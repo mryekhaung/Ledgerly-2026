@@ -1,0 +1,47 @@
+name: ledgerly
+description: "A Budget Tracker & Manager Flutter project — compact, premium personal finance for iOS/Android/web."
+publish_to: 'none'
+version: 1.0.0+1
+
+# Toolchain is pinned by .fvmrc (Flutter 3.47.1). CI must use the same version.
+# See docs/Versions.md — that file is the single source of truth for versions.
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Flutter 3.47+: Material and Cupertino are standalone, independently released packages.
+  # Import `package:material_ui/...` and `package:cupertino_ui/...`,
+  # NEVER `package:flutter/material.dart` or `package:flutter/cupertino.dart`. See docs/Versions.md §2.
+  material_ui: any
+  cupertino_ui: any
+
+  # Presentation state (docs/Architecture.md §5). Riverpod 3.x only — no legacy providers.
+  flutter_riverpod: ^3.4.1
+
+  # Routing (docs/Architecture.md §9)
+  go_router: ^17.0.0
+
+  # Dependency wiring for data/domain (docs/Architecture.md §10)
+  get_it: any
+
+  # i18n (en / my / ja) and date/number formatting
+  intl: any
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Fonts are bundled in Phase 0 (Roadmap) so web has a reliable fallback.
+  # Inter = amounts/Latin · Noto Sans Myanmar = my · Noto Sans JP = ja.
+  # Asset files land in assets/fonts/ — see docs/Design.md §3.

@@ -1,0 +1,104 @@
+# analysis_options.yaml — analyzer + strict lint configuration
+#
+# Policy (docs/Conventions.md §1): ZERO analyzer warnings. A warning fails CI.
+# Baseline is `flutter_lints`, with the extras the project depends on switched on below.
+
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    # --- Zero-tolerance: these are errors, not hints ---
+    unused_import: error
+    unused_local_variable: error
+    unused_element: error
+    unused_field: error
+    dead_code: error
+    deprecated_member_use: error
+    deprecated_member_use_from_same_package: error
+    invalid_use_of_protected_member: error
+    missing_required_param: error
+    missing_return: error
+    todo: ignore # TODOs are tracked in the roadmap, not the analyzer
+    # Avoid turning style nits into build-breakers
+    prefer_const_constructors: warning
+    public_member_api_docs: ignore # not a package; no doc requirement
+
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.mocks.dart"
+    - "lib/l10n/generated/**"
+    - "**/*.gr.dart"
+    - ".fvm/**"
+
+  plugins:
+    # NOTE: the `import_lint` / custom-rule plugin that enforces the layer boundaries in
+    # docs/Conventions.md §2 is a Roadmap Phase 0 follow-up. When adopted, register it here
+    # and move the layer rules out of review-only enforcement.
+
+linter:
+  rules:
+    # --- Correctness ---
+    always_declare_return_types: true
+    avoid_dynamic_calls: true
+    avoid_slow_async_io: true
+    avoid_type_to_string: true
+    cancel_subscriptions: true
+    close_sinks: true
+    collection_methods_unrelated_type: true
+    comment_references: true
+    discarded_futures: true
+    literal_only_boolean_expressions: true
+    no_adjacent_strings_in_list: true
+    test_types_in_equals: true
+    throw_in_finally: true
+    unnecessary_statements: true
+    unrelated_type_equality_checks: true
+    use_build_context_synchronously: true
+    valid_regexps: true
+
+    # --- Async / Future safety ---
+    avoid_void_async: true
+    unawaited_futures: true
+
+    # --- Immutability & const (docs/Conventions.md §3) ---
+    prefer_const_constructors: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_final_fields: true
+    prefer_final_in_for_each: true
+    prefer_final_locals: true
+
+    # --- API & style ---
+    always_use_package_imports: true # docs/Conventions.md §1: absolute package: imports
+    avoid_relative_lib_imports: true
+    directives_ordering: true
+    prefer_single_quotes: true
+    require_trailing_commas: true
+    sort_pub_dependencies: true
+    unnecessary_lambdas: true
+    use_super_parameters: true
+    use_string_in_part_of_directives: true
+    prefer_expression_function_bodies: false # full bodies read better with our doc comments
+
+    # --- Documentation & naming ---
+    camel_case_extensions: true
+    camel_case_types: true
+    library_names: true
+    library_prefixes: true
+    slash_for_doc_comments: true
+    type_annotate_public_apis: true
+
+    # --- Do NOT use: legacy / banned APIs ---
+    # flutter_riverpod/legacy.dart (StateProvider, StateNotifierProvider, ChangeNotifierProvider)
+    # is banned by docs/Conventions.md §1 and docs/Versions.md §4. There is no built-in lint for
+    # an import ban, so it is enforced by the dedicated CI grep step in
+    # .github/workflows/ci.yml (job: "banned-imports") and by review.
+    avoid_print: true # docs/Conventions.md §4 — use AppLogger
+    avoid_web_libraries_in_flutter: true # docs/Platform.md §6 — no dart:html
+    prefer_void_to_null: true

@@ -1,0 +1,35 @@
+{
+  "@@locale": "ja",
+
+  "appTitle": "Ledgerly",
+
+  "navigation.calendar": "カレンダー",
+  "navigation.insights": "分析",
+  "navigation.categories": "カテゴリ",
+  "navigation.settings": "設定",
+
+  "state.empty.title": "まだ何もありません",
+  "state.empty.body": "＋をタップして最初の取引を追加しましょう。",
+  "state.error.title": "問題が発生しました",
+  "state.error.body": "読み込めませんでした。もう一度お試しください。",
+  "state.error.retry": "再試行",
+
+  "failure.storage": "保存データを読み込めませんでした。もう一度お試しください。",
+  "failure.network": "接続がありません。ネットワークを確認してください。",
+  "failure.auth": "サインインが完了しませんでした。もう一度お試しください。",
+  "failure.validation": "入力内容をご確認ください。",
+  "failure.notFound": "該当する項目が見つかりませんでした。",
+  "failure.conflict": "既に保存されている内容と競合しています。",
+  "failure.parse": "このファイルを読み込めませんでした。形式をご確認ください。",
+  "failure.unexpected": "予期しないエラーが発生しました。もう一度お試しください。",
+
+  "calendar.spentToday": "本日の支出",
+  "calendar.income": "収入",
+  "calendar.expense": "支出",
+  "calendar.net": "収支",
+  "calendar.today": "今日",
+  "calendar.emptyDay": "この日の記録はありません",
+  "calendar.selectDay": "日付を選択してください",
+  "calendar.previousMonth": "前の月",
+  "calendar.nextMonth": "次の月"
+}

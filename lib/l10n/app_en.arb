@@ -1,0 +1,115 @@
+{
+  "@@locale": "en",
+  "appTitle": "Ledgerly",
+  "@appTitle": {
+    "description": "The application name shown in the task switcher and stores."
+  },
+
+  "navigation.calendar": "Calendar",
+  "@navigation.calendar": {
+    "description": "Primary navigation destination label."
+  },
+  "navigation.insights": "Insights",
+  "@navigation.insights": {
+    "description": "Primary navigation destination label."
+  },
+  "navigation.categories": "Categories",
+  "@navigation.categories": {
+    "description": "Primary navigation destination label."
+  },
+  "navigation.settings": "Settings",
+  "@navigation.settings": {
+    "description": "Primary navigation destination label."
+  },
+
+  "state.empty.title": "Nothing here yet",
+  "@state.empty.title": {
+    "description": "Generic empty-state heading."
+  },
+  "state.empty.body": "Tap + to add your first transaction.",
+  "@state.empty.body": {
+    "description": "Generic empty-state supporting text."
+  },
+  "state.error.title": "Something went wrong",
+  "@state.error.title": {
+    "description": "Inline error banner heading."
+  },
+  "state.error.body": "We couldn't load this. Please try again.",
+  "@state.error.body": {
+    "description": "Inline error banner supporting text."
+  },
+  "state.error.retry": "Retry",
+  "@state.error.retry": {
+    "description": "Retry button in the error banner."
+  },
+
+  "failure.storage": "Couldn't read your saved data. Please try again.",
+  "@failure.storage": {
+    "description": "Maps StorageFailure to user-facing text."
+  },
+  "failure.network": "No connection. Check your network and try again.",
+  "@failure.network": {
+    "description": "Maps NetworkFailure to user-facing text."
+  },
+  "failure.auth": "Sign-in didn't complete. Please try again.",
+  "@failure.auth": {
+    "description": "Maps AuthFailure to user-facing text."
+  },
+  "failure.validation": "Please check the highlighted fields.",
+  "@failure.validation": {
+    "description": "Maps ValidationFailure to user-facing text."
+  },
+  "failure.notFound": "We couldn't find that item.",
+  "@failure.notFound": {
+    "description": "Maps NotFoundFailure to user-facing text."
+  },
+  "failure.conflict": "That conflicts with something already saved.",
+  "@failure.conflict": {
+    "description": "Maps ConflictFailure to user-facing text."
+  },
+  "failure.parse": "This file couldn't be read. Check the format and try again.",
+  "@failure.parse": {
+    "description": "Maps ParseFailure to user-facing text."
+  },
+  "failure.unexpected": "Something unexpected happened. Please try again.",
+  "@failure.unexpected": {
+    "description": "Maps UnexpectedFailure to user-facing text."
+  },
+
+  "calendar.spentToday": "Spent today",
+  "@calendar.spentToday": {
+    "description": "Eyebrow above the hero amount on the calendar summary card."
+  },
+  "calendar.income": "Income",
+  "@calendar.income": {
+    "description": "Summary card column label for money in."
+  },
+  "calendar.expense": "Expense",
+  "@calendar.expense": {
+    "description": "Summary card column label for money out."
+  },
+  "calendar.net": "Net",
+  "@calendar.net": {
+    "description": "Summary card column label for net (income minus expense)."
+  },
+  "calendar.today": "Today",
+  "@calendar.today": {
+    "description": "Button that jumps the calendar back to the current month."
+  },
+  "calendar.emptyDay": "Nothing on this day",
+  "@calendar.emptyDay": {
+    "description": "Empty state heading for the selected-day transaction list."
+  },
+  "calendar.selectDay": "Select a day",
+  "@calendar.selectDay": {
+    "description": "Two-pane placeholder shown before a day has been picked."
+  },
+  "calendar.previousMonth": "Previous month",
+  "@calendar.previousMonth": {
+    "description": "Accessibility label for the previous-month arrow."
+  },
+  "calendar.nextMonth": "Next month",
+  "@calendar.nextMonth": {
+    "description": "Accessibility label for the next-month arrow."
+  }
+}
