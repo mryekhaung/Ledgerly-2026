@@ -3,22 +3,28 @@
 Legend: ☐ todo · ◐ in progress · ☑ done. Each task = one small PR following `Agent.md` §5.
 
 ## Phase 0 — Foundation
-- ◐ **Pin toolchain** (FVM 3.47.1, Dart ^3.13, CI same); create project with `material_ui` / `cupertino_ui` imports; resolve & record all unverified packages in `docs/Versions.md`
+- ☑ **Pin toolchain** (FVM 3.47.1, Dart ^3.13, CI same); create project with `material_ui` / `cupertino_ui` imports; resolve & record all unverified packages in `docs/Versions.md`
   - ✅ `.fvmrc` = 3.47.1, `pubspec.yaml` `sdk: ^3.13.0` / `flutter: ">=3.47.0"`, CI pinned to 3.47.1
-  - ⚠ **Blocked:** the Flutter tool cannot start on the dev machine (`All pipe instances are busy`, OS error 231), and the installed SDK is 3.38.2 not 3.47.1 — so no package has been genuinely resolved. See the status block in `Versions.md`.
+  - ✅ Every package resolved on CI with Flutter 3.47.1 and recorded in `docs/Versions.md` §3: `material_ui` 1.6.0, `cupertino_ui` 1.1.2, `flutter_riverpod` 3.4.3, `go_router` 17.5.0, `get_it` 9.3.0, `intl` 0.20.3.
+  - ⚠ The Flutter tool still cannot start on the dev machine (`All pipe instances are busy`, OS error 231) and the installed SDK is 3.38.2, not 3.47.1. **CI is the verification channel of record.** Locally, only `dart format` is runnable, via a standalone Dart 3.13.5 SDK — so formatting is checked locally before pushing.
 - ☐ Riverpod 3 baseline provider/notifier template + lint rule banning `legacy.dart` imports
   - ◐ CI `banned-imports` job enforces the ban; the baseline provider template is still todo
 - ☑ Create Flutter project, flavors (dev/prod), lints, CI (format/analyze/test)
+  - ✅ CI green on `dev` at `8523fb7`: banned-imports, format, analyze (**0 issues**), test (**145 passing**). `dev` → `main` → `prod` all merged and pushed.
 - ☑ `core/`: Result, Failure, UseCase, Money + MoneyFormatter (+ tests)
+  - ✅ `Money` is `int` minor units + `CurrencyCode`; `showSign: false` renders the magnitude unsigned (direction is carried by colour/layout — `docs/Design.md` §2.4).
 - ◐ Design tokens (`app/theme`): colors light/dark, typography, spacing, radius — done; motion/elevation included. Awaiting a font-bundling pass.
+  - ✅ Contrast verified against WCAG AA with the correct sRGB relative-luminance curve (`channel(v) = v ≤ 0.03928 ? v/12.92 : ((v+0.055)/1.055)^2.4`); coral and sage both clear 4.5:1.
 - ◐ get_it bootstrap + Riverpod `ProviderScope` + go_router skeleton — wired; the real adaptive nav shell lands with the design-system item below
-- ◐ l10n setup (en/my/ja) + font bundling — ARB files + `l10n.yaml` written; **not generated** (`flutter gen-l10n` blocked) and fonts not bundled
+- ◐ l10n setup (en/my/ja) + font bundling — ARB files + `l10n.yaml` written; `MaterialApp` now wires `GlobalMaterialLocalizations.delegates` from `material_ui`, so the framework's en/my/ja strings resolve. Our own `AppLocalizations` delegate joins that list once `flutter gen-l10n` has run (CI-only until the local Flutter tool works); fonts not bundled.
 - ☐ Drift database, migration test harness, seed defaults
 - ☐ `core/platform/` (AppPlatform, WindowSizeClass, AdaptiveStyle) + `GlassSurface` spike: blur fallback first, then `cupertino_native_better` (native iOS 26 tab bar/buttons); `liquid_glass_renderer` experimental only — decide & document
   - ✅ `core/platform/` done (AppPlatform, WindowSizeClass, AdaptiveStyle + tests); GlassSurface spike still todo
 - ☐ Web spike: Drift (`drift_flutter` WASM) + conditional imports + fonts + `flutter build web --wasm` running
-- ☐ Design-system widgets (adaptive iOS/Material impls + responsive helpers): AppScaffold, AppCard, CategoryGem, AmountText, SegmentedTabs, ListRow, buttons, fields, EmptyState, GlassDock (+ goldens)
+- ◐ Design-system widgets (adaptive iOS/Material impls + responsive helpers): AppScaffold, AppCard, CategoryGem, ~~AmountText~~, SegmentedTabs, ListRow, buttons, fields, EmptyState, GlassDock (+ goldens)
   - 📄 Specs for all of these now live in `docs/Design.md` §5
+  - ✅ `AmountText` shipped (`core/widgets/amount_text.dart`) — tabular figures enforced in every style, signed/unsigned modes, symbol prefix/suffix; covered by widget tests
+  - ☐ Goldens not yet scaffolded; the remaining widgets are still todo
 
 
 ## Phase 1 — MVP "Log & See" (v0.1)
