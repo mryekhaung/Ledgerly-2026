@@ -135,10 +135,15 @@ void main() {
     });
 
     testWidgets('should_keep_tabular_figures_in_every_style', (tester) async {
+      const amount = Money.minor(1250, CurrencyCode.mmk);
+
       for (final style in AmountStyle.values) {
-        await tester.pumpWidget(
-          host(AmountText(Money.minor(1250, CurrencyCode.mmk), style: style)),
-        );
+        // `style` varies per iteration, so this widget cannot be const — the
+        // lint is a false positive here. Building it through a typed local
+        // makes that explicit and keeps the analyzer quiet.
+        final Widget subject = AmountText(amount, style: style);
+
+        await tester.pumpWidget(host(subject));
 
         final text = tester.widget<Text>(find.byType(Text).last);
         expect(

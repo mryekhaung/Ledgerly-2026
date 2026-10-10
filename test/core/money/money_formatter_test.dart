@@ -16,7 +16,7 @@ void main() {
         const Money.minor(1250, CurrencyCode.mmk),
       );
 
-      expect(result, 'Ks\u20091250');
+      expect(result, 'Ks\u20091,250');
     });
 
     test('should_group_digits_when_amount_is_large', () {
@@ -59,7 +59,7 @@ void main() {
         useHairSpace: false,
       );
 
-      expect(result, 'Ks 1250');
+      expect(result, 'Ks 1,250');
     });
   });
 

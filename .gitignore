@@ -49,3 +49,6 @@ app.*.map.json
 
 # Crash logs from the flutter tool
 flutter_*.log
+
+# Agent working memory — local scratch, not part of the product
+.workbuddy-ai/

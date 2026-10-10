@@ -46,10 +46,18 @@ final class MoneyFormatter {
 
   /// Formats [money] using this formatter's locale.
   ///
-  /// [format] selects symbol placement. [showSign] forces a leading `+`/`−`,
-  /// which is what the Calendar summary card needs for income/expense rows
-  /// (docs/Design.md §6.3). Uses U+2212 MINUS SIGN, not a hyphen — hyphens are
-  /// too short next to tabular figures.
+  /// [format] selects symbol placement.
+  ///
+  /// [showSign] controls whether a sign is emitted **at all**:
+  /// - `true`  → `+` for positive, `−` for negative (`−Ks 1,250`).
+  /// - `false` → no sign; the magnitude is rendered unsigned (`Ks 1,250`).
+  ///
+  /// Amounts are unsigned by default because direction is carried by colour and
+  /// layout in the UI (docs/Design.md §2.4) and by the row's label. Callers that
+  /// need an explicit sign — the Calendar summary card — pass `showSign: true`.
+  ///
+  /// Uses U+2212 MINUS SIGN, never a hyphen: hyphens are too short next to
+  /// tabular figures.
   ///
   /// [useHairSpace] inserts U+2009 between symbol and digits so the two don't
   /// visually merge (docs/Design.md §5.4).
@@ -61,7 +69,7 @@ final class MoneyFormatter {
   }) {
     final digits = _formatMajorUnits(money, useCurrencySeparator: false);
     final sign = switch (money.amountMinor) {
-      < 0 => '\u2212', // −
+      < 0 when showSign => '\u2212', // −
       > 0 when showSign => '+',
       _ => '',
     };

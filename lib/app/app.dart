@@ -1,3 +1,4 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_router.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
@@ -62,11 +63,16 @@ class _LedgerlyAppState extends State<LedgerlyApp> {
         supportedLocales: AppLocalization.supportedLocales
             .map(Locale.new)
             .toList(growable: false),
+        // Flutter's own Material/Cupertino/Widgets strings for en/my/ja. The
+        // app's own ARB delegates (`AppLocalizations.localizationsDelegates`)
+        // join this list once `flutter gen-l10n` has run — see l10n.yaml.
+        localizationsDelegates: const <LocalizationsDelegate<Object>>[
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
 
-        // Re-wrap here so AdaptiveStyle is available *below* MediaQuery
-        // (MaterialApp provides Localizations for us). When the ARB bindings are
-        // generated, `localizationsDelegates: AppLocalizations.localizationsDelegates`
-        // is added alongside `supportedLocales` above.
+        // Re-wrap here so AdaptiveStyle is available *below* MediaQuery.
         builder: (context, child) => AdaptiveStyleScope(
           platformOverride: widget.platformOverride,
           child: AppThemeColors(
