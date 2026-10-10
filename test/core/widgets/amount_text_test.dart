@@ -162,6 +162,19 @@ void main() {
       );
 
       final text = tester.widget<Text>(find.byType(Text).last);
+      // `signed` defaults to true, so an unsigned-then-signed amount carries a
+      // leading '+' (docs/Design.md §5.4).
+      expect(text.data, '+Ks\u20091,250');
+    });
+
+    testWidgets('should_omit_sign_when_signed_is_false', (tester) async {
+      await tester.pumpWidget(
+        host(
+          const AmountText(Money.minor(1250, CurrencyCode.mmk), signed: false),
+        ),
+      );
+
+      final text = tester.widget<Text>(find.byType(Text).last);
       expect(text.data, 'Ks\u20091,250');
     });
 
