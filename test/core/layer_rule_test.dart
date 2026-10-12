@@ -34,6 +34,7 @@ void main() {
     'lib/core/usecase',
     'lib/core/money',
     'lib/core/utils',
+    'lib/core/period',
   ];
 
   /// Import prefixes `core/` may never use, with the reason they are banned.
