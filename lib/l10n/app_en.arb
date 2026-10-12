@@ -4,112 +4,508 @@
   "@appTitle": {
     "description": "The application name shown in the task switcher and stores."
   },
-
-  "navigation.calendar": "Calendar",
-  "@navigation.calendar": {
+  "navigationCalendar": "Calendar",
+  "@navigationCalendar": {
     "description": "Primary navigation destination label."
   },
-  "navigation.insights": "Insights",
-  "@navigation.insights": {
+  "navigationInsights": "Insights",
+  "@navigationInsights": {
     "description": "Primary navigation destination label."
   },
-  "navigation.categories": "Categories",
-  "@navigation.categories": {
+  "navigationCategories": "Categories",
+  "@navigationCategories": {
     "description": "Primary navigation destination label."
   },
-  "navigation.settings": "Settings",
-  "@navigation.settings": {
+  "navigationSettings": "Settings",
+  "@navigationSettings": {
     "description": "Primary navigation destination label."
   },
-
-  "state.empty.title": "Nothing here yet",
-  "@state.empty.title": {
+  "stateEmptyTitle": "Nothing here yet",
+  "@stateEmptyTitle": {
     "description": "Generic empty-state heading."
   },
-  "state.empty.body": "Tap + to add your first transaction.",
-  "@state.empty.body": {
+  "stateEmptyBody": "Tap + to add your first transaction.",
+  "@stateEmptyBody": {
     "description": "Generic empty-state supporting text."
   },
-  "state.error.title": "Something went wrong",
-  "@state.error.title": {
+  "stateErrorTitle": "Something went wrong",
+  "@stateErrorTitle": {
     "description": "Inline error banner heading."
   },
-  "state.error.body": "We couldn't load this. Please try again.",
-  "@state.error.body": {
+  "stateErrorBody": "We couldn't load this. Please try again.",
+  "@stateErrorBody": {
     "description": "Inline error banner supporting text."
   },
-  "state.error.retry": "Retry",
-  "@state.error.retry": {
+  "stateErrorRetry": "Retry",
+  "@stateErrorRetry": {
     "description": "Retry button in the error banner."
   },
-
-  "failure.storage": "Couldn't read your saved data. Please try again.",
-  "@failure.storage": {
+  "stateComingSoon": "This part isn't built yet. It's planned and coming.",
+  "@stateComingSoon": {
+    "description": "Body for a destination whose feature has not shipped."
+  },
+  "failureStorage": "Couldn't read your saved data. Please try again.",
+  "@failureStorage": {
     "description": "Maps StorageFailure to user-facing text."
   },
-  "failure.network": "No connection. Check your network and try again.",
-  "@failure.network": {
+  "failureNetwork": "No connection. Check your network and try again.",
+  "@failureNetwork": {
     "description": "Maps NetworkFailure to user-facing text."
   },
-  "failure.auth": "Sign-in didn't complete. Please try again.",
-  "@failure.auth": {
+  "failureAuth": "Sign-in didn't complete. Please try again.",
+  "@failureAuth": {
     "description": "Maps AuthFailure to user-facing text."
   },
-  "failure.validation": "Please check the highlighted fields.",
-  "@failure.validation": {
+  "failureValidation": "Please check the highlighted fields.",
+  "@failureValidation": {
     "description": "Maps ValidationFailure to user-facing text."
   },
-  "failure.notFound": "We couldn't find that item.",
-  "@failure.notFound": {
+  "failureNotFound": "We couldn't find that item.",
+  "@failureNotFound": {
     "description": "Maps NotFoundFailure to user-facing text."
   },
-  "failure.conflict": "That conflicts with something already saved.",
-  "@failure.conflict": {
+  "failureConflict": "That conflicts with something already saved.",
+  "@failureConflict": {
     "description": "Maps ConflictFailure to user-facing text."
   },
-  "failure.parse": "This file couldn't be read. Check the format and try again.",
-  "@failure.parse": {
+  "failureParse": "This file couldn't be read. Check the format and try again.",
+  "@failureParse": {
     "description": "Maps ParseFailure to user-facing text."
   },
-  "failure.unexpected": "Something unexpected happened. Please try again.",
-  "@failure.unexpected": {
+  "failureUnexpected": "Something unexpected happened. Please try again.",
+  "@failureUnexpected": {
     "description": "Maps UnexpectedFailure to user-facing text."
   },
-
-  "calendar.spentToday": "Spent today",
-  "@calendar.spentToday": {
+  "calendarSpentToday": "Spent today",
+  "@calendarSpentToday": {
     "description": "Eyebrow above the hero amount on the calendar summary card."
   },
-  "calendar.income": "Income",
-  "@calendar.income": {
+  "calendarIncome": "Income",
+  "@calendarIncome": {
     "description": "Summary card column label for money in."
   },
-  "calendar.expense": "Expense",
-  "@calendar.expense": {
+  "calendarExpense": "Expense",
+  "@calendarExpense": {
     "description": "Summary card column label for money out."
   },
-  "calendar.net": "Net",
-  "@calendar.net": {
+  "calendarNet": "Net",
+  "@calendarNet": {
     "description": "Summary card column label for net (income minus expense)."
   },
-  "calendar.today": "Today",
-  "@calendar.today": {
+  "calendarToday": "Today",
+  "@calendarToday": {
     "description": "Button that jumps the calendar back to the current month."
   },
-  "calendar.emptyDay": "Nothing on this day",
-  "@calendar.emptyDay": {
+  "calendarEmptyDay": "Nothing on this day",
+  "@calendarEmptyDay": {
     "description": "Empty state heading for the selected-day transaction list."
   },
-  "calendar.selectDay": "Select a day",
-  "@calendar.selectDay": {
+  "calendarSelectDay": "Select a day",
+  "@calendarSelectDay": {
     "description": "Two-pane placeholder shown before a day has been picked."
   },
-  "calendar.previousMonth": "Previous month",
-  "@calendar.previousMonth": {
+  "calendarPreviousMonth": "Previous month",
+  "@calendarPreviousMonth": {
     "description": "Accessibility label for the previous-month arrow."
   },
-  "calendar.nextMonth": "Next month",
-  "@calendar.nextMonth": {
+  "calendarNextMonth": "Next month",
+  "@calendarNextMonth": {
     "description": "Accessibility label for the next-month arrow."
+  },
+  "calendarPickMonth": "Jump to month",
+  "@calendarPickMonth": {
+    "description": "App-bar title of the month/year picker opened from the calendar header."
+  },
+  "calendarPickMonthHint": "Pick any month to jump straight to it.",
+  "@calendarPickMonthHint": {
+    "description": "Supporting hint at the bottom of the month/year picker."
+  },
+  "calendarPreviousYear": "Previous year",
+  "@calendarPreviousYear": {
+    "description": "Accessibility label for the previous-year arrow in the month picker."
+  },
+  "calendarNextYear": "Next year",
+  "@calendarNextYear": {
+    "description": "Accessibility label for the next-year arrow in the month picker."
+  },
+  "categoriesTitle": "Categories",
+  "@categoriesTitle": {
+    "description": "App-bar title of the categories list page."
+  },
+  "categoriesEmptyTitle": "No categories yet",
+  "@categoriesEmptyTitle": {
+    "description": "Empty-state heading when the user has no categories."
+  },
+  "categoriesEmptyBody": "Create one to start logging your spending.",
+  "@categoriesEmptyBody": {
+    "description": "Empty-state supporting text for the categories list."
+  },
+  "categoriesSelectHint": "Pick a category to edit, or create a new one.",
+  "@categoriesSelectHint": {
+    "description": "Placeholder in the wide layout's detail pane before a category is selected."
+  },
+  "categoriesArchived": "Archived",
+  "@categoriesArchived": {
+    "description": "Section heading above archived categories."
+  },
+  "categoriesNew": "New category",
+  "@categoriesNew": {
+    "description": "Action that opens the category form in create mode."
+  },
+  "categoriesEdit": "Edit category",
+  "@categoriesEdit": {
+    "description": "App-bar title of the category form in edit mode."
+  },
+  "categoriesArchive": "Archive",
+  "@categoriesArchive": {
+    "description": "Menu action that archives a category."
+  },
+  "categoriesUnarchive": "Unarchive",
+  "@categoriesUnarchive": {
+    "description": "Menu action that restores an archived category."
+  },
+  "categoriesDelete": "Delete",
+  "@categoriesDelete": {
+    "description": "Menu action that soft-deletes a category."
+  },
+  "categoriesDeleted": "Category deleted",
+  "@categoriesDeleted": {
+    "description": "Snack-bar confirmation after deleting a category; carries an Undo action."
+  },
+  "categoriesDeleteConfirmTitle": "Delete this category?",
+  "@categoriesDeleteConfirmTitle": {
+    "description": "Confirmation dialog heading before deleting a category."
+  },
+  "categoriesDeleteConfirmBody": "Transactions already filed under it keep their history.",
+  "@categoriesDeleteConfirmBody": {
+    "description": "Confirmation dialog body explaining deletion keeps history."
+  },
+  "categoriesNameLabel": "Name",
+  "@categoriesNameLabel": {
+    "description": "Text-field label for the category name."
+  },
+  "categoriesNameHint": "e.g. Groceries",
+  "@categoriesNameHint": {
+    "description": "Placeholder example inside the category name field."
+  },
+  "categoriesIconLabel": "Icon",
+  "@categoriesIconLabel": {
+    "description": "Section label above the icon grid."
+  },
+  "categoriesColorLabel": "Color",
+  "@categoriesColorLabel": {
+    "description": "Section label above the color palette."
+  },
+  "categoriesKindLabel": "Type",
+  "@categoriesKindLabel": {
+    "description": "Section label above the income/expense segmented control."
+  },
+  "categoriesPreview": "Preview",
+  "@categoriesPreview": {
+    "description": "Section label above the live preview of the category row."
+  },
+  "categoriesNameRequired": "Give the category a name.",
+  "@categoriesNameRequired": {
+    "description": "Validation message when the category name is blank."
+  },
+  "categoriesNameTooLong": "Keep the name under 60 characters.",
+  "@categoriesNameTooLong": {
+    "description": "Validation message when the category name is too long."
+  },
+  "categoriesNameTaken": "Another category already uses that name.",
+  "@categoriesNameTaken": {
+    "description": "Validation message when the category name is a duplicate."
+  },
+  "categoriesIconRequired": "Pick an icon.",
+  "@categoriesIconRequired": {
+    "description": "Validation message when no icon has been chosen."
+  },
+  "categoriesColorInvalid": "Pick a color.",
+  "@categoriesColorInvalid": {
+    "description": "Validation message when no color has been chosen."
+  },
+  "transactionNew": "Add transaction",
+  "@transactionNew": {
+    "description": "App-bar title of the add-transaction page."
+  },
+  "transactionEdit": "Edit transaction",
+  "@transactionEdit": {
+    "description": "App-bar title of the edit-transaction page."
+  },
+  "transactionAmountLabel": "Amount",
+  "@transactionAmountLabel": {
+    "description": "Label above the amount keypad display."
+  },
+  "transactionCategoryLabel": "Category",
+  "@transactionCategoryLabel": {
+    "description": "Label of the category picker row."
+  },
+  "transactionCategoryChoose": "Choose a category",
+  "@transactionCategoryChoose": {
+    "description": "Placeholder in the category picker when nothing is chosen."
+  },
+  "transactionDateLabel": "Date",
+  "@transactionDateLabel": {
+    "description": "Label of the date picker row."
+  },
+  "transactionNoteLabel": "Note",
+  "@transactionNoteLabel": {
+    "description": "Label of the optional note field."
+  },
+  "transactionNoteHint": "Optional",
+  "@transactionNoteHint": {
+    "description": "Placeholder inside the optional note field."
+  },
+  "transactionDirectionExpense": "Expense",
+  "@transactionDirectionExpense": {
+    "description": "Segmented-control label for money out."
+  },
+  "transactionDirectionIncome": "Income",
+  "@transactionDirectionIncome": {
+    "description": "Segmented-control label for money in."
+  },
+  "transactionSave": "Save",
+  "@transactionSave": {
+    "description": "Primary action that saves the transaction."
+  },
+  "transactionSaved": "Transaction saved",
+  "@transactionSaved": {
+    "description": "Snack-bar confirmation after saving a transaction."
+  },
+  "transactionDeleted": "Transaction deleted",
+  "@transactionDeleted": {
+    "description": "Snack-bar confirmation after deleting a transaction."
+  },
+  "transactionUndo": "Undo",
+  "@transactionUndo": {
+    "description": "Snack-bar action that restores a just-deleted transaction."
+  },
+  "transactionAmountZero": "Enter an amount.",
+  "@transactionAmountZero": {
+    "description": "Validation message when the amount is zero."
+  },
+  "transactionAmountTooLarge": "That amount is too large.",
+  "@transactionAmountTooLarge": {
+    "description": "Validation message when the amount exceeds the safe digit limit."
+  },
+  "transactionNoteTooLong": "Keep the note under 500 characters.",
+  "@transactionNoteTooLong": {
+    "description": "Validation message when the note is too long."
+  },
+  "transactionCategoryRequired": "Pick a category.",
+  "@transactionCategoryRequired": {
+    "description": "Validation message when no category has been chosen."
+  },
+  "transactionDirectionUnsupported": "Transfers aren't available yet.",
+  "@transactionDirectionUnsupported": {
+    "description": "Validation message for the transfer direction in v1."
+  },
+  "transactionFuture": "That date is in the future.",
+  "@transactionFuture": {
+    "description": "Warning shown when the chosen date is ahead of today."
+  },
+  "actionCancel": "Cancel",
+  "@actionCancel": {
+    "description": "Generic cancel action in dialogs and sheets."
+  },
+  "actionSave": "Save",
+  "@actionSave": {
+    "description": "Generic save action."
+  },
+  "actionDelete": "Delete",
+  "@actionDelete": {
+    "description": "Generic destructive action."
+  },
+  "actionDone": "Done",
+  "@actionDone": {
+    "description": "Generic dismiss/confirm action for sheets."
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Settings page title."
+  },
+  "settingsPreferencesSection": "Preferences",
+  "@settingsPreferencesSection": {
+    "description": "Section header for the currency/language/theme/week-start group."
+  },
+  "settingsCurrencyLabel": "Currency",
+  "@settingsCurrencyLabel": {
+    "description": "Settings row label for the display currency."
+  },
+  "settingsCurrencyBody": "How amounts are shown throughout the app.",
+  "@settingsCurrencyBody": {
+    "description": "Supporting text under the currency setting."
+  },
+  "settingsLanguageLabel": "Language",
+  "@settingsLanguageLabel": {
+    "description": "Settings row label for the display language."
+  },
+  "settingsLanguageSystem": "System default",
+  "@settingsLanguageSystem": {
+    "description": "Language option that follows the device setting."
+  },
+  "settingsThemeLabel": "Appearance",
+  "@settingsThemeLabel": {
+    "description": "Settings row label for light/dark mode."
+  },
+  "settingsThemeSystem": "System",
+  "@settingsThemeSystem": {
+    "description": "Theme option that follows the device setting."
+  },
+  "settingsThemeLight": "Light",
+  "@settingsThemeLight": {
+    "description": "Light theme option."
+  },
+  "settingsThemeDark": "Dark",
+  "@settingsThemeDark": {
+    "description": "Dark theme option."
+  },
+  "settingsWeekStartLabel": "Week starts on",
+  "@settingsWeekStartLabel": {
+    "description": "Settings row label for the first day of the calendar week."
+  },
+  "settingsWeekStartMonday": "Monday",
+  "@settingsWeekStartMonday": {
+    "description": "Week-start option: Monday first."
+  },
+  "settingsWeekStartSunday": "Sunday",
+  "@settingsWeekStartSunday": {
+    "description": "Week-start option: Sunday first."
+  },
+  "settingsSaved": "Settings saved.",
+  "@settingsSaved": {
+    "description": "Confirmation shown after a preference is stored."
+  },
+  "settingsSaveFailed": "Couldn't save that. Please try again.",
+  "@settingsSaveFailed": {
+    "description": "Shown when writing a preference fails."
+  },
+  "settingsAboutSection": "About",
+  "@settingsAboutSection": {
+    "description": "Section header for the version/build info group."
+  },
+  "settingsVersionLabel": "Version",
+  "@settingsVersionLabel": {
+    "description": "About row label for the app version."
+  },
+  "profileTitle": "Profile",
+  "@profileTitle": {
+    "description": "App bar title for the Profile page."
+  },
+  "profileGuestBadge": "Guest",
+  "@profileGuestBadge": {
+    "description": "Badge shown when the user has not signed in."
+  },
+  "profileGuestBody": "You're using Ledgerly as a guest. Your data stays on this device.",
+  "@profileGuestBody": {
+    "description": "Explains the guest state on the Profile page."
+  },
+  "profileSignedOutBody": "Sign in to sync across devices.",
+  "@profileSignedOutBody": {
+    "description": "Placeholder for the future account state."
+  },
+  "profileNameLabel": "Name",
+  "@profileNameLabel": {
+    "description": "Profile row label for the display name."
+  },
+  "profileNameHint": "Add your name",
+  "@profileNameHint": {
+    "description": "Placeholder when the user has not set a name."
+  },
+  "profileNamePlaceholder": "Your name",
+  "@profileNamePlaceholder": {
+    "description": "Text field placeholder in the name dialog."
+  },
+  "profileEditName": "Edit name",
+  "@profileEditName": {
+    "description": "Action that opens the name editor."
+  },
+  "profileNameSaved": "Name saved.",
+  "@profileNameSaved": {
+    "description": "Confirmation after the name is stored."
+  },
+  "profileNameTooLong": "That name is a bit long. Try 40 characters or fewer.",
+  "@profileNameTooLong": {
+    "description": "Validation error for an over-long display name."
+  },
+  "profileNameInvalid": "That name has characters we can't use. Try text only.",
+  "@profileNameInvalid": {
+    "description": "Validation error for control characters in a display name."
+  },
+  "profileAvatarLabel": "Avatar",
+  "@profileAvatarLabel": {
+    "description": "Profile row label for the avatar."
+  },
+  "profileEditAvatar": "Edit avatar",
+  "@profileEditAvatar": {
+    "description": "Action that opens the Avatar Editor."
+  },
+  "profileAvatarSaved": "Avatar updated.",
+  "@profileAvatarSaved": {
+    "description": "Confirmation after the avatar is stored."
+  },
+  "profileAvatarSaveFailed": "Couldn't save that. Please try again.",
+  "@profileAvatarSaveFailed": {
+    "description": "Fallback error when a profile write fails."
+  },
+  "avatarEditorTitle": "Avatar",
+  "@avatarEditorTitle": {
+    "description": "App bar title for the Avatar Editor page."
+  },
+  "avatarEditorBackground": "Background",
+  "@avatarEditorBackground": {
+    "description": "Avatar editor section for the background colour."
+  },
+  "avatarEditorBackdrop": "Backdrop",
+  "@avatarEditorBackdrop": {
+    "description": "Avatar editor section for the decorative backdrop."
+  },
+  "avatarEditorShape": "Shape",
+  "@avatarEditorShape": {
+    "description": "Avatar editor section for the head shape."
+  },
+  "avatarEditorEyes": "Eyes",
+  "@avatarEditorEyes": {
+    "description": "Avatar editor section for the eye style."
+  },
+  "avatarEditorMouth": "Mouth",
+  "@avatarEditorMouth": {
+    "description": "Avatar editor section for the mouth style."
+  },
+  "avatarEditorRandom": "Shuffle",
+  "@avatarEditorRandom": {
+    "description": "Button that generates a random avatar."
+  },
+  "avatarEditorPreview": "Preview",
+  "@avatarEditorPreview": {
+    "description": "Accessibility label for the avatar preview."
+  },
+  "avatarEditorSave": "Save",
+  "@avatarEditorSave": {
+    "description": "Save action in the Avatar Editor."
+  },
+  "avatarEditorOptionLabel": "{part} option {number}",
+  "avatarEditorPartSelected": "{part}: {value}",
+  "@avatarEditorOptionLabel": {
+    "description": "Accessibility label for one avatar option swatch.",
+    "placeholders": {
+      "part": {
+        "type": "String"
+      },
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@avatarEditorPartSelected": {
+    "description": "Accessibility label for a chosen avatar part.",
+    "placeholders": {
+      "part": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
   }
 }

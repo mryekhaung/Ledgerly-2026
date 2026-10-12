@@ -34,6 +34,10 @@ analyzer:
     - "lib/l10n/generated/**"
     - "**/*.gr.dart"
     - ".fvm/**"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
 
   plugins:
     # NOTE: the `import_lint` / custom-rule plugin that enforces the layer boundaries in

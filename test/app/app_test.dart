@@ -4,9 +4,16 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/app.dart';
 import 'package:ledgerly/app/router/app_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/router/nav_destinations.dart';
 import 'package:ledgerly/core/platform/adaptive_style.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
+import 'package:ledgerly/core/widgets/app_nav/adaptive_nav.dart';
+import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
+import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
+import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
+import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
+import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Boot tests for the Phase 0 shell.
@@ -25,6 +32,10 @@ void main() {
         router: createRouter(initialLocation: initialLocation),
         platformOverride: platform,
         locale: locale,
+        // The app reads theme/locale from the settings stream, which needs the
+        // get_it locator — not configured in a widget test. Passing an explicit
+        // snapshot keeps this a pure boot test of the shell.
+        settingsOverride: AppSettings.defaults,
       ),
     );
   }
@@ -38,13 +49,14 @@ void main() {
       expect(find.byType(MaterialApp), findsOneWidget);
     });
 
-    testWidgets('should_show_phase_zero_scaffold_when_no_feature_exists', (
+    testWidgets('should_show_primary_navigation_when_app_boots', (
       tester,
     ) async {
       await tester.pumpWidget(hostApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Phase 0 scaffold'), findsOneWidget);
+      // The shell now mounts real chrome rather than a bare passthrough.
+      expect(find.byType(AdaptiveNav), findsOneWidget);
     });
 
     testWidgets('should_apply_brand_primary_to_primary_buttons', (
@@ -75,13 +87,29 @@ void main() {
   });
 
   group('routing', () {
+    // The destinations used to be placeholder text keyed by `navigation.*`.
+    // Calendar, Categories and Settings are real pages now, so these assert on
+    // the page type and the destination's own label instead of a placeholder
+    // string that no longer exists.
+    testWidgets('should_open_calendar_when_router_starts_at_root', (
+      tester,
+    ) async {
+      await tester.pumpWidget(hostApp(initialLocation: AppRoutes.calendar));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CalendarPage), findsOneWidget);
+    });
+
     testWidgets('should_open_requested_destination_when_starting_on_insights', (
       tester,
     ) async {
       await tester.pumpWidget(hostApp(initialLocation: AppRoutes.insights));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('navigation.insights'), findsOneWidget);
+      // Insights is still a placeholder — it renders the shared coming-soon
+      // state rather than a bespoke page.
+      expect(find.byType(StatePlaceholder), findsOneWidget);
+      expect(find.textContaining('coming soon'), findsOneWidget);
     });
 
     testWidgets('should_navigate_when_router_pushed_to_categories', (
@@ -94,7 +122,7 @@ void main() {
       GoRouter.of(context).goNamed(AppRoutes.categoriesName);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('navigation.categories'), findsOneWidget);
+      expect(find.byType(CategoryListPage), findsOneWidget);
     });
 
     testWidgets('should_navigate_to_settings_when_router_pushed', (
@@ -107,7 +135,24 @@ void main() {
       GoRouter.of(context).goNamed(AppRoutes.settingsName);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('navigation.settings'), findsOneWidget);
+      expect(find.byType(SettingsPage), findsOneWidget);
+    });
+
+    testWidgets('should_follow_the_route_when_a_nav_destination_is_selected', (
+      tester,
+    ) async {
+      await tester.pumpWidget(hostApp());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CalendarPage), findsOneWidget);
+
+      await tester.tap(find.text('Settings'));
+      await tester.pumpAndSettle();
+
+      // Selecting a destination must both navigate and move the active state.
+      expect(find.byType(SettingsPage), findsOneWidget);
+      final nav = tester.widget<AdaptiveNav>(find.byType(AdaptiveNav));
+      expect(nav.current, NavDestination.settings);
     });
   });
 

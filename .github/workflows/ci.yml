@@ -125,8 +125,8 @@ jobs:
           path: format-fix.tar.gz
           retention-days: 7
 
-  analyze:
-    name: Analyze
+  codegen-check:
+    name: Codegen check
     runs-on: ubuntu-latest
     needs: [banned-imports]
     steps:
@@ -137,13 +137,36 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      # Produces lib/**/*.g.dart (Drift) and lib/l10n/generated/**.
+      # `analyze` and `test` depend on these existing, so they run after this job.
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: flutter gen-l10n
+      # Fail loudly if generation is not reproducible: a checked-in .g.dart that
+      # no longer matches its source is a silent build hazard.
+      - name: Verify generated code is up to date
+        run: git diff --exit-code -- '*.g.dart' 'lib/l10n/generated/**'
+
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    needs: [banned-imports, codegen-check]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: flutter gen-l10n
       # Zero warnings policy (docs/Conventions.md §1).
       - run: flutter analyze --fatal-infos --fatal-warnings
 
   test:
     name: Test
     runs-on: ubuntu-latest
-    needs: [banned-imports]
+    needs: [banned-imports, codegen-check]
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -152,6 +175,8 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: flutter gen-l10n
       - name: Run tests with coverage
         run: flutter test --coverage --reporter expanded
       - name: Upload coverage artifact

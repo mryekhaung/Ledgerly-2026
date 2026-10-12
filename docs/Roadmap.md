@@ -4,11 +4,14 @@ Legend: ☐ todo · ◐ in progress · ☑ done. Each task = one small PR follow
 
 **Where we are:** Phase 0 is ~80% done and is the only phase started. **Phases 1–5 are not started** — the `lib/features/*` folders exist but contain only `.gitkeep` scaffolds, and there is no `lib/data/` or `lib/domain/` yet. The app currently has no screens beyond the scaffold placeholder and no persistence (Drift is not a dependency yet).
 
+
 ## Phase 0 — Foundation
+
 - ☑ **Pin toolchain** (FVM 3.47.1, Dart ^3.13, CI same); create project with `material_ui` / `cupertino_ui` imports; resolve & record all unverified packages in `docs/Versions.md`
   - ✅ `.fvmrc` = 3.47.1, `pubspec.yaml` `sdk: ^3.13.0` / `flutter: ">=3.47.0"`, CI pinned to 3.47.1
   - ✅ Every package resolved on CI with Flutter 3.47.1 and recorded in `docs/Versions.md` §3: `material_ui` 1.6.0, `cupertino_ui` 1.1.2, `flutter_riverpod` 3.4.3, `go_router` 17.5.0, `get_it` 9.3.0, `intl` 0.20.3.
-  - ⚠ The Flutter tool still cannot start on the dev machine (`All pipe instances are busy`, OS error 231) and the installed SDK is 3.38.2, not 3.47.1. **CI is the verification channel of record.** Locally, only `dart format` is runnable, via a standalone Dart 3.13.5 SDK — so formatting is checked locally before pushing.
+  - ✅ **The installed SDK is 3.47.7 / Dart 3.13.5** — the directory name `flutter_windows_3.38.2-stable` is stale and must not be trusted. Proven from `bin/cache/flutter.version.json` and `git describe --tags`. `pub get` succeeds locally (28 → 106 packages), so the version pins are satisfied and **no FVM install is needed** for local work.
+  - ✅ The only local limitation is that Dart cannot spawn child processes in the agent sandbox: `CreateNamedPipeW` with `nMaxInstances = -1` returns `ERROR_INVALID_PARAMETER` (87), which is the value Dart passes. Named pipes are *not* globally blocked (Python's `capture_output=True` works), so this is a sandbox/token interaction with Dart's launcher, not a project defect. Full analysis in `docs/Versions.md`. **CI remains the verification channel of record**; locally we can run `dart format`, JIT-run non-spawning scripts, and `gen-l10n` via the tools snapshot.
 - ☐ Riverpod 3 baseline provider/notifier template + lint rule banning `legacy.dart` imports
   - ◐ CI `banned-imports` job enforces the ban; the baseline provider template is still todo
 - ☑ Create Flutter project, flavors (dev/prod), lints, CI (format/analyze/test)
@@ -20,8 +23,22 @@ Legend: ☐ todo · ◐ in progress · ☑ done. Each task = one small PR follow
 - ◐ Design tokens (`app/theme`): colors light/dark, typography, spacing, radius — done; motion/elevation included. Awaiting a font-bundling pass.
   - ✅ Contrast verified against WCAG AA with the correct sRGB relative-luminance curve (`channel(v) = v ≤ 0.03928 ? v/12.92 : ((v+0.055)/1.055)^2.4`); coral and sage both clear 4.5:1.
 - ◐ get_it bootstrap + Riverpod `ProviderScope` + go_router skeleton — wired; the real adaptive nav shell lands with the design-system item below
-- ◐ l10n setup (en/my/ja) + font bundling — ARB files + `l10n.yaml` written; `MaterialApp` now wires `GlobalMaterialLocalizations.delegates` from `material_ui`, so the framework's en/my/ja strings resolve. Our own `AppLocalizations` delegate joins that list once `flutter gen-l10n` has run (CI-only until the local Flutter tool works); fonts not bundled.
-- ☐ Drift database, migration test harness, seed defaults — **blocks all of Phase 1**; `drift` is not yet a dependency
+- ◐ l10n setup (en/my/ja) + font bundling — **localizations now generate and validate**; fonts not bundled.
+  - ✅ All 73 keys present in en/my/ja with an ARB ↔ generated ↔ lookup parity check of **73/73/73** and `l10n_untranslated.json` = `{}`.
+  - ✅ `flutter gen-l10n` runs locally via the tools snapshot (see `docs/Versions.md` for the invocation); `lib/l10n/generated/app_localizations{,_en,_ja,_my}.dart` are written and committed, so CI needs no extra step.
+  - ✅ `MaterialApp` wires `GlobalMaterialLocalizations.delegates` from `material_ui`, so the framework's en/my/ja strings resolve; our `AppLocalizations` delegate joins that list.
+  - ⚠ Three real ARB defects were found only once codegen ran: `synthetic-package` is deprecated, `generate: true` is required with an explicit `output-dir`, and **ARB keys must be valid Dart identifiers** — all 73 keys were renamed `navigation.calendar` → `navigationCalendar`. The 73 `@`-metadata entries were also malformed (lists, not maps).
+  - ☐ Font bundling (Padauk / Noto) still todo.
+- ◐ Drift database, migration test harness, seed defaults — **implemented; awaiting first real codegen run in CI**
+  - ✅ `drift` / `drift_dev` / `drift_flutter` / `uuid` declared and pinned (`docs/Versions.md` §3).
+  - ✅ Schema v1: `categories`, `transactions`, `accounts` + 6 `@TableIndex` hot-path indexes — spec in `docs/DataModel.md`.
+  - ✅ Three DAOs (`CategoriesDao`, `TransactionsDao`, `AccountsDao`): soft-delete-filtered reads, `updateById`, `softDelete`, plus `setArchived`/`reorder`; all aggregation done in SQL (`SUM … FILTER … GROUP BY`).
+  - ✅ Migration harness: `test/core/database/migration_test.dart` — cold-open `onCreate`, `PRAGMA foreign_keys` proven *enforced* not just set, index/column/nullability contract, and a seed-survives-reopen baseline for the first real upgrade test.
+  - ✅ Seed defaults: `seedDefaults()` inserts the 11 starter categories (9 expense + 2 income) with dense `sortOrder` and `isDefault = true`; idempotent by physical emptiness, so a user who deletes them all does not get them back.
+  - ✅ Test suite: `db_harness.dart` + per-DAO suites + `seed_test.dart` (~60 cases) over `NativeDatabase.memory()`.
+  - ✅ `scripts/codegen.sh` — the committed-codegen entry point.
+  - ⚠ **`build_runner` has never run.** `drift_dev` has not validated the `@TableIndex` / `@DriftDatabase` annotations, and no `.g.dart` exists yet. The DAO/table signatures were compile-checked against a hand-written replica of the generated code, and the emitted SQL was asserted textually (38 assertions); the schema was checked with 58 further assertions. **CI's first `build_runner` + `flutter test` is the real validation** — treat the first CI run as part of this item, not after it.
+  - The item stays ◐ until that CI run is green; see `docs/Versions.md` §3 for the four build-behaviour facts (monolithic codegen, aggregate annotation, `isNotNull` collision, `updateById` naming) that were derived from drift's source and cost real debugging time.
 - ◐ `core/platform/` (AppPlatform, WindowSizeClass, AdaptiveStyle) + `GlassSurface` spike: blur fallback first, then `cupertino_native_better` (native iOS 26 tab bar/buttons); `liquid_glass_renderer` experimental only — decide & document
   - ✅ `core/platform/` done (`app_platform.dart`, `window_size.dart`, `adaptive_style.dart` + `window_size_test.dart`); GlassSurface spike still todo, so the item stays ◐.
 - ☐ Web spike: Drift (`drift_flutter` WASM) + conditional imports + fonts + `flutter build web --wasm` running
@@ -31,38 +48,146 @@ Legend: ☐ todo · ◐ in progress · ☑ done. Each task = one small PR follow
   - ☐ Goldens not yet scaffolded; the remaining widgets are still todo
 
 
-## Phase 1 — MVP "Log & See" (v0.1) — NOT STARTED
-Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaffolds; there is no `lib/data/` or `lib/domain/` yet.
-- ☐ Categories: domain/data/use cases (CRUD, reorder, archive)
+## Phase 1 — MVP "Log & See" (v0.1) — STARTED (data layer only)
+
+Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaffolds; there is no `lib/data/` or `lib/domain/` yet. The **persistence layer** under `lib/core/database/` is done (see the Phase 0 Drift item above) — what Phase 1 still needs is the domain layer on top of it.
+
+- ◐ Categories: domain/data/use cases (CRUD, reorder, archive)
+  - ✅ `CategoriesDao` done (persistence).
+  - ✅ Domain: `Category` entity + `CategoryKind`; `CategoryValidators` (name/icon/colour, case-insensitive uniqueness); `CategoryRepository` interface; 7 use cases (`WatchCategories`, `WatchPickableCategories`, `GetCategory`, `SaveCategory`, `DeleteCategory`, `SetCategoryArchived`, `ReorderCategories`).
+  - ✅ Data: `CategoryMapper`, `CategoryLocalDataSource`, `CategoryRepositoryImpl` (every call funnelled through `guardResult`).
+  - ✅ DI + Riverpod bridge: `features/categories/di/categories_module.dart`, `presentation/providers/category_providers.dart`.
+  - ☐ Categories pages: list + form (icon grid, color palette, live preview).
+  - ✅ Tests: 24 validator + 22 use-case cases **executed** locally; 23 data cases written against a real `NativeDatabase.memory()` (execution needs `flutter test` — see the Phase 0 `build_runner` caveat above).
 - ☐ Categories pages: list + form (icon grid, color palette, live preview)
-- ☐ Transactions: domain/data/use cases (add/update/delete/watch by month/day)
-- ☐ Add/Edit Transaction page + AmountKeypad + Category Picker page
-- ☐ Calendar page: Day Capsules, month switcher, summary card, day list
-- ☐ Settings: currency, language, theme, week start
-- ☐ Profile (guest) + Avatar catalog/renderer + Avatar Editor page + random generate
-- ☐ Responsive layouts (compact/medium/expanded) for Calendar, Forms, Categories, Settings
-- ☐ Empty/loading/error states, haptics, undo
+- ◐ Transactions: domain/data/use cases (add/update/delete/watch by month/day)
+  - ✅ `TransactionsDao` done (persistence, incl. month/day watches and SQL aggregates).
+  - ✅ Domain: `Transaction` entity + `TransactionDirection`; `DailyTotal`/`CategoryTotal`/`MonthTotal`; `TransactionValidators`; `TransactionRepository` interface; 9 use cases (`WatchDayTransactions`, `WatchMonthTransactions`, `WatchMonthDailyTotals`, `WatchMonthCategoryTotals`, `WatchMonthTotal`, `GetTransaction`, `SaveTransaction`, `DeleteTransaction`, `RestoreTransaction`).
+  - ✅ Data: `TransactionMapper`, `TransactionLocalDataSource`, `TransactionRepositoryImpl`. The mapper **throws** on an unknown stored currency/direction, unlike the category mapper — a wrong direction flips the sign of money in every total.
+  - ✅ DI + Riverpod bridge: `features/transactions/di/transactions_module.dart`, `presentation/providers/transaction_providers.dart`.
+  - ✅ Tests: 26 validator + 28 use-case cases **executed** locally; 31 data cases written (same execution caveat as above).
+- ☑ Add/Edit Transaction page + AmountKeypad + Category Picker page
+  - ✅ `AmountEntry` (pure Dart, 23 tests): digit/decimal/backspace rules, per-currency precision.
+  - ✅ `AmountKeypad` widget: display row + numeric tray, 56 px keys, `surfaceSunken` background, `SafeArea(top:false)`.
+  - ✅ `TransactionFormState` (pure Dart, 16 tests): entry buffer → `Money?` → `TransactionDraft?`; `from(Transaction)` seeds the buffer correctly for MMK/USD.
+  - ✅ `TransactionFormNotifier` (Riverpod `autoDispose`): `initialise`, digit/decimal/backspace/clear, `setDirection`/`setDate`/`setCategory`/`setNote`, `save()` with `ValidationFailure` folding and `ref.mounted` guard.
+  - ✅ `CategoryPickerPage`: `StreamBuilder<Result<List<Category>>>` over `watchPickableCategoriesProvider`, empty/error states, pops chosen `Category`.
+  - ✅ `TransactionFormPage`: direction toggle, category row (launches picker, shows gem + name), date row (launches `MonthDayPickerPage`), note field (owning `TextEditingController`), `AmountKeypad` at thumb height, `ref.listen` pop on save.
+  - ✅ `MonthDayPickerPage` + `MonthGridLayout` (pure Dart, 18 tests): Monday-first grid, month switcher with `LocalDate.addMonths`, today shortcut, blank cells at edges, leap-year Feb 29 verified.
+  - ✅ `FormFieldSurface` + `FormFieldError` + `FormFieldChevron`: shared `surfaceSubtle` filled field, `warningSubtle` error treatment, `radius.md`, no Material outline boxes.
+- ✅ `AppStringLookup` updated with `transaction.saved`, `transaction.deleted`, `transaction.undo`, `state.empty.title`, `state.empty.body`.
+- ✅ Routes: `AppRoutes.transactionNew` → `TransactionFormPage`; `AppRoutes.transactionEditRelative` nested under it, with `_TransactionEditLoader` resolving via `FutureBuilder<Result<Transaction>>`.
+- ✅ Shim suite: 164 tests passing, non-vacuous (corrupted `cellCount` → 2 failures).
+- ☐ Goldens, haptics, responsive layout still todo.
+- ◐ Calendar page: Day Capsules, month switcher, summary card, day list
+  - ✅ `CalendarPage`: month switcher (`‹ ›` + tappable title), Monday-first weekday header, Day Capsule grid, summary card, day list, FAB → new transaction with the selected day passed as `?date=`.
+  - ✅ `CalendarNotifier` + `CalendarState` (pure-Dart month/day arithmetic, month clamping via `LocalDate.addMonths`), with derived `selectedDayTransactionsProvider` / `monthDailyTotalsProvider` / `monthTotalProvider`.
+  - ✅ Capsule intensity: `clamp(net / p95MonthNet, 0, 1)` quantized to 5 steps, `moneyOutSubtle` vs `moneyInSubtle` by net direction, 4 px bar at 60 % cell width (Design.md §6.2).
+  - ✅ Route `/` now builds `CalendarPage` (was the Phase 0 placeholder).
+  - ☐ **Summary card shows the month total, not the day total** — a day-level aggregate use case (`WatchDayTotal`) does not exist yet. Tracked below.
+  - ☐ Horizontal swipe to change month, tappable month/year picker, `Expanded` density (tiny amount under the capsule), swipe-to-delete/edit on day rows, two-pane medium+ layout.
+- ☑ Settings: currency, language, theme, week start
+  - ✅ `app_settings` Drift table (schema **v2**, additive) + `AppSettingsDao` (`readAll`/`watchAll`/`read`/`put`/`putAll`/`remove`).
+  - ✅ Domain: `AppSettings` entity (+ `AppThemeMode`, `WeekStart` pure-Dart enums with null-returning `tryParse`), `SettingsRepository` interface, 3 use cases (`LoadSettings`, `WatchSettings`, `SaveSettings`). `SaveSettings` refuses a `partial` write rather than silently doing a full one.
+  - ✅ Data: `SettingsLocalDataSource` (owns the storage keys; unknown/missing/empty values decode to the field default — never throws), `SettingsRepositoryImpl` through `guardResult`/`guardResultStream`.
+  - ✅ DI + providers: `settings_module.dart`; `settingsProvider` (the one `keepAlive` provider — re-reading during a route transition would flash MMK over a USD amount), plus `currencyProvider`/`weekStartProvider`/`themeModeProvider`/`localeCodeProvider`.
+  - ✅ `SettingsPage`: currency (bottom sheet, 10 currencies), appearance (segmented: system/light/dark), week start (segmented: Mon/Sun), language (system/en/my/ja), About (version). No local state — the Drift stream repaints it.
+  - ✅ `app.dart` is now a `ConsumerWidget`: `themeMode` + `locale` follow the stored settings; the custom `AppColors` token set is chosen from the *effective* brightness so an explicit light/dark choice recolours the whole tree, not just Material's scheme.
+  - ✅ `currencyProvider`'s hardcoded `CurrencyCode.mmk` default is gone — it reads the settings stream now.
+  - ✅ Week start is honoured by the calendar: `MonthGridLayout` gained a `GridWeekStart` parameter (default `monday`, so existing tests stayed valid) and `_WeekdayHeader` rotates its `narrowWeekdays` window to match. Both are settings-driven.
+  - ✅ Tests: 17 entity/enum, 12 DAO, 10 datasource, 9 use-case cases; migration suite gained a real **v1→v2 upgrade** test that builds the v1 schema by hand and proves both the existing rows and the new table survive.
+  - ✅ ARB: 17 new keys in en/my/ja; `l10n_untranslated.json` = `{}`.
+  - ✅ **Verified on device** (`emulator-5554`): the v1→v2 upgrade was proved by planting a real v1 file (`sqlite3`, frozen v1 DDL, `user_version = 1`) into the sandbox — the app upgraded it to v2 with `idx_settings_key` present, all 11 categories and the transaction intact. All four preferences round-tripped: currency → `eur`, theme → `dark` (whole UI recoloured), locale → `ja` then `my` (entire UI switched language), week start → `sunday`.
+  - ✅ `onUpgrade` now calls `m.createIndex(idxSettingsKey)` explicitly. **`Migrator.createTable` does not emit `@TableIndex` indexes** (only `createAll` does), so an upgraded database was silently missing the index that a freshly created one had. The migration test asserts it.
+  - ✅ Bottom-sheet overflow fixed: the 10-currency sheet used a plain `Column`, which overflowed by 117 px on a short screen and hid the last rows. Now a `Flexible` + `shrinkWrap` `ListView`, so it scrolls.
+- ☐ **Pay-cycle month — custom month start day** (`docs/DataModel.md` §8, `docs/Design.md` §6.6). A "month" becomes a `BudgetPeriod` that starts on the user's pay day (e.g. the 10th → Oct 10 – Nov 9). **Refactor of work already marked done above — the calendar and the month use cases currently assume a calendar month.**
+  - ☐ `core/period/`: `BudgetPeriod` + `PeriodCalculator` (pure Dart, `startDay` 1–28) + `LocalDate.addDays` if missing. Tests: year boundary, leap/non-leap Feb, startDay 1 ≡ calendar month, startDay 28, `previous(next(p)) == p` ×100.
+  - ☐ Settings: `monthStartDay` key in `SettingsKeys` (no migration; absent/invalid → 1), `AppSettings` field, `SettingsLocalDataSource` decode, `monthStartDayProvider`; **"Month starts on" picker page** with live "Current period: …" preview.
+  - ☐ Domain/data: audit `TransactionsDao` month/day queries → take an inclusive `start..end` range; rename `WatchMonthTransactions` / `WatchMonthDailyTotals` / `WatchMonthCategoryTotals` / `WatchMonthTotal` and `MonthTotal` → `*Period*` taking a `BudgetPeriod`. Keep the existing `(date, deletedAt)` index.
+  - ☐ Calendar: `CalendarState`/`CalendarNotifier` hold a `BudgetPeriod`; `MonthGridLayout` renders the period's days (padded week edges, tiny month label on each calendar-month 1st); capsule intensity uses `p95PeriodNet`; header shows `Oct 10 – Nov 9` + "Pay cycle" when `monthStartDay` ≠ 1; "today" button, swipe and picker navigate periods. `MonthDayPickerPage` (transaction date picker) stays calendar-based.
+  - ☐ ARB keys (en/my/ja): month-starts-on label/description/preview strings, "Pay cycle", "This period".
+  - ☐ Tests: period boundary transactions land in exactly one period; changing `monthStartDay` recomputes totals without touching rows; widget walk at 360/768/1440 × text scale 1.0/2.0 for the longer title.
+- ☑ **Profile (guest) + Avatar catalog/renderer + Avatar Editor page + random generate** — built; on-device verification pending (see below).
+  - ✅ **Domain** (`lib/features/profile/domain/`): `AvatarConfig` (five indices encoded as `"a-b-c-d-e"`, `tryParse` returns null on anything malformed rather than throwing), `AvatarPart`, `AvatarCatalog` (static option lists — background 8, backdrop 4, shape 4, eyes 4, mouth 4 — plus `optionCount`, `optionIndices`, `random(Random)`, `paintOrder`), `UserProfile`, `UserProfileRepository`, and four use cases: `LoadUserProfile`, `WatchUserProfile`, `SaveAvatar` (rejects `!isValid` → `ValidationFailure`), `SaveDisplayName` (trims; rejects > 40 code units → `profileNameTooLong`; rejects C0/C1/DEL/line-separator characters → `profileNameInvalid`).
+  - ✅ **Data**: `ProfileKeys`, `ProfileLocalDataSource` (**reuses `AppSettingsDao`** — no migration, the profile is two scalars), `UserProfileRepositoryImpl` (all through `guardResult`/`guardResultStream`), `registerProfileModule`. Decode never throws: a missing, malformed, empty or out-of-range avatar falls back to `UserProfile.initial.avatar`.
+  - ✅ **Renderer**: `AvatarPalette` (9 palette slots resolved per theme — slot 8 is the ink, light/dark variants differ so dark mode is contrast-corrected), `AvatarPainter` (`CustomPainter`, **no new dependency** — `flutter_svg` is not used; every index is clamped), `Avatar` widget (`size`, optional `semanticLabel`).
+  - ✅ **Art direction fix — "these look like emoji"** (post-build review): the first composition was a 56% circle centred at 52% with dot eyes and a smile, which at swatch size reads as the smiley glyph. Three changes, no catalogue reordering (the option lists are the persisted format, so only *appending* is safe):
+    - The figure is now a **bust**: `AvatarPainter._paintShoulders` draws a torso arc at `shoulderY = 0.80`, clipped by the frame, so the silhouette is a person rather than a floating ball.
+    - The head is **smaller and off-centre** (`headHeight = 0.44`, `headCenterY = 0.44`) so the background reads as a frame around the figure instead of a thin border. Both are public constants on `AvatarPainter` so the composition is assertable.
+    - `AvatarConfig.initial` is `0-0-1-1-1` (rounded-square head, line eyes, neutral mouth) rather than all-zeros. `initial` is only the seed read before the first save, so existing profiles are unaffected — and it is no longer the one combination that renders as an emoji, which also fixes the editor's swatch grid showing twenty near-identical smileys.
+    - `_paintBackdrop` now derives its tint with `AvatarPalette.headFor(colors, background)` instead of using the option's own `PaletteSlot`. That slot (1 = sky blue, 2 = violet) was unresolved against a mint head and produced the **dark grey square** visible behind the head in the iOS screenshot. The slot stays on the option — it is persisted data — but the renderer ignores it for the tint.
+    - The eyes and mouth are positioned against the head box rather than the canvas, so they follow the head when it is resized.
+  - ✅ **Regression tests** (`test/features/profile/presentation/avatar_painter_test.dart`, 12 cases): the composition constants are pinned (`headHeight < 0.56`, `headCenterY < 0.5`, shoulders below the head, head fully inside the canvas, head/shoulder boxes overlapping), every catalogue option paints in both schemes, out-of-range indices degrade instead of throwing, `shouldRepaint` is correct, and a **pixel probe** asserts the background is still visible on at least three margins — the direct signature of the old face-filling composition. Plus `should_not_default_to_the_smiley_glyph` in `avatar_config_test.dart` guarding `initial`.
+  - ✅ **UI**: `ProfilePage` (guest badge, identity card, avatar row → editor, name row → rename dialog) and `AvatarEditorPage` (160 px preview, one horizontal swatch strip per `AvatarPart`, shuffle from `avatarRandomProvider`, save-then-pop). Entry point: an avatar row in Settings → About, routing to `/profile`.
+  - ✅ **Routes**: `AppRoutes.profile` = `/profile` (inside the shell) with a nested `avatar` sub-route, so the back stack reads Profile → Avatar and the editor cannot be deep-linked with nothing to pop to. The dead `enum AppDestination` duplicate in `app_routes.dart` was removed.
+  - ✅ **`AppStrings.fill(context, key, values)`** added to `lib/core/presentation/app_strings.dart` — the bridge from the key-based lookup to the two ARB keys that carry placeholders (`avatarEditorOptionLabel`, `avatarEditorPartSelected`), so no call site concatenates a sentence.
+  - ✅ ARB: 26 new keys in en/my/ja with real Burmese and Japanese values; `l10n_untranslated.json` = `{}`.
+  - ✅ Tests: 23 `AvatarConfig`/`AvatarCatalog` cases (including 200 seeded `random` draws all valid, and 500 draws reaching every option of every part), 20 use-case cases, 13 datasource cases, and a page suite that paints **every** option of **every** part and asserts no exception. All type-check via the kernel loop; the DB and widget suites execute on the device/CI harness.
+  - ⏳ **On-device verification still to do.** The build could not run from the agent's process tree (the pipe ceiling below was still in force at the end of the session — a bare `Process.run(['cmd.exe','/c','echo','hi'])` probe still failed). Run this from your own terminal:
+    ```sh
+    ./tool/build_dev_apk.sh                        # build + install + launch
+    # or, to land directly on the profile page:
+    #   add -Pdart-defines=<base64 of INITIAL_ROUTE=/profile> to the gradlew line
+    ```
+    What to check: Settings → the **avatar row** opens Profile; the avatar renders at 96 px; the name row opens the rename dialog and the name **persists across a relaunch**; the avatar row opens the editor; **Shuffle** changes the preview; picking a swatch changes it live; **Save** pops back and the new avatar is on Profile; then pull the DB and confirm the two rows:
+    ```sh
+    adb exec-out "run-as com.yk.ledgerly.dev cat app_flutter/ledgerly.sqlite" > /tmp/l.sqlite
+    sqlite3 /tmp/l.sqlite "select key, value from app_settings where key like 'profile%'"
+    ```
+- ☑ **Responsive layouts (compact/medium/expanded) for Calendar, Forms, Categories, Settings** — built; on-device verification pending (see below).
+  - ✅ **Shared primitives** (`lib/features/shared/presentation/widgets/responsive_layout.dart`): `TwoPaneLayout` (stacks below medium, `Row` with a width-capped master at medium+), `ConstrainedPane` (a prose-width ceiling so a short page does not stretch to 1440 px), `ModalFormScaffold` (a real route on compact, a centred raised card over `surfaceSunken` at medium+), and `ResponsiveInsets` (`pageHorizontal` — 16 compact / 24 medium+ — plus a bottom safe-area helper).
+  - ✅ **Calendar**: below medium it is one scrolling column; at medium+ `_WideBody` gives **each pane its own `ListView`** (flex 4 / 6) rather than sharing one scrollable. That distinction is the whole point — a shared scroll view would let a busy day push the month header off screen, defeating the wide layout.
+  - ✅ **Categories**: a master–detail split at `usesSidebar` (`list flex 4` + `VerticalDivider` + `_DetailPane flex 6`). Tapping a row opens `CategoryFormBody` **inline in the pane** instead of pushing a route, the open row is tinted `brandSubtle` (the tint is the only cue linking row to pane, so it is a real surface change), and deleting/archiving the shown category closes the pane. The form body was extracted to a public widget so the same code renders as a route on compact and as a pane on wide — no forked form.
+  - ✅ **Settings** and the **transaction form** are both wrapped in `ConstrainedPane`, so a desktop window shows a readable column instead of edge-to-edge rows.
+  - ✅ ARB: `categoriesSelectHint` (the detail-pane placeholder) in en/my/ja; `l10n_untranslated.json` = `{}`.
+  - ✅ Tests: `responsive_layout_test.dart` (stack-vs-row, width caps, the modal-card branch, insets) plus `category_list_page_test.dart`, `calendar_page_test.dart` and `settings_page_responsive_test.dart`, each walking **every mandated width (360/390/430/768/1024/1440)** at text scale **1.0 and 2.0** and asserting `takeException()` is null. All type-check via the kernel loop.
+  - ⏳ **On-device verification still to do** — same pipe ceiling as the Profile item above. From your own terminal: `./tool/build_dev_apk.sh`, then rotate the emulator to landscape (the sidebar layout) and check Calendar shows two panes, Categories edits inline, and nothing overflows at any width.
+- ☑ **Empty/loading/error states, haptics, undo** — built; on-device verification pending.
+  - ✅ `StatePlaceholder` / `LoadingPlaceholder` / `ErrorBanner` (`features/shared/presentation/widgets/state_placeholder.dart`) are the single treatment for the three "nothing to show" states, wired into the calendar day list, the categories list and the pickers.
+  - ✅ **`AppFeedback`** (`features/shared/presentation/feedback/app_feedback.dart`) — the one place for transient feedback. `selection`/`success`/`destructive` map to `HapticFeedback.{selectionClick,lightImpact,mediumImpact}`, so a destructive action *feels* different from a selection before the message is read. `confirm` = 2 s, `failure` = 4 s (longer — the user may have to act on it), `undoable` = **5 s** (undo is a *recovery* action: notice, decide, reach — 2 s would make it decorative). Every path clears the previous bar first, so a burst of edits shows the latest result instead of a lagging queue, and `ScaffoldMessenger.maybeOf` makes feedback outside a `Scaffold` a no-op rather than a crash.
+  - ✅ **Undo is real, not a re-create.** `restore` was added through every layer — `CategoriesDao.restore` → `CategoryLocalDataSource.restore` → `CategoryRepository.restore` → `CategoryRepositoryImpl.restore` → the **`RestoreCategory`** use case → `restoreCategoryProvider` → DI. The original id and `createdAt` survive, so transactions that referenced the category still resolve; a re-create would mint a new id and orphan that history. `restore` is deliberately **not** scoped by `deletedAt IS NOT NULL` — restoring a live row writes the same value, so a double-tap on Undo cannot corrupt anything.
+  - ✅ Wired into categories (delete → destructive haptic → undoable bar → restore), the transaction form (success haptic + confirmation on the **transition** into `saved`, guarded with `!(previous?.saved ?? false)` so a re-layout cannot buzz twice) and Settings.
+  - ✅ ARB: `categoriesDeleted` in en/my/ja; `l10n_untranslated.json` = `{}`.
+  - ✅ Tests: `app_feedback_test.dart` (replace-don't-queue, the three durations, the no-messenger no-op, and haptics captured through a mock `SystemChannels.platform` handler — a fire-and-forget platform call is otherwise indistinguishable from a no-op), a `RestoreCategory` group in the use-case suite, and four round-trip cases in the category data suite.
+  - ⏳ **On-device verification still to do** — same pipe ceiling. Check that deleting a category shows the Undo bar for a full 5 s and that Undo brings the row back with its transactions intact.
 - ☐ Memory profiling pass + accessibility pass
 - ☐ **Milestone: TestFlight/internal build**
+- ☑ **`AdaptiveNav`** — **built and verified on `emulator-5554`.** The glass tab bar / M3 `NavigationBar` / rail / sidebar are all in place: `NavDestination` (the single source of truth for the four destinations and their route matcher), `GlassSurface`/`FloatingGlassBar`/`DockedBottomBar`, `AdaptiveNav` (compact → M3 bar on Android/web, floating glass bar on iOS; medium → `NavigationRail`; expanded/large → 240 px sidebar), and `AppShell` (mounted from the router's `ShellRoute`; also raises the bottom `MediaQuery` padding so content is never hidden behind the bar). `_PlaceholderShell` is gone and `_PlaceholderPage` now renders the shared coming-soon state.
+  - Size class beats platform: a wide Android tablet gets the same sidebar as an iPad (`docs/Platform.md` §2 rule 4).
+  - On-device: all four destinations navigate by tapping, the active pill follows, the landscape window switches to the sidebar, and logcat shows no `overflow`/`RenderFlex` across the whole run.
+  - `--dart-define=INITIAL_ROUTE=/settings` still starts a dev build on a specific route (`AppEnvironment.initialRouteFromDartDefine`, ignored in prod) — useful for screenshotting a page directly.
+- ⚠ **`flutter run` cannot find the APK when a flavor is configured.** The Gradle build *succeeds*, but AGP writes to `build/app/outputs/apk/<flavor>/<buildType>/` and the tool does not resolve that for `dev`/`prod`, so it reports *"Gradle build failed to produce an .apk file"* even though `build/app/outputs/flutter-apk/app-dev-debug.apk` is freshly written. Until that is fixed, build and install in two steps:
+  ```sh
+  flutter build apk --debug --flavor dev --target-platform android-x64   # or ./tool/build_dev_apk.sh
+  adb install -r build/app/outputs/flutter-apk/app-dev-debug.apk
+  ```
+  Launch with `com.yk.ledgerly.dev/com.yk.ledgerly.MainActivity` — the package carries the `.dev` suffix but the **activity class does not** (it is the `namespace`).
+- ℹ **On this dev box, `flutter run` / `flutter build` can be blocked by OS-level named-pipe exhaustion** (`CreateFile failed 231 (All pipe instances are busy.)`) — `CreateNamedPipeW` runs out of instances machine-wide, so the tool cannot spawn its first child process. Proved with a bare `Process.run` probe that fails even outside the sandbox and after `adb kill-server`. Unrelated to the project. Run the build from a terminal outside the agent's process tree, or reboot to reset the pipe instance table.
+  - Shortcut while the localizations are already generated: temporarily `mv l10n.yaml .l10n.yaml.buildskip` so the build skips the `gen_localizations` target (which spawns `dart format`), then move it back.
+  - After a failed attempt, `rm -rf .dart_tool/flutter_build` — the abandoned `--incremental --initialize-from-dill` step leaves a 0-byte `app.dill` that breaks the next run.
+- ☐ **`WatchDayTotal` use case** — a day-level income/expense/net aggregate, so the calendar summary card can show the selected day rather than the month. Needs a `TransactionsDao` day-total query alongside the existing month ones; the repository interface and the stream bridge follow the same shape as `WatchMonthTotal`.
 
 ## Phase 2 — "Understand & Account" (v0.2) — NOT STARTED
+
 - ☐ Firebase project + flavors; `AuthRepository` + Firebase adapter
-- ☐ Welcome / Sign in with Apple / Google (/ Email) / Account pages
+- ☐ Welcome / Sign in with Apple / Google (/ Email) / Account pages — and the first-run **"When does your month start?"** question (default 1, skippable; `Design.md` §6.6)
 - ☐ Guest → account linking + merge prompt
 - ☐ Sign out + **Delete account** (re-auth, Apple token revoke) — store requirement
-- ☐ Insights: donut, bar, line, top categories (SQL aggregations)
+- ☐ Insights: donut, bar, line, top categories (SQL aggregations) — all by `BudgetPeriod`; "previous period" delta uses `PeriodCalculator.previous`
 - ☐ Transactions list page: search, filters, paging
-- ☐ Export CSV/JSON (+ share)
+- ☐ Export CSV/JSON (+ share) — range presets ("this period", "last period") come from `PeriodCalculator`
 - ☐ Import CSV/JSON with mapping, preview, dedupe (isolate)
 - ☐ Full backup/restore
 
 ## Phase 3 — "Manage" (v0.3) — NOT STARTED
+
 - ☐ Accounts + transfers
-- ☐ Budgets (category + total) with progress and alerts
+- ☐ Budgets (category + total) with progress and alerts — keyed by **period id** (`yyyy-MM` of the start date); decide start-month vs end-month naming **before** creating the table (`DataModel.md` §8)
 - ☐ Recurring transactions (scheduler on app open + local notifications)
 - ☐ Savings goals
 
 ## Phase 4 — "Sync & Polish" (v0.4) — NOT STARTED
+
 - ☐ (Auth already shipped in v0.2) Sync status UI
 - ☐ Outbox + `RemoteStore` contract tests + Firebase adapter
 - ☐ Sync status UI, merge-on-first-login flow, delete account
@@ -71,6 +196,7 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
 - ☐ Supabase adapter (prove swap)
 
 ## Phase 5 — Release — NOT STARTED
+
 - ☐ Store checklist from `Platform.md` §7 (Sign in with Apple, data safety, deletion URL, iPad/tablet screenshots)
 - ☐ Store listing, privacy policy, screenshots
 - ☐ Crash reporting + (opt-in) analytics decision
@@ -78,4 +204,5 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
 - ☐ Monetization decision
 
 ## Backlog / ideas
+
 Receipt photos · split bills · multi-currency FX · shared budgets · PDF monthly report · Siri Shortcuts

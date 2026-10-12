@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/app.dart';
 import 'package:ledgerly/app/di/app_environment.dart';
 import 'package:ledgerly/app/di/injection.dart';
+import 'package:ledgerly/app/router/app_router.dart';
 
 /// Entry point.
 ///
@@ -17,5 +18,16 @@ Future<void> main() async {
 
   await configureDependencies(environment: AppEnvironment.fromDartDefine());
 
-  runApp(const ProviderScope(child: LedgerlyApp()));
+  // Dev-only: `--dart-define=INITIAL_ROUTE=/settings` opens straight on a screen
+  // that has no navigation entry point yet. Null in a normal run (and always in
+  // prod), in which case the router's own default applies.
+  final initialRoute = AppEnvironment.initialRouteFromDartDefine();
+
+  runApp(
+    ProviderScope(
+      child: LedgerlyApp(
+        router: initialRoute == null ? null : createRouter(initialLocation: initialRoute),
+      ),
+    ),
+  );
 }

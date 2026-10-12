@@ -1,5 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:ledgerly/app/di/app_environment.dart';
+import 'package:ledgerly/core/database/app_database.dart';
+import 'package:ledgerly/core/database/seed.dart';
+import 'package:ledgerly/core/di/core_module.dart';
+import 'package:ledgerly/features/categories/di/categories_module.dart';
+import 'package:ledgerly/features/profile/di/profile_module.dart';
+import 'package:ledgerly/features/settings/di/settings_module.dart';
+import 'package:ledgerly/features/transactions/di/transactions_module.dart';
 
 /// The app-wide service locator.
 ///
@@ -33,10 +40,30 @@ Future<void> configureDependencies({
 
   getIt.registerSingleton<AppEnvironment>(environment);
 
-  // --- Feature modules (Phase 1+) ---
-  // registerTransactionsModule(getIt);
-  // registerCategoriesModule(getIt);
-  // registerSettingsModule(getIt);
+  // --- Feature modules (Phase 1) ---
+  // Order matters: `core` owns the database and every feature module resolves
+  // it from the locator, so it must be registered first
+  // (docs/Architecture.md §10).
+  registerCoreModule(getIt);
+  registerCategoriesModule(getIt);
+  registerTransactionsModule(getIt);
+  // Registered last because its only cross-feature dependency is the database;
+  // nothing else depends on it at wiring time, and it must be available before
+  // the first frame reads a currency or a theme (`app.dart`).
+  registerSettingsModule(getIt);
+  // Shares the `app_settings` DAO with the settings module but nothing else, so
+  // it registers independently and either can be removed without the other.
+  registerProfileModule(getIt);
+
+  // Seed the starter categories on a genuinely fresh install.
+  //
+  // Runs *after* the modules so the database is resolvable, and it deliberately
+  // forces the (otherwise lazy) singleton open: a first launch with an empty
+  // category picker is a broken-looking app, and waiting until the first screen
+  // reads would seed behind a spinner. [seedDefaults] itself is idempotent —
+  // it no-ops when the table already has rows, so this is safe on every launch
+  // and cannot resurrect categories the user deleted on purpose.
+  await seedDefaults(getIt<AppDatabase>());
 }
 
 /// Resets the locator. Test-only, so a suite can start from a clean container.

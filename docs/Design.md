@@ -365,7 +365,7 @@ Roadmap Phase 1. Compact = single column; medium+ = two panes (`Platform.md` §5
 
 ```
 ┌─────────────────────────────────────────────┐
-│  ‹   October 2026   ›          [today]      │  month switcher, sticky
+│  ‹   October 2026   ›          [today]      │  period switcher, sticky (§6.6: "Oct 10 – Nov 9" in pay-cycle mode)
 ├─────────────────────────────────────────────┤
 │  M   T   W   T   F   S   S                  │  weekday header — `overline`
 │  29  30  1   2   3   4   5                  │
@@ -385,26 +385,26 @@ Roadmap Phase 1. Compact = single column; medium+ = two panes (`Platform.md` §5
 
 ### 6.2 Day Capsule grid
 
-The signature component. A month grid where each day cell carries a **capsule** whose fill encodes
+The signature component. A **period** grid (a calendar month by default; the pay-cycle days when `monthStartDay` ≠ 1 — §6.6) where each day cell carries a **capsule** whose fill encodes
 that day's net spend magnitude.
 
 - Cell: minimum **44×44**; grid is `7` columns, always.
 - Capsule: rounded bar (`radius.sm`, 4 px tall) under the day number, width = 60% of cell.
-- **Intensity** maps to `intensity = clamp(net / p95MonthNet, 0, 1)` where `p95MonthNet` is the
-  95th-percentile absolute net of the visible month. Quantize into **5 steps** (`0, .25, .5, .75, 1`)
+- **Intensity** maps to `intensity = clamp(net / p95MonthNet, 0, 1)` where `p95PeriodNet` is the
+  95th-percentile absolute net of the visible period. Quantize into **5 steps** (`0, .25, .5, .75, 1`)
   so the grid reads as texture, not noise.
   - Step 0 (no transactions): no capsule at all.
   - Steps 1–4: `moneyOutSubtle` at 25/50/75/100% alpha — **or** `moneyInSubtle` for net-positive days.
 - **Today**: `brandPrimary` 1.5 px ring around the cell, `radius.full`.
 - **Selected**: `brandSubtle` fill behind the whole cell, `radius.md`; day number goes
   `brandPrimary` w600. Selection and today can coexist (ring drawn over fill).
-- **Outside current month**: `textTertiary`, capsule at 40% alpha, still tappable (navigates month).
+- **Outside the visible period** (padding days that complete the first/last week): `textTertiary`, capsule at 40% alpha, still tappable (navigates to the neighbouring period).
 - Weekend column headers get `textTertiary`; no other special-casing.
 - Densities: compact shows capsule + number. Expanded shows capsule + number + tiny amount
   (`caption`, truncated) for cells wide enough (≥ 64 px).
 
-**Month switcher**: `‹` / `›` icons (`short` slide+fade of the grid), title is a tappable
-month/year picker. `today` button appears only when the visible month ≠ current month.
+**Period switcher**: `‹` / `›` icons (`short` slide+fade of the grid), title is a tappable
+period picker. `today` button appears only when the visible period ≠ the current period.
 Horizontal swipe on the grid changes month; the swipe must not fight the day-list scroll
 (grid owns horizontal, list owns vertical).
 
@@ -418,7 +418,7 @@ An `AppCard` directly under the grid.
 - Footer: two columns — `Income +45,000` (`moneyIn`) and `Expense −57,500` (`moneyOut`), both
   `amountLarge`. Equal flex, left-aligned, labels in `label`/`textSecondary`.
 - Compact: two columns side by side. Expanded (≥ medium): same, with a third "Net" column.
-- Tapping the card opens the Insights page for that month (Phase 2 — until then, no `onTap`).
+- Tapping the card opens the Insights page for that period (Phase 2 — until then, no `onTap`).
 
 ### 6.4 Day list
 
@@ -442,6 +442,33 @@ An `AppCard` directly under the grid.
 
 In two-pane mode the day list is the detail pane and must show a `EmptyState` ("Select a day")
 before any day is picked only on first launch; afterwards the last-selected day persists.
+
+### 6.6 Pay-cycle period ("month starts on the 10th")
+
+A "month" is a **budget period** (`DataModel.md` §8). Default `monthStartDay = 1` renders exactly
+as a calendar month; anything else switches the screen to pay-cycle mode.
+
+- **Header title:** calendar mode → `October 2026`. Pay-cycle mode → `Oct 10 – Nov 9` (`title`
+  weight, short month names from `intl`, never hardcoded) with a `caption`/`textSecondary`
+  line below: "Pay cycle" (localized). Tapping opens the period picker (a list of recent periods
+  in that same format, current one marked `brandSubtle`).
+- **Grid:** shows only the period's days, from the start day to the end day, padded with dimmed
+  outside days to complete the first/last week (§6.2). Because a period spans two calendar
+  months, **the 1st of each calendar month carries a tiny month label** (`overline`, e.g. `Nov`)
+  above the day number, so the boundary is obvious without a divider line.
+- **Capsule intensity** uses the period's own `p95PeriodNet` (§6.2) — never the calendar month's.
+- **Summary card & stats strip:** all totals are for the period; eyebrow labels say "THIS PERIOD"
+  (localized) in pay-cycle mode and "THIS MONTH" in calendar mode.
+- **Settings → "Month starts on":** a dedicated picker **page** (not a dialog), consistent with
+  the other settings rows. Day chips/wheel 1–28; a **live preview card** under it:
+  "Current period: Oct 10 – Nov 9" and "Previous: Sep 10 – Oct 9". Changing it recomputes every
+  screen immediately; show a one-line `caption`: "Your transactions are not changed."
+- **First-run question** (with onboarding, Phase 2): "When does your month start? (e.g. pay day)",
+  default 1, skippable.
+- The **date picker in the transaction form stays a calendar** — picking a date is not a period
+  concern.
+- **Widths:** no layout change; only the title string gets longer — it must ellipsize
+  gracefully at 360 px and text scale 2.0 (add to the §8 checklist run).
 
 ---
 

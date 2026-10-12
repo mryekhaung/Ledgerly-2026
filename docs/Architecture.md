@@ -26,6 +26,7 @@ lib/
 │  ├─ result/                  # Result<T>, Failure types
 │  ├─ usecase/                 # UseCase<T, Params>
 │  ├─ money/                   # Money, CurrencyCode, MoneyFormatter
+│  ├─ period/                  # BudgetPeriod, PeriodCalculator (custom month start day — DataModel.md §8)
 │  ├─ network/                 # Dio factory, interceptors
 │  ├─ database/                # Drift AppDatabase, DAOs shared, migrations
 │  ├─ utils/ extensions/ constants/
@@ -86,10 +87,10 @@ Swap = change one binding in `app/di/` — nothing in domain/presentation change
 - Form state: dedicated notifier per form (`TransactionFormNotifier`) with validation in domain `Validators`.
 
 ## 6. Data flow example — add transaction
-`AddTransactionPage` → `TransactionFormNotifier.submit()` → `AddTransaction` use case (validates, builds entity) → `TransactionRepository.add` → `LocalDataSource.insert` (+ enqueue outbox row if sync enabled) → Drift stream emits → `watchMonthTransactions` use case → calendar & summary providers update.
+`AddTransactionPage` → `TransactionFormNotifier.submit()` → `AddTransaction` use case (validates, builds entity) → `TransactionRepository.add` → `LocalDataSource.insert` (+ enqueue outbox row if sync enabled) → Drift stream emits → `watchPeriodTransactions` use case (takes a `BudgetPeriod`) → calendar & summary providers update.
 
 ## 7. Reactive reads
-Drift `watch*` queries expose `Stream`s through repositories → `StreamNotifier`s. Aggregations (month totals, per-day net, category sums) are computed **in SQL** (GROUP BY), not in Dart loops.
+Drift `watch*` queries expose `Stream`s through repositories → `StreamNotifier`s. Aggregations (**period** totals, per-day net, category sums) are computed **in SQL** (GROUP BY), not in Dart loops. A "month" is always a `BudgetPeriod` (`start..end` range) resolved by `PeriodCalculator` from the `monthStartDay` setting — never `DateTime.month` arithmetic scattered across screens (`DataModel.md` §8).
 
 ## 8. Error handling
 Data layer catches exceptions → maps to `Failure`. Domain returns `Result`. Presentation maps `Failure` → localized message + retry affordance. Global `FlutterError`/zone guard logs unexpected errors (Crashlytics/Sentry optional later).

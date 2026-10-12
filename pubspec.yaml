@@ -14,6 +14,9 @@ dependencies:
   # Import `package:material_ui/...` and `package:cupertino_ui/...`,
   # NEVER `package:flutter/material.dart` or `package:flutter/cupertino.dart`. See docs/Versions.md §2.
   cupertino_ui: ^1.1.2
+  # Local-first persistence. SQLite is the source of truth (docs/Architecture.md ADR #1).
+  drift: ^2.32.0
+  drift_flutter: ^0.3.0
   flutter:
     sdk: flutter
   # i18n delegates (en / my / ja)
@@ -28,14 +31,24 @@ dependencies:
   # Date/number formatting
   intl: ^0.20.3
   material_ui: ^1.6.0
+  # Client-generated UUIDv4 primary keys (docs/Architecture.md ADR #3) — offline-safe ids.
+  uuid: ^4.5.1
 
 dev_dependencies:
+  # Drift schema codegen (same minor as `drift`). Run: dart run build_runner build
+  build_runner: ^2.4.13
+  drift_dev: ^2.32.0
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
 
 flutter:
   uses-material-design: true
+
+  # Required by `flutter gen-l10n` with an explicit `output-dir` (Flutter ≥3.32):
+  # without it the tool warns that the generated sources "will not be importable".
+  # The generated files are committed, so CI needs no extra step to build them.
+  generate: true
 
   # Fonts are bundled in Phase 0 (Roadmap) so web has a reliable fallback.
   # Inter = amounts/Latin · Noto Sans Myanmar = my · Noto Sans JP = ja.

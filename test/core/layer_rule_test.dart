@@ -199,6 +199,122 @@ void main() {
     }
   });
 
+  group('feature domain layer purity', () {
+    /// Every feature's `domain/` directory (docs/Architecture.md §2).
+    List<String> domainDirectories() {
+      final features = Directory('lib/features');
+      if (!features.existsSync()) return const <String>[];
+      return features
+          .listSync()
+          .whereType<Directory>()
+          .map((dir) => '${dir.path}/domain')
+          .toList()
+        ..sort();
+    }
+
+    test('should_have_at_least_one_feature_with_a_domain_layer', () {
+      // A tripwire rather than a nicety: if this fails, the loop below ran zero
+      // times and the purity guarantee silently stopped applying.
+      expect(
+        domainDirectories().where((dir) => Directory(dir).existsSync()),
+        isNotEmpty,
+        reason: 'Phase 1+ features must each own a domain/ layer.',
+      );
+    });
+
+    for (final library in domainDirectories()) {
+      group(library, () {
+        test('should_not_import_flutter_or_data_layer_packages', () {
+          if (!Directory(library).existsSync()) return;
+
+          final violations = <String>[];
+          for (final file in dartFilesIn(library)) {
+            for (final uri in directiveUris(file.readAsStringSync())) {
+              for (final entry in forbiddenPrefixes.entries) {
+                if (uri.startsWith(entry.key)) {
+                  violations.add(
+                    '${_relative(file.path)} imports "$uri" '
+                    '(${entry.value})',
+                  );
+                }
+              }
+            }
+          }
+
+          expect(
+            violations,
+            isEmpty,
+            reason:
+                'domain/ must be pure Dart (docs/Agent.md §3.1, §3.2) — it may '
+                'not see Flutter, Drift, or any remote SDK:\n'
+                '${violations.join('\n')}',
+          );
+        });
+
+        test('should_not_import_forbidden_dart_libraries', () {
+          if (!Directory(library).existsSync()) return;
+
+          final violations = <String>[];
+          for (final file in dartFilesIn(library)) {
+            for (final uri in directiveUris(file.readAsStringSync())) {
+              final reason = forbiddenDartLibraries[uri];
+              if (reason != null) {
+                violations.add(
+                  '${_relative(file.path)} imports "$uri" ($reason)',
+                );
+              }
+            }
+          }
+
+          expect(
+            violations,
+            isEmpty,
+            reason:
+                'domain/ must stay portable (docs/Agent.md §3.11):\n'
+                '${violations.join('\n')}',
+          );
+        });
+
+        test('should_not_import_its_own_data_or_presentation_layer', () {
+          // The dependency rule is presentation → domain ← data. A domain file
+          // importing `../data/...` inverts it, which is how a repository
+          // interface quietly becomes untestable and the backend stops being
+          // swappable (docs/Architecture.md §4).
+          if (!Directory(library).existsSync()) return;
+
+          final featureRoot = library.substring(
+            0,
+            library.length - '/domain'.length,
+          );
+          final forbiddenSiblings = <String>[
+            '$featureRoot/data/',
+            '$featureRoot/presentation/',
+          ];
+
+          final violations = <String>[];
+          for (final file in dartFilesIn(library)) {
+            for (final uri in directiveUris(file.readAsStringSync())) {
+              for (final sibling in forbiddenSiblings) {
+                if (uri.contains(sibling)) {
+                  violations.add('${_relative(file.path)} imports "$uri"');
+                }
+              }
+            }
+          }
+
+          expect(
+            violations,
+            isEmpty,
+            reason:
+                'domain/ must not depend on data/ or presentation/ '
+                '(docs/Conventions.md §2):\n'
+                '${violations.join('\n')}',
+          );
+        });
+      });
+    }
+  });
+
   group('forbidden-import policy self-check', () {
     test('should_flag_a_flutter_import', () {
       // Guards the detector itself: if the regex regressed, the layer tests

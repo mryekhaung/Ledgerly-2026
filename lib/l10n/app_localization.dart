@@ -21,14 +21,37 @@ abstract final class AppLocalization {
   /// exhaustive over the sealed hierarchy (docs/Architecture.md §8).
   static String failureKeyFor(String failureRuntimeType) =>
       switch (failureRuntimeType) {
-        'StorageFailure' => 'failure.storage',
-        'NetworkFailure' => 'failure.network',
-        'AuthFailure' => 'failure.auth',
-        'ValidationFailure' => 'failure.validation',
-        'NotFoundFailure' => 'failure.notFound',
-        'ConflictFailure' => 'failure.conflict',
-        'ParseFailure' => 'failure.parse',
-        'UnexpectedFailure' => 'failure.unexpected',
-        _ => 'failure.unexpected',
+        'StorageFailure' => 'failureStorage',
+        'NetworkFailure' => 'failureNetwork',
+        'AuthFailure' => 'failureAuth',
+        'ValidationFailure' => 'failureValidation',
+        'NotFoundFailure' => 'failureNotFound',
+        'ConflictFailure' => 'failureConflict',
+        'ParseFailure' => 'failureParse',
+        'UnexpectedFailure' => 'failureUnexpected',
+        _ => 'failureUnexpected',
       };
+
+  /// ARB key for a **validator key** carried in `ValidationFailure.fieldErrors`.
+  ///
+  /// Validators emit stable domain keys such as `categoryNameRequired` rather
+  /// than ARB keys, because `domain/` must not know about the l10n catalog
+  /// (`docs/Agent.md` §3.1). This is the single place that bridges the two, so a
+  /// new validator message is added here and nowhere else.
+  ///
+  /// Falls back to the generic validation message for an unknown key, so a
+  /// validator added ahead of its translation still shows something readable.
+  static String validationKeyFor(String validatorKey) => switch (validatorKey) {
+    'categoryNameRequired' => 'categoriesNameRequired',
+    'categoryNameTooLong' => 'categoriesNameTooLong',
+    'categoryNameTaken' => 'categoriesNameTaken',
+    'categoryIconRequired' => 'categoriesIconRequired',
+    'categoryColorInvalid' => 'categoriesColorInvalid',
+    'transactionAmountZero' => 'transactionAmountZero',
+    'transactionAmountTooLarge' => 'transactionAmountTooLarge',
+    'transactionNoteTooLong' => 'transactionNoteTooLong',
+    'transactionCategoryRequired' => 'transactionCategoryRequired',
+    'transactionDirectionUnsupported' => 'transactionDirectionUnsupported',
+    _ => 'failureValidation',
+  };
 }

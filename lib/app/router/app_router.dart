@@ -1,5 +1,20 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/router/app_shell.dart';
+import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/result/result.dart';
+import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
+import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
+import 'package:ledgerly/features/profile/presentation/pages/profile_page.dart';
+import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
+import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
+import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
+import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
+import 'package:ledgerly/features/transactions/presentation/pages/transaction_form_page.dart';
+import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
+import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Builds the app's router.
@@ -18,74 +33,141 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
     debugLogDiagnostics: false,
     routes: <RouteBase>[
       ShellRoute(
-        builder: (context, state, child) => _PlaceholderShell(child: child),
+        builder: (context, state, child) =>
+            AppShell(location: state.uri.path, child: child),
         routes: <RouteBase>[
           GoRoute(
             path: AppRoutes.calendar,
             name: AppRoutes.calendarName,
-            builder: (context, state) => const _PlaceholderPage(
-              titleKey: 'navigation.calendar',
-              icon: Icons.calendar_today_outlined,
-            ),
+            builder: (context, state) => const CalendarPage(),
           ),
           GoRoute(
             path: AppRoutes.insights,
             name: AppRoutes.insightsName,
             builder: (context, state) => const _PlaceholderPage(
-              titleKey: 'navigation.insights',
+              titleKey: 'navigationInsights',
               icon: Icons.pie_chart_outline,
             ),
           ),
           GoRoute(
             path: AppRoutes.categories,
             name: AppRoutes.categoriesName,
-            builder: (context, state) => const _PlaceholderPage(
-              titleKey: 'navigation.categories',
-              icon: Icons.category_outlined,
-            ),
+            builder: (context, state) => const CategoryListPage(),
           ),
           GoRoute(
             path: AppRoutes.settings,
             name: AppRoutes.settingsName,
-            builder: (context, state) => const _PlaceholderPage(
-              titleKey: 'navigation.settings',
-              icon: Icons.settings_outlined,
-            ),
+            builder: (context, state) => const SettingsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.profile,
+            name: AppRoutes.profileName,
+            builder: (context, state) => const ProfilePage(),
+            routes: <RouteBase>[
+              // Nested so the editor inherits the profile segment and the back
+              // stack reads Profile → Avatar: the editor is meaningless without
+              // the profile behind it, and a top-level route would let a deep
+              // link open it with nothing to pop back to.
+              GoRoute(
+                path: AppRoutes.avatarEditorRelative,
+                name: AppRoutes.avatarEditorName,
+                builder: (context, state) => const AvatarEditorPage(),
+              ),
+            ],
           ),
         ],
       ),
 
       // Add / edit transaction are top-level (outside the shell) so they can be
       // presented as a full-screen page on compact and a centered modal page on
-      // medium+ (docs/Platform.md §5). Phase 1.
+      // medium+ (docs/Platform.md §5).
       GoRoute(
         path: AppRoutes.transactionNew,
         name: AppRoutes.transactionNewName,
-        builder: (context, state) => const _PlaceholderPage(
-          titleKey: 'navigation.calendar',
-          icon: Icons.add,
-        ),
+        builder: (context, state) =>
+            TransactionFormPage(initialDate: _dateFromQuery(state)),
+        routes: <RouteBase>[
+          // Nested so the edit path inherits the new-transaction segment and the
+          // two can never be confused: `/transactions/new` vs
+          // `/transactions/<id>/edit`.
+          GoRoute(
+            path: AppRoutes.transactionEditRelative,
+            name: AppRoutes.transactionEditName,
+            builder: (context, state) =>
+                _TransactionEditLoader(id: state.pathParameters['id']!),
+          ),
+        ],
       ),
     ],
   );
 }
 
-/// Phase 0 shell: renders [child] without nav chrome.
+/// Reads the optional `?date=yyyyMMdd` a deep link or the calendar may supply.
 ///
-/// The real `AdaptiveNav` (glass tab bar / M3 NavigationBar / rail / sidebar)
-/// lands with the design-system widgets in Phase 0's final item — this exists so
-/// the router and shell wiring are provably correct before then.
-class _PlaceholderShell extends StatelessWidget {
-  const _PlaceholderShell({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => child;
+/// Parsed through `LocalDate.fromPacked` so a malformed value is dropped rather
+/// than crashing the page — the form falls back to today.
+LocalDate? _dateFromQuery(GoRouterState state) {
+  final raw = state.uri.queryParameters['date'];
+  if (raw == null) return null;
+  return LocalDate.fromPacked(int.tryParse(raw) ?? 0);
 }
 
-/// Phase 0 placeholder page. Shows the destination and states plainly that no
-/// feature is implemented yet — no Lorem, no fake data (docs/Agent.md §8).
+/// Loads the transaction being edited, then renders the form.
+///
+/// The id arrives from the route, so the page cannot be built until the row is
+/// resolved. A missing row renders the not-found state rather than an empty form
+/// that would silently create a second transaction on save.
+class _TransactionEditLoader extends ConsumerWidget {
+  const _TransactionEditLoader({required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = AppStrings.of(context);
+    // `getTransactionProvider` is a factory, so reading it here builds a fresh
+    // use case per loader rather than sharing mutable state across routes.
+    final future = ref.watch(getTransactionProvider)((id: id));
+
+    return FutureBuilder<Result<Transaction>>(
+      future: future,
+      builder: (context, snapshot) {
+        final result = snapshot.data;
+        if (result == null) return const _EditLoadingScaffold();
+
+        return result.fold(
+          onSuccess: (transaction) =>
+              TransactionFormPage(existing: transaction),
+          onErr: (failure) => Scaffold(
+            appBar: AppBar(),
+            body: StatePlaceholder(
+              icon: Icons.search_off,
+              title: strings('stateEmptyTitle'),
+              body: strings(
+                AppLocalization.failureKeyFor(failure.runtimeType.toString()),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// A bare app bar while the row loads, so the route transition has a frame to
+/// land on instead of a blank screen.
+class _EditLoadingScaffold extends StatelessWidget {
+  const _EditLoadingScaffold();
+
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: SafeArea(child: LoadingPlaceholder()));
+}
+
+/// Not-yet-built destination. States plainly that the feature is missing — no
+/// Lorem, no fake data (`docs/Agent.md` §8) — through the same
+/// [StatePlaceholder] every other empty state uses, so it matches the design
+/// system instead of being a bespoke one-off.
 class _PlaceholderPage extends StatelessWidget {
   const _PlaceholderPage({required this.titleKey, required this.icon});
 
@@ -94,32 +176,14 @@ class _PlaceholderPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final strings = AppStrings.of(context);
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Icon(icon, size: 40, color: theme.colorScheme.onSurfaceVariant),
-                const SizedBox(height: 16),
-                Text('Phase 0 scaffold', style: theme.textTheme.headlineLarge),
-                const SizedBox(height: 8),
-                Text(
-                  '$titleKey — feature not implemented yet.\n'
-                  'See docs/Roadmap.md.',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      appBar: AppBar(title: Text(strings(titleKey))),
+      body: StatePlaceholder(
+        icon: icon,
+        title: strings(titleKey),
+        body: strings('stateComingSoon'),
       ),
     );
   }

@@ -23,15 +23,12 @@ void main() {
       expect(Money.tryParse('1.10', CurrencyCode.usd)?.amountMinor, 110);
     });
 
-    test(
-      'should_reject_amounts_beyond_the_digit_cap_instead_of_losing_cents',
-      () {
-        // 900719925474099.99 has 17 significant digits — past the 15-digit cap
-        // that guarantees exactness on every platform. It must be rejected rather
-        // than silently truncated, which is what a `double` path would do.
-        expect(Money.tryParse('900719925474099.99', CurrencyCode.usd), isNull);
-      },
-    );
+    test('should_reject_amounts_beyond_the_digit_cap_instead_of_losing_cents', () {
+      // 900719925474099.99 has 17 significant digits — past the 15-digit cap
+      // that guarantees exactness on every platform. It must be rejected rather
+      // than silently truncated, which is what a `double` path would do.
+      expect(Money.tryParse('900719925474099.99', CurrencyCode.usd), isNull);
+    });
 
     test('should_preserve_cents_at_the_top_of_the_supported_range', () {
       // The largest 15-digit value with cents still parses exactly.

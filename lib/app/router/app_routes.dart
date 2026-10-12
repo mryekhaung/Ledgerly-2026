@@ -1,5 +1,3 @@
-import 'package:material_ui/material_ui.dart';
-
 /// Route path + name constants. Feature-owned route files extend this
 /// (docs/Architecture.md §9: go_router with typed routes).
 ///
@@ -28,66 +26,22 @@ abstract final class AppRoutes {
   static const String transactionNew = '/transactions/new';
   static const String transactionNewName = 'transactionNew';
 
-  static const String transactionEdit = '/transactions/:id/edit';
+  /// Relative to [transactionNew], so the router nests it and the two paths can
+  /// never collide.
+  static const String transactionEditRelative = ':id/edit';
   static const String transactionEditName = 'transactionEdit';
 
   /// Sub-route of the settings branch (Phase 1).
   static const String settingsCurrency = '/settings/currency';
   static const String settingsCurrencyName = 'settingsCurrency';
-}
 
-/// Shell destinations for the primary navigation. Rendered as a glass tab bar
-/// on iOS, M3 `NavigationBar` on Android, rail/sidebar on wide windows
-/// (docs/Platform.md §3).
-enum AppDestination {
-  /// Calendar / home.
-  calendar(
-    route: AppRoutes.calendar,
-    labelKey: 'navigation.calendar',
-    icon: Icons.calendar_today_outlined,
-    selectedIcon: Icons.calendar_today,
-  ),
+  /// Profile (Phase 1). Reached from the settings list and the shell avatar —
+  /// it is a secondary destination, not a fifth tab.
+  static const String profile = '/profile';
+  static const String profileName = 'profile';
 
-  /// Insights.
-  insights(
-    route: AppRoutes.insights,
-    labelKey: 'navigation.insights',
-    icon: Icons.pie_chart_outline,
-    selectedIcon: Icons.pie_chart,
-  ),
-
-  /// Categories.
-  categories(
-    route: AppRoutes.categories,
-    labelKey: 'navigation.categories',
-    icon: Icons.category_outlined,
-    selectedIcon: Icons.category,
-  ),
-
-  /// Settings.
-  settings(
-    route: AppRoutes.settings,
-    labelKey: 'navigation.settings',
-    icon: Icons.settings_outlined,
-    selectedIcon: Icons.settings,
-  );
-
-  const AppDestination({
-    required this.route,
-    required this.labelKey,
-    required this.icon,
-    required this.selectedIcon,
-  });
-
-  /// Path this destination navigates to.
-  final String route;
-
-  /// ARB key for the label — never a literal (docs/Conventions.md §5).
-  final String labelKey;
-
-  /// Unselected icon.
-  final IconData icon;
-
-  /// Selected icon (filled) — docs/Design.md §5.10.
-  final IconData selectedIcon;
+  /// Avatar editor. A sub-route of [profile] so the back stack reads
+  /// Profile → Avatar and the editor can never be opened without a parent.
+  static const String avatarEditorRelative = 'avatar';
+  static const String avatarEditorName = 'avatarEditor';
 }

@@ -38,6 +38,8 @@ Status: **prototype** — real user count unknown. Backend is **free-tier only**
 13. **Versions are pinned in `docs/Versions.md`.** Use Flutter 3.47.1 APIs (no deprecated/legacy: no `StateProvider`, no `dart:html`, no `package:flutter/material.dart` imports). Prerelease packages only behind an interface + exit plan.
 14. **Never** add a package without justification in the PR/commit message and checking maintenance status, license, and size.
 
+15. **A "month" is a `BudgetPeriod`, never a calendar month.** The user can start their month on their pay day (`monthStartDay` 1–28). All month-style logic — calendar, summaries, charts, budgets, export ranges, "this/last month" — goes through `PeriodCalculator` (`core/period/`) and range queries `date BETWEEN start AND end`. No `GROUP BY date/100`, no `DateTime(year, month, 1)` shortcuts for budgeting. See `docs/DataModel.md` §8.
+
 ## 4. Tech stack (fixed unless discussed)
 - **Flutter 3.47.1 / Dart 3.13.1** (pinned with FVM) — sealed classes, records, patterns. **Exact package versions: `docs/Versions.md`** (single source of truth)
 - UI libs: **`material_ui` + `cupertino_ui`** standalone packages (Flutter 3.47+). Import from these, not `package:flutter/material.dart` / `cupertino.dart`
@@ -67,6 +69,7 @@ Status: **prototype** — real user count unknown. Backend is **free-tier only**
 - [ ] Layer boundaries respected (no forbidden imports)
 - [ ] `Result<T>` used; no UI try/catch
 - [ ] No `double` money; formatting via `MoneyFormatter`
+- [ ] No calendar-month assumptions: period logic uses `BudgetPeriod`/`PeriodCalculator` (works for `monthStartDay` 1 and e.g. 10)
 - [ ] All streams/controllers/timers/listeners disposed
 - [ ] Providers are `autoDispose` unless they must live app-wide
 - [ ] UI matches `Design.md` tokens; light **and** dark mode checked
