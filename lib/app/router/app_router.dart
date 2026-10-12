@@ -63,17 +63,6 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             path: AppRoutes.profile,
             name: AppRoutes.profileName,
             builder: (context, state) => const ProfilePage(),
-            routes: <RouteBase>[
-              // Nested so the editor inherits the profile segment and the back
-              // stack reads Profile → Avatar: the editor is meaningless without
-              // the profile behind it, and a top-level route would let a deep
-              // link open it with nothing to pop back to.
-              GoRoute(
-                path: AppRoutes.avatarEditorRelative,
-                name: AppRoutes.avatarEditorName,
-                builder: (context, state) => const AvatarEditorPage(),
-              ),
-            ],
           ),
         ],
       ),
@@ -97,6 +86,17 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
                 _TransactionEditLoader(id: state.pathParameters['id']!),
           ),
         ],
+      ),
+
+      // Avatar editor is a full-screen route OUTSIDE the shell (docs/Avatar.md §2
+      // step 0): no bottom navigation, so the pinned Save bar owns the bottom
+      // edge and the preview never competes with a tab bar. Reached by deep link
+      // `/profile/avatar` or by `pushNamed` from the Profile page; popping
+      // returns to the profile, which stays in the shell.
+      GoRoute(
+        path: '/profile/avatar',
+        name: AppRoutes.avatarEditorName,
+        builder: (context, state) => const AvatarEditorPage(),
       ),
     ],
   );

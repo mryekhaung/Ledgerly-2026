@@ -15,7 +15,8 @@ Status: **prototype** — real user count unknown. Backend is **free-tier only**
 | `docs/Design.md` | Any UI work — tokens, components, screen specs (MANDATORY for UI) |
 | `docs/Architecture.md` | Creating/moving files, new features, DI, state |
 | `docs/Platform.md` | Any UI work — iOS Liquid Glass / Android Material 3 / responsive web (MANDATORY for UI) |
-| `docs/Auth.md` | Auth, profile, avatar, account deletion |
+| `docs/Auth.md` | Auth, profile, account deletion |
+| `docs/Avatar.md` | Avatar editor, Open Peeps assets, avatar model & renderer |
 | `docs/DataModel.md` | Entities, DB schema, money handling |
 | `docs/Backend.md` | Anything touching remote/sync/auth |
 | `docs/Versions.md` | Before adding/upgrading any package or SDK; Riverpod 3 / Flutter 3.47 rules |

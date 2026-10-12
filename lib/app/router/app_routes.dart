@@ -40,8 +40,9 @@ abstract final class AppRoutes {
   static const String profile = '/profile';
   static const String profileName = 'profile';
 
-  /// Avatar editor. A sub-route of [profile] so the back stack reads
-  /// Profile → Avatar and the editor can never be opened without a parent.
-  static const String avatarEditorRelative = 'avatar';
+  /// Avatar editor — a top-level, full-screen route OUTSIDE the shell
+  /// (docs/Avatar.md §2 step 0): no bottom navigation, so the Save bar owns the
+  /// bottom edge. Reached by deep link `/profile/avatar` or by `pushNamed` from
+  /// the Profile page; popping returns to the profile (which stays in the shell).
   static const String avatarEditorName = 'avatarEditor';
 }

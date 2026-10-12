@@ -37,19 +37,22 @@ void main() {
         if (random case final random?)
           avatarRandomProvider.overrideWithValue(random),
       ],
-      child: MaterialApp(
-        locale: locale,
-        supportedLocales: AppLocalization.supportedLocales
-            .map(Locale.new)
-            .toList(growable: false),
-        localizationsDelegates: <LocalizationsDelegate<Object?>>[
-          ...GlobalMaterialLocalizations.delegates,
-          AppLocalizations.delegate,
-        ],
-        home: Builder(
-          builder: (context) => AppStringsScope(
-            lookup: AppStringLookup.of(AppLocalizations.of(context)),
-            child: child,
+      child: AppThemeColors(
+        colors: const AppColorsLight(),
+        child: MaterialApp(
+          locale: locale,
+          supportedLocales: AppLocalization.supportedLocales
+              .map(Locale.new)
+              .toList(growable: false),
+          localizationsDelegates: <LocalizationsDelegate<Object?>>[
+            ...GlobalMaterialLocalizations.delegates,
+            AppLocalizations.delegate,
+          ],
+          home: Builder(
+            builder: (context) => AppStringsScope(
+              lookup: AppStringLookup.of(AppLocalizations.of(context)),
+              child: child,
+            ),
           ),
         ),
       ),

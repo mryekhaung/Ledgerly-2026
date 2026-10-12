@@ -59,6 +59,20 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
     final strings = AppStrings.of(context);
     final colors = AppThemeColors.of(context);
     final config = _draft$;
+    final width = MediaQuery.sizeOf(context).width;
+
+    final saveButton = FilledButton(
+      onPressed: _saving ? null : () => _save(config, strings),
+      child: _saving
+          ? SizedBox.square(
+              dimension: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colors.textOnBrand,
+              ),
+            )
+          : Text(strings('avatarEditorSave')),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -70,42 +84,42 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
           ),
         ],
       ),
+      // The editor is a full-screen route outside the shell (docs/Avatar.md §2
+      // step 0), so the only bottom edge it must clear is the system gesture
+      // area. One SafeArea wraps the column: the scrollable content respects the
+      // top, and the pinned Save bar respects the bottom.
       body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppSpacing.pageHorizontal(
-              MediaQuery.sizeOf(context).width,
-            ),
-            vertical: AppSpacing.lg,
-          ),
+        child: Column(
           children: <Widget>[
-            _Preview(config: config, colors: colors),
-            const SizedBox(height: AppSpacing.xl),
-            // Every slot is a row of swatches: one tap = one choice, no sheet,
-            // because the whole point of the editor is to see combinations.
-            for (final part in AvatarPart.values) ...<Widget>[
-              _PartRow(
-                part: part,
-                selectedIndex: config.indexOf(part),
-                onSelected: (index) =>
-                    setState(() => _draft = config.withPart(part, index)),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.pageHorizontal(width),
+                  vertical: AppSpacing.lg,
+                ),
+                children: <Widget>[
+                  // Top breathing room so the preview never tucks under the
+                  // header, even at text scale 2.0 (docs/Avatar.md §2 step 0).
+                  const SizedBox(height: AppSpacing.xl),
+                  _Preview(config: config, colors: colors),
+                  const SizedBox(height: AppSpacing.xl),
+                  // Every slot is a row of swatches: one tap = one choice, no
+                  // sheet, because the whole point of the editor is to see
+                  // combinations.
+                  for (final part in AvatarPart.values) ...<Widget>[
+                    _PartRow(
+                      part: part,
+                      selectedIndex: config.indexOf(part),
+                      onSelected: (index) =>
+                          setState(() => _draft = config.withPart(part, index)),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                  ],
+                ],
               ),
-              const SizedBox(height: AppSpacing.lg),
-            ],
-            const SizedBox(height: AppSpacing.sm),
-            FilledButton(
-              onPressed: _saving ? null : () => _save(config, strings),
-              child: _saving
-                  ? SizedBox.square(
-                      dimension: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: colors.textOnBrand,
-                      ),
-                    )
-                  : Text(strings('avatarEditorSave')),
             ),
-            const SizedBox(height: AppSpacing.xxl),
+            // Pinned Save bar: always visible and clear of the gesture area.
+            _SaveBar(child: saveButton),
           ],
         ),
       ),
@@ -154,6 +168,37 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
       ..showSnackBar(
         SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
       );
+  }
+}
+
+/// The pinned Save footer of the editor.
+///
+/// Lives outside the scrollable content so the button is always on screen and
+/// never slides under the system gesture area, even on a long list of part rows
+/// (docs/Avatar.md §2 step 0). The hairline divides it from the scrolling
+/// options; the page's outer [SafeArea] owns the system bottom inset.
+class _SaveBar extends StatelessWidget {
+  const _SaveBar({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        const Divider(height: 1, thickness: 1),
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.pageHorizontal(width),
+            vertical: AppSpacing.md,
+          ),
+          child: SizedBox(width: double.infinity, child: child),
+        ),
+      ],
+    );
   }
 }
 
