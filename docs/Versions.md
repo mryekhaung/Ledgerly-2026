@@ -174,6 +174,24 @@ this machine cannot run `build_runner`.
 Run `./scripts/codegen.sh` after any change under `lib/core/database/`. Generated files are
 **committed**.
 
+### Avatar art source — **verified 12 Oct 2026** (Avatar v2 step 1 spike)
+
+Not a package (no runtime dependency) — the art is extracted at build time and committed
+(`docs/Avatar.md`). Recorded here because §1 requires the license be verified at implementation
+time with the date.
+
+- **Source definition:** `dicebear/styles/src/open-peeps.json` (`@dicebear/schema@2.0.1`),
+  downloaded 12 Oct 2026. Also available as the `dicebear_styles` pub package (`open_peeps`).
+- **License: `CC0 1.0`** — confirmed both in the definition's `meta.license` and on
+  `dicebear.com/licenses` (12 Oct 2026), where Open Peeps is listed under "CC0 1.0" as a
+  *"Remix of Open Peeps by Pablo Stanley"*. Original work: Open Peeps, Pablo Stanley.
+  CC0 requires no attribution; we credit anyway (Settings → Credits, Avatar v2 step 5).
+- **Canvas 704 × 704; groups `head`(48) · `expression`(30) · `facialHair`(16) ·
+  `accessories`(8) · `mask`(2); color groups `skin`(5) · `clothing`(7) · `headContrast`(10) ·
+  `ink`(1).** Full report in `docs/Avatar.md` §9.
+- **`flutter_svg` is still NOT declared** — it is added in the PR that first needs it (step 3,
+  the composer); per §3/§"Phase 0", no premature dependency.
+
 
 
 ## 4. Riverpod 3 rules (we start on 3.x, never 2.x)
