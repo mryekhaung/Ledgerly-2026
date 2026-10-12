@@ -11,6 +11,7 @@ import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
+import 'package:ledgerly/features/transactions/domain/usecases/delete_transaction.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/watch_transactions.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
@@ -66,8 +67,10 @@ void main() {
     Locale? locale,
     double textScale = 1,
     List<Transaction>? transactions,
+    FakeTransactionRepository? repository,
+    List<Override> extraOverrides = const <Override>[],
   }) {
-    final fakes = FakeTransactionRepository(
+    final fakes = repository ?? FakeTransactionRepository(
       seed: transactions ?? dayTransactions(),
     );
 
@@ -88,6 +91,7 @@ void main() {
         ),
         currencyProvider.overrideWithValue(CurrencyCode.mmk),
         weekStartProvider.overrideWithValue(WeekStart.monday),
+        ...extraOverrides,
       ],
       child: MaterialApp(
         theme: AppTheme.light(),
@@ -380,6 +384,101 @@ void main() {
           reason: 'CalendarPage threw at width $width, text scale 2.0',
         );
       }
+    });
+  });
+
+  group('day row swipe-to-delete and overflow menu', () {
+    /// Hosts [CalendarPage] with a known fake repository so the swipe's soft
+    /// delete and its undo can be asserted against the same in-memory store the
+    /// page mutates.
+    Widget hostWithFakes(FakeTransactionRepository fakes) => host(
+      TestWidths.phone,
+      repository: fakes,
+      extraOverrides: <Override>[
+        deleteTransactionProvider.overrideWithValue(DeleteTransaction(fakes)),
+        restoreTransactionProvider.overrideWithValue(
+          RestoreTransaction(fakes),
+        ),
+      ],
+    );
+
+    testWidgets('should_soft_delete_a_row_on_a_left_swipe_and_undo_it', (
+      tester,
+    ) async {
+      final fakes = FakeTransactionRepository(seed: dayTransactions());
+      await tester.pumpWidget(hostWithFakes(fakes));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Morning coffee'), findsOneWidget);
+
+      // Swipe left (end → start) deletes.
+      await tester.fling(
+        find.text('Morning coffee'),
+        const Offset(-400, 0),
+        1000,
+      );
+      await tester.pumpAndSettle();
+
+      // The row leaves the tree immediately (locally dismissed), and the
+      // repository recorded a soft delete.
+      expect(find.text('Morning coffee'), findsNothing);
+      expect(
+        fakes.items.firstWhere((t) => t.id == 'txn-coffee').isActive,
+        isFalse,
+      );
+
+      // The undo snack bar brings it back.
+      await tester.tap(find.widgetWithText(SnackBarAction, 'Undo'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Morning coffee'), findsOneWidget);
+      expect(fakes.restoredIds, contains('txn-coffee'));
+      expect(
+        fakes.items.firstWhere((t) => t.id == 'txn-coffee').isActive,
+        isTrue,
+      );
+    });
+
+    testWidgets('should_not_remove_the_row_when_a_right_swipe_requests_edit', (
+      tester,
+    ) async {
+      final fakes = FakeTransactionRepository(seed: dayTransactions());
+      await tester.pumpWidget(hostWithFakes(fakes));
+      await tester.pumpAndSettle();
+
+      final before = fakes.items.where((t) => t.isActive).length;
+
+      // Swipe right (start → end) edits: the row must snap back and stay.
+      await tester.fling(
+        find.text('Morning coffee'),
+        const Offset(400, 0),
+        1000,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Morning coffee'), findsOneWidget);
+      expect(fakes.items.where((t) => t.isActive).length, before);
+    });
+
+    testWidgets('should_offer_edit_and_delete_in_the_overflow_menu', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(TestWidths.phone));
+      await tester.pumpAndSettle();
+
+      final menu = find.descendant(
+        of: find.ancestor(
+          of: find.text('Morning coffee'),
+          matching: find.byType(ListTile),
+        ),
+        matching: find.byIcon(Icons.more_horiz),
+      );
+      await tester.tap(menu);
+      await tester.pumpAndSettle();
+
+      // The menu mirrors the swipe gestures for keyboard / screen-reader users.
+      expect(find.text('Edit transaction'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
     });
   });
 }

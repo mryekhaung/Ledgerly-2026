@@ -85,7 +85,11 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
   - ✅ Capsule intensity: `clamp(net / p95MonthNet, 0, 1)` quantized to 5 steps, `moneyOutSubtle` vs `moneyInSubtle` by net direction, 4 px bar at 60 % cell width (Design.md §6.2).
   - ✅ Route `/` now builds `CalendarPage` (was the Phase 0 placeholder).
   - ☐ **Summary card shows the month total, not the day total** — a day-level aggregate use case (`WatchDayTotal`) does not exist yet. Tracked below.
-  - ☐ Horizontal swipe to change month, tappable month/year picker, `Expanded` density (tiny amount under the capsule), swipe-to-delete/edit on day rows, two-pane medium+ layout.
+  - ✅ Horizontal swipe to change month (`_MonthSwipeArea`: velocity + distance threshold, one code path with the `‹ ›` buttons).
+  - ✅ Tappable month/year picker (`_MonthSwitcher` title → `MonthYearPickerPage`).
+  - ✅ Two-pane medium+ layout (`_WideBody`: each pane scrolls independently).
+  - ✅ **Swipe-to-delete/edit on day rows** — `_TransactionRow` is a `Dismissible`: swipe left deletes (soft delete + 5 s undo snack bar, `AppFeedback.destructive`/`undoable`), swipe right edits, on top of tap-to-edit; a trailing overflow menu mirrors both actions for keyboard / screen-reader users. Covered by `calendar_page_test.dart` (delete+undo, edit-snapback, menu items).
+  - ☐ `Expanded` density: a tiny amount under each capsule.
 - ☑ Settings: currency, language, theme, week start
   - ✅ `app_settings` Drift table (schema **v2**, additive) + `AppSettingsDao` (`readAll`/`watchAll`/`read`/`put`/`putAll`/`remove`).
   - ✅ Domain: `AppSettings` entity (+ `AppThemeMode`, `WeekStart` pure-Dart enums with null-returning `tryParse`), `SettingsRepository` interface, 3 use cases (`LoadSettings`, `WatchSettings`, `SaveSettings`). `SaveSettings` refuses a `partial` write rather than silently doing a full one.

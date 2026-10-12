@@ -745,32 +745,58 @@ class _SummaryColumn extends StatelessWidget {
 }
 
 /// The list of transactions for the selected day.
-class _DayList extends ConsumerWidget {
+class _DayList extends ConsumerStatefulWidget {
   const _DayList({required this.day});
 
   final LocalDate day;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_DayList> createState() => _DayListState();
+}
+
+/// State for [_DayList].
+///
+/// Holds the set of ids dismissed by a swipe so the row is removed from the
+/// visible list on the same frame the gesture completes. The soft delete only
+/// propagates through the provider stream a frame later, and a `Dismissible`
+/// whose key is still in the parent's children after `onDismissed` throws — so
+/// we drop it locally first and let the stream confirm the removal.
+class _DayListState extends ConsumerState<_DayList> {
+  final Set<String> _dismissed = <String>{};
+
+  @override
+  Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final transactionsAsync = ref.watch(selectedDayTransactionsProvider);
 
     return transactionsAsync.when(
-      data: (transactions) => transactions.isEmpty
-          ? StatePlaceholder(
-              icon: Icons.inbox_outlined,
-              title: strings('calendarEmptyDay'),
-              body: strings('stateEmptyBody'),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                _DayHeader(day: day),
-                const SizedBox(height: AppSpacing.sm),
-                for (final transaction in transactions)
-                  _TransactionRow(transaction: transaction),
-              ],
-            ),
+      data: (transactions) {
+        final visible =
+            transactions
+                .where((t) => !_dismissed.contains(t.id))
+                .toList(growable: false);
+
+        return visible.isEmpty
+            ? StatePlaceholder(
+                icon: Icons.inbox_outlined,
+                title: strings('calendarEmptyDay'),
+                body: strings('stateEmptyBody'),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  _DayHeader(day: widget.day),
+                  const SizedBox(height: AppSpacing.sm),
+                  for (final transaction in visible)
+                    _TransactionRow(
+                      transaction: transaction,
+                      onRemoved: (id) => setState(() => _dismissed.add(id)),
+                      onRestored:
+                          (id) => setState(() => _dismissed.remove(id)),
+                    ),
+                ],
+              );
+      },
       loading: () => const LoadingPlaceholder(),
       error: (_, __) => ErrorBanner(
         message: strings('stateErrorBody'),
@@ -813,46 +839,125 @@ class _DayHeader extends StatelessWidget {
 }
 
 /// One transaction in the day list.
+///
+/// Direct manipulation: swipe **left** to delete (a 5-second undo snack bar
+/// follows, because the delete is *soft* — the same tombstone a v0.4 sync will
+/// propagate, so the undo is honest rather than decorative) and swipe **right**
+/// to edit, on top of the existing tap-to-edit. A trailing overflow menu
+/// mirrors both actions for keyboard and screen-reader users, who cannot
+/// perform a swipe (`docs/Roadmap.md` Phase 1).
 class _TransactionRow extends ConsumerWidget {
-  const _TransactionRow({required this.transaction});
+  const _TransactionRow({
+    required this.transaction,
+    required this.onRemoved,
+    required this.onRestored,
+  });
 
   final Transaction transaction;
 
+  /// Adds [transaction.id] to the parent's locally-dismissed set when a delete
+  /// swipe completes, so the row leaves the tree before the provider stream
+  /// confirms the soft delete.
+  final ValueChanged<String> onRemoved;
+
+  /// Removes [transaction.id] from that set when an undo restores it, letting
+  /// the row reappear from the provider data.
+  final ValueChanged<String> onRestored;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = AppStrings.of(context);
     final colors = AppThemeColors.of(context);
     final category = ref
         .watch(categoryByIdProvider(transaction.categoryId))
         .value;
 
-    return ListTile(
-      onTap: () => _editTransaction(context, transaction),
-      leading: category == null
-          ? const SizedBox.square(dimension: 40)
-          : CategoryGem(
-              colorValue: category.colorValue,
-              iconKey: category.iconKey,
-              size: CategoryGemSize.md,
-            ),
-      title: Text(
-        category?.name ?? transaction.categoryId,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+    return Dismissible(
+      key: ValueKey<String>(transaction.id),
+      direction: DismissDirection.horizontal,
+      // Swiping right (start → end) edits: navigate, then snap back so the row
+      // never disappears for an action that keeps it.
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          _editTransaction(context, transaction);
+          return false;
+        }
+        return true;
+      },
+      onDismissed: (direction) {
+        if (direction == DismissDirection.endToStart) {
+          onRemoved(transaction.id);
+          _deleteTransaction(context, ref, transaction);
+        }
+      },
+      background: _SwipeAffordance(
+        alignStart: true,
+        icon: Icons.edit_outlined,
+        label: strings('transactionEdit'),
+        color: colors.brandSubtle,
+        iconColor: colors.brandPrimary,
       ),
-      subtitle: transaction.note == null
-          ? null
-          : Text(
-              transaction.note!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+      secondaryBackground: _SwipeAffordance(
+        alignStart: false,
+        icon: Icons.delete_outline,
+        label: strings('actionDelete'),
+        color: colors.moneyOutSubtle,
+        iconColor: colors.moneyOut,
+      ),
+      child: ListTile(
+        onTap: () => _editTransaction(context, transaction),
+        leading: category == null
+            ? const SizedBox.square(dimension: 40)
+            : CategoryGem(
+                colorValue: category.colorValue,
+                iconKey: category.iconKey,
+                size: CategoryGemSize.md,
+              ),
+        title: Text(
+          category?.name ?? transaction.categoryId,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: transaction.note == null
+            ? null
+            : Text(
+                transaction.note!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            AmountText(
+              transaction.amount,
+              style: AmountStyle.row,
+              signed: true,
+              color: transaction.direction == TransactionDirection.income
+                  ? colors.moneyIn
+                  : colors.moneyOut,
             ),
-      trailing: AmountText(
-        transaction.amount,
-        style: AmountStyle.row,
-        signed: true,
-        color: transaction.direction == TransactionDirection.income
-            ? colors.moneyIn
-            : colors.moneyOut,
+            const SizedBox(width: AppSpacing.xs),
+            PopupMenuButton<_TransactionAction>(
+              icon: Icon(Icons.more_horiz, color: colors.textSecondary),
+              onSelected: (action) => switch (action) {
+                _TransactionAction.edit =>
+                  _editTransaction(context, transaction),
+                _TransactionAction.delete =>
+                  _deleteTransaction(context, ref, transaction),
+              },
+              itemBuilder: (context) => <PopupMenuEntry<_TransactionAction>>[
+                PopupMenuItem<_TransactionAction>(
+                  value: _TransactionAction.edit,
+                  child: Text(strings('transactionEdit')),
+                ),
+                PopupMenuItem<_TransactionAction>(
+                  value: _TransactionAction.delete,
+                  child: Text(strings('actionDelete')),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -863,4 +968,102 @@ class _TransactionRow extends ConsumerWidget {
       pathParameters: <String, String>{'id': transaction.id},
     );
   }
+
+  Future<void> _deleteTransaction(
+    BuildContext context,
+    WidgetRef ref,
+    Transaction transaction,
+  ) async {
+    final strings = AppStrings.of(context);
+    // A destructive action buzzes before the snack bar is read, so deleting
+    // feels different from tapping a row.
+    AppFeedback.destructive();
+    final result = await ref
+        .read(deleteTransactionProvider)
+        .call((id: transaction.id));
+    if (!context.mounted) return;
+
+    if (result.isErr) {
+      AppFeedback.failure(context, message: strings('stateErrorBody'));
+      // A failed delete must not leave the row hidden.
+      onRestored(transaction.id);
+      return;
+    }
+
+    AppFeedback.undoable(
+      context,
+      message: strings('transactionDeleted'),
+      undoLabel: undoLabelFor(context),
+      onUndo: () => _restoreTransaction(context, ref, transaction),
+    );
+  }
+
+  Future<void> _restoreTransaction(
+    BuildContext context,
+    WidgetRef ref,
+    Transaction transaction,
+  ) async {
+    final result = await ref
+        .read(restoreTransactionProvider)
+        .call((id: transaction.id));
+    if (!context.mounted) return;
+
+    if (result.isSuccess) {
+      onRestored(transaction.id);
+      AppFeedback.success();
+    } else {
+      AppFeedback.failure(
+        context,
+        message: AppStrings.of(context)('stateErrorBody'),
+      );
+    }
+  }
 }
+
+/// The colored panel revealed behind a transaction row as it is swiped.
+///
+/// One instance per swipe direction: the edit affordance on the start side, the
+/// delete affordance on the end side. Kept tiny and declarative so both
+/// backgrounds share one painter.
+class _SwipeAffordance extends StatelessWidget {
+  const _SwipeAffordance({
+    required this.alignStart,
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.iconColor,
+  });
+
+  final bool alignStart;
+  final IconData icon;
+  final String label;
+  final Color color;
+  final Color iconColor;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    alignment: alignStart
+        ? AlignmentDirectional.centerStart
+        : AlignmentDirectional.centerEnd,
+    color: color,
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment:
+          alignStart ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+      children: <Widget>[
+        Icon(icon, color: iconColor),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: iconColor,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+/// What the row's overflow menu can do — the swipe-free alternative.
+enum _TransactionAction { edit, delete }
