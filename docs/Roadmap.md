@@ -42,10 +42,10 @@ Legend: ☐ todo · ◐ in progress · ☑ done. Each task = one small PR follow
 - ◐ `core/platform/` (AppPlatform, WindowSizeClass, AdaptiveStyle) + `GlassSurface` spike: blur fallback first, then `cupertino_native_better` (native iOS 26 tab bar/buttons); `liquid_glass_renderer` experimental only — decide & document
   - ✅ `core/platform/` done (`app_platform.dart`, `window_size.dart`, `adaptive_style.dart` + `window_size_test.dart`); GlassSurface spike still todo, so the item stays ◐.
 - ☐ Web spike: Drift (`drift_flutter` WASM) + conditional imports + fonts + `flutter build web --wasm` running
-- ◐ Design-system widgets (adaptive iOS/Material impls + responsive helpers): AppScaffold, AppCard, CategoryGem, ~~AmountText~~, SegmentedTabs, ListRow, buttons, fields, EmptyState, GlassDock (+ goldens)
-  - 📄 Specs for all of these now live in `docs/Design.md` §5
-  - ✅ `AmountText` shipped (`core/widgets/amount_text.dart`) — tabular figures enforced in every style, signed/unsigned modes, symbol prefix/suffix; covered by widget tests
-  - ☐ Goldens not yet scaffolded; the remaining widgets are still todo
+- ◐ Design-system widgets (adaptive iOS/Material impls + responsive helpers): AppScaffold, AppCard, CategoryGem, AmountText, SegmentedTabs, ListRow, buttons, fields, EmptyState, GlassDock (+ goldens)
+  - 📄 Specs for all of these live in `docs/Design.md` §5
+  - ✅ `AmountText`, `AppCard`, `ListRow`, `SegmentedTabs`, `AppButton`, `AppScaffold` shipped under `core/widgets/`; covered by widget tests (`amount_text_test.dart`, `design_system_widgets_test.dart`).
+  - ☐ Goldens not yet scaffolded.
 
 
 ## Phase 1 — MVP "Log & See" (v0.1) — STARTED (data layer only)
