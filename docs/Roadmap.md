@@ -12,8 +12,10 @@ Legend: ☐ todo · ◐ in progress · ☑ done. Each task = one small PR follow
   - ✅ Every package resolved on CI with Flutter 3.47.1 and recorded in `docs/Versions.md` §3: `material_ui` 1.6.0, `cupertino_ui` 1.1.2, `flutter_riverpod` 3.4.3, `go_router` 17.5.0, `get_it` 9.3.0, `intl` 0.20.3.
   - ✅ **The installed SDK is 3.47.7 / Dart 3.13.5** — the directory name `flutter_windows_3.38.2-stable` is stale and must not be trusted. Proven from `bin/cache/flutter.version.json` and `git describe --tags`. `pub get` succeeds locally (28 → 106 packages), so the version pins are satisfied and **no FVM install is needed** for local work.
   - ✅ The only local limitation is that Dart cannot spawn child processes in the agent sandbox: `CreateNamedPipeW` with `nMaxInstances = -1` returns `ERROR_INVALID_PARAMETER` (87), which is the value Dart passes. Named pipes are *not* globally blocked (Python's `capture_output=True` works), so this is a sandbox/token interaction with Dart's launcher, not a project defect. Full analysis in `docs/Versions.md`. **CI remains the verification channel of record**; locally we can run `dart format`, JIT-run non-spawning scripts, and `gen-l10n` via the tools snapshot.
-- ☐ Riverpod 3 baseline provider/notifier template + lint rule banning `legacy.dart` imports
-  - ◐ CI `banned-imports` job enforces the ban; the baseline provider template is still todo
+- ☑ Riverpod 3 baseline provider/notifier template + lint rule banning `legacy.dart` imports
+  - ✅ CI `banned-imports` job enforces the ban on `legacy.dart`, `StateNotifierProvider`, `ChangeNotifierProvider`, and `StateProvider`.
+  - ✅ Pure-architecture layer rule test (`test/core/layer_rule_test.dart`) enforces Riverpod 3 purity across `lib/`.
+  - ✅ Canonical Riverpod 3 templates implemented in `lib/core/presentation/riverpod_templates.dart` covering `Notifier`, `AsyncNotifier`, `StreamNotifier`, and use-case bridge helpers; verified with full unit tests in `test/core/presentation/riverpod_templates_test.dart`.
 - ☑ Create Flutter project, flavors (dev/prod), lints, CI (format/analyze/test)
   - ✅ CI green on `dev` at `8523fb7`: banned-imports, format, analyze (**0 issues**), test (**145 passing**). `dev` → `main` → `prod` all merged and pushed.
 - ☑ `core/`: Result, Failure, UseCase, Money + MoneyFormatter, LocalDate (+ tests)

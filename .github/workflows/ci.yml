@@ -64,7 +64,7 @@ jobs:
           # 1. Legacy Riverpod providers are forbidden (use Notifier/AsyncNotifier/StreamNotifier).
           check \
             "Legacy Riverpod import. Use Notifier/AsyncNotifier/StreamNotifier (docs/Versions.md §4)." \
-            "flutter_riverpod/legacy\.dart|StateNotifierProvider|ChangeNotifierProvider" \
+            "flutter_riverpod/legacy\.dart|StateNotifierProvider|ChangeNotifierProvider|StateProvider" \
             "lib"
 
           # 2. Material/Cupertino must come from the standalone packages, not the SDK.

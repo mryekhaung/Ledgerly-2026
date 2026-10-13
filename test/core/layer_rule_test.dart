@@ -322,6 +322,49 @@ void main() {
     }
   });
 
+  group('Riverpod 3 purity across lib/', () {
+    test('should_not_import_legacy_riverpod_or_use_legacy_providers', () {
+      final libDir = Directory('lib');
+      final dartFiles = libDir
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.dart') && !f.path.endsWith('.g.dart'))
+          .toList();
+
+      final violations = <String>[];
+      const legacyTokens = <String>[
+        'flutter_riverpod/legacy.dart',
+        'StateNotifierProvider',
+        'ChangeNotifierProvider',
+        'StateProvider',
+      ];
+
+      for (final file in dartFiles) {
+        final lines = file.readAsStringSync().split('\n');
+        for (var i = 0; i < lines.length; i++) {
+          final line = lines[i];
+          final commentIdx = line.indexOf('//');
+          final code = commentIdx >= 0 ? line.substring(0, commentIdx) : line;
+          for (final token in legacyTokens) {
+            if (code.contains(token)) {
+              violations.add(
+                '${_relative(file.path)}:${i + 1} uses legacy Riverpod token "$token"',
+              );
+            }
+          }
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Riverpod 3 forbids legacy providers (docs/Versions.md §4, '
+            'docs/Conventions.md §1):\n${violations.join('\n')}',
+      );
+    });
+  });
+
   group('forbidden-import policy self-check', () {
     test('should_flag_a_flutter_import', () {
       // Guards the detector itself: if the regex regressed, the layer tests
