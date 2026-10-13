@@ -35,6 +35,7 @@ class SettingsLocalDataSource {
         SettingsKeys.currency: settings.currency.name,
         SettingsKeys.themeMode: settings.themeMode.name,
         SettingsKeys.weekStart: settings.weekStart.name,
+        SettingsKeys.monthStartDay: settings.monthStartDay.toString(),
         // The locale is the one key that is *removed* when null, because an absent
         // row is how "follow the device" is stored — see [_decode].
         ...switch (settings.localeCode) {
@@ -58,6 +59,12 @@ class SettingsLocalDataSource {
   AppSettings _decode(Map<String, String> raw) {
     const defaults = AppSettings.defaults;
     final locale = raw[SettingsKeys.locale];
+    final rawDay = raw[SettingsKeys.monthStartDay];
+    final parsedDay = rawDay != null ? int.tryParse(rawDay) : null;
+    final monthStartDay =
+        (parsedDay != null && parsedDay >= 1 && parsedDay <= 28)
+        ? parsedDay
+        : defaults.monthStartDay;
 
     return AppSettings(
       currency:
@@ -72,6 +79,7 @@ class SettingsLocalDataSource {
       // An empty string decodes to null too, so a blank row cannot shadow the
       // device locale with "no locale at all".
       localeCode: (locale == null || locale.isEmpty) ? null : locale,
+      monthStartDay: monthStartDay,
     );
   }
 

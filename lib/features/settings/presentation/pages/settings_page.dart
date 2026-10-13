@@ -124,6 +124,18 @@ class SettingsPage extends ConsumerWidget {
                     strings,
                   ),
                 ),
+                const _GroupDivider(),
+                _NavRow(
+                  label: strings('settingsMonthStartsOn'),
+                  subtitle: strings('settingsMonthStartsOnDescription'),
+                  trailingText: AppStrings.fill(
+                    context,
+                    'monthStartsOnDayFormat',
+                    {'day': settings.monthStartDay},
+                  ),
+                  onTap: () =>
+                      context.pushNamed(AppRoutes.settingsMonthStartsOnName),
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -532,6 +544,7 @@ class _NavRow extends StatelessWidget {
     required this.onTap,
     this.leading,
     this.subtitle,
+    this.trailingText,
   });
 
   final String label;
@@ -542,6 +555,9 @@ class _NavRow extends StatelessWidget {
 
   /// Optional supporting text below the label.
   final String? subtitle;
+
+  /// Optional value text shown before the chevron.
+  final String? trailingText;
 
   @override
   Widget build(BuildContext context) {
@@ -585,6 +601,14 @@ class _NavRow extends StatelessWidget {
                   ],
                 ),
               ),
+              if (trailingText case final trailingText?) ...<Widget>[
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  trailingText,
+                  style: Theme.of(context).textTheme.bodyMedium
+                      ?.copyWith(color: colors.textSecondary),
+                ),
+              ],
               const SizedBox(width: AppSpacing.xs),
               Icon(Icons.chevron_right, size: 20, color: colors.textTertiary),
             ],

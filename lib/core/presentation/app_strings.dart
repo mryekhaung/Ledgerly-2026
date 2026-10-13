@@ -56,6 +56,15 @@ abstract final class AppStrings {
         _require(values, 'part') as String,
         _require(values, 'value') as String,
       ),
+      'monthStartsOnCurrentPeriod' => l10n.monthStartsOnCurrentPeriod(
+        _require(values, 'range') as String,
+      ),
+      'monthStartsOnPreviousPeriod' => l10n.monthStartsOnPreviousPeriod(
+        _require(values, 'range') as String,
+      ),
+      'monthStartsOnDayFormat' => l10n.monthStartsOnDayFormat(
+        _require(values, 'day') as int,
+      ),
       _ => throw FlutterError(
         'AppStrings.fill() has no case for "$key". Add one in '
         'lib/core/presentation/app_strings.dart.',
@@ -213,6 +222,14 @@ abstract final class AppStringLookup {
     'settingsVersionLabel' => l10n.settingsVersionLabel,
     'settingsCreditsTitle' => l10n.settingsCreditsTitle,
     'settingsCreditsAvatar' => l10n.settingsCreditsAvatar,
+    'settingsMonthStartsOn' => l10n.settingsMonthStartsOn,
+    'settingsMonthStartsOnDescription' => l10n.settingsMonthStartsOnDescription,
+    'monthStartsOnTitle' => l10n.monthStartsOnTitle,
+    'monthStartsOnDescription' => l10n.monthStartsOnDescription,
+    'monthStartsOnTransactionsNotice' => l10n.monthStartsOnTransactionsNotice,
+    'calendarPayCycle' => l10n.calendarPayCycle,
+    'calendarThisPeriod' => l10n.calendarThisPeriod,
+    'calendarSpentThisPeriod' => l10n.calendarSpentThisPeriod,
     'profileTitle' => l10n.profileTitle,
     'profileGuestBadge' => l10n.profileGuestBadge,
     'profileGuestBody' => l10n.profileGuestBody,

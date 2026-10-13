@@ -35,6 +35,10 @@ abstract final class AppRoutes {
   static const String settingsCurrency = '/settings/currency';
   static const String settingsCurrencyName = 'settingsCurrency';
 
+  /// Month starts on picker (Phase 1, docs/Design.md §6.6).
+  static const String settingsMonthStartsOn = '/settings/month-starts-on';
+  static const String settingsMonthStartsOnName = 'settingsMonthStartsOn';
+
   /// Profile (Phase 1). Reached from the settings list and the shell avatar —
   /// it is a secondary destination, not a fifth tab.
   static const String profile = '/profile';

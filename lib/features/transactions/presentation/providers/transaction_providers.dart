@@ -12,25 +12,37 @@ final watchDayTransactionsProvider = Provider<WatchDayTransactions>(
   (_) => getIt<WatchDayTransactions>(),
 );
 
-/// Bridge for [WatchMonthTransactions].
-final watchMonthTransactionsProvider = Provider<WatchMonthTransactions>(
-  (_) => getIt<WatchMonthTransactions>(),
+/// Bridge for [WatchPeriodTransactions].
+final watchPeriodTransactionsProvider = Provider<WatchPeriodTransactions>(
+  (_) => getIt<WatchPeriodTransactions>(),
 );
 
-/// Bridge for [WatchMonthDailyTotals].
-final watchMonthDailyTotalsProvider = Provider<WatchMonthDailyTotals>(
-  (_) => getIt<WatchMonthDailyTotals>(),
+/// Bridge for [WatchPeriodDailyTotals].
+final watchPeriodDailyTotalsProvider = Provider<WatchPeriodDailyTotals>(
+  (_) => getIt<WatchPeriodDailyTotals>(),
 );
 
-/// Bridge for [WatchMonthCategoryTotals].
-final watchMonthCategoryTotalsProvider = Provider<WatchMonthCategoryTotals>(
-  (_) => getIt<WatchMonthCategoryTotals>(),
+/// Bridge for [WatchPeriodCategoryTotals].
+final watchPeriodCategoryTotalsProvider = Provider<WatchPeriodCategoryTotals>(
+  (_) => getIt<WatchPeriodCategoryTotals>(),
 );
 
-/// Bridge for [WatchMonthTotal].
-final watchMonthTotalProvider = Provider<WatchMonthTotal>(
-  (_) => getIt<WatchMonthTotal>(),
+/// Bridge for [WatchPeriodTotal].
+final watchPeriodTotalProvider = Provider<WatchPeriodTotal>(
+  (_) => getIt<WatchPeriodTotal>(),
 );
+
+/// Backward-compatible alias for [watchPeriodTransactionsProvider].
+final watchMonthTransactionsProvider = watchPeriodTransactionsProvider;
+
+/// Backward-compatible alias for [watchPeriodDailyTotalsProvider].
+final watchMonthDailyTotalsProvider = watchPeriodDailyTotalsProvider;
+
+/// Backward-compatible alias for [watchPeriodCategoryTotalsProvider].
+final watchMonthCategoryTotalsProvider = watchPeriodCategoryTotalsProvider;
+
+/// Backward-compatible alias for [watchPeriodTotalProvider].
+final watchMonthTotalProvider = watchPeriodTotalProvider;
 
 /// Bridge for [WatchDayTotal].
 final watchDayTotalProvider = Provider<WatchDayTotal>(

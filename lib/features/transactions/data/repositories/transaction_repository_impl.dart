@@ -1,5 +1,6 @@
 import 'package:ledgerly/core/database/result_guard.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
+import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -29,14 +30,34 @@ class TransactionRepositoryImpl implements TransactionRepository {
       guardResultStream(_local.watchDay(date));
 
   @override
+  Stream<Result<List<Transaction>>> watchPeriod(BudgetPeriod period) =>
+      guardResultStream(_local.watchPeriod(period));
+
+  @override
   Stream<Result<List<Transaction>>> watchMonth(LocalDate month) =>
       guardResultStream(_local.watchMonth(month));
+
+  @override
+  Stream<Result<List<DailyTotal>>> watchPeriodDailyTotals(
+    BudgetPeriod period, {
+    required CurrencyCode currency,
+  }) => guardResultStream(
+    _local.watchPeriodDailyTotals(period, currency: currency),
+  );
 
   @override
   Stream<Result<List<DailyTotal>>> watchDailyTotals(
     LocalDate month, {
     required CurrencyCode currency,
   }) => guardResultStream(_local.watchDailyTotals(month, currency: currency));
+
+  @override
+  Stream<Result<List<CategoryTotal>>> watchPeriodCategoryTotals(
+    BudgetPeriod period, {
+    required CurrencyCode currency,
+  }) => guardResultStream(
+    _local.watchPeriodCategoryTotals(period, currency: currency),
+  );
 
   @override
   Stream<Result<List<CategoryTotal>>> watchCategoryTotals(
@@ -46,7 +67,13 @@ class TransactionRepositoryImpl implements TransactionRepository {
       guardResultStream(_local.watchCategoryTotals(month, currency: currency));
 
   @override
-  Stream<Result<MonthTotal>> watchMonthTotal(
+  Stream<Result<PeriodTotal>> watchPeriodTotal(
+    BudgetPeriod period, {
+    required CurrencyCode currency,
+  }) => guardResultStream(_local.watchPeriodTotal(period, currency: currency));
+
+  @override
+  Stream<Result<PeriodTotal>> watchMonthTotal(
     LocalDate month, {
     required CurrencyCode currency,
   }) => guardResultStream(_local.watchMonthTotal(month, currency: currency));
@@ -56,6 +83,12 @@ class TransactionRepositoryImpl implements TransactionRepository {
     LocalDate date, {
     required CurrencyCode currency,
   }) => guardResultStream(_local.watchDayTotal(date, currency: currency));
+
+  @override
+  Future<Result<int>> sumForPeriod(
+    BudgetPeriod period,
+    TransactionDirection direction,
+  ) => guardResult(() => _local.sumForPeriod(period, direction));
 
   @override
   Future<Result<int>> sumForMonth(

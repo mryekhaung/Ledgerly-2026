@@ -67,17 +67,23 @@ final class AppSettings {
     required this.themeMode,
     required this.weekStart,
     this.localeCode,
-  });
+    this.monthStartDay = 1,
+  }) : assert(
+         monthStartDay >= 1 && monthStartDay <= 28,
+         'monthStartDay must be 1..28 (docs/DataModel.md §8).',
+       );
 
   /// The defaults for a fresh install, and the fallback when a stored value is
   /// unreadable.
   ///
   /// MMK + Monday-first mirrors the primary market; `system` theme respects the
-  /// OS; a null locale follows the device.
+  /// OS; a null locale follows the device; month start day 1 is the standard
+  /// calendar month.
   static const AppSettings defaults = AppSettings(
     currency: CurrencyCode.mmk,
     themeMode: AppThemeMode.system,
     weekStart: WeekStart.monday,
+    monthStartDay: 1,
   );
 
   /// The currency every amount is denominated in.
@@ -96,6 +102,12 @@ final class AppSettings {
   /// round-trip (`Locale('en')` cannot express it).
   final String? localeCode;
 
+  /// Day of the month (1–28) on which each budget period begins.
+  ///
+  /// 1 represents a standard calendar month (the default). Any other day
+  /// (e.g. 10th) represents a pay-cycle month (e.g. Oct 10 – Nov 9).
+  final int monthStartDay;
+
   /// A copy with the given fields replaced.
   ///
   /// [localeCode] is settable to null explicitly via [clearLocale] rather than
@@ -107,11 +119,13 @@ final class AppSettings {
     AppThemeMode? themeMode,
     WeekStart? weekStart,
     String? localeCode,
+    int? monthStartDay,
   }) => AppSettings(
     currency: currency ?? this.currency,
     themeMode: themeMode ?? this.themeMode,
     weekStart: weekStart ?? this.weekStart,
     localeCode: localeCode ?? this.localeCode,
+    monthStartDay: monthStartDay ?? this.monthStartDay,
   );
 
   /// A copy that follows the device locale again.
@@ -119,6 +133,7 @@ final class AppSettings {
     currency: currency,
     themeMode: themeMode,
     weekStart: weekStart,
+    monthStartDay: monthStartDay,
   );
 
   @override
@@ -127,13 +142,16 @@ final class AppSettings {
       other.currency == currency &&
       other.themeMode == themeMode &&
       other.weekStart == weekStart &&
-      other.localeCode == localeCode;
+      other.localeCode == localeCode &&
+      other.monthStartDay == monthStartDay;
 
   @override
-  int get hashCode => Object.hash(currency, themeMode, weekStart, localeCode);
+  int get hashCode =>
+      Object.hash(currency, themeMode, weekStart, localeCode, monthStartDay);
 
   @override
   String toString() =>
       'AppSettings(currency: ${currency.code}, themeMode: ${themeMode.name}, '
-      'weekStart: ${weekStart.name}, localeCode: $localeCode)';
+      'weekStart: ${weekStart.name}, localeCode: $localeCode, '
+      'monthStartDay: $monthStartDay)';
 }

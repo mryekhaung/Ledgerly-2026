@@ -8,6 +8,7 @@ import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/profile_page.dart';
+import 'package:ledgerly/features/settings/presentation/pages/month_starts_on_page.dart';
 import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
@@ -58,6 +59,11 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             path: AppRoutes.settings,
             name: AppRoutes.settingsName,
             builder: (context, state) => const SettingsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.settingsMonthStartsOn,
+            name: AppRoutes.settingsMonthStartsOnName,
+            builder: (context, state) => const MonthStartsOnPage(),
           ),
           GoRoute(
             path: AppRoutes.profile,

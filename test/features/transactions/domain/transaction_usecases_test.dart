@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
+import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -457,6 +458,76 @@ void main() {
       expect(third.valueOrNull?.incomeMinor, 0);
       expect(fourth.valueOrNull?.incomeMinor, 500);
       expect(fourth.valueOrNull?.expenseMinor, 0);
+    });
+
+    test('should_delegate_watchPeriod_with_the_given_period', () async {
+      final period = PeriodCalculator(10).containing(LocalDate(2026, 10, 3));
+      final result = await WatchPeriodTransactions(repository)((period: period))
+          .first;
+
+      expect(result.valueOrNull?.length, 1);
+    });
+
+    test(
+      'should_delegate_watchPeriodDailyTotals_with_the_given_period',
+      () async {
+        final period = PeriodCalculator(10).containing(LocalDate(2026, 10, 3));
+        final result = await WatchPeriodDailyTotals(repository)((
+          period: period,
+          currency: CurrencyCode.mmk,
+        )).first;
+
+        expect(result.valueOrNull?.length, 1);
+      },
+    );
+
+    test(
+      'should_delegate_watchPeriodCategoryTotals_with_the_given_period',
+      () async {
+        final period = PeriodCalculator(10).containing(LocalDate(2026, 10, 3));
+        final result = await WatchPeriodCategoryTotals(repository)((
+          period: period,
+          currency: CurrencyCode.mmk,
+        )).first;
+
+        expect(result.valueOrNull?.length, 1);
+      },
+    );
+
+    test('should_delegate_watchPeriodTotal_with_the_given_period', () async {
+      final period = PeriodCalculator(10).containing(LocalDate(2026, 10, 3));
+      final result = await WatchPeriodTotal(repository)((
+        period: period,
+        currency: CurrencyCode.mmk,
+      )).first;
+
+      expect(result.valueOrNull?.expenseMinor, 1000);
+    });
+  });
+
+  group('SumForPeriod', () {
+    test('should_sum_only_the_requested_direction', () async {
+      await repository.create((
+        categoryId: 'cat-food',
+        amount: const Money.minor(700, CurrencyCode.mmk),
+        direction: TransactionDirection.income,
+        date: LocalDate(2026, 10, 4),
+        note: null,
+      ));
+
+      final period = PeriodCalculator(1).containing(LocalDate(2026, 10, 1));
+      final expense = await repository.sumForPeriod(
+        period,
+        TransactionDirection.expense,
+      );
+      final income = await repository.sumForPeriod(
+        period,
+        TransactionDirection.income,
+      );
+
+      expect(expense, isA<Success<int>>());
+      expect((expense as Success<int>).value, 1000);
+      expect(income.valueOrNull, 700);
     });
   });
 

@@ -579,5 +579,64 @@
   "settingsCreditsAvatar": "Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear",
   "@settingsCreditsAvatar": {
     "description": "Attribution credit for Open Peeps avatar artwork."
+  },
+  "settingsMonthStartsOn": "Month starts on",
+  "@settingsMonthStartsOn": {
+    "description": "Label for the month-start day preference in Settings."
+  },
+  "settingsMonthStartsOnDescription": "Align budget cycles with your pay day",
+  "@settingsMonthStartsOnDescription": {
+    "description": "Subtitle describing the month-start day preference in Settings."
+  },
+  "monthStartsOnTitle": "Month starts on",
+  "@monthStartsOnTitle": {
+    "description": "App bar title for the month-start day picker page."
+  },
+  "monthStartsOnDescription": "Choose the day of the month your budget begins (1–28). Days 29–31 are excluded so February is never ambiguous.",
+  "@monthStartsOnDescription": {
+    "description": "Explanatory caption on the month-start day picker page."
+  },
+  "monthStartsOnCurrentPeriod": "Current period: {range}",
+  "@monthStartsOnCurrentPeriod": {
+    "description": "Preview of the current budget period in the month start day picker.",
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "monthStartsOnPreviousPeriod": "Previous: {range}",
+  "@monthStartsOnPreviousPeriod": {
+    "description": "Preview of the previous budget period in the month start day picker.",
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "monthStartsOnTransactionsNotice": "Your transactions are not changed.",
+  "@monthStartsOnTransactionsNotice": {
+    "description": "Notice confirming that changing the pay cycle does not alter stored transactions."
+  },
+  "monthStartsOnDayFormat": "Day {day}",
+  "@monthStartsOnDayFormat": {
+    "description": "Format for a day number.",
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "calendarPayCycle": "Pay cycle",
+  "@calendarPayCycle": {
+    "description": "Subtitle shown under the period header when month start day is not 1."
+  },
+  "calendarThisPeriod": "This period",
+  "@calendarThisPeriod": {
+    "description": "Eyebrow label for summary card in pay-cycle mode."
+  },
+  "calendarSpentThisPeriod": "Spent this period",
+  "@calendarSpentThisPeriod": {
+    "description": "Hero label for period summary when viewing in pay-cycle mode."
   }
 }

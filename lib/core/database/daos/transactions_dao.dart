@@ -3,6 +3,8 @@ import 'package:ledgerly/core/database/app_database.dart';
 import 'package:ledgerly/core/database/daos/clock.dart';
 import 'package:ledgerly/core/database/tables/transactions.dart';
 import 'package:ledgerly/core/database/uuid.dart';
+import 'package:ledgerly/core/period/budget_period.dart';
+import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 
 part 'transactions_dao.g.dart';
@@ -83,11 +85,11 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
         .watch();
   }
 
-  /// Every live transaction in the calendar month containing [month], oldest day
-  /// first. Backs the Calendar page's day list and capsule grid.
-  Stream<List<Transaction>> watchMonth(LocalDate month) {
-    final first = month.firstDayOfMonth.value;
-    final last = month.lastDayOfMonth.value;
+  /// Every live transaction in [period], oldest day first.
+  /// Backs the Calendar page's day list and capsule grid.
+  Stream<List<Transaction>> watchPeriod(BudgetPeriod period) {
+    final first = period.start.value;
+    final last = period.end.value;
     return (select(transactions)
           ..where(
             (t) =>
@@ -102,17 +104,21 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
         .watch();
   }
 
-  /// Income and expense per day for [month], aggregated in SQL.
+  /// Backward-compatible alias for calendar months (startDay 1).
+  Stream<List<Transaction>> watchMonth(LocalDate month) =>
+      watchPeriod(PeriodCalculator(1).containing(month));
+
+  /// Income and expense per day for [period], aggregated in SQL.
   ///
   /// Rows come back only for days that have transactions — the UI fills the gaps
   /// rather than the query emitting empty days, which keeps the result set
-  /// proportional to activity instead of to the length of the month.
+  /// proportional to activity instead of to the length of the period.
   ///
   /// Both directions are returned separately (not pre-netted) so a
   /// break-even day still renders as active; see [DailyTotalRow].
-  Stream<List<DailyTotalRow>> watchMonthDailyTotals(LocalDate month) {
-    final first = month.firstDayOfMonth.value;
-    final last = month.lastDayOfMonth.value;
+  Stream<List<DailyTotalRow>> watchPeriodDailyTotals(BudgetPeriod period) {
+    final first = period.start.value;
+    final last = period.end.value;
 
     // Annotated rather than inferred. `ArithmeticAggregates.sum` is declared
     // `Expression<DT> sum()` on `Expression<DT extends num>`, so leaving the
@@ -151,12 +157,18 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// Totals per category for [month], for the summary card / donut.
-  Stream<List<CategoryTotalRow>> watchMonthCategoryTotals(LocalDate month) {
-    final first = month.firstDayOfMonth.value;
-    final last = month.lastDayOfMonth.value;
+  /// Backward-compatible alias for calendar months (startDay 1).
+  Stream<List<DailyTotalRow>> watchMonthDailyTotals(LocalDate month) =>
+      watchPeriodDailyTotals(PeriodCalculator(1).containing(month));
 
-    // Annotated, as in `watchMonthDailyTotals` — see the comment there.
+  /// Totals per category for [period], for the summary card / donut.
+  Stream<List<CategoryTotalRow>> watchPeriodCategoryTotals(
+    BudgetPeriod period,
+  ) {
+    final first = period.start.value;
+    final last = period.end.value;
+
+    // Annotated, as in `watchPeriodDailyTotals` — see the comment there.
     final Expression<int> total = transactions.amountMinor.sum();
 
     final query = selectOnly(transactions)
@@ -181,24 +193,30 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// Sum of [direction] movements within [month], in minor units, or 0.
+  /// Backward-compatible alias for calendar months (startDay 1).
+  Stream<List<CategoryTotalRow>> watchMonthCategoryTotals(LocalDate month) =>
+      watchPeriodCategoryTotals(PeriodCalculator(1).containing(month));
+
+  /// Sum of [direction] movements within [period], in minor units, or 0.
   ///
-  /// Uses `SUM` in SQL rather than `watchMonth(...).length` plus Dart arithmetic.
-  Future<int> sumForMonth(LocalDate month, String direction) async {
+  /// Uses `SUM` in SQL rather than `watchPeriod(...).length` plus Dart arithmetic.
+  Future<int> sumForPeriod(BudgetPeriod period, String direction) async {
     final Expression<int> total = transactions.amountMinor.sum();
     final query = selectOnly(transactions)
       ..addColumns([total])
       ..where(
         transactions.deletedAt.isNull() &
             transactions.direction.equals(direction) &
-            transactions.date.isBiggerOrEqualValue(
-              month.firstDayOfMonth.value,
-            ) &
-            transactions.date.isSmallerOrEqualValue(month.lastDayOfMonth.value),
+            transactions.date.isBiggerOrEqualValue(period.start.value) &
+            transactions.date.isSmallerOrEqualValue(period.end.value),
       );
     final row = await query.getSingle();
     return row.read(total) ?? 0;
   }
+
+  /// Backward-compatible alias for calendar months (startDay 1).
+  Future<int> sumForMonth(LocalDate month, String direction) =>
+      sumForPeriod(PeriodCalculator(1).containing(month), direction);
 
   /// Income and expense for a single [date], in minor units, or 0 each.
   ///

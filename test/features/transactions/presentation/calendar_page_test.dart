@@ -92,11 +92,11 @@ void main() {
         watchDayTransactionsProvider.overrideWithValue(
           WatchDayTransactions(fakes),
         ),
-        watchMonthDailyTotalsProvider.overrideWithValue(
-          WatchMonthDailyTotals(fakes),
+        watchPeriodDailyTotalsProvider.overrideWithValue(
+          WatchPeriodDailyTotals(fakes),
         ),
         watchDayTotalProvider.overrideWithValue(WatchDayTotal(fakes)),
-        watchMonthTotalProvider.overrideWithValue(WatchMonthTotal(fakes)),
+        watchPeriodTotalProvider.overrideWithValue(WatchPeriodTotal(fakes)),
         // `_TransactionRow` resolves a category name through this family; the
         // override keeps it off the locator while still returning real names.
         categoryByIdProvider.overrideWith(
@@ -604,6 +604,54 @@ void main() {
       expect(find.text('Delete'), findsOneWidget);
     });
   });
+
+  group('pay-cycle month start day', () {
+    testWidgets('shows month name when monthStartDay is 1', (tester) async {
+      await host(
+        tester,
+        TestWidths.phone,
+        extraOverrides: <Override>[monthStartDayProvider.overrideWithValue(1)],
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('October 2026'), findsOneWidget);
+      expect(find.text('Pay cycle'), findsNothing);
+    });
+
+    testWidgets(
+      'shows date range and Pay cycle caption when monthStartDay is 10',
+      (tester) async {
+        await host(
+          tester,
+          TestWidths.phone,
+          extraOverrides: <Override>[
+            monthStartDayProvider.overrideWithValue(10),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Pay cycle'), findsOneWidget);
+        expect(find.textContaining(' – '), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'shows tiny month label on the 1st of calendar month in pay-cycle mode',
+      (tester) async {
+        await host(
+          tester,
+          TestWidths.phone,
+          extraOverrides: <Override>[
+            monthStartDayProvider.overrideWithValue(10),
+          ],
+        );
+        await tester.pumpAndSettle();
+
+        // In period Sep 10 – Oct 9 containing day (Oct 3), Oct 1 appears with label 'Oct'.
+        expect(find.text('Oct'), findsOneWidget);
+      },
+    );
+  });
 }
 
 /// A [CalendarNotifier] that starts on a fixed day rather than the real
@@ -618,9 +666,12 @@ class _SeededCalendarNotifier extends CalendarNotifier {
   final LocalDate _day;
 
   @override
-  CalendarState build() => CalendarState(
-    visibleMonth: _day.firstDayOfMonth,
-    selectedDay: _day,
-    isTodaySelected: false,
-  );
+  CalendarState build() {
+    final calculator = ref.watch(periodCalculatorProvider);
+    return CalendarState(
+      visiblePeriod: calculator.containing(_day),
+      selectedDay: _day,
+      isTodaySelected: false,
+    );
+  }
 }

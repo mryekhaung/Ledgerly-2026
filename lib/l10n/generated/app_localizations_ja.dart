@@ -436,4 +436,44 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get settingsCreditsAvatar =>
       'Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear';
+
+  @override
+  String get settingsMonthStartsOn => '月の開始日';
+
+  @override
+  String get settingsMonthStartsOnDescription => '家計簿の集計サイクルを給料日に合わせる';
+
+  @override
+  String get monthStartsOnTitle => '月の開始日';
+
+  @override
+  String get monthStartsOnDescription =>
+      '家計簿の集計を開始する日を選択してください (1〜28日)。2月にも対応できるよう29〜31日は除外されています。';
+
+  @override
+  String monthStartsOnCurrentPeriod(String range) {
+    return '現在の期間: $range';
+  }
+
+  @override
+  String monthStartsOnPreviousPeriod(String range) {
+    return '前の期間: $range';
+  }
+
+  @override
+  String get monthStartsOnTransactionsNotice => '記録された取引は変更されません。';
+
+  @override
+  String monthStartsOnDayFormat(int day) {
+    return '$day日';
+  }
+
+  @override
+  String get calendarPayCycle => '給与サイクル';
+
+  @override
+  String get calendarThisPeriod => '今期';
+
+  @override
+  String get calendarSpentThisPeriod => '今期の支出';
 }

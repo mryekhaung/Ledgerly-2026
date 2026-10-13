@@ -21,4 +21,9 @@ abstract final class SettingsKeys {
 
   /// BCP-47 tag, e.g. `my`. Absent means "follow the device".
   static const String locale = 'locale';
+
+  /// Day of the month (1–28) on which each budget period begins.
+  ///
+  /// Absent means 1 (standard calendar month). Spec: `docs/DataModel.md` §8.
+  static const String monthStartDay = 'month_start_day';
 }

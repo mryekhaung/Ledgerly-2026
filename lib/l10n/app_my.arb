@@ -140,5 +140,16 @@
   "avatarEditorDiscardConfirm": "ဖျက်မည်",
   "avatarEditorKeepEditing": "ဆက်လက်ပြင်ဆင်မည်",
   "settingsCreditsTitle": "ဂုဏ်ပြုမှတ်တမ်း",
-  "settingsCreditsAvatar": "Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear"
+  "settingsCreditsAvatar": "Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear",
+  "settingsMonthStartsOn": "လစတင်ရက်",
+  "settingsMonthStartsOnDescription": "ဘတ်ဂျက်စက်ဝန်းကို သင့်လစာရက်နှင့် ညှိပါ",
+  "monthStartsOnTitle": "လစတင်ရက်",
+  "monthStartsOnDescription": "သင့်ဘတ်ဂျက်စတင်မည့် ရက်ကို ရွေးချယ်ပါ (၁–၂၈)။ ဖေဖော်ဝါရီလအတွက် အဆင်ပြေစေရန် ၂၉–၃၁ ရက်များကို ချန်လှပ်ထားပါသည်။",
+  "monthStartsOnCurrentPeriod": "လက်ရှိကာလ - {range}",
+  "monthStartsOnPreviousPeriod": "ယခင်ကာလ - {range}",
+  "monthStartsOnTransactionsNotice": "သင့်စာရင်းများကို ပြောင်းလဲမှုမရှိစေပါ။",
+  "monthStartsOnDayFormat": "ရက် {day}",
+  "calendarPayCycle": "လစာစက်ဝန်း",
+  "calendarThisPeriod": "ယခုကာလ",
+  "calendarSpentThisPeriod": "ယခုကာလအတွင်း သုံးစွဲငွေ"
 }

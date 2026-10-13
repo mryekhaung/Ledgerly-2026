@@ -1,4 +1,5 @@
 import 'package:ledgerly/core/money/currency_code.dart';
+import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
@@ -7,8 +8,8 @@ import 'package:ledgerly/features/transactions/domain/entities/transaction_total
 
 /// The domain's contract for reading and writing transactions.
 ///
-/// Read side is split into **row reads** (the day list, the month list) and
-/// **aggregate reads** (per-day and per-category totals, a month's sums). Both
+/// Read side is split into **row reads** (the day list, the period list) and
+/// **aggregate reads** (per-day and per-category totals, a period's sums). Both
 /// come from SQL rather than a Dart loop over rows: the aggregate is what makes
 /// a year of history scrollable (`docs/Architecture.md` §7,
 /// `docs/Conventions.md` §3).
@@ -18,31 +19,51 @@ abstract interface class TransactionRepository {
   /// Every live transaction on [date], newest write first.
   Stream<Result<List<Transaction>>> watchDay(LocalDate date);
 
-  /// Every live transaction in the calendar month containing [month], oldest
-  /// day first.
+  /// Every live transaction in [period], oldest day first.
+  Stream<Result<List<Transaction>>> watchPeriod(BudgetPeriod period);
+
+  /// Backward-compatible delegate for calendar months (startDay 1).
   Stream<Result<List<Transaction>>> watchMonth(LocalDate month);
 
-  /// Net-per-day totals for [month], computed in SQL.
+  /// Net-per-day totals for [period], computed in SQL.
   ///
   /// Emits a row only for days that have transactions — the UI fills the gaps,
   /// which keeps the result proportional to activity rather than to the length
-  /// of the month.
+  /// of the period.
+  Stream<Result<List<DailyTotal>>> watchPeriodDailyTotals(
+    BudgetPeriod period, {
+    required CurrencyCode currency,
+  });
+
+  /// Backward-compatible delegate for calendar months (startDay 1).
   Stream<Result<List<DailyTotal>>> watchDailyTotals(
     LocalDate month, {
     required CurrencyCode currency,
   });
 
-  /// Per-category totals for [month], computed in SQL.
+  /// Per-category totals for [period], computed in SQL.
+  Stream<Result<List<CategoryTotal>>> watchPeriodCategoryTotals(
+    BudgetPeriod period, {
+    required CurrencyCode currency,
+  });
+
+  /// Backward-compatible delegate for calendar months (startDay 1).
   Stream<Result<List<CategoryTotal>>> watchCategoryTotals(
     LocalDate month, {
     required CurrencyCode currency,
   });
 
-  /// A month's headline figures, computed in SQL.
+  /// A period's headline figures, computed in SQL.
   ///
   /// Derived from the aggregates above rather than a third query streaming every
-  /// row: the summary card must paint without loading the month.
-  Stream<Result<MonthTotal>> watchMonthTotal(
+  /// row: the summary card must paint without loading the whole period.
+  Stream<Result<PeriodTotal>> watchPeriodTotal(
+    BudgetPeriod period, {
+    required CurrencyCode currency,
+  });
+
+  /// Backward-compatible delegate for calendar months (startDay 1).
+  Stream<Result<PeriodTotal>> watchMonthTotal(
     LocalDate month, {
     required CurrencyCode currency,
   });
@@ -50,14 +71,20 @@ abstract interface class TransactionRepository {
   /// A single day's headline figures, computed in SQL.
   ///
   /// The calendar's summary card follows the *selected day*, so it needs a
-  /// day-scoped aggregate rather than the month one. Re-emits whenever the day's
+  /// day-scoped aggregate rather than the period one. Re-emits whenever the day's
   /// rows change, so an edit updates the card without an explicit invalidation.
   Stream<Result<DailyTotal>> watchDayTotal(
     LocalDate date, {
     required CurrencyCode currency,
   });
 
-  /// Sum of [direction] movements within [month], in minor units, or 0.
+  /// Sum of [direction] movements within [period], in minor units, or 0.
+  Future<Result<int>> sumForPeriod(
+    BudgetPeriod period,
+    TransactionDirection direction,
+  );
+
+  /// Backward-compatible delegate for calendar months (startDay 1).
   Future<Result<int>> sumForMonth(
     LocalDate month,
     TransactionDirection direction,

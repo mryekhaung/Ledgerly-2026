@@ -52,6 +52,7 @@ void main() {
         'Currency',
         'Appearance',
         'Week starts on',
+        'Month starts on',
         'Language',
         'Version',
         'Credits',
@@ -93,6 +94,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text(r'$  USD'), findsOneWidget);
+    });
+
+    testWidgets('shows the current month start day', (tester) async {
+      await host(tester, AppSettings.defaults.copyWith(monthStartDay: 10));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Day 10'), findsOneWidget);
     });
 
     testWidgets('shows System default when no language is pinned', (

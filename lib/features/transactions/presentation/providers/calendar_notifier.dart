@@ -1,28 +1,43 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/core/period/budget_period.dart';
+import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_totals.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
 
-/// The calendar page's mutable state: which month and day are visible.
+/// The calendar page's mutable state: which period and day are visible.
 ///
-/// Pure Dart so the month-arithmetic and day-selection logic is unit-testable
+/// Pure Dart so the period-arithmetic and day-selection logic is unit-testable
 /// without a widget tree (`docs/Agent.md` §6).
 final class CalendarState {
   /// Creates calendar state.
-  const CalendarState({
-    required this.visibleMonth,
+  CalendarState({
+    BudgetPeriod? visiblePeriod,
+    LocalDate? visibleMonth,
     required this.selectedDay,
     required this.isTodaySelected,
-  });
+    PeriodCalculator? calculator,
+  }) : visibleMonth = visibleMonth ??
+           (visiblePeriod != null
+               ? visiblePeriod.start
+               : (calculator ?? PeriodCalculator(1))
+                   .containing(selectedDay)
+                   .start),
+       visiblePeriod = visiblePeriod ??
+           (calculator ?? PeriodCalculator(1)).containing(
+             visibleMonth ?? selectedDay,
+           );
 
-  /// The month being browsed, normalised to its first day.
+  /// The month being browsed (backward compatibility).
   final LocalDate visibleMonth;
 
-  /// The day the user has selected. Always inside [visibleMonth] unless the
-  /// user just switched month, in which case it is the same day-of-month
-  /// clamped to the new month (so 31 March → 30 April, not 30 April → 29).
+  /// The budget period being browsed.
+  final BudgetPeriod visiblePeriod;
+
+  /// The day the user has selected. Always inside [visiblePeriod] unless the
+  /// user just switched period, in which case it is clamped into the new period.
   final LocalDate selectedDay;
 
   /// True when [selectedDay] is the current calendar day. Used to show/hide
@@ -35,33 +50,72 @@ final class CalendarState {
   /// The month after [visibleMonth], or null when the year would go above 9999.
   LocalDate? get nextMonth => visibleMonth.addMonths(1);
 
-  /// True when the visible month is not the current month.
+  /// True when the visible period does not contain today or today is not selected.
   bool get canGoToToday =>
       !isTodaySelected ||
-      visibleMonth.value !=
-          LocalDate.fromDateTime(DateTime.now()).firstDayOfMonth.value;
+      !visiblePeriod.contains(LocalDate.fromDateTime(DateTime.now()));
 
-  /// Returns a state shifted to [month], keeping the selected day clamped.
-  CalendarState withMonth(LocalDate month) {
-    final clampedDay = _clampDay(month, selectedDay.day);
+  /// Returns a state shifted to [period], keeping the selected day clamped.
+  CalendarState withPeriod(BudgetPeriod period) {
+    final candidateDay1 = _clampDay(period.start, selectedDay.day);
+    final candidateDay2 = _clampDay(period.end, selectedDay.day);
+    final LocalDate clampedDay;
+    if (period.contains(candidateDay1)) {
+      clampedDay = candidateDay1;
+    } else if (period.contains(candidateDay2)) {
+      clampedDay = candidateDay2;
+    } else {
+      clampedDay = _clampToPeriod(period, selectedDay);
+    }
     return CalendarState(
-      visibleMonth: month,
+      visibleMonth: period.start,
+      visiblePeriod: period,
       selectedDay: clampedDay,
       isTodaySelected: _isToday(clampedDay),
     );
   }
 
-  /// Returns a state with [day] selected.
-  CalendarState withDay(LocalDate day) => CalendarState(
-    visibleMonth: day.firstDayOfMonth,
-    selectedDay: day,
-    isTodaySelected: _isToday(day),
-  );
+  /// Returns a state shifted to [month], keeping the selected day clamped.
+  CalendarState withMonth(LocalDate month, {PeriodCalculator? calculator}) {
+    final calc = calculator ?? PeriodCalculator(1);
+    final period = calc.containing(
+      LocalDate(month.year, month.month, calc.startDay),
+    );
+    final state = withPeriod(period);
+    return CalendarState(
+      visibleMonth: month,
+      visiblePeriod: period,
+      selectedDay: state.selectedDay,
+      isTodaySelected: state.isTodaySelected,
+    );
+  }
+
+  /// Returns a state with [day] selected, scrolling the period if needed.
+  CalendarState withDay(LocalDate day, {PeriodCalculator? calculator}) {
+    final calc = calculator ?? PeriodCalculator(1);
+    final period = visiblePeriod.contains(day)
+        ? visiblePeriod
+        : calc.containing(day);
+    return CalendarState(
+      visibleMonth: visiblePeriod.contains(day)
+          ? visibleMonth
+          : day.firstDayOfMonth,
+      visiblePeriod: period,
+      selectedDay: day,
+      isTodaySelected: _isToday(day),
+    );
+  }
 
   /// Clamps [day] to the days actually in [month].
   static LocalDate _clampDay(LocalDate month, int day) {
     final maxDay = LocalDate.daysInMonth(month.year, month.month);
     return LocalDate(month.year, month.month, day > maxDay ? maxDay : day);
+  }
+
+  static LocalDate _clampToPeriod(BudgetPeriod period, LocalDate day) {
+    if (day.isBefore(period.start)) return period.start;
+    if (day.isAfter(period.end)) return period.end;
+    return day;
   }
 
   static bool _isToday(LocalDate day) =>
@@ -70,45 +124,65 @@ final class CalendarState {
 
 /// Drives the calendar page.
 ///
-/// Holds the visible month and selected day; the streams for transactions,
-/// daily totals, and month totals are derived from this state via
+/// Holds the visible period and selected day; the streams for transactions,
+/// daily totals, and day totals are derived from this state via
 /// `ref.watch` in the page.
 class CalendarNotifier extends Notifier<CalendarState> {
   @override
   CalendarState build() {
+    final calculator = ref.watch(periodCalculatorProvider);
     final today = LocalDate.fromDateTime(DateTime.now());
     return CalendarState(
-      visibleMonth: today.firstDayOfMonth,
+      visiblePeriod: calculator.containing(today),
       selectedDay: today,
       isTodaySelected: true,
     );
   }
 
-  /// Shifts the visible month by [delta] months.
-  void shiftMonth(int delta) {
-    final next = state.visibleMonth.addMonths(delta);
-    if (next == null) return;
-    state = state.withMonth(next);
+  /// Shifts the visible period by [delta] periods.
+  void shiftPeriod(int delta) {
+    final calculator = ref.read(periodCalculatorProvider);
+    var p = state.visiblePeriod;
+    if (delta > 0) {
+      for (var i = 0; i < delta; i++) {
+        p = calculator.next(p);
+      }
+    } else if (delta < 0) {
+      for (var i = 0; i < -delta; i++) {
+        p = calculator.previous(p);
+      }
+    }
+    state = state.withPeriod(p);
   }
 
-  /// Jumps straight to [month], from the month/year picker.
-  ///
-  /// Normalises to the first day because the round-trip through the picker is
-  /// not guaranteed to preserve it, and the calendar's invariant is that
-  /// `visibleMonth` is always a month's first day.
-  ///
-  /// The selected day follows via [CalendarState.withMonth], which clamps it
-  /// into the new month — so jumping from 31 March to February lands on the
-  /// 28th/29th rather than throwing.
-  void jumpToMonth(LocalDate month) =>
-      state = state.withMonth(month.firstDayOfMonth);
+  /// Shifts the visible month/period by [delta].
+  void shiftMonth(int delta) => shiftPeriod(delta);
 
-  /// Selects a specific day, scrolling the month if needed.
-  void selectDay(LocalDate day) => state = state.withDay(day);
+  /// Jumps straight to [period].
+  void jumpToPeriod(BudgetPeriod period) => state = state.withPeriod(period);
+
+  /// Jumps straight to the period containing [month].
+  void jumpToMonth(LocalDate month) {
+    final calculator = ref.read(periodCalculatorProvider);
+    state = state.withPeriod(calculator.containing(month));
+  }
+
+  /// Selects a specific day, scrolling the period if needed.
+  void selectDay(LocalDate day) {
+    final calculator = ref.read(periodCalculatorProvider);
+    state = state.withDay(day, calculator: calculator);
+  }
 
   /// Jumps to today.
-  void goToToday() =>
-      state = state.withDay(LocalDate.fromDateTime(DateTime.now()));
+  void goToToday() {
+    final calculator = ref.read(periodCalculatorProvider);
+    final today = LocalDate.fromDateTime(DateTime.now());
+    state = CalendarState(
+      visiblePeriod: calculator.containing(today),
+      selectedDay: today,
+      isTodaySelected: true,
+    );
+  }
 }
 
 /// Provides the calendar state.
@@ -136,16 +210,16 @@ final selectedDayTransactionsProvider =
       );
     });
 
-/// Derived: the stream of daily totals for the visible month.
+/// Derived: the stream of daily totals for the visible period.
 ///
 /// Used by the grid to paint the capsule intensities.
 final monthDailyTotalsProvider = StreamProvider.autoDispose<List<DailyTotal>>((
   ref,
 ) {
-  final month = ref.watch(calendarProvider).visibleMonth;
+  final period = ref.watch(calendarProvider).visiblePeriod;
   final currency = ref.watch(currencyProvider);
-  final stream = ref.watch(watchMonthDailyTotalsProvider).call((
-    month: month,
+  final stream = ref.watch(watchPeriodDailyTotalsProvider).call((
+    period: period,
     currency: currency,
   ));
   return stream.map(
@@ -158,9 +232,9 @@ final monthDailyTotalsProvider = StreamProvider.autoDispose<List<DailyTotal>>((
 
 /// Derived: the selected **day's** headline figures — the summary card.
 ///
-/// Deliberately a *day* total, not the month total: the card sits directly under
-/// the grid and follows the highlighted day, so a month figure there would
-/// answer a question the user did not ask. `WatchMonthTotal` stays in the domain
+/// Deliberately a *day* total, not the period total: the card sits directly under
+/// the grid and follows the highlighted day, so a period figure there would
+/// answer a question the user did not ask. `WatchPeriodTotal` stays in the domain
 /// for the Insights phase, but this screen does not need it — and an unwatched
 /// provider would still open a Drift stream, so it is not declared here.
 final selectedDayTotalProvider = StreamProvider.autoDispose<DailyTotal>((ref) {

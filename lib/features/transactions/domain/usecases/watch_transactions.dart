@@ -1,4 +1,5 @@
 import 'package:ledgerly/core/money/currency_code.dart';
+import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/usecase/usecase.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -21,19 +22,19 @@ class WatchDayTransactions
       _repository.watchDay(params.date);
 }
 
-/// Parameters for [WatchMonthTransactions].
-typedef WatchMonthParams = ({LocalDate month});
+/// Parameters for [WatchPeriodTransactions].
+typedef WatchPeriodParams = ({BudgetPeriod period});
 
-/// Watches a month's transactions — the calendar's day list and capsule grid.
-class WatchMonthTransactions
-    implements StreamUseCase<List<Transaction>, WatchMonthParams> {
-  const WatchMonthTransactions(this._repository);
+/// Watches a period's transactions — the calendar's day list and capsule grid.
+class WatchPeriodTransactions
+    implements StreamUseCase<List<Transaction>, WatchPeriodParams> {
+  const WatchPeriodTransactions(this._repository);
 
   final TransactionRepository _repository;
 
   @override
-  Stream<Result<List<Transaction>>> call(WatchMonthParams params) =>
-      _repository.watchMonth(params.month);
+  Stream<Result<List<Transaction>>> call(WatchPeriodParams params) =>
+      _repository.watchPeriod(params.period);
 }
 
 /// Parameters for the aggregate watches.
@@ -42,42 +43,48 @@ class WatchMonthTransactions
 /// without knowing what those units are — the repository stamps the result, so
 /// the UI never has to guess (`docs/DataModel.md` §1: money always travels with
 /// its currency).
-typedef MonthAggregateParams = ({LocalDate month, CurrencyCode currency});
+typedef PeriodAggregateParams = ({BudgetPeriod period, CurrencyCode currency});
 
-/// Watches the month's net-per-day totals, computed in SQL.
-class WatchMonthDailyTotals
-    implements StreamUseCase<List<DailyTotal>, MonthAggregateParams> {
-  const WatchMonthDailyTotals(this._repository);
+/// Watches the period's net-per-day totals, computed in SQL.
+class WatchPeriodDailyTotals
+    implements StreamUseCase<List<DailyTotal>, PeriodAggregateParams> {
+  const WatchPeriodDailyTotals(this._repository);
 
   final TransactionRepository _repository;
 
   @override
-  Stream<Result<List<DailyTotal>>> call(MonthAggregateParams params) =>
-      _repository.watchDailyTotals(params.month, currency: params.currency);
+  Stream<Result<List<DailyTotal>>> call(PeriodAggregateParams params) =>
+      _repository.watchPeriodDailyTotals(
+        params.period,
+        currency: params.currency,
+      );
 }
 
-/// Watches the month's per-category totals — the donut / top-categories chart.
-class WatchMonthCategoryTotals
-    implements StreamUseCase<List<CategoryTotal>, MonthAggregateParams> {
-  const WatchMonthCategoryTotals(this._repository);
+/// Watches the period's per-category totals — the donut / top-categories chart.
+class WatchPeriodCategoryTotals
+    implements StreamUseCase<List<CategoryTotal>, PeriodAggregateParams> {
+  const WatchPeriodCategoryTotals(this._repository);
 
   final TransactionRepository _repository;
 
   @override
-  Stream<Result<List<CategoryTotal>>> call(MonthAggregateParams params) =>
-      _repository.watchCategoryTotals(params.month, currency: params.currency);
+  Stream<Result<List<CategoryTotal>>> call(PeriodAggregateParams params) =>
+      _repository.watchPeriodCategoryTotals(
+        params.period,
+        currency: params.currency,
+      );
 }
 
-/// Watches the month's headline figures — the summary card.
-class WatchMonthTotal
-    implements StreamUseCase<MonthTotal, MonthAggregateParams> {
-  const WatchMonthTotal(this._repository);
+/// Watches the period's headline figures — the summary card.
+class WatchPeriodTotal
+    implements StreamUseCase<PeriodTotal, PeriodAggregateParams> {
+  const WatchPeriodTotal(this._repository);
 
   final TransactionRepository _repository;
 
   @override
-  Stream<Result<MonthTotal>> call(MonthAggregateParams params) =>
-      _repository.watchMonthTotal(params.month, currency: params.currency);
+  Stream<Result<PeriodTotal>> call(PeriodAggregateParams params) =>
+      _repository.watchPeriodTotal(params.period, currency: params.currency);
 }
 
 /// Parameters for a single day's aggregate.
@@ -98,4 +105,58 @@ class WatchDayTotal implements StreamUseCase<DailyTotal, DayAggregateParams> {
   @override
   Stream<Result<DailyTotal>> call(DayAggregateParams params) =>
       _repository.watchDayTotal(params.date, currency: params.currency);
+}
+
+/// Parameters for [WatchMonthTransactions] (backward compatibility).
+typedef WatchMonthParams = ({LocalDate month});
+
+/// Backward-compatible alias for [WatchPeriodTransactions] over calendar months.
+class WatchMonthTransactions
+    implements StreamUseCase<List<Transaction>, WatchMonthParams> {
+  const WatchMonthTransactions(this._repository);
+
+  final TransactionRepository _repository;
+
+  @override
+  Stream<Result<List<Transaction>>> call(WatchMonthParams params) =>
+      _repository.watchMonth(params.month);
+}
+
+/// Parameters for calendar-month aggregate watches (backward compatibility).
+typedef MonthAggregateParams = ({LocalDate month, CurrencyCode currency});
+
+/// Backward-compatible alias for [WatchPeriodDailyTotals].
+class WatchMonthDailyTotals
+    implements StreamUseCase<List<DailyTotal>, MonthAggregateParams> {
+  const WatchMonthDailyTotals(this._repository);
+
+  final TransactionRepository _repository;
+
+  @override
+  Stream<Result<List<DailyTotal>>> call(MonthAggregateParams params) =>
+      _repository.watchDailyTotals(params.month, currency: params.currency);
+}
+
+/// Backward-compatible alias for [WatchPeriodCategoryTotals].
+class WatchMonthCategoryTotals
+    implements StreamUseCase<List<CategoryTotal>, MonthAggregateParams> {
+  const WatchMonthCategoryTotals(this._repository);
+
+  final TransactionRepository _repository;
+
+  @override
+  Stream<Result<List<CategoryTotal>>> call(MonthAggregateParams params) =>
+      _repository.watchCategoryTotals(params.month, currency: params.currency);
+}
+
+/// Backward-compatible alias for [WatchPeriodTotal].
+class WatchMonthTotal
+    implements StreamUseCase<PeriodTotal, MonthAggregateParams> {
+  const WatchMonthTotal(this._repository);
+
+  final TransactionRepository _repository;
+
+  @override
+  Stream<Result<PeriodTotal>> call(MonthAggregateParams params) =>
+      _repository.watchMonthTotal(params.month, currency: params.currency);
 }

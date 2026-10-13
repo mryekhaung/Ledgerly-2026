@@ -25,17 +25,17 @@ void registerTransactionsModule(GetIt getIt) {
     ..registerFactory<WatchDayTransactions>(
       () => WatchDayTransactions(getIt<TransactionRepository>()),
     )
-    ..registerFactory<WatchMonthTransactions>(
-      () => WatchMonthTransactions(getIt<TransactionRepository>()),
+    ..registerFactory<WatchPeriodTransactions>(
+      () => WatchPeriodTransactions(getIt<TransactionRepository>()),
     )
-    ..registerFactory<WatchMonthDailyTotals>(
-      () => WatchMonthDailyTotals(getIt<TransactionRepository>()),
+    ..registerFactory<WatchPeriodDailyTotals>(
+      () => WatchPeriodDailyTotals(getIt<TransactionRepository>()),
     )
-    ..registerFactory<WatchMonthCategoryTotals>(
-      () => WatchMonthCategoryTotals(getIt<TransactionRepository>()),
+    ..registerFactory<WatchPeriodCategoryTotals>(
+      () => WatchPeriodCategoryTotals(getIt<TransactionRepository>()),
     )
-    ..registerFactory<WatchMonthTotal>(
-      () => WatchMonthTotal(getIt<TransactionRepository>()),
+    ..registerFactory<WatchPeriodTotal>(
+      () => WatchPeriodTotal(getIt<TransactionRepository>()),
     )
     ..registerFactory<WatchDayTotal>(
       () => WatchDayTotal(getIt<TransactionRepository>()),

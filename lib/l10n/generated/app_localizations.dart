@@ -945,6 +945,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear'**
   String get settingsCreditsAvatar;
+
+  /// Label for the month-start day preference in Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Month starts on'**
+  String get settingsMonthStartsOn;
+
+  /// Subtitle describing the month-start day preference in Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Align budget cycles with your pay day'**
+  String get settingsMonthStartsOnDescription;
+
+  /// App bar title for the month-start day picker page.
+  ///
+  /// In en, this message translates to:
+  /// **'Month starts on'**
+  String get monthStartsOnTitle;
+
+  /// Explanatory caption on the month-start day picker page.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the day of the month your budget begins (1–28). Days 29–31 are excluded so February is never ambiguous.'**
+  String get monthStartsOnDescription;
+
+  /// Preview of the current budget period in the month start day picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Current period: {range}'**
+  String monthStartsOnCurrentPeriod(String range);
+
+  /// Preview of the previous budget period in the month start day picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous: {range}'**
+  String monthStartsOnPreviousPeriod(String range);
+
+  /// Notice confirming that changing the pay cycle does not alter stored transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Your transactions are not changed.'**
+  String get monthStartsOnTransactionsNotice;
+
+  /// Format for a day number.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String monthStartsOnDayFormat(int day);
+
+  /// Subtitle shown under the period header when month start day is not 1.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay cycle'**
+  String get calendarPayCycle;
+
+  /// Eyebrow label for summary card in pay-cycle mode.
+  ///
+  /// In en, this message translates to:
+  /// **'This period'**
+  String get calendarThisPeriod;
+
+  /// Hero label for period summary when viewing in pay-cycle mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent this period'**
+  String get calendarSpentThisPeriod;
 }
 
 class _AppLocalizationsDelegate

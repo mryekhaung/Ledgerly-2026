@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/database/app_database.dart' as db;
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
+import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/transactions/data/datasources/transaction_local_datasource.dart';
@@ -528,6 +529,101 @@ void main() {
       expect(companion.date.present, isTrue);
       expect(companion.note.present, isTrue);
       expect(companion.updatedAt.present, isTrue);
+    });
+  });
+
+  group('BudgetPeriod and custom monthStartDay queries', () {
+    test('boundary transactions land in exactly one period', () async {
+      final calc = PeriodCalculator(10);
+      final oct9 = LocalDate(2026, 10, 9);
+      final oct10 = LocalDate(2026, 10, 10);
+
+      await harness.datasource.create(
+        txDraft(
+          month: 10,
+          day: 9,
+          amountMinor: 1000,
+          direction: TransactionDirection.expense,
+        ),
+      );
+      await harness.datasource.create(
+        txDraft(
+          month: 10,
+          day: 10,
+          amountMinor: 2000,
+          direction: TransactionDirection.expense,
+        ),
+      );
+
+      final prevPeriod = calc.containing(oct9); // Sep 10 – Oct 9
+      final currPeriod = calc.containing(oct10); // Oct 10 – Nov 9
+
+      final prevTxns = expectSuccess(
+        await harness.repository.watchPeriod(prevPeriod).first,
+      );
+      final currTxns = expectSuccess(
+        await harness.repository.watchPeriod(currPeriod).first,
+      );
+
+      expect(prevTxns.map((t) => t.date), [oct9]);
+      expect(currTxns.map((t) => t.date), [oct10]);
+    });
+
+    test('changing monthStartDay recomputes totals without touching rows', () async {
+      // Seed two transactions: Oct 5 (3000) and Oct 15 (5000)
+      await harness.datasource.create(
+        txDraft(
+          month: 10,
+          day: 5,
+          amountMinor: 3000,
+          direction: TransactionDirection.expense,
+        ),
+      );
+      await harness.datasource.create(
+        txDraft(
+          month: 10,
+          day: 15,
+          amountMinor: 5000,
+          direction: TransactionDirection.expense,
+        ),
+      );
+
+      // Total for calendar month (startDay = 1): contains both Oct 5 and Oct 15
+      final calcCalendar = PeriodCalculator(1);
+      final octCalendarPeriod = calcCalendar.containing(LocalDate(2026, 10, 1));
+      final calendarTotal = expectSuccess(
+        await harness.repository
+            .watchPeriodTotal(octCalendarPeriod, currency: CurrencyCode.mmk)
+            .first,
+      );
+      expect(calendarTotal.expenseMinor, 8000);
+
+      // Now query with pay-cycle startDay = 10:
+      // Oct 5 belongs to Sep 10 – Oct 9 period
+      // Oct 15 belongs to Oct 10 – Nov 9 period
+      final calcPayCycle = PeriodCalculator(10);
+      final prevPeriod = calcPayCycle.containing(LocalDate(2026, 10, 5));
+      final currPeriod = calcPayCycle.containing(LocalDate(2026, 10, 15));
+
+      final prevTotal = expectSuccess(
+        await harness.repository
+            .watchPeriodTotal(prevPeriod, currency: CurrencyCode.mmk)
+            .first,
+      );
+      final currTotal = expectSuccess(
+        await harness.repository
+            .watchPeriodTotal(currPeriod, currency: CurrencyCode.mmk)
+            .first,
+      );
+
+      expect(prevTotal.expenseMinor, 3000);
+      expect(currTotal.expenseMinor, 5000);
+
+      // Confirm row count and stored dates in DB are completely unchanged
+      final allOctRows = expectSuccess(
+        await harness.repository.watchPeriod(octCalendarPeriod).first,
+      );
+      expect(allOctRows.length, 2);
     });
   });
 }

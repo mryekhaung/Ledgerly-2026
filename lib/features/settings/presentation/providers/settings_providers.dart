@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/di/injection.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
+import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/usecase/usecase.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
@@ -84,6 +85,18 @@ final themeModeProvider = Provider<AppThemeMode>(
 final localeCodeProvider = Provider<String?>(
   (ref) => ref.watch(currentSettingsProvider).localeCode,
   name: 'localeCode',
+);
+
+/// The day of the month (1–28) on which each budget period begins.
+final monthStartDayProvider = Provider<int>(
+  (ref) => ref.watch(currentSettingsProvider).monthStartDay,
+  name: 'monthStartDay',
+);
+
+/// The calculator deriving budget periods from the stored [monthStartDayProvider].
+final periodCalculatorProvider = Provider<PeriodCalculator>(
+  (ref) => PeriodCalculator(ref.watch(monthStartDayProvider)),
+  name: 'periodCalculator',
 );
 
 /// Writes preferences and returns the stored snapshot.

@@ -9,6 +9,8 @@ import 'dart:async';
 
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
+import 'package:ledgerly/core/period/budget_period.dart';
+import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -69,24 +71,28 @@ class FakeTransactionRepository implements TransactionRepository {
   }
 
   @override
-  Stream<Result<List<Transaction>>> watchMonth(LocalDate month) async* {
-    List<Transaction> forMonth() =>
-        _live.where((t) => t.date.isSameMonthAs(month)).toList(growable: false);
-    yield Success<List<Transaction>>(forMonth());
+  Stream<Result<List<Transaction>>> watchPeriod(BudgetPeriod period) async* {
+    List<Transaction> forPeriod() =>
+        _live.where((t) => period.contains(t.date)).toList(growable: false);
+    yield Success<List<Transaction>>(forPeriod());
     yield* _controller.stream.map(
       (list) => Success<List<Transaction>>(
         list
-            .where((t) => t.isActive && t.date.isSameMonthAs(month))
+            .where((t) => t.isActive && period.contains(t.date))
             .toList(growable: false),
       ),
     );
   }
 
   @override
-  Stream<Result<List<DailyTotal>>> watchDailyTotals(
-    LocalDate month, {
+  Stream<Result<List<Transaction>>> watchMonth(LocalDate month) =>
+      watchPeriod(PeriodCalculator(1).containing(month));
+
+  @override
+  Stream<Result<List<DailyTotal>>> watchPeriodDailyTotals(
+    BudgetPeriod period, {
     required CurrencyCode currency,
-  }) => watchMonth(month).map(
+  }) => watchPeriod(period).map(
     (result) => result.map((list) {
       final byDay = <int, DailyTotal>{};
       for (final transaction in list) {
@@ -107,10 +113,19 @@ class FakeTransactionRepository implements TransactionRepository {
   );
 
   @override
-  Stream<Result<List<CategoryTotal>>> watchCategoryTotals(
+  Stream<Result<List<DailyTotal>>> watchDailyTotals(
     LocalDate month, {
     required CurrencyCode currency,
-  }) => watchMonth(month).map(
+  }) => watchPeriodDailyTotals(
+    PeriodCalculator(1).containing(month),
+    currency: currency,
+  );
+
+  @override
+  Stream<Result<List<CategoryTotal>>> watchPeriodCategoryTotals(
+    BudgetPeriod period, {
+    required CurrencyCode currency,
+  }) => watchPeriod(period).map(
     (result) => result.map((list) {
       final byKey = <(String, TransactionDirection), int>{};
       for (final transaction in list) {
@@ -131,10 +146,19 @@ class FakeTransactionRepository implements TransactionRepository {
   );
 
   @override
-  Stream<Result<MonthTotal>> watchMonthTotal(
+  Stream<Result<List<CategoryTotal>>> watchCategoryTotals(
     LocalDate month, {
     required CurrencyCode currency,
-  }) => watchMonth(month).map(
+  }) => watchPeriodCategoryTotals(
+    PeriodCalculator(1).containing(month),
+    currency: currency,
+  );
+
+  @override
+  Stream<Result<PeriodTotal>> watchPeriodTotal(
+    BudgetPeriod period, {
+    required CurrencyCode currency,
+  }) => watchPeriod(period).map(
     (result) => result.map((list) {
       var income = 0;
       var expense = 0;
@@ -145,13 +169,22 @@ class FakeTransactionRepository implements TransactionRepository {
           expense += transaction.amountMinor;
         }
       }
-      return MonthTotal(
-        month: month.firstDayOfMonth,
+      return PeriodTotal(
+        period: period,
         incomeMinor: income,
         expenseMinor: expense,
         currency: currency,
       );
     }),
+  );
+
+  @override
+  Stream<Result<PeriodTotal>> watchMonthTotal(
+    LocalDate month, {
+    required CurrencyCode currency,
+  }) => watchPeriodTotal(
+    PeriodCalculator(1).containing(month),
+    currency: currency,
   );
 
   @override
@@ -179,16 +212,22 @@ class FakeTransactionRepository implements TransactionRepository {
   );
 
   @override
-  Future<Result<int>> sumForMonth(
-    LocalDate month,
+  Future<Result<int>> sumForPeriod(
+    BudgetPeriod period,
     TransactionDirection direction,
   ) async {
     if (forcedFailure case final failure?) return Err<int>(failure);
     final sum = _live
-        .where((t) => t.date.isSameMonthAs(month) && t.direction == direction)
+        .where((t) => period.contains(t.date) && t.direction == direction)
         .fold<int>(0, (total, t) => total + t.amountMinor);
     return Success(sum);
   }
+
+  @override
+  Future<Result<int>> sumForMonth(
+    LocalDate month,
+    TransactionDirection direction,
+  ) => sumForPeriod(PeriodCalculator(1).containing(month), direction);
 
   @override
   Future<Result<Transaction>> findById(String id) async {

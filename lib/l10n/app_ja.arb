@@ -140,5 +140,16 @@
   "avatarEditorDiscardConfirm": "破棄",
   "avatarEditorKeepEditing": "編集を続ける",
   "settingsCreditsTitle": "クレジット",
-  "settingsCreditsAvatar": "Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear"
+  "settingsCreditsAvatar": "Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear",
+  "settingsMonthStartsOn": "月の開始日",
+  "settingsMonthStartsOnDescription": "家計簿の集計サイクルを給料日に合わせる",
+  "monthStartsOnTitle": "月の開始日",
+  "monthStartsOnDescription": "家計簿の集計を開始する日を選択してください (1〜28日)。2月にも対応できるよう29〜31日は除外されています。",
+  "monthStartsOnCurrentPeriod": "現在の期間: {range}",
+  "monthStartsOnPreviousPeriod": "前の期間: {range}",
+  "monthStartsOnTransactionsNotice": "記録された取引は変更されません。",
+  "monthStartsOnDayFormat": "{day}日",
+  "calendarPayCycle": "給与サイクル",
+  "calendarThisPeriod": "今期",
+  "calendarSpentThisPeriod": "今期の支出"
 }

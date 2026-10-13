@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/money.dart';
+import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -63,6 +65,9 @@ class CalendarPage extends ConsumerWidget {
     // deliberately *not* the summary card. The card reports the selected day, so
     // making it part of the horizontal gesture would let a swipe that clearly
     // reads as "the calendar moved" silently also change the figure below it.
+    final monthStartDay = ref.watch(monthStartDayProvider);
+    final isPayCycle = monthStartDay != 1;
+
     final monthPane = <Widget>[
       _MonthSwipeArea(
         onPrevious: () => notifier.shiftMonth(-1),
@@ -70,19 +75,21 @@ class CalendarPage extends ConsumerWidget {
         child: Column(
           children: <Widget>[
             _MonthSwitcher(
-              month: state.visibleMonth,
+              period: state.visiblePeriod,
+              isPayCycle: isPayCycle,
               onPrevious: () => notifier.shiftMonth(-1),
               onNext: () => notifier.shiftMonth(1),
               onPickMonth: () =>
-                  _pickMonth(context, notifier, state.visibleMonth),
+                  _pickMonth(context, notifier, state.visiblePeriod.start),
             ),
             const SizedBox(height: AppSpacing.md),
             _WeekdayHeader(weekStart: weekStart),
             const SizedBox(height: AppSpacing.sm),
             _CalendarGrid(
-              month: state.visibleMonth,
+              period: state.visiblePeriod,
               selectedDay: state.selectedDay,
               weekStart: weekStart,
+              isPayCycle: isPayCycle,
               onSelectDay: notifier.selectDay,
             ),
           ],
@@ -292,15 +299,20 @@ class _MonthSwipeAreaState extends State<_MonthSwipeArea> {
 /// The title in the middle is tappable and opens the month/year picker — the
 /// only way to cross a year boundary without stepping through twelve `‹ ›`
 /// taps. The chevrons stay for the common one-month move.
+///
+/// When [isPayCycle] is true (i.e. monthStartDay != 1), shows the period date
+/// range with a "Pay cycle" caption below it (docs/Roadmap.md Phase 1).
 class _MonthSwitcher extends StatelessWidget {
   const _MonthSwitcher({
-    required this.month,
+    required this.period,
+    required this.isPayCycle,
     required this.onPrevious,
     required this.onNext,
     required this.onPickMonth,
   });
 
-  final LocalDate month;
+  final BudgetPeriod period;
+  final bool isPayCycle;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
   final VoidCallback onPickMonth;
@@ -310,8 +322,15 @@ class _MonthSwitcher extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
-    final label = MaterialLocalizations.of(context)
-        .formatMonthYear(DateTime(month.year, month.month));
+    final locale = Localizations.localeOf(context);
+
+    final String label;
+    if (isPayCycle) {
+      label = _formatPeriod(period, locale);
+    } else {
+      label = MaterialLocalizations.of(context)
+          .formatMonthYear(DateTime(period.start.year, period.start.month));
+    }
 
     return Row(
       children: <Widget>[
@@ -333,25 +352,40 @@ class _MonthSwitcher extends StatelessWidget {
                 message: strings('calendarPickMonth'),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Flexible(
-                        child: Text(
-                          label,
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleMedium,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Flexible(
+                            child: Text(
+                              label,
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.titleMedium,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          // The caret is the affordance; without it the label reads
+                          // as a heading, not a control.
+                          Icon(
+                            Icons.arrow_drop_down,
+                            size: 20,
+                            color: colors.textSecondary,
+                          ),
+                        ],
+                      ),
+                      if (isPayCycle) ...<Widget>[
+                        const SizedBox(height: 2),
+                        Text(
+                          strings('calendarPayCycle'),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      // The caret is the affordance; without it the label reads
-                      // as a heading, not a control.
-                      Icon(
-                        Icons.arrow_drop_down,
-                        size: 20,
-                        color: colors.textSecondary,
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -366,6 +400,20 @@ class _MonthSwitcher extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  static String _formatPeriod(BudgetPeriod period, Locale locale) {
+    final startDt = period.start.toDateTime();
+    final endDt = period.end.toDateTime();
+    final localeStr = locale.toLanguageTag();
+    if (period.start.year != period.end.year) {
+      final startYear = DateFormat.yMMMd(localeStr).format(startDt);
+      final endYear = DateFormat.yMMMd(localeStr).format(endDt);
+      return '$startYear – $endYear';
+    }
+    final startFmt = DateFormat.MMMd(localeStr).format(startDt);
+    final endFmt = DateFormat.MMMd(localeStr).format(endDt);
+    return '$startFmt – $endFmt';
   }
 }
 
@@ -412,15 +460,17 @@ class _WeekdayHeader extends StatelessWidget {
 /// transactions change, without rebuilding the whole page.
 class _CalendarGrid extends ConsumerWidget {
   const _CalendarGrid({
-    required this.month,
+    required this.period,
     required this.selectedDay,
     required this.weekStart,
+    required this.isPayCycle,
     required this.onSelectDay,
   });
 
-  final LocalDate month;
+  final BudgetPeriod period;
   final LocalDate selectedDay;
   final GridWeekStart weekStart;
+  final bool isPayCycle;
   final ValueChanged<LocalDate> onSelectDay;
 
   @override
@@ -429,9 +479,10 @@ class _CalendarGrid extends ConsumerWidget {
     final totals = totalsAsync.value ?? const <DailyTotal>[];
 
     return _MonthGrid(
-      month: month,
+      period: period,
       selectedDay: selectedDay,
       weekStart: weekStart,
+      isPayCycle: isPayCycle,
       totals: totals,
       onSelectDay: onSelectDay,
     );
@@ -441,22 +492,24 @@ class _CalendarGrid extends ConsumerWidget {
 /// The grid widget itself, separated so it can be unit-tested with fake data.
 class _MonthGrid extends StatelessWidget {
   const _MonthGrid({
-    required this.month,
+    required this.period,
     required this.selectedDay,
     required this.weekStart,
+    this.isPayCycle = false,
     required this.totals,
     required this.onSelectDay,
   });
 
-  final LocalDate month;
+  final BudgetPeriod period;
   final LocalDate selectedDay;
   final GridWeekStart weekStart;
+  final bool isPayCycle;
   final List<DailyTotal> totals;
   final ValueChanged<LocalDate> onSelectDay;
 
   @override
   Widget build(BuildContext context) {
-    final cells = MonthGridLayout.cells(month, weekStart: weekStart);
+    final cells = MonthGridLayout.periodCells(period, weekStart: weekStart);
     final rowCount = cells.length ~/ MonthGridLayout.daysPerWeek;
     final today = LocalDate.fromDateTime(DateTime.now());
     final intensities = _intensities(totals);
@@ -477,6 +530,7 @@ class _MonthGrid extends StatelessWidget {
                     null => const SizedBox(height: 48),
                     final day => _DayCell(
                       day: day,
+                      showMonthLabel: isPayCycle && day.day == 1,
                       isSelected: day.value == selectedDay.value,
                       isToday: day.value == today.value,
                       intensity: intensities[day.value],
@@ -552,6 +606,7 @@ final class _Intensity {
 class _DayCell extends StatelessWidget {
   const _DayCell({
     required this.day,
+    this.showMonthLabel = false,
     required this.isSelected,
     required this.isToday,
     required this.intensity,
@@ -559,6 +614,7 @@ class _DayCell extends StatelessWidget {
   });
 
   final LocalDate day;
+  final bool showMonthLabel;
   final bool isSelected;
   final bool isToday;
   final _Intensity? intensity;
@@ -591,21 +647,27 @@ class _DayCell extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  // The number sits in a fixed-height slot and the capsule
-                  // hangs below it, rather than the pair being centred as a
-                  // group. If the pair were centred, adding a capsule would
-                  // nudge the number *up*, so the digits would visibly shift
-                  // row to row on a month where some days have activity and
-                  // others do not — the grid would look misaligned even though
-                  // every cell is centred. Fixing the number's slot keeps every
-                  // digit on one baseline and lets the capsule use the leftover
-                  // space instead.
+                  if (showMonthLabel)
+                    Text(
+                      DateFormat.MMM(
+                        Localizations.localeOf(context).toLanguageTag(),
+                      ).format(day.toDateTime()),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontSize: 8,
+                        height: 1.0,
+                        color: isSelected
+                            ? colors.brandPrimary
+                            : colors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   SizedBox(
-                    height: 20,
+                    height: showMonthLabel ? 14 : 20,
                     child: Center(
                       child: Text(
                         '${day.day}',
                         style: theme.textTheme.bodyMedium?.copyWith(
+                          fontSize: showMonthLabel ? 12 : null,
                           color: isSelected
                               ? colors.brandPrimary
                               : colors.textPrimary,

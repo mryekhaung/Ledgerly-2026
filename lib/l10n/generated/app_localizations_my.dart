@@ -452,4 +452,46 @@ class AppLocalizationsMy extends AppLocalizations {
   @override
   String get settingsCreditsAvatar =>
       'Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear';
+
+  @override
+  String get settingsMonthStartsOn => 'လစတင်ရက်';
+
+  @override
+  String get settingsMonthStartsOnDescription =>
+      'ဘတ်ဂျက်စက်ဝန်းကို သင့်လစာရက်နှင့် ညှိပါ';
+
+  @override
+  String get monthStartsOnTitle => 'လစတင်ရက်';
+
+  @override
+  String get monthStartsOnDescription =>
+      'သင့်ဘတ်ဂျက်စတင်မည့် ရက်ကို ရွေးချယ်ပါ (၁–၂၈)။ ဖေဖော်ဝါရီလအတွက် အဆင်ပြေစေရန် ၂၉–၃၁ ရက်များကို ချန်လှပ်ထားပါသည်။';
+
+  @override
+  String monthStartsOnCurrentPeriod(String range) {
+    return 'လက်ရှိကာလ - $range';
+  }
+
+  @override
+  String monthStartsOnPreviousPeriod(String range) {
+    return 'ယခင်ကာလ - $range';
+  }
+
+  @override
+  String get monthStartsOnTransactionsNotice =>
+      'သင့်စာရင်းများကို ပြောင်းလဲမှုမရှိစေပါ။';
+
+  @override
+  String monthStartsOnDayFormat(int day) {
+    return 'ရက် $day';
+  }
+
+  @override
+  String get calendarPayCycle => 'လစာစက်ဝန်း';
+
+  @override
+  String get calendarThisPeriod => 'ယခုကာလ';
+
+  @override
+  String get calendarSpentThisPeriod => 'ယခုကာလအတွင်း သုံးစွဲငွေ';
 }

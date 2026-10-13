@@ -1,4 +1,5 @@
 import 'package:ledgerly/core/money/currency_code.dart';
+import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
 
@@ -46,7 +47,7 @@ final class DailyTotal {
   ///
   /// The day-list summary card needs a renderable "nothing happened" value the
   /// moment the user taps an empty day, so a caller never has to unwrap a null
-  /// just to draw a zero. Mirrors [MonthTotal.empty].
+  /// just to draw a zero. Mirrors [PeriodTotal.empty].
   factory DailyTotal.empty(LocalDate date, CurrencyCode currency) => DailyTotal(
     date: date,
     incomeMinor: 0,
@@ -119,37 +120,40 @@ final class CategoryTotal {
       'CategoryTotal($categoryId, ${direction.name}, $amountMinor)';
 }
 
-/// A month's headline figures — the summary card
-/// (`docs/Design.md` §6.3).
-final class MonthTotal {
-  /// Creates a month summary.
-  const MonthTotal({
-    required this.month,
+/// A budget period's headline figures — the summary card
+/// (`docs/Design.md` §6.3, `docs/DataModel.md` §8).
+final class PeriodTotal {
+  /// Creates a period summary.
+  const PeriodTotal({
+    required this.period,
     required this.incomeMinor,
     required this.expenseMinor,
     required this.currency,
   });
 
-  /// A zeroed summary for [month] in [currency].
+  /// A zeroed summary for [period] in [currency].
   ///
   /// Exists so a screen has an honest empty state instead of a nullable it must
-  /// unwrap — "no transactions this month" is a real, renderable fact, not a
+  /// unwrap — "no transactions this period" is a real, renderable fact, not a
   /// missing value.
-  factory MonthTotal.empty(LocalDate month, CurrencyCode currency) =>
-      MonthTotal(
-        month: month.firstDayOfMonth,
+  factory PeriodTotal.empty(BudgetPeriod period, CurrencyCode currency) =>
+      PeriodTotal(
+        period: period,
         incomeMinor: 0,
         expenseMinor: 0,
         currency: currency,
       );
 
-  /// The month this summary covers, normalised to its first day.
-  final LocalDate month;
+  /// The budget period this summary covers.
+  final BudgetPeriod period;
 
-  /// Money in for the month, as a positive magnitude.
+  /// The first day of the period (backward compatibility for calendar months).
+  LocalDate get month => period.start;
+
+  /// Money in for the period, as a positive magnitude.
   final int incomeMinor;
 
-  /// Money out for the month, as a positive magnitude.
+  /// Money out for the period, as a positive magnitude.
   final int expenseMinor;
 
   /// The currency both totals are denominated in.
@@ -158,21 +162,21 @@ final class MonthTotal {
   /// Income minus expense. Signed.
   int get netMinor => incomeMinor - expenseMinor;
 
-  /// True when the month has no activity.
+  /// True when the period has no activity.
   bool get isEmpty => incomeMinor == 0 && expenseMinor == 0;
 
   @override
   bool operator ==(Object other) =>
-      other is MonthTotal &&
-      other.month == month &&
+      other is PeriodTotal &&
+      other.period == period &&
       other.incomeMinor == incomeMinor &&
       other.expenseMinor == expenseMinor &&
       other.currency == currency;
 
   @override
-  int get hashCode => Object.hash(month, incomeMinor, expenseMinor, currency);
+  int get hashCode => Object.hash(period, incomeMinor, expenseMinor, currency);
 
   @override
   String toString() =>
-      'MonthTotal($month, +$incomeMinor, -$expenseMinor, net $netMinor)';
+      'PeriodTotal($period, +$incomeMinor, -$expenseMinor, net $netMinor)';
 }

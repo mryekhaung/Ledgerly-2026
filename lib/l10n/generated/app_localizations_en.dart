@@ -451,4 +451,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsCreditsAvatar =>
       'Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear';
+
+  @override
+  String get settingsMonthStartsOn => 'Month starts on';
+
+  @override
+  String get settingsMonthStartsOnDescription =>
+      'Align budget cycles with your pay day';
+
+  @override
+  String get monthStartsOnTitle => 'Month starts on';
+
+  @override
+  String get monthStartsOnDescription =>
+      'Choose the day of the month your budget begins (1–28). Days 29–31 are excluded so February is never ambiguous.';
+
+  @override
+  String monthStartsOnCurrentPeriod(String range) {
+    return 'Current period: $range';
+  }
+
+  @override
+  String monthStartsOnPreviousPeriod(String range) {
+    return 'Previous: $range';
+  }
+
+  @override
+  String get monthStartsOnTransactionsNotice =>
+      'Your transactions are not changed.';
+
+  @override
+  String monthStartsOnDayFormat(int day) {
+    return 'Day $day';
+  }
+
+  @override
+  String get calendarPayCycle => 'Pay cycle';
+
+  @override
+  String get calendarThisPeriod => 'This period';
+
+  @override
+  String get calendarSpentThisPeriod => 'Spent this period';
 }

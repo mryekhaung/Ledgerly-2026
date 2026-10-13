@@ -1,3 +1,4 @@
+import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 
 /// Which day the calendar grid starts its week on.
@@ -33,7 +34,7 @@ abstract final class MonthGridLayout {
   /// stays pure Dart and does not depend on `dart:core`'s date constants.
   static const int daysPerWeek = 7;
 
-  /// How many blank cells precede day 1.
+  /// How many blank cells precede day 1 of [month].
   ///
   /// A month beginning on the start day needs none; on the day before it needs
   /// six. Derived from [LocalDate.isoWeekday], where Monday is 1.
@@ -87,5 +88,51 @@ abstract final class MonthGridLayout {
   }) => <LocalDate?>[
     for (var index = 0; index < cellCount(month, weekStart: weekStart); index++)
       dayAt(month, index, weekStart: weekStart),
+  ];
+
+  /// How many blank cells precede `period.start`.
+  static int periodLeadingBlanks(
+    BudgetPeriod period, {
+    GridWeekStart weekStart = GridWeekStart.monday,
+  }) => switch (weekStart) {
+    GridWeekStart.monday => period.start.isoWeekday - 1,
+    GridWeekStart.sunday => period.start.isoWeekday % daysPerWeek,
+  };
+
+  /// Total cells for [period] including leading and trailing blanks.
+  static int periodCellCount(
+    BudgetPeriod period, {
+    GridWeekStart weekStart = GridWeekStart.monday,
+  }) {
+    final used =
+        periodLeadingBlanks(period, weekStart: weekStart) + period.length;
+    return ((used + daysPerWeek - 1) ~/ daysPerWeek) * daysPerWeek;
+  }
+
+  /// The day occupying [cellIndex] within [period], or null for a blank.
+  static LocalDate? periodDayAt(
+    BudgetPeriod period,
+    int cellIndex, {
+    GridWeekStart weekStart = GridWeekStart.monday,
+  }) {
+    final offset =
+        cellIndex - periodLeadingBlanks(period, weekStart: weekStart);
+    if (offset < 0 || offset >= period.length) {
+      return null;
+    }
+    return period.start.addDays(offset);
+  }
+
+  /// The cells of [period], row-major, with nulls for the blanks.
+  static List<LocalDate?> periodCells(
+    BudgetPeriod period, {
+    GridWeekStart weekStart = GridWeekStart.monday,
+  }) => <LocalDate?>[
+    for (
+      var index = 0;
+      index < periodCellCount(period, weekStart: weekStart);
+      index++
+    )
+      periodDayAt(period, index, weekStart: weekStart),
   ];
 }
