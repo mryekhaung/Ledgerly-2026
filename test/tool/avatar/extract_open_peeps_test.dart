@@ -31,25 +31,25 @@ List<Object?> _arr(Object? value) => value! as List<Object?>;
 Map<String, Object?> _loadSource() =>
     _obj(jsonDecode(File(_sourcePath).readAsStringSync()));
 
-Map<String, Object?> _loadManifest() => _obj(
-  jsonDecode(File('$_assetsPath/manifest.json').readAsStringSync()),
-);
+Map<String, Object?> _loadManifest() =>
+    _obj(jsonDecode(File('$_assetsPath/manifest.json').readAsStringSync()));
 
 /// Every file under [root] as sorted forward-slash relative paths.
 ///
 /// `Directory.list()` order is platform-defined, so it is always sorted here.
 List<String> _filesUnder(String root) {
   final prefix = Directory(root).absolute.path.replaceAll(r'\', '/');
-  final paths = Directory(root)
-      .listSync(recursive: true)
-      .whereType<File>()
-      .map(
-        (file) => file.absolute.path
-            .replaceAll(r'\', '/')
-            .substring(prefix.length + 1),
-      )
-      .toList()
-    ..sort();
+  final paths =
+      Directory(root)
+          .listSync(recursive: true)
+          .whereType<File>()
+          .map(
+            (file) => file.absolute.path
+                .replaceAll(r'\', '/')
+                .substring(prefix.length + 1),
+          )
+          .toList()
+        ..sort();
   return paths;
 }
 
@@ -122,8 +122,7 @@ void main() {
         'manifest.json',
         'base/body.svg',
         for (final g in _arr(manifest['groups']))
-          for (final id in _arr(_obj(g)['ids']))
-            '${_obj(g)['dir']}/$id.svg',
+          for (final id in _arr(_obj(g)['ids'])) '${_obj(g)['dir']}/$id.svg',
       };
       final onDisk = _filesUnder(_assetsPath);
 
@@ -145,10 +144,11 @@ void main() {
         isEmpty,
       );
       final optionality = _obj(manifest['optionality']);
-      expect(
-        _arr(optionality['optionalGroups']),
-        <Object?>['facial_hair', 'accessories', 'mask'],
-      );
+      expect(_arr(optionality['optionalGroups']), <Object?>[
+        'facial_hair',
+        'accessories',
+        'mask',
+      ]);
       expect(_arr(optionality['requiredGroups']), <Object?>[
         'head',
         'expression',
@@ -205,9 +205,9 @@ void main() {
       final hexPattern = RegExp(r'#[0-9a-fA-F]{3,8}');
       final allowedFills = <String>{..._tokens, ...allowedLiteralFills};
 
-      for (final path in _filesUnder(_assetsPath).where(
-        (p) => p.endsWith('.svg'),
-      )) {
+      for (final path in _filesUnder(
+        _assetsPath,
+      ).where((p) => p.endsWith('.svg'))) {
         final svg = _read('$_assetsPath/$path');
         for (final m in fillPattern.allMatches(svg)) {
           expect(allowedFills, contains(m.group(1)), reason: path);
@@ -315,7 +315,10 @@ void main() {
           isA<ExtractionException>().having(
             (e) => e.message,
             'message',
-            allOf(contains('components.head.variants.afro'), contains('#123456')),
+            allOf(
+              contains('components.head.variants.afro'),
+              contains('#123456'),
+            ),
           ),
         ),
       );
@@ -345,8 +348,19 @@ void main() {
       final head = _obj(_obj(doc['components'])['head']);
       final variants = _obj(head['variants']);
       variants['FlatTop'] = variants['flatTop'];
+      expect(
+        () => buildPlan(doc),
+        throwsA(
+          isA<ExtractionException>().having(
+            (e) => e.message,
+            'message',
+            contains('flat_top'),
+          ),
+        ),
+      );
+    });
 
-X_is_no_longer_cc0', () {
+    test('should_fail_when_the_license_is_no_longer_cc0', () {
       final doc = _loadSource();
       _obj(_obj(doc['meta'])['license'])['name'] = 'CC BY 4.0';
 
