@@ -67,7 +67,7 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      const testFailure = UnknownFailure('fetch failed');
+      const testFailure = UnexpectedFailure('fetch failed');
       final provider =
           AsyncNotifierProvider.autoDispose<
             TemplateAsyncNotifier<String>,
@@ -79,14 +79,20 @@ void main() {
             ),
           );
 
-      expect(container.read(provider.future), throwsA(isA<UnknownFailure>()));
+      expect(
+        container.read(provider.future),
+        throwsA(isA<UnexpectedFailure>()),
+      );
     });
 
     test('should_transition_to_error_when_mutation_fails', () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      const testFailure = ValidationFailure({'field': 'invalid'});
+      const testFailure = ValidationFailure(
+        'invalid field',
+        fieldErrors: {'field': 'invalid'},
+      );
       final provider =
           AsyncNotifierProvider.autoDispose<
             TemplateAsyncNotifier<String>,
@@ -120,7 +126,7 @@ void main() {
             () => _TestStreamNotifier(controller.stream),
           );
 
-      final subscription = container.listen(provider, (_, __) {});
+      final subscription = container.listen(provider, (_, _) {});
       addTearDown(subscription.close);
 
       controller.add(42);

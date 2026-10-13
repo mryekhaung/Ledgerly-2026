@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/result/result.dart';
 
 /// Riverpod 3 Baseline Templates and Best Practices.
@@ -70,17 +69,16 @@ class TemplateCounterNotifier extends Notifier<int> {
 /// - Failures are cleanly folded into [AsyncError].
 class TemplateAsyncNotifier<T> extends AsyncNotifier<T> {
   TemplateAsyncNotifier({
-    required Future<Result<T>> Function() fetchInitial,
-    required Future<Result<T>> Function(T current, dynamic delta) mutateAction,
-  }) : _fetchInitial = fetchInitial,
-       _mutateAction = mutateAction;
+    required this.fetchInitial,
+    required this.mutateAction,
+  });
 
-  final Future<Result<T>> Function() _fetchInitial;
-  final Future<Result<T>> Function(T current, dynamic delta) _mutateAction;
+  final Future<Result<T>> Function() fetchInitial;
+  final Future<Result<T>> Function(T current, dynamic delta) mutateAction;
 
   @override
   Future<T> build() async {
-    final result = await _fetchInitial();
+    final result = await fetchInitial();
     return switch (result) {
       Success(:final value) => value,
       Err(:final failure) => throw failure,
@@ -96,7 +94,7 @@ class TemplateAsyncNotifier<T> extends AsyncNotifier<T> {
 
     state = const AsyncLoading();
 
-    final result = await _mutateAction(currentValue, delta);
+    final result = await mutateAction(currentValue, delta);
 
     // Riverpod 3 lifecycle guard: do not touch state if disposed while awaiting.
     if (!ref.mounted) return false;

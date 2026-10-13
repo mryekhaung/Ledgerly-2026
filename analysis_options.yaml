@@ -39,10 +39,10 @@ analyzer:
     - ios/**
     - web/**
 
-  plugins:
-    # NOTE: the `import_lint` / custom-rule plugin that enforces the layer boundaries in
-    # docs/Conventions.md §2 is a Roadmap Phase 0 follow-up. When adopted, register it here
-    # and move the layer rules out of review-only enforcement.
+  # plugins:
+  #   NOTE: the `import_lint` / custom-rule plugin that enforces the layer boundaries in
+  #   docs/Conventions.md §2 is a Roadmap Phase 0 follow-up. When adopted, register it here
+  #   and move the layer rules out of review-only enforcement.
 
 linter:
   rules:
