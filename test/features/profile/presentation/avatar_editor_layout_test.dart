@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
+import 'package:ledgerly/features/profile/presentation/widgets/avatar.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
@@ -95,8 +96,15 @@ void main() {
 
     testWidgets('preview sits clear of the header', (tester) async {
       await pumpAt(tester, 360, 2.0);
-      // The preview avatar is the only one labelled for screen readers.
-      final preview = find.bySemanticsLabel('Avatar');
+      // The page title and the preview share the label "Avatar" by design
+      // (both are the thing the screen is about), so a bare semantics-label
+      // finder resolves to the AppBar title at y≈9 and the assertion below
+      // would measure the header instead of the preview. Scope to the preview
+      // widget itself.
+      final preview = find.descendant(
+        of: find.byType(Avatar),
+        matching: find.bySemanticsLabel('Avatar'),
+      );
       expect(preview, findsOneWidget);
 
       final rect = tester.getRect(preview);

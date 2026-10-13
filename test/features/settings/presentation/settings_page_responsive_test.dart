@@ -34,6 +34,21 @@ void main() {
   );
 
   group('width cap', () {
+    /// The width the rows are actually laid out at.
+    ///
+    /// `ConstrainedPane` is an `Align`, so the pane *widget* is always as wide
+    /// as its parent — measuring it reports the window (1440 on a desktop) and
+    /// would pass or fail for the wrong reason. The cap lives on the
+    /// `ConstrainedBox` inside, so that is what the assertions below measure.
+    double cappedWidth(WidgetTester tester) => tester
+        .getSize(
+          find.descendant(
+            of: find.byType(ConstrainedPane),
+            matching: find.byType(ConstrainedBox),
+          ),
+        )
+        .width;
+
     testWidgets('should_cap_the_content_column_on_a_wide_window', (
       tester,
     ) async {
@@ -52,8 +67,7 @@ void main() {
       await host(tester, TestWidths.wide);
       await tester.pumpAndSettle();
 
-      final paneSize = tester.getSize(find.byType(ConstrainedPane));
-      expect(paneSize.width, lessThanOrEqualTo(AppSpacing.proseMaxWidth));
+      expect(cappedWidth(tester), lessThanOrEqualTo(AppSpacing.proseMaxWidth));
     });
 
     testWidgets('should_use_the_full_width_of_a_phone', (tester) async {
@@ -61,8 +75,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // 360 px is narrower than the cap, so nothing should be wasted.
-      final paneSize = tester.getSize(find.byType(ConstrainedPane));
-      expect(paneSize.width, TestWidths.smallPhone);
+      expect(cappedWidth(tester), TestWidths.smallPhone);
     });
   });
 

@@ -276,9 +276,14 @@ class _DetailPane extends ConsumerWidget {
                   ?.copyWith(color: colors.textPrimary),
             ),
           ),
-          const Expanded(
-            child: SingleChildScrollView(child: CategoryFormBody()),
-          ),
+          // No `SingleChildScrollView` here: `CategoryFormBody` is already a
+          // `ListView`, so it brings its own scrollable. Wrapping it in a second
+          // one gives the inner viewport an unbounded box — a scroll view sizes
+          // its child to the child's intrinsic height, and a `ListView` has none
+          // — which throws "Vertical viewport was given unbounded height" as
+          // soon as a row is tapped. `Expanded` alone gives it the pane's
+          // remaining height, which is what it actually needs.
+          const Expanded(child: CategoryFormBody()),
         ],
       ),
     );

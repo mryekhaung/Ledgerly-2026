@@ -7,7 +7,6 @@ import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
-import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/delete_transaction.dart';
@@ -114,13 +113,27 @@ void main() {
   /// `Bad state: No element` when its target never materialises, which hides
   /// whether the row was missing or merely far down. A bounded drag loop lets
   /// the assertion that follows produce the meaningful failure instead.
+  ///
+  /// `pumpAndSettle` after each drag, not a bare `pump`: a drag that leaves
+  /// velocity behind starts a ballistic scroll, so a bare pump would measure
+  /// mid-flight and the loop could exhaust its budget before the list actually
+  /// reached the row.
+  ///
+  /// Every scrollable is dragged in turn rather than only the first, because the
+  /// target may live in either pane: in the compact layout the grid and the day
+  /// rows share one `ListView`, but at medium and up the day rows are in the
+  /// *second* pane's list.
   Future<void> revealOnCompact(WidgetTester tester, String target) async {
     for (var step = 0; step < 12; step++) {
       if (find.text(target).evaluate().isNotEmpty) return;
-      final scrollable = find.byType(ListView);
-      if (scrollable.evaluate().isEmpty) return;
-      await tester.drag(scrollable.first, const Offset(0, -150));
-      await tester.pump();
+      final scrollables = find.byType(ListView);
+      final count = scrollables.evaluate().length;
+      if (count == 0) return;
+      for (var index = 0; index < count; index++) {
+        if (find.text(target).evaluate().isNotEmpty) return;
+        await tester.drag(scrollables.at(index), const Offset(0, -200));
+        await tester.pumpAndSettle();
+      }
     }
   }
 
@@ -301,6 +314,9 @@ void main() {
       // The header lives in the left pane, which the day list cannot scroll.
       expect(find.byIcon(Icons.chevron_left), findsOneWidget);
       expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+      // The day rows are inside the right pane's own scrollable, so they are
+      // below the fold on a 900 px tall split until that pane is scrolled.
+      await revealOnCompact(tester, 'Morning coffee');
       expect(find.text('Morning coffee'), findsOneWidget);
     });
 
@@ -315,26 +331,27 @@ void main() {
           .toList(growable: false);
       expect(panes, hasLength(2));
 
-      // flex 4 / 6 — the list is the wider pane, matching the single-column
-      // emphasis where the day list is the primary content.
+      // flex 4 / 6 — the day list is the wider pane, matching the
+      // single-column emphasis where it is the primary content.
       //
-      // Scoped to the split `Row` itself (`TwoPaneLayout`'s direct child), not
-      // to `find.byType(Row)` at large: that finder resolves to every Row in the
-      // page, and `find.descendant` unions them, so an unrelated flex-1
-      // `Flexible` further up would be collected and the assertion would fail
-      // with a list that has nothing to do with the split.
-      final splitRow = find.descendant(
-        of: find.byType(TwoPaneLayout),
-        matching: find.byType(Row),
-      );
-      expect(splitRow, findsOneWidget);
-
-      final flexible = tester
-          .widgetList<Flexible>(
-            find.descendant(of: splitRow, matching: find.byType(Flexible)),
-          )
-          .toList(growable: false);
-      final flexes = flexible.map((f) => f.flex).toList()..sort();
+      // Scoped to the `Flexible`s that are siblings of the split's divider
+      // rather than to `find.byType(Row)` at large: that finder resolves to
+      // every Row on the page and `find.descendant` unions them, so an
+      // unrelated flex-1 deeper in the tree would be collected and the
+      // assertion would compare a list having nothing to do with the split.
+      // Both pane wrappers are `Expanded`s (flex 4 and 6) and are direct
+      // children of the same Row as the `SizedBox` divider between them.
+      final flexes =
+          tester
+              .widgetList<Flexible>(
+                find.ancestor(
+                  of: find.byType(ListView),
+                  matching: find.byType(Flexible),
+                ),
+              )
+              .map((f) => f.flex)
+              .toList()
+            ..sort();
       expect(flexes, <int>[4, 6]);
     });
 

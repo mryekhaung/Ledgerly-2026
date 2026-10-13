@@ -204,16 +204,27 @@ class ModalFormScaffold extends StatelessWidget {
 
     // Medium and up: the same route and the same widgets, presented as a card on
     // a sunk background so the form reads as a visit rather than a destination.
+    //
+    // The body is intentionally **not** wrapped in a scroll view. A form body is
+    // itself a `ListView` (that is how `CategoryFormBody` scrolls), and nesting
+    // it in a `SingleChildScrollView` hands the inner viewport an unbounded box
+    // — a scroll view sizes its child to intrinsic height, and a `ListView` has
+    // none — so it throws "Vertical viewport was given unbounded height". The
+    // card is capped by the window and the inner list scrolls within it, which
+    // is also the better feel: the card frame stays put instead of scrolling
+    // away with the fields.
     return Scaffold(
       backgroundColor: colors.surfaceSunken,
       appBar: AppBar(title: Text(title), actions: actions),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
+      body: SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: maxWidth),
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              margin: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.xl,
+              ),
               decoration: BoxDecoration(
                 color: colors.surfaceRaised,
                 borderRadius: AppRadius.borderLg,

@@ -38,16 +38,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // A lazy `ListView` only builds the rows in (and just past) the viewport,
-      // so the service rows at the bottom do not exist until they are scrolled
-      // into range. Walk the list down in steps and assert each label the first
-      // time it appears, rather than assuming a 600 px window fits the whole
-      // list.
+      // so the rows at the bottom do not exist until they are scrolled into
+      // range. Scroll in fixed steps, recording every label seen at any point,
+      // rather than assuming a 900 px window fits the whole list on one screen.
       //
       // `scrollUntilVisible` is deliberately not used: it drags until its target
-      // resolves, and throws `Bad state: No element` if the target never
-      // materialises — which turns a "the row is missing" bug into an opaque
-      // framework error. A bounded `drag` loop keeps the failure message on the
-      // assertion that actually matters.
+      // resolves and throws `Bad state: No element` if the target never
+      // materialises, which turns a "the row is missing" bug into an opaque
+      // framework error. Dragging explicitly keeps the failure on the assertion
+      // that names the missing row.
       const labels = <String>[
         'Settings',
         'Currency',
@@ -56,25 +55,22 @@ void main() {
         'Language',
         'Version',
       ];
-      final missing = <String>{...labels};
+      final seen = <String>{};
 
-      for (var step = 0; step < 12 && missing.isNotEmpty; step++) {
-        for (final label in labels.toList(growable: false)) {
-          if (find.text(label).evaluate().isNotEmpty) missing.remove(label);
+      void recordVisible() {
+        for (final label in labels) {
+          if (find.text(label).evaluate().isNotEmpty) seen.add(label);
         }
-        if (missing.isEmpty) break;
-        await tester.dragUntilVisible(
-          find.text(labels.last),
-          find.byType(ListView),
-          const Offset(0, -120),
-        );
-        await tester.pump();
       }
 
-      expect(missing, isEmpty, reason: 'rows never built: $missing');
-      for (final label in labels) {
-        expect(find.text(label), findsWidgets, reason: 'missing row $label');
+      recordVisible();
+      for (var step = 0; step < 10; step++) {
+        await tester.drag(find.byType(ListView), const Offset(0, -200));
+        await tester.pump();
+        recordVisible();
       }
+
+      expect(seen, containsAll(labels), reason: 'rows never built');
     });
 
     testWidgets('shows the current currency', (tester) async {

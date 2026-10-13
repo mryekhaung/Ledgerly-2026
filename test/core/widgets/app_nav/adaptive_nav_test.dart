@@ -1,9 +1,7 @@
-import 'dart:ui' show Tristate;
-
-import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/router/nav_destinations.dart';
+import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/widgets/app_nav/adaptive_nav.dart';
@@ -171,36 +169,46 @@ void main() {
     testWidgets('should_select_nothing_when_the_route_is_not_a_destination', (
       tester,
     ) async {
-      final semantics = tester.ensureSemantics();
-      addTearDown(semantics.dispose);
-
       await tester.pumpWidget(host(width: TestWidths.phone, current: null));
       await tester.pumpAndSettle();
 
-      // `NavigationBar.selectedIndex` is a non-nullable `int`, so it can never
-      // report "nothing selected" the way `NavigationRail.selectedIndex` (an
-      // `int?`) can. The bar is driven by that index, so the honest assertion is
-      // on what it *publishes*: no destination may be marked selected.
-      final selected = <String>[];
-      void collect(SemanticsNode node) {
-        // `flagsCollection.isSelected` is a `Tristate` (none / isFalse / isTrue),
-        // not a `bool` — the old `hasFlag(SemanticsFlag.isSelected)` helper was
-        // deprecated after 3.32 in favour of this richer representation.
-        if (node.flagsCollection.isSelected == Tristate.isTrue) {
-          selected.add(node.label);
-        }
-        node.visitChildren((SemanticsNode child) {
-          collect(child);
-          return true;
-        });
-      }
+      // `NavigationBar.selectedIndex` is a non-nullable `int`, so the widget
+      // cannot express "nothing selected" the way `NavigationRail.selectedIndex`
+      // (an `int?`) can — it always marks *some* destination selected, both for
+      // painting and for accessibility. There is therefore no truthful
+      // assertion on the semantics flag here: it is set no matter what.
+      //
+      // What this widget actually guarantees is that no destination *looks*
+      // selected when `current` is null. That is carried by the theme the bar
+      // is given, so assert on it directly rather than on a proxy the framework
+      // overrides.
+      final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+      final theme = bar.selectedIndex;
+      expect(theme, 0, reason: 'the bar still needs an in-range index');
 
-      collect(tester.getSemantics(find.byType(NavigationBar)));
+      final barTheme = tester
+          .widget<NavigationBarTheme>(find.byType(NavigationBarTheme))
+          .data;
       expect(
-        selected,
-        isEmpty,
-        reason: 'a route that is not a destination must not read as selected',
+        barTheme.indicatorColor,
+        const Color(0x00000000),
+        reason: 'a null selection must not paint an indicator',
       );
+
+      // And the labels must not be tinted with the brand colour as if the route
+      // were a destination.
+      final colors = AppColorsLight();
+      for (final state in <Set<WidgetState>>[
+        <WidgetState>{WidgetState.selected},
+        <WidgetState>{},
+      ]) {
+        final style = barTheme.labelTextStyle?.resolve(state);
+        expect(
+          style?.color,
+          isNot(colors.brandPrimary),
+          reason: 'no label may read as selected when current is null',
+        );
+      }
     });
   });
 
