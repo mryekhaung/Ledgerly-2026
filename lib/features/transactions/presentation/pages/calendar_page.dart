@@ -932,15 +932,18 @@ class _TransactionRow extends ConsumerWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // `Flexible`, not a bare child: `ListTile` hands `trailing` a
-            // bounded width, but a `Row` sizes its non-flexible children to
-            // their intrinsic width — and a `Text` with `ellipsis` still
-            // *reports* its full width at layout time. So at a narrow width with
-            // a large text scale (360 px × 2.0) the amount plus the overflow
-            // button exceeded the trailing budget and the `RenderFlex`
-            // overflowed. Flexible lets the Row shrink the amount, which is the
-            // only child that can give, and the ellipsis then does its job.
-            Flexible(
+            // The amount is capped, not flexible. `ListTile` asserts when the
+            // trailing "consumes the entire tile width", and a `Flexible` child
+            // does exactly that — it expands to fill the slot, so at 360 px with
+            // a 2.0 text scale the tile threw. A `ConstrainedBox` instead lets
+            // the amount take its natural width when there is room and shrink to
+            // the cap (where the built-in `ellipsis` takes over) when there is
+            // not. The cap is a share of the window so it tracks the size class
+            // rather than assuming a phone width.
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.sizeOf(context).width * 0.4,
+              ),
               child: AmountText(
                 transaction.amount,
                 style: AmountStyle.row,
