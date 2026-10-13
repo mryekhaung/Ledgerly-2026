@@ -16,6 +16,8 @@ import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../support/app_test_host.dart';
+
 /// The Profile and Avatar Editor pages, driven with an overridden profile stream.
 ///
 /// [userProfileProvider] and [avatarRandomProvider] are overridden so the pages
@@ -37,24 +39,20 @@ void main() {
         if (random case final random?)
           avatarRandomProvider.overrideWithValue(random),
       ],
-      child: AppThemeColors(
-        colors: const AppColorsLight(),
-        child: MaterialApp(
-          locale: locale,
-          supportedLocales: AppLocalization.supportedLocales
-              .map(Locale.new)
-              .toList(growable: false),
-          localizationsDelegates: const <LocalizationsDelegate<Object?>>[
-            ...GlobalMaterialLocalizations.delegates,
-            AppLocalizations.delegate,
-          ],
-          home: Builder(
-            builder: (context) => AppStringsScope(
-              lookup: AppStringLookup.of(AppLocalizations.of(context)),
-              child: child,
-            ),
-          ),
-        ),
+      child: MaterialApp(
+        locale: locale,
+        supportedLocales: AppLocalization.supportedLocales
+            .map(Locale.new)
+            .toList(growable: false),
+        localizationsDelegates: const <LocalizationsDelegate<Object?>>[
+          ...GlobalMaterialLocalizations.delegates,
+          AppLocalizations.delegate,
+        ],
+        // `builder` so the scopes sit above the `Navigator` — the editor is a
+        // pushed route and reads `AppThemeColors`/`AppStrings` too.
+        builder: (context, child) =>
+            AppTestScopes(child: child ?? const SizedBox.shrink()),
+        home: child,
       ),
     );
   }
@@ -112,11 +110,23 @@ void main() {
       await tester.pumpWidget(host(const AvatarEditorPage()));
       await tester.pumpAndSettle();
 
-      expect(find.text('BACKGROUND'), findsOneWidget);
-      expect(find.text('BACKDROP'), findsOneWidget);
-      expect(find.text('SHAPE'), findsOneWidget);
-      expect(find.text('EYES'), findsOneWidget);
-      expect(find.text('MOUTH'), findsOneWidget);
+      // The body is a `ListView`, so only the rows inside the viewport are
+      // built. Scrolling to each label is what proves every part has a row —
+      // `find.text` alone would only see the first one or two.
+      for (final label in <String>[
+        'BACKGROUND',
+        'BACKDROP',
+        'SHAPE',
+        'EYES',
+        'MOUTH',
+      ]) {
+        await tester.scrollUntilVisible(
+          find.text(label),
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect(find.text(label), findsOneWidget, reason: 'missing row $label');
+      }
     });
 
     testWidgets('should_offer_a_swatch_count_matching_the_catalogue', (

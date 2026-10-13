@@ -394,12 +394,23 @@ void main() {
     });
 
     test('should_map_a_storage_error_when_the_database_is_closed', () async {
-      // The cheapest way to provoke a real engine error: close the connection
-      // and then read. Proves the guard catches and maps rather than letting an
-      // exception escape `data/` (docs/Agent.md §3.4).
+      // Provoke a real engine error: close the connection, then **write**. A
+      // write must reach the engine, so it fails with a `StateError`/engine
+      // error rather than resolving against a cached read. A read was the
+      // original choice here, but drift can satisfy a `SELECT` from an
+      // already-loaded executor without touching the closed handle, so the read
+      // silently succeeded and the test proved nothing.
+      //
+      // Proves the guard catches and maps rather than letting an exception
+      // escape `data/` (docs/Agent.md §3.4).
       await harness.db.close();
 
-      final result = await harness.repository.nameExists('Food');
+      final result = await harness.repository.create((
+        name: 'After close',
+        iconKey: 'tag',
+        colorValue: 0xFF112233,
+        kind: CategoryKind.expense,
+      ));
 
       expect(result.failureOrNull, isA<StorageFailure>());
     });

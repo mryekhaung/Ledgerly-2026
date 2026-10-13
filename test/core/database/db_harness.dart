@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,6 +10,26 @@ import 'package:ledgerly/core/database/daos/clock.dart';
 import 'package:ledgerly/core/database/daos/transactions_dao.dart';
 import 'package:ledgerly/core/database/seed.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+
+/// A temporary, on-disk SQLite file that behaves like a real database file.
+///
+/// `NativeDatabase.memory()` is a single-shot connection: once it is closed the
+/// executor cannot be reopened, so a test that wants to *close and reopen the
+/// same database* cannot use it. A temp file can be closed and reopened as many
+/// times as the test needs, and the file is deleted when the returned cleanup
+/// runs — register it with `addTearDown`.
+///
+/// Returns a record of the file and a `dispose` callback.
+({File file, void Function() dispose}) useTempDbFile() {
+  final dir = Directory.systemTemp.createTempSync('ledgerly_db_test_');
+  final file = File('${dir.path}${Platform.pathSeparator}ledgerly.sqlite');
+  return (
+    file: file,
+    dispose: () {
+      if (dir.existsSync()) dir.deleteSync(recursive: true);
+    },
+  );
+}
 
 /// Shared harness for the DAO tests.
 ///
@@ -50,14 +72,20 @@ DbHarness useDbHarness({int startMillis = 1000}) {
 /// Counts rows in [table] including soft-deleted ones.
 ///
 /// `select(table).get()` cannot be used to prove a soft delete did not remove the
-/// row, because the ordinary reads filter `deleted_at`. Reading via `selectOnly`
-/// with no `where` sees the physical rows.
+/// row, because the ordinary reads filter `deleted_at`. A `COUNT(*)` over the
+/// bare table with no `where` sees the physical rows.
+///
+/// The column list is not optional: `selectOnly` with no columns renders
+/// `SELECT  FROM "t"`, which SQLite rejects with `near "FROM": syntax error`.
 Future<int> physicalRowCount(
   AppDatabase db,
   TableInfo<Table, dynamic> table,
 ) async {
-  final rows = await db.selectOnly(table).get();
-  return rows.length;
+  final count = table.$columns.first;
+  final row = await db.selectOnly(table).addColumns([
+    count.count(),
+  ]).getSingle();
+  return row.read(count.count())!;
 }
 
 /// Looks a raw column up by name, bypassing the DAO's filters and converters.

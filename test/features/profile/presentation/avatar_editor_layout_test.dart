@@ -1,14 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ledgerly/app/theme/app_colors.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
+
+import '../../../support/app_test_host.dart';
 
 /// Layout checks for the Avatar Editor full-screen page (docs/Avatar.md §2 step 0).
 ///
@@ -45,24 +44,20 @@ void main() {
           (_) => Stream.value(UserProfile.initial),
         ),
       ],
-      child: AppThemeColors(
-        colors: const AppColorsLight(),
-        child: MaterialApp(
-          locale: locale,
-          supportedLocales: AppLocalization.supportedLocales
-              .map(Locale.new)
-              .toList(),
-          localizationsDelegates: const <LocalizationsDelegate<Object?>>[
-            ...GlobalMaterialLocalizations.delegates,
-            AppLocalizations.delegate,
-          ],
-          home: Builder(
-            builder: (context) => AppStringsScope(
-              lookup: AppStringLookup.of(AppLocalizations.of(context)),
-              child: child,
-            ),
-          ),
-        ),
+      child: MaterialApp(
+        locale: locale,
+        supportedLocales: AppLocalization.supportedLocales
+            .map(Locale.new)
+            .toList(),
+        localizationsDelegates: const <LocalizationsDelegate<Object?>>[
+          ...GlobalMaterialLocalizations.delegates,
+          AppLocalizations.delegate,
+        ],
+        // `builder` so the app's scopes sit above the `Navigator` and below
+        // `Localizations` — exactly where `app.dart` puts them.
+        builder: (context, child) =>
+            AppTestScopes(child: child ?? const SizedBox.shrink()),
+        home: child,
       ),
     );
   }

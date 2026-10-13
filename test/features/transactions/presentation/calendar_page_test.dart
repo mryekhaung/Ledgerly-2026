@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
-import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -20,6 +19,7 @@ import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../support/app_test_host.dart';
 import '../../categories/domain/fake_category_repository.dart';
 import '../domain/fake_transaction_repository.dart';
 
@@ -104,17 +104,16 @@ void main() {
           ...GlobalMaterialLocalizations.delegates,
           AppLocalizations.delegate,
         ],
+        // `builder` so the app's scopes sit above the `Navigator`; the calendar
+        // pushes the transaction form, which reads the same scopes.
+        builder: (context, child) =>
+            AppTestScopes(child: child ?? const SizedBox.shrink()),
         home: MediaQuery(
           data: MediaQueryData(
             size: Size(width, 900),
             textScaler: TextScaler.linear(textScale),
           ),
-          child: Builder(
-            builder: (context) => AppStringsScope(
-              lookup: AppStringLookup.of(AppLocalizations.of(context)),
-              child: const CalendarPage(),
-            ),
-          ),
+          child: const CalendarPage(),
         ),
       ),
     );

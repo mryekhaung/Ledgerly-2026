@@ -1,11 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/month_year_picker_page.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
+
+import '../../../support/app_test_host.dart';
 
 /// A fixed month so the tests do not depend on the clock.
 ///
@@ -39,26 +40,25 @@ void main() {
         ...GlobalMaterialLocalizations.delegates,
         AppLocalizations.delegate,
       ],
-      home: Builder(
-        builder: (context) => AppStringsScope(
-          lookup: AppStringLookup.of(AppLocalizations.of(context)),
-          child: Scaffold(
-            body: Center(
-              child: Builder(
-                builder: (inner) => TextButton(
-                  onPressed: () async {
-                    popped = await Navigator.of(inner).push<LocalDate>(
-                      MaterialPageRoute<LocalDate>(
-                        builder: (_) => MonthYearPickerPage(
-                          initialMonth: initialMonth,
-                          selectableYearRange: range,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text('open'),
-                ),
-              ),
+      // `builder` (not `home`) so the scopes sit above the `Navigator`: the
+      // picker is pushed onto it and needs `AppThemeColors`/`AppStrings` too.
+      builder: (context, child) =>
+          AppTestScopes(child: child ?? const SizedBox.shrink()),
+      home: Scaffold(
+        body: Center(
+          child: Builder(
+            builder: (inner) => TextButton(
+              onPressed: () async {
+                popped = await Navigator.of(inner).push<LocalDate>(
+                  MaterialPageRoute<LocalDate>(
+                    builder: (_) => MonthYearPickerPage(
+                      initialMonth: initialMonth,
+                      selectableYearRange: range,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('open'),
             ),
           ),
         ),
@@ -216,17 +216,14 @@ void main() {
           ...GlobalMaterialLocalizations.delegates,
           AppLocalizations.delegate,
         ],
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context)
-              .copyWith(textScaler: const TextScaler.linear(2)),
-          child: child!,
-        ),
-        home: Builder(
-          builder: (context) => AppStringsScope(
-            lookup: AppStringLookup.of(AppLocalizations.of(context)),
-            child: MonthYearPickerPage(initialMonth: _may2026),
+        builder: (context, child) => AppTestScopes(
+          child: MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(2)),
+            child: child ?? const SizedBox.shrink(),
           ),
         ),
+        home: MonthYearPickerPage(initialMonth: _may2026),
       ),
     );
     await tester.pumpAndSettle();

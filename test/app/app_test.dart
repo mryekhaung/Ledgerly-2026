@@ -107,9 +107,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Insights is still a placeholder — it renders the shared coming-soon
-      // state rather than a bespoke page.
+      // state rather than a bespoke page. Assert on the shipped string
+      // (`stateComingSoon`), not a fragment of it: the copy has already changed
+      // once, and a `textContaining` on a phrase that no longer exists fails
+      // silently as "nothing found".
       expect(find.byType(StatePlaceholder), findsOneWidget);
-      expect(find.textContaining('coming soon'), findsOneWidget);
+      expect(
+        find.text("This part isn't built yet. It's planned and coming."),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should_navigate_when_router_pushed_to_categories', (

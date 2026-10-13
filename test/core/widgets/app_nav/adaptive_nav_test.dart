@@ -10,6 +10,8 @@ import 'package:ledgerly/core/widgets/glass/glass_surface.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../support/app_test_host.dart';
+
 /// `AdaptiveNav` — the chrome every platform and size class gets.
 ///
 /// The point of these tests is the **branch table** in `docs/Platform.md` §3:
@@ -18,10 +20,12 @@ import 'package:material_ui/material_ui.dart';
 /// decisions a screenshot cannot verify, because a wrong branch still renders
 /// *something*.
 void main() {
-  /// Hosts [AdaptiveNav] at a given width with the string scope wired.
+  /// Hosts [AdaptiveNav] at a given width with the app's scopes wired.
   ///
   /// The string lookup runs through the real generated delegate so the labels
-  /// asserted below are the shipped translations, not stubs.
+  /// asserted below are the shipped translations, not stubs. [AppTestScopes]
+  /// installs `AppThemeColors`/`AppStringsScope`/`AdaptiveStyleScope` exactly as
+  /// `app.dart` does — `AdaptiveNav` asserts on all three.
   Widget host({
     required double width,
     AppPlatform platform = AppPlatform.android,
@@ -39,15 +43,12 @@ void main() {
           builder: (context) => MediaQuery(
             // A tall surface so nothing overflows; the nav is what is under test.
             data: MediaQuery.of(context).copyWith(size: Size(width, 900)),
-            child: AdaptiveStyleScope(
-              platformOverride: platform,
+            child: AppTestScopes(
+              platform: platform,
               child: Scaffold(
-                body: AppStringsScope(
-                  lookup: AppStringLookup.of(AppLocalizations.of(context)),
-                  child: AdaptiveNav(
-                    current: current,
-                    onSelect: onSelect ?? (_) {},
-                  ),
+                body: AdaptiveNav(
+                  current: current,
+                  onSelect: onSelect ?? (_) {},
                 ),
               ),
             ),
@@ -102,16 +103,11 @@ void main() {
                   size: Size(390, 900),
                   highContrast: true,
                 ),
-                child: AdaptiveStyleScope(
-                  platformOverride: AppPlatform.ios,
-                  child: Builder(
-                    builder: (context) => AppStringsScope(
-                      lookup: AppStringLookup.of(AppLocalizations.of(context)),
-                      child: AdaptiveNav(
-                        current: NavDestination.calendar,
-                        onSelect: (_) {},
-                      ),
-                    ),
+                child: AppTestScopes(
+                  platform: AppPlatform.ios,
+                  child: AdaptiveNav(
+                    current: NavDestination.calendar,
+                    onSelect: (_) {},
                   ),
                 ),
               ),

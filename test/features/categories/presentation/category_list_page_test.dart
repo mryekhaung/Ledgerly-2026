@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
-import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/category_list_state.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_form_page.dart';
@@ -11,6 +10,7 @@ import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../support/app_test_host.dart';
 import '../domain/fake_category_repository.dart';
 
 /// The categories list at each window size class.
@@ -42,14 +42,13 @@ void main() {
           ...GlobalMaterialLocalizations.delegates,
           AppLocalizations.delegate,
         ],
+        // `builder` so the app's scopes sit above the `Navigator` — the page
+        // pushes a form route that reads the same scopes.
+        builder: (context, child) =>
+            AppTestScopes(child: child ?? const SizedBox.shrink()),
         home: MediaQuery(
           data: MediaQueryData(size: Size(width, 900)),
-          child: Builder(
-            builder: (context) => AppStringsScope(
-              lookup: AppStringLookup.of(AppLocalizations.of(context)),
-              child: const CategoryListPage(),
-            ),
-          ),
+          child: const CategoryListPage(),
         ),
       ),
     );
@@ -231,17 +230,14 @@ void main() {
                 ...GlobalMaterialLocalizations.delegates,
                 AppLocalizations.delegate,
               ],
+              builder: (context, child) =>
+                  AppTestScopes(child: child ?? const SizedBox.shrink()),
               home: MediaQuery(
                 data: MediaQueryData(
                   size: Size(width, 900),
                   textScaler: const TextScaler.linear(2),
                 ),
-                child: Builder(
-                  builder: (context) => AppStringsScope(
-                    lookup: AppStringLookup.of(AppLocalizations.of(context)),
-                    child: const CategoryListPage(),
-                  ),
-                ),
+                child: const CategoryListPage(),
               ),
             ),
           ),

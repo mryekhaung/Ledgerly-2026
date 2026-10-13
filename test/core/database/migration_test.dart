@@ -94,15 +94,15 @@ void main() {
       }
     });
 
-    test(
-      'should_report_version_1_and_leave_no_drift_internal_schema',
-      () async {
-        final h = useDbHarness();
-        await h.db.customSelect('SELECT 1').get();
+    test('should_report_the_current_schema_version_and_leave_no_drift_internal_schema', () async {
+      final h = useDbHarness();
+      await h.db.customStatement('SELECT 1');
 
-        expect(await pragmaInt(h.db, 'user_version'), 1);
-      },
-    );
+      // Read from `AppDatabase.schemaVersion` rather than hard-coding: the
+      // schema is at v2 (`app_settings` was added additively), and a literal
+      // here would silently go stale on the next bump instead of tracking it.
+      expect(await pragmaInt(h.db, 'user_version'), h.db.schemaVersion);
+    });
 
     test('should_create_every_declared_index', () async {
       final h = useDbHarness();
@@ -155,24 +155,39 @@ void main() {
       );
     });
 
-    test('should_keep_deleted_at_nullable_on_every_table', () async {
-      final h = useDbHarness();
+    test(
+      'should_keep_deleted_at_nullable_on_every_soft_deletable_table',
+      () async {
+        final h = useDbHarness();
 
-      for (final table in schemaTables) {
-        final rows = await h.db.customSelect('PRAGMA table_info($table)').get();
-        final deletedAt = rows.firstWhere(
-          (row) => row.read<String>('name') == 'deleted_at',
-          orElse: () => throw StateError('$table has no deleted_at column'),
-        );
-        expect(
-          deletedAt.read<int>('notnull'),
-          0,
-          reason:
-              '$table.deleted_at must be nullable — NULL means live '
-              '(ADR #4)',
-        );
-      }
-    });
+        // `app_settings` is a key/value table added in v2 and is not
+        // soft-deletable, so it has no `deleted_at` at all. The contract under
+        // test is "where a `deleted_at` exists, it is nullable", so the table list
+        // is the soft-deletable subset rather than every table.
+        const softDeletable = <String>[
+          'categories',
+          'transactions',
+          'accounts',
+        ];
+
+        for (final table in softDeletable) {
+          final rows = await h.db
+              .customSelect('PRAGMA table_info($table)')
+              .get();
+          final deletedAt = rows.firstWhere(
+            (row) => row.read<String>('name') == 'deleted_at',
+            orElse: () => throw StateError('$table has no deleted_at column'),
+          );
+          expect(
+            deletedAt.read<int>('notnull'),
+            0,
+            reason:
+                '$table.deleted_at must be nullable — NULL means live '
+                '(ADR #4)',
+          );
+        }
+      },
+    );
 
     test('should_keep_account_id_nullable_until_accounts_ship', () async {
       // A NOT NULL column could not be added to a populated transactions table
@@ -281,17 +296,24 @@ void main() {
       // The real upgrade proof.
       //
       // A v1 database is built **by hand** with the exact v1 DDL and
-      // `PRAGMA user_version = 1`, using the same in-memory connection that is
-      // then handed to the *current* [AppDatabase]. Opening it at version 2 is
-      // what makes drift run `onUpgrade(from: 1, to: 2)` — the code path this
-      // test exists to exercise.
+      // `PRAGMA user_version = 1`, then closed. Opening the *same file* through
+      // the current [AppDatabase] at version 2 is what makes drift run
+      // `onUpgrade(from: 1, to: 2)` — the code path this test exists to
+      // exercise.
       //
       // Building v1 by hand (rather than opening an old AppDatabase) is what
       // makes this honest: the handwritten DDL is frozen at v1 forever and
       // cannot drift along with the current schema.
-      final connection = NativeDatabase.memory();
+      //
+      // A file, not `NativeDatabase.memory()`: an in-memory executor cannot be
+      // reopened after `close()`, and the reopen is the whole test.
+      final temp = useTempDbFile();
+      addTearDown(temp.dispose);
 
-      final v1 = AppDatabase(connection);
+      // Build v1 through a throwaway [AppDatabase] on the temp file: the schema
+      // management is bypassed with raw DDL, but the file is then closed and
+      // reopened by the real database below.
+      final v1 = AppDatabase(NativeDatabase(temp.file));
       await v1.customStatement('DROP TABLE IF EXISTS app_settings');
       await v1.customStatement('DROP TABLE IF EXISTS transactions');
       await v1.customStatement('DROP TABLE IF EXISTS categories');
@@ -300,7 +322,7 @@ void main() {
         'CREATE TABLE categories ('
         'id TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, '
         'icon_key TEXT NOT NULL, color_value INTEGER NOT NULL, '
-        'kind TEXT NOT NULL DEFAULT \'expense\', '
+        "kind TEXT NOT NULL DEFAULT 'expense', "
         'is_default INTEGER NOT NULL DEFAULT 0, '
         'created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, '
         'deleted_at INTEGER, sort_order INTEGER NOT NULL DEFAULT 0, '
@@ -339,8 +361,8 @@ void main() {
       await v1.customStatement('PRAGMA user_version = 1');
       await v1.close();
 
-      // --- Open through the current database: onUpgrade v1→v2 must run ---
-      final upgraded = AppDatabase(connection);
+      // --- Reopen the same file through the current database: onUpgrade runs ---
+      final upgraded = AppDatabase(NativeDatabase(temp.file));
 
       // ...existing rows survived...
       final categories = await upgraded.categoriesDao.watchAll().first;
@@ -384,9 +406,13 @@ void main() {
       // migration must preserve, so it establishes the baseline the first real
       // upgrade test will compare against.
       final clock = FixedClock(1000);
-      final connection = NativeDatabase.memory();
+      // A file, not `NativeDatabase.memory()`: the whole point is to close the
+      // database and open it again, and an in-memory executor cannot be
+      // reopened once closed.
+      final temp = useTempDbFile();
+      addTearDown(temp.dispose);
 
-      final first = AppDatabase(connection);
+      final first = AppDatabase(NativeDatabase(temp.file));
       final firstDao = CategoriesDao(first, clock: clock);
       await seedDefaults(first, clock: clock);
       final seededIds = (await firstDao.watchAll().first)
@@ -394,7 +420,7 @@ void main() {
           .toList();
       await first.close();
 
-      final second = AppDatabase(connection);
+      final second = AppDatabase(NativeDatabase(temp.file));
       final secondDao = CategoriesDao(second, clock: clock);
       final reopened = await secondDao.watchAll().first;
       expect(reopened.map((c) => c.id).toList(), seededIds);

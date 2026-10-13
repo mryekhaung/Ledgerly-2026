@@ -1,13 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
-import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
+
+import '../../../support/app_test_host.dart';
 
 /// The Settings page, driven with an overridden settings stream.
 ///
@@ -34,12 +35,11 @@ void main() {
           ...GlobalMaterialLocalizations.delegates,
           AppLocalizations.delegate,
         ],
-        home: Builder(
-          builder: (context) => AppStringsScope(
-            lookup: AppStringLookup.of(AppLocalizations.of(context)),
-            child: const SettingsPage(),
-          ),
-        ),
+        // `builder` so the scopes sit above the `Navigator` and are available
+        // to any route the page pushes.
+        builder: (context, child) =>
+            AppTestScopes(child: child ?? const SizedBox.shrink()),
+        home: const SettingsPage(),
       ),
     );
   }

@@ -1,11 +1,29 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
+
+import '../../../support/app_test_host.dart';
+
+/// Fires every feedback entry point from a context with no `ScaffoldMessenger`,
+/// then renders nothing.
+///
+/// Top-level (not an inline closure) so it can be `const` and so the `no
+/// messenger` test reads as one idea: call them all, expect no throw.
+Widget _noMessengerProbe(BuildContext context) {
+  AppFeedback.confirm(context, message: 'Saved');
+  AppFeedback.failure(context, message: 'Failed');
+  AppFeedback.undoable(
+    context,
+    message: 'Deleted',
+    undoLabel: 'Undo',
+    onUndo: () {},
+  );
+  return const SizedBox.shrink();
+}
 
 /// The shared feedback layer.
 ///
@@ -31,16 +49,14 @@ void main() {
         ...GlobalMaterialLocalizations.delegates,
         AppLocalizations.delegate,
       ],
+      builder: (context, child) => AppTestScopes(
+        child: Scaffold(body: child ?? const SizedBox.shrink()),
+      ),
       home: Builder(
-        builder: (context) => AppStringsScope(
-          lookup: AppStringLookup.of(AppLocalizations.of(context)),
-          child: Scaffold(
-            body: Center(
-              child: ElevatedButton(
-                onPressed: () => onTap(context),
-                child: const Text('fire'),
-              ),
-            ),
+        builder: (context) => Center(
+          child: ElevatedButton(
+            onPressed: () => onTap(context),
+            child: const Text('fire'),
           ),
         ),
       ),
@@ -210,22 +226,18 @@ void main() {
 
   group('no messenger', () {
     testWidgets('should_be_a_no_op_rather_than_throwing', (tester) async {
-      // A widget outside any Scaffold has no messenger. Feedback is best-effort,
-      // so this must not be the reason an action fails.
+      // A context with no `ScaffoldMessenger` above it at all. Feedback is
+      // best-effort, so this must not be the reason an action fails.
+      //
+      // Deliberately *not* wrapped in `MaterialApp`: `MaterialApp` always
+      // installs a `ScaffoldMessenger`, and calling `showSnackBar` on one with
+      // no descendant `Scaffold` asserts inside Material itself. The behaviour
+      // under test is `ScaffoldMessenger.maybeOf` returning null, so the host
+      // has to be a bare element with no messenger.
       await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
-            builder: (context) {
-              AppFeedback.confirm(context, message: 'Saved');
-              AppFeedback.undoable(
-                context,
-                message: 'Deleted',
-                undoLabel: 'Undo',
-                onUndo: () {},
-              );
-              return const SizedBox.shrink();
-            },
-          ),
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: Builder(builder: _noMessengerProbe),
         ),
       );
       await tester.pump();

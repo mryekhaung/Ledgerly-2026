@@ -60,17 +60,24 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.id.equals(id) & t.deletedAt.isNull())).getSingleOrNull();
   }
 
-  /// Whether an active category already uses [name].
+  /// Whether an active category already uses [name], ignoring case.
   ///
   /// Uniqueness is checked here rather than by a UNIQUE index so that a
   /// soft-deleted `Food` does not block recreating `Food`
   /// (`docs/DataModel.md` §2).
+  ///
+  /// The comparison is **case-insensitive**: `Food` and `food` are the same
+  /// category as far as a user is concerned, and letting both exist produces two
+  /// indistinguishable rows in the picker. drift's `equals` emits a plain `=`,
+  /// which is case-sensitive for TEXT, so the fold is done explicitly with
+  /// SQLite's `COLLATE NOCASE` on both sides.
   Future<bool> nameExists(String name, {String? excludingId}) async {
+    final lowered = name.toLowerCase();
     final query = select(categories)
       ..where(
         (t) =>
             t.deletedAt.isNull() &
-            t.name.equals(name) &
+            t.name.lower().equals(lowered) &
             (excludingId == null
                 ? const Constant(true)
                 : t.id.equals(excludingId).not()),

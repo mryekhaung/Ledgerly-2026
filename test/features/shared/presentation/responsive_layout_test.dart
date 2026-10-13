@@ -3,6 +3,8 @@ import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../support/app_test_host.dart';
+
 /// The responsive layout primitives (docs/Platform.md §5).
 ///
 /// These are the only widgets that decide *when* the app changes shape, so a bug
@@ -14,12 +16,11 @@ void main() {
   ///
   /// `MediaQuery.size` is set directly rather than through a real surface, so the
   /// tests exercise the exact breakpoints without depending on the harness's
-  /// default 800×600 window.
-  Widget host(Widget child, double width) => MaterialApp(
-    home: MediaQuery(
-      data: MediaQueryData(size: Size(width, 800)),
-      child: Scaffold(body: child),
-    ),
+  /// default 800×600 window. The app's scopes come from [appTestHost], because
+  /// these widgets read `AppThemeColors`/`AppStrings`.
+  Widget host(Widget child, double width) => appTestHost(
+    home: Scaffold(body: child),
+    size: Size(width, 800),
   );
 
   group('TwoPaneLayout', () {
@@ -360,17 +361,13 @@ void main() {
       // at scale 1 is a bug for anyone using large type.
       for (final width in <double>[TestWidths.smallPhone, TestWidths.tablet]) {
         await tester.pumpWidget(
-          MediaQuery(
-            data: MediaQueryData(
-              size: Size(width, 800),
-              textScaler: const TextScaler.linear(2),
-            ),
-            child: const MaterialApp(
-              home: Scaffold(
-                body: TwoPaneLayout(
-                  master: Text('master'),
-                  detail: Text('detail'),
-                ),
+          appTestHost(
+            size: Size(width, 800),
+            textScaler: const TextScaler.linear(2),
+            home: const Scaffold(
+              body: TwoPaneLayout(
+                master: Text('master'),
+                detail: Text('detail'),
               ),
             ),
           ),
