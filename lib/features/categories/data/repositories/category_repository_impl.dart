@@ -1,6 +1,6 @@
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/result/result.dart';
-import 'package:ledgerly/core/result/result_guard.dart';
+import 'package:ledgerly/core/database/result_guard.dart';
 import 'package:ledgerly/features/categories/data/datasources/category_local_datasource.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';

@@ -1,7 +1,7 @@
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/result/result.dart';
-import 'package:ledgerly/core/result/result_guard.dart';
+import 'package:ledgerly/core/database/result_guard.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/transactions/data/datasources/transaction_local_datasource.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';

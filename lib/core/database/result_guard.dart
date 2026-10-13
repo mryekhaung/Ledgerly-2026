@@ -7,9 +7,12 @@ import 'package:ledgerly/core/result/result.dart';
 
 /// Translates an exception thrown by the local database into a [Failure].
 ///
-/// Lives in `core/` because every feature's repository needs the same mapping,
-/// and three copies of "is this a constraint violation or a disk problem?" would
-/// drift apart (`docs/Architecture.md` §8, `docs/Agent.md` §3.4).
+/// Lives in `core/database/` — **not** `core/result/` — because it is the one
+/// place that knows about Drift's exception types, and `core/result/` must stay
+/// pure Dart (it is imported by `domain`; `docs/Agent.md` §3.1, enforced by
+/// `test/core/layer_rule_test.dart`). `GuardResult` is a data-layer concern:
+/// `docs/Agent.md` §3.4 puts exception→`Failure` mapping in `data/`, and this is
+/// the shared implementation every drift-backed repository reuses.
 ///
 /// The rule: **an exception never crosses out of `data/`.** Repositories wrap
 /// their bodies in [guardResult] and return the [Failure] it produces.

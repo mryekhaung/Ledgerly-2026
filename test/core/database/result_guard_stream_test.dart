@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/result/result.dart';
-import 'package:ledgerly/core/result/result_guard.dart';
+import 'package:ledgerly/core/database/result_guard.dart';
 
 /// Regression suite for [guardResultStream].
 ///

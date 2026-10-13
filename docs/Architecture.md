@@ -28,7 +28,7 @@ lib/
 │  ├─ money/                   # Money, CurrencyCode, MoneyFormatter
 │  ├─ period/                  # BudgetPeriod, PeriodCalculator (custom month start day — DataModel.md §8)
 │  ├─ network/                 # Dio factory, interceptors
-│  ├─ database/                # Drift AppDatabase, DAOs shared, migrations
+│  ├─ database/                # Drift AppDatabase, DAOs shared, migrations, guardResult (exception→Failure bridge)
 │  ├─ utils/ extensions/ constants/
 │  ├─ platform/                # AppPlatform, WindowSizeClass, AdaptiveStyle
 │  └─ widgets/                 # Design-system; adaptive: ios/ + material/ impls (see Platform.md)

@@ -1,5 +1,5 @@
 import 'package:ledgerly/core/result/result.dart';
-import 'package:ledgerly/core/result/result_guard.dart';
+import 'package:ledgerly/core/database/result_guard.dart';
 import 'package:ledgerly/features/profile/data/datasources/profile_local_datasource.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_config.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';

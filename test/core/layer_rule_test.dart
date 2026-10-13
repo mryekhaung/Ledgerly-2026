@@ -11,6 +11,12 @@ import 'package:flutter_test/flutter_test.dart';
 /// whole domain untestable in pure Dart and would silently couple business
 /// rules to a UI toolkit.
 ///
+/// `core/result` holds only the result *types* (`Result`/`Success`/`Err` and the
+/// `Failure` taxonomy) — pure Dart. The drift-aware `guardResult` bridge lives in
+/// `core/database/result_guard.dart` instead, because it must know Drift's
+/// exception types and `Agent.md` §3.4 keeps exception→`Failure` mapping in the
+/// data layer. It is deliberately **not** in this list.
+///
 /// This is a *test* rather than a lint because it needs to inspect every file in
 /// a directory, which `analysis_options.yaml` rules cannot express.
 /// Strips the current working directory from [absolutePath] for readable output.
