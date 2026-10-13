@@ -49,12 +49,25 @@ void main() {
       await tester.pumpWidget(host(AppSettings.defaults));
       await tester.pumpAndSettle();
 
-      expect(find.text('Settings'), findsOneWidget);
-      expect(find.text('Currency'), findsOneWidget);
-      expect(find.text('Appearance'), findsOneWidget);
-      expect(find.text('Week starts on'), findsOneWidget);
-      expect(find.text('Language'), findsOneWidget);
-      expect(find.text('Version'), findsOneWidget);
+      // A lazy `ListView` only builds the rows in (and just past) the viewport,
+      // so the service rows at the bottom do not exist until they are scrolled
+      // into range. Scroll to each in turn rather than assuming a 600 px window
+      // happens to fit the whole list.
+      for (final label in <String>[
+        'Settings',
+        'Currency',
+        'Appearance',
+        'Week starts on',
+        'Language',
+        'Version',
+      ]) {
+        await tester.scrollUntilVisible(
+          find.text(label),
+          120,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect(find.text(label), findsOneWidget, reason: 'missing row $label');
+      }
     });
 
     testWidgets('shows the current currency', (tester) async {

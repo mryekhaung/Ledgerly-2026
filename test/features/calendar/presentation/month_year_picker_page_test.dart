@@ -81,10 +81,13 @@ void main() {
 
     // The year header.
     expect(find.text('2026'), findsOneWidget);
-    // Twelve month tiles are on screen.
-    expect(find.text('May'), findsOneWidget);
-    expect(find.text('January'), findsOneWidget);
-    expect(find.text('December'), findsOneWidget);
+    // Twelve month tiles are on screen. Each label is CLDR's month+year (via
+    // `MaterialLocalizations.formatMonthYear`), not a bare month name — the
+    // picker deliberately reuses the platform's locale data instead of putting
+    // 12 names × 3 locales in the ARB.
+    expect(find.text('May 2026'), findsOneWidget);
+    expect(find.text('January 2026'), findsOneWidget);
+    expect(find.text('December 2026'), findsOneWidget);
   });
 
   testWidgets('should_return_the_first_day_of_the_tapped_month', (
@@ -94,7 +97,7 @@ void main() {
     await read();
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('August'));
+    await tester.tap(find.text('August 2026'));
     await tester.pumpAndSettle();
 
     // Key assertion: the *17th* was the initial day, but the result must be the
@@ -114,7 +117,7 @@ void main() {
     expect(find.text('2027'), findsOneWidget);
     expect(find.text('2026'), findsNothing);
     // Still on the picker: browsing is not choosing.
-    expect(find.text('January'), findsOneWidget);
+    expect(find.text('January 2027'), findsOneWidget);
   });
 
   testWidgets('should_go_back_a_year_too', (tester) async {

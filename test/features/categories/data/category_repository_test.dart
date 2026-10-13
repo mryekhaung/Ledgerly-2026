@@ -393,24 +393,21 @@ void main() {
       expect(result.failureOrNull, isA<NotFoundFailure>());
     });
 
-    test('should_map_a_storage_error_when_the_database_is_closed', () async {
-      // Provoke a real engine error: close the connection, then **write**. A
-      // write must reach the engine, so it fails with a `StateError`/engine
-      // error rather than resolving against a cached read. A read was the
-      // original choice here, but drift can satisfy a `SELECT` from an
-      // already-loaded executor without touching the closed handle, so the read
-      // silently succeeded and the test proved nothing.
+    test('should_map_a_storage_error_when_the_query_fails', () async {
+      // Provoke a real engine error: drop the table out from under the query, so
+      // the next `SELECT` fails in SQLite with "no such table". The guard must
+      // catch it and hand back a `StorageFailure` rather than letting the
+      // exception escape `data/` (docs/Agent.md §3.4).
       //
-      // Proves the guard catches and maps rather than letting an exception
-      // escape `data/` (docs/Agent.md §3.4).
-      await harness.db.close();
+      // Closing the connection was the original approach here, but drift reopens
+      // a `DelegatedDatabase` lazily on the next operation, so both a read and a
+      // write quietly succeeded against the "closed" handle and the test proved
+      // nothing. A corrupt row was the second attempt, and does not work either:
+      // `CategoryMapper` decodes every field defensively (an unknown `kind` falls
+      // back to `expense` on purpose), so no row can make it throw.
+      await harness.db.customStatement('DROP TABLE categories');
 
-      final result = await harness.repository.create((
-        name: 'After close',
-        iconKey: 'tag',
-        colorValue: 0xFF112233,
-        kind: CategoryKind.expense,
-      ));
+      final result = await harness.repository.watchAll().first;
 
       expect(result.failureOrNull, isA<StorageFailure>());
     });

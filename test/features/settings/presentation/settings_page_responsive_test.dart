@@ -1,12 +1,8 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
-import 'package:ledgerly/l10n/app_localization.dart';
-import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
@@ -34,7 +30,6 @@ void main() {
     tester,
     size: Size(width, 900),
     textScaler: TextScaler.linear(textScale),
-    overrides: const <Override>[],
     home: const SettingsPage(),
   );
 

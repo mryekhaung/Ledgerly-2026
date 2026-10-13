@@ -1,10 +1,8 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
-import 'package:ledgerly/l10n/app_localization.dart';
-import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
@@ -18,7 +16,10 @@ import '../../../support/app_test_host.dart';
 /// purpose — the tests never tap Save, so the unconfigured get_it locator is
 /// never reached.
 void main() {
-  late final List<FlutterErrorDetails> overflowErrors;
+  // Not `final`: `setUp` re-assigns this before *every* test, and a `late final`
+  // can only ever be written once — so the second test in the file failed with
+  // `LateInitializationError` before it got to assert anything.
+  late List<FlutterErrorDetails> overflowErrors;
 
   setUp(() {
     overflowErrors = <FlutterErrorDetails>[];
@@ -35,48 +36,26 @@ void main() {
 
   tearDown(() => FlutterError.onError = FlutterError.dumpErrorToConsole);
 
-  Widget host(Widget child, {Locale locale = const Locale('en')}) {
-    return ProviderScope(
-      overrides: [
+  Future<void> pumpAt(
+    WidgetTester tester,
+    double width,
+    double textScale,
+  ) async {
+    // `pumpAppHost` resizes the real view and registers the restore via
+    // `addTearDown`, so walking several widths in one file cannot leak a
+    // surface size into the next test.
+    await pumpAppHost(
+      tester,
+      size: Size(width, 850),
+      textScaler: TextScaler.linear(textScale),
+      overrides: <Override>[
         // The editor reads the avatar from here; the shuffle provider is left at
         // its production default (a plain Random) because tests only render.
         userProfileProvider.overrideWith(
           (_) => Stream.value(UserProfile.initial),
         ),
       ],
-      child: MaterialApp(
-        locale: locale,
-        supportedLocales: AppLocalization.supportedLocales
-            .map(Locale.new)
-            .toList(),
-        localizationsDelegates: const <LocalizationsDelegate<Object?>>[
-          ...GlobalMaterialLocalizations.delegates,
-          AppLocalizations.delegate,
-        ],
-        // `builder` so the app's scopes sit above the `Navigator` and below
-        // `Localizations` — exactly where `app.dart` puts them.
-        builder: (context, child) =>
-            AppTestScopes(child: child ?? const SizedBox.shrink()),
-        home: child,
-      ),
-    );
-  }
-
-  Future<void> pumpAt(
-    WidgetTester tester,
-    double width,
-    double textScale,
-  ) async {
-    tester.view.physicalSize = Size(width, 850);
-    tester.view.devicePixelRatio = 1;
-    await tester.pumpWidget(
-      MediaQuery(
-        data: MediaQueryData(
-          size: Size(width, 850),
-          textScaler: TextScaler.linear(textScale),
-        ),
-        child: host(const AvatarEditorPage()),
-      ),
+      home: const AvatarEditorPage(),
     );
     await tester.pumpAndSettle();
   }

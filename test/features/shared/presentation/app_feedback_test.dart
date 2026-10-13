@@ -113,7 +113,10 @@ void main() {
       );
 
       await tester.tap(find.text('fire'));
-      await tester.pump();
+      // Settle, not a single pump: the bar animates in and its action is behind
+      // an `IgnorePointer` until that finishes, so an immediate tap is reported
+      // as a miss and the callback never fires.
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('Undo'));
       await tester.pump();
@@ -180,7 +183,10 @@ void main() {
       );
 
       await tester.tap(find.text('fire'));
-      await tester.pump();
+      // Settle rather than pump one frame: the snack bar animates in, and until
+      // that finishes the action is behind an `IgnorePointer` and a tap reports
+      // a miss instead of invoking the callback.
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Undo'));
       await tester.pump();
 
@@ -216,7 +222,9 @@ void main() {
       );
 
       await tester.tap(find.text('fire'));
-      await tester.pump();
+      // See the undo test: the action only becomes tappable once the bar has
+      // finished animating in.
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Retry'));
       await tester.pump();
 

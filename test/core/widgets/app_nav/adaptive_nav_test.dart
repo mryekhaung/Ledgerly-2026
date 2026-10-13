@@ -1,3 +1,4 @@
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/router/nav_destinations.dart';
@@ -183,7 +184,7 @@ void main() {
         if (node.hasFlag(SemanticsFlag.isSelected)) {
           selected.add(node.label);
         }
-        node.visitChildren((child) {
+        node.visitChildren((SemanticsNode child) {
           collect(child);
           return true;
         });

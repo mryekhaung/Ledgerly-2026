@@ -59,11 +59,18 @@ void main() {
     fakeCategory(id: 'cat-salary', name: 'Salary'),
   ];
 
-  /// Hosts [CalendarPage] at [width] with a fixed month of data.
+  /// Hosts [CalendarPage] at a real surface [width] wide with a fixed month of
+  /// data.
   ///
   /// Every provider that would otherwise reach the get_it locator is overridden
   /// with a fake, so the real page, grid, summary card and rows all run.
-  Widget host(
+  ///
+  /// The width is a genuine surface (via [pumpAppHost]) rather than `MediaQuery`
+  /// data alone, because the two-pane assertions measure the panes: a pane that
+  /// flexes into its parent reports the test window's width unless the view
+  /// itself was resized.
+  Future<void> host(
+    WidgetTester tester,
     double width, {
     Locale? locale,
     double textScale = 1,
@@ -75,8 +82,12 @@ void main() {
         repository ??
         FakeTransactionRepository(seed: transactions ?? dayTransactions());
 
-    return ProviderScope(
-      overrides: [
+    return pumpAppHost(
+      tester,
+      size: Size(width, 900),
+      locale: locale ?? const Locale('en'),
+      textScaler: TextScaler.linear(textScale),
+      overrides: <Override>[
         watchDayTransactionsProvider.overrideWithValue(
           WatchDayTransactions(fakes),
         ),
@@ -94,28 +105,7 @@ void main() {
         weekStartProvider.overrideWithValue(WeekStart.monday),
         ...extraOverrides,
       ],
-      child: MaterialApp(
-        theme: AppTheme.light(),
-        locale: locale ?? const Locale('en'),
-        supportedLocales: AppLocalization.supportedLocales
-            .map(Locale.new)
-            .toList(growable: false),
-        localizationsDelegates: const <LocalizationsDelegate<Object?>>[
-          ...GlobalMaterialLocalizations.delegates,
-          AppLocalizations.delegate,
-        ],
-        // `builder` so the app's scopes sit above the `Navigator`; the calendar
-        // pushes the transaction form, which reads the same scopes.
-        builder: (context, child) =>
-            AppTestScopes(child: child ?? const SizedBox.shrink()),
-        home: MediaQuery(
-          data: MediaQueryData(
-            size: Size(width, 900),
-            textScaler: TextScaler.linear(textScale),
-          ),
-          child: const CalendarPage(),
-        ),
-      ),
+      home: const CalendarPage(),
     );
   }
 
@@ -123,21 +113,34 @@ void main() {
     testWidgets('should_scroll_the_month_grid_and_the_day_list_together', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.smallPhone));
+      await host(tester, TestWidths.smallPhone);
       await tester.pumpAndSettle();
 
       // One ListView for the body: grid, summary and day list all inside it.
       expect(find.byType(ListView), findsOneWidget);
+      // The grid sits above the day list in the same scrollable, so the day's
+      // rows start below the fold on a phone and only exist once scrolled to —
+      // a lazy list never builds what is off-screen.
+      await tester.scrollUntilVisible(
+        find.text('Food'),
+        150,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('Food'), findsOneWidget);
     });
 
     testWidgets('should_show_the_summary_card_and_the_day_list', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.smallPhone));
+      await host(tester, TestWidths.smallPhone);
       await tester.pumpAndSettle();
 
       expect(find.text('Spent today'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Morning coffee'),
+        150,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('Morning coffee'), findsOneWidget);
     });
   });
@@ -173,7 +176,7 @@ void main() {
     testWidgets('should_advance_to_the_next_month_on_a_left_flick', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.phone));
+      await host(tester, TestWidths.phone);
       await tester.pumpAndSettle();
 
       final before = switcherLabel(tester);
@@ -190,7 +193,7 @@ void main() {
     });
 
     testWidgets('should_go_back_a_month_on_a_right_flick', (tester) async {
-      await tester.pumpWidget(host(TestWidths.phone));
+      await host(tester, TestWidths.phone);
       await tester.pumpAndSettle();
 
       final before = switcherLabel(tester);
@@ -204,7 +207,7 @@ void main() {
     testWidgets('should_ignore_a_tiny_drag_that_is_neither_flick_nor_drag', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.phone));
+      await host(tester, TestWidths.phone);
       await tester.pumpAndSettle();
 
       final before = switcherLabel(tester);
@@ -225,7 +228,7 @@ void main() {
     });
 
     testWidgets('should_swipe_on_a_wide_layout_too', (tester) async {
-      await tester.pumpWidget(host(TestWidths.desktop));
+      await host(tester, TestWidths.desktop);
       await tester.pumpAndSettle();
 
       final before = switcherLabel(tester);
@@ -238,7 +241,7 @@ void main() {
     testWidgets('should_open_the_month_picker_when_the_title_is_tapped', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.phone));
+      await host(tester, TestWidths.phone);
       await tester.pumpAndSettle();
 
       await tester.tap(labelFinder(tester));
@@ -251,7 +254,7 @@ void main() {
     testWidgets('should_jump_to_the_picked_month_and_close_the_picker', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.phone));
+      await host(tester, TestWidths.phone);
       await tester.pumpAndSettle();
 
       // Open the picker, step a year forward, then choose January.
@@ -259,7 +262,10 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.chevron_right));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('January'));
+      // The tiles are labelled by CLDR's month+year (`formatMonthYear`), so match
+      // on the month prefix rather than the bare name — the year depends on the
+      // real "today" and would otherwise make this break every New Year.
+      await tester.tap(find.textContaining('January '));
       await tester.pumpAndSettle();
 
       // Back on the calendar, and the header year moved on.
@@ -272,7 +278,7 @@ void main() {
     testWidgets('should_split_into_two_independently_scrolling_panes', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.tablet));
+      await host(tester, TestWidths.tablet);
       await tester.pumpAndSettle();
 
       // Two ListViews, not one: this is the whole point of the wide layout.
@@ -282,7 +288,7 @@ void main() {
     testWidgets('should_keep_the_month_header_visible_on_a_wide_split', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.desktop));
+      await host(tester, TestWidths.desktop);
       await tester.pumpAndSettle();
 
       // The header lives in the left pane, which the day list cannot scroll.
@@ -294,7 +300,7 @@ void main() {
     testWidgets('should_give_the_detail_pane_more_room_than_the_master', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.desktop));
+      await host(tester, TestWidths.desktop);
       await tester.pumpAndSettle();
 
       final panes = tester
@@ -317,7 +323,7 @@ void main() {
     });
 
     testWidgets('should_not_split_at_compact_even_when_tall', (tester) async {
-      await tester.pumpWidget(host(TestWidths.largePhone));
+      await host(tester, TestWidths.largePhone);
       await tester.pumpAndSettle();
 
       // 430 px is still a phone: one column.
@@ -327,9 +333,7 @@ void main() {
 
   group('localisation', () {
     testWidgets('should_render_the_myanmar_titles', (tester) async {
-      await tester.pumpWidget(
-        host(TestWidths.smallPhone, locale: const Locale('my')),
-      );
+      await host(tester, TestWidths.smallPhone, locale: const Locale('my'));
       await tester.pumpAndSettle();
 
       expect(find.text('ပြက္ခဒိန်'), findsWidgets);
@@ -341,9 +345,7 @@ void main() {
       tester,
     ) async {
       for (final width in <double>[TestWidths.smallPhone, TestWidths.desktop]) {
-        await tester.pumpWidget(
-          host(width, transactions: const <Transaction>[]),
-        );
+        await host(tester, width, transactions: const <Transaction>[]);
         await tester.pumpAndSettle();
 
         expect(
@@ -360,7 +362,7 @@ void main() {
       tester,
     ) async {
       for (final width in TestWidths.all) {
-        await tester.pumpWidget(host(width));
+        await host(tester, width);
         await tester.pump();
 
         expect(
@@ -375,7 +377,7 @@ void main() {
       tester,
     ) async {
       for (final width in TestWidths.all) {
-        await tester.pumpWidget(host(width, textScale: 2));
+        await host(tester, width, textScale: 2);
         await tester.pump();
 
         expect(
@@ -391,7 +393,11 @@ void main() {
     /// Hosts [CalendarPage] with a known fake repository so the swipe's soft
     /// delete and its undo can be asserted against the same in-memory store the
     /// page mutates.
-    Widget hostWithFakes(FakeTransactionRepository fakes) => host(
+    Future<void> hostWithFakes(
+      WidgetTester tester,
+      FakeTransactionRepository fakes,
+    ) => host(
+      tester,
       TestWidths.phone,
       repository: fakes,
       extraOverrides: <Override>[
@@ -400,12 +406,28 @@ void main() {
       ],
     );
 
+    /// Scrolls the day's rows into view.
+    ///
+    /// The calendar body is one lazy `ListView` with the month grid above the
+    /// day list, so on a phone the rows start below the fold and are not built
+    /// until they are scrolled to. Every test in this group acts on a row, so
+    /// they all begin here rather than assuming the row is already on screen.
+    Future<void> revealRows(WidgetTester tester) async {
+      await tester.scrollUntilVisible(
+        find.text('Morning coffee'),
+        150,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+    }
+
     testWidgets('should_soft_delete_a_row_on_a_left_swipe_and_undo_it', (
       tester,
     ) async {
       final fakes = FakeTransactionRepository(seed: dayTransactions());
-      await tester.pumpWidget(hostWithFakes(fakes));
+      await hostWithFakes(tester, fakes);
       await tester.pumpAndSettle();
+      await revealRows(tester);
 
       expect(find.text('Morning coffee'), findsOneWidget);
 
@@ -441,8 +463,9 @@ void main() {
       tester,
     ) async {
       final fakes = FakeTransactionRepository(seed: dayTransactions());
-      await tester.pumpWidget(hostWithFakes(fakes));
+      await hostWithFakes(tester, fakes);
       await tester.pumpAndSettle();
+      await revealRows(tester);
 
       final before = fakes.items.where((t) => t.isActive).length;
 
@@ -461,8 +484,9 @@ void main() {
     testWidgets('should_offer_edit_and_delete_in_the_overflow_menu', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.phone));
+      await host(tester, TestWidths.phone);
       await tester.pumpAndSettle();
+      await revealRows(tester);
 
       final menu = find.descendant(
         of: find.ancestor(

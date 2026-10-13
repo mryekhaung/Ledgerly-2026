@@ -47,13 +47,15 @@ class AppTestScopes extends StatelessWidget {
     const lightColors = AppColorsLight();
     const darkColors = AppColorsDark();
 
-    // `AppLocalizations.of` returns null when the host `MaterialApp` was built
-    // without the app's delegates — some focused tests do exactly that, since
-    // they do not care about copy. Resolving through the generated
-    // `lookupAppLocalizations` keeps the lookup on the *shipped* strings either
-    // way, rather than null-crashing the whole subtree.
+    // `AppLocalizations.of` is non-nullable: it unwraps `Localizations.of`
+    // with a `!`, so it *throws* rather than returning null when the host
+    // `MaterialApp` was built without the app's delegates — which several
+    // focused tests do, since they do not care about copy. Asking the base
+    // `Localizations` lookup first is the only way to detect that case, and the
+    // generated lookup then supplies the shipped strings rather than crashing
+    // the whole subtree.
     final l10n =
-        AppLocalizations.of(context) ??
+        Localizations.of<AppLocalizations>(context, AppLocalizations) ??
         lookupAppLocalizations(
           Localizations.maybeLocaleOf(context) ?? const Locale('en'),
         );
