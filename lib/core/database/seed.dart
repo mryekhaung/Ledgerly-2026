@@ -2,7 +2,6 @@ import 'package:drift/drift.dart';
 import 'package:ledgerly/core/database/app_database.dart';
 import 'package:ledgerly/core/database/daos/clock.dart';
 import 'package:ledgerly/core/database/uuid.dart';
-import 'package:ledgerly/core/database/tables/categories.dart';
 
 /// A starter category: name, icon catalog key, and light-mode accent colour.
 ///

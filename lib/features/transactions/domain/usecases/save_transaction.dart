@@ -7,7 +7,7 @@ import 'package:ledgerly/features/transactions/domain/validators/transaction_val
 
 /// Parameters for [SaveTransaction].
 ///
-/// [id] null means "create"; a value means "update". One use case for both
+/// `id` null means "create"; a value means "update". One use case for both
 /// because the form is one form — splitting it would duplicate the validation
 /// that is the only interesting part.
 typedef SaveTransactionParams = ({String? id, TransactionDraft draft});

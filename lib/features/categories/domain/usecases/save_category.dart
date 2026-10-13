@@ -7,7 +7,7 @@ import 'package:ledgerly/features/categories/domain/validators/category_validato
 
 /// Parameters for [SaveCategory].
 ///
-/// [id] null means "create"; a value means "update". One use case rather than a
+/// `id` null means "create"; a value means "update". One use case rather than a
 /// separate Create/Update pair because the form is one form — splitting it would
 /// duplicate the validation and uniqueness logic that is the only interesting
 /// part.

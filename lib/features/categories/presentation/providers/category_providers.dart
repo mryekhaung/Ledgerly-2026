@@ -56,7 +56,7 @@ final getCategoryProvider = Provider<GetCategory>((_) => getIt<GetCategory>());
 
 /// Resolves one category by id, for widgets that hold only a `categoryId`.
 ///
-/// The transaction day-list row is the reason this exists: a [Transaction]
+/// The transaction day-list row is the reason this exists: a `Transaction`
 /// stores an id, not a name or a colour, and the row still has to render both.
 /// A `FutureProvider.family` (rather than calling [getCategoryProvider] inside a
 /// `FutureBuilder`) keeps the result cached and shared across rows — a day with

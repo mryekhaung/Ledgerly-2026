@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
-import 'in_memory_unsupported.dart'
-    if (dart.library.io) 'in_memory_native.dart'
+import 'package:ledgerly/core/database/connection/in_memory_unsupported.dart'
+    if (dart.library.io) 'package:ledgerly/core/database/connection/in_memory_native.dart'
     as platform;
 
 /// Opens the on-device database file.

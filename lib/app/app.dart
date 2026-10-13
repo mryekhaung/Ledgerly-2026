@@ -103,7 +103,7 @@ class LedgerlyApp extends ConsumerWidget {
       // is `LocalizationsDelegate<AppLocalizations>` while Flutter's built-ins
       // are `LocalizationsDelegate<dynamic>`, so neither `<Object>` nor
       // `<dynamic>` accepts both. `Object?` is the common supertype that does.
-      localizationsDelegates: <LocalizationsDelegate<Object?>>[
+      localizationsDelegates: const <LocalizationsDelegate<Object?>>[
         ...GlobalMaterialLocalizations.delegates,
         AppLocalizations.delegate,
       ],

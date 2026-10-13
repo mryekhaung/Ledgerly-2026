@@ -40,9 +40,9 @@ void main() {
     test('should_leave_the_head_fully_inside_the_canvas', () {
       // The top of the head must not be clipped, or the rim would be lost and
       // the figure would bleed off the frame.
-      final headTop = AvatarPainter.headCenterY - AvatarPainter.headHeight / 2;
+      const headTop = AvatarPainter.headCenterY - AvatarPainter.headHeight / 2;
       expect(headTop, greaterThan(0.0));
-      final headBottom =
+      const headBottom =
           AvatarPainter.headCenterY + AvatarPainter.headHeight / 2;
       expect(headBottom, lessThan(1.0));
     });
@@ -54,19 +54,19 @@ void main() {
       // makes its silhouette sweep up well above the top edge of its box, so
       // the box top and the chin are close even though the visible curve closes
       // the gap. The bound below is that box-top-to-chin distance.
-      final headBottom =
+      const headBottom =
           AvatarPainter.headCenterY + AvatarPainter.headHeight / 2;
-      final shoulderBoxTop = AvatarPainter.shoulderY;
+      const shoulderBoxTop = AvatarPainter.shoulderY;
       expect(shoulderBoxTop - headBottom, lessThan(0.2));
     });
 
     test('should_place_the_face_on_the_head_not_on_the_canvas', () {
       // The eyes sit at 40% down the head box; that must land inside the head
       // rather than between the head and the shoulders.
-      final headTop = AvatarPainter.headCenterY - AvatarPainter.headHeight / 2;
+      const headTop = AvatarPainter.headCenterY - AvatarPainter.headHeight / 2;
       const eyeFractionWithinHead = 0.40;
-      final eyeY = headTop + AvatarPainter.headHeight * eyeFractionWithinHead;
-      final headBottom =
+      const eyeY = headTop + AvatarPainter.headHeight * eyeFractionWithinHead;
+      const headBottom =
           AvatarPainter.headCenterY + AvatarPainter.headHeight / 2;
       expect(eyeY, greaterThan(headTop));
       expect(eyeY, lessThan(headBottom));
@@ -122,10 +122,10 @@ void main() {
       const colors = AppColorsLight();
 
       expect(
-        AvatarPainter(
+        const AvatarPainter(
           config: config,
           colors: colors,
-        ).shouldRepaint(AvatarPainter(config: config, colors: colors)),
+        ).shouldRepaint(const AvatarPainter(config: config, colors: colors)),
         isFalse,
       );
     });
@@ -148,10 +148,10 @@ void main() {
       );
 
       expect(
-        AvatarPainter(
+        const AvatarPainter(
           config: before,
           colors: colors,
-        ).shouldRepaint(AvatarPainter(config: after, colors: colors)),
+        ).shouldRepaint(const AvatarPainter(config: after, colors: colors)),
         isTrue,
       );
     });
@@ -169,9 +169,9 @@ void main() {
         const ui.Rect.fromLTWH(0, 0, size, size),
         ui.Paint()..color = const ui.Color(0xFF7FD1B9),
       );
-      AvatarPainter(
+      const AvatarPainter(
         config: AvatarConfig.initial,
-        colors: const AppColorsLight(),
+        colors: AppColorsLight(),
       ).paint(canvas, const ui.Size.square(size));
       final image = await recorder.endRecording().toImage(
         size.toInt(),
@@ -182,8 +182,8 @@ void main() {
 
       const left = 8;
       const right = 91;
-      final top = 8;
-      final bottom = 91;
+      const top = 8;
+      const bottom = 91;
       final probes = <Offset>[
         Offset(left.toDouble(), size / 2),
         Offset(right.toDouble(), size / 2),

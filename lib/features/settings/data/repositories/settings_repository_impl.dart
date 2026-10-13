@@ -1,5 +1,5 @@
-import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/database/result_guard.dart';
+import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/features/settings/data/datasources/settings_local_datasource.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/domain/repositories/settings_repository.dart';

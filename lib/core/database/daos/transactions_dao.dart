@@ -68,9 +68,9 @@ class CategoryTotalRow {
 @DriftAccessor(tables: [Transactions])
 class TransactionsDao extends DatabaseAccessor<AppDatabase>
     with _$TransactionsDaoMixin {
-  TransactionsDao(super.db, {Clock clock = const Clock()}) : _clock = clock;
+  TransactionsDao(super.db, {this.clock = const Clock()});
 
-  final Clock _clock;
+  final Clock clock;
 
   /// Every live transaction on [date], newest write first.
   Stream<List<Transaction>> watchDay(LocalDate date) {
@@ -266,7 +266,7 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
       'amountMinor must be non-negative; direction carries the sign',
     );
     final newId = id ?? generateUuid();
-    final now = nowUtcMillis ?? _clock.nowUtcMillis();
+    final now = nowUtcMillis ?? clock.nowUtcMillis();
     await into(transactions).insert(
       TransactionsCompanion.insert(
         id: Value(newId),
@@ -312,14 +312,14 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
         direction: direction == null ? const Value.absent() : Value(direction),
         date: date == null ? const Value.absent() : Value(date),
         note: note == null ? const Value.absent() : Value(note),
-        updatedAt: Value(nowUtcMillis ?? _clock.nowUtcMillis()),
+        updatedAt: Value(nowUtcMillis ?? clock.nowUtcMillis()),
       ),
     );
   }
 
   /// Soft-deletes [id] — no `DELETE` statement is issued (`ADR #4`).
   Future<void> softDelete(String id) {
-    final now = _clock.nowUtcMillis();
+    final now = clock.nowUtcMillis();
     return (update(transactions)..where((t) => t.id.equals(id))).write(
       TransactionsCompanion(deletedAt: Value(now), updatedAt: Value(now)),
     );

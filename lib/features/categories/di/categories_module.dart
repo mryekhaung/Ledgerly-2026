@@ -16,7 +16,7 @@ import 'package:ledgerly/features/categories/domain/usecases/watch_categories.da
 /// - use cases are **factories** — they are stateless and cheap, and a factory
 ///   keeps a long-lived reference from outliving the screen that grabbed it.
 ///
-/// Requires [registerCoreModule] to have run: every `getIt<AppDatabase>()` call
+/// Requires `registerCoreModule` to have run: every `getIt<AppDatabase>()` call
 /// below resolves the singleton registered there.
 void registerCategoriesModule(GetIt getIt) {
   getIt

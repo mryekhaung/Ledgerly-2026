@@ -7,7 +7,7 @@ import 'package:ledgerly/l10n/generated/app_localizations.dart';
 /// unable to serve a key that is only known at runtime. The validation layer
 /// hands back exactly that: `ValidationFailure.fieldErrors` maps a field to a
 /// validator key, which `AppLocalization.validationKeyFor` bridges to an ARB
-/// key. [lookup] is the single place that turns such a key into text, so no
+/// key. `lookup` is the single place that turns such a key into text, so no
 /// widget builds a user-facing string by concatenation
 /// (`docs/Conventions.md` §5).
 ///
@@ -47,12 +47,6 @@ abstract final class AppStrings {
     Map<String, Object> values,
   ) {
     final l10n = AppLocalizations.of(context);
-    if (l10n == null) {
-      throw FlutterError(
-        'AppStrings.fill() was called with a context that has no '
-        'AppLocalizations. See lib/app/app.dart.',
-      );
-    }
     return switch (key) {
       'avatarEditorOptionLabel' => l10n.avatarEditorOptionLabel(
         _require(values, 'part') as String,

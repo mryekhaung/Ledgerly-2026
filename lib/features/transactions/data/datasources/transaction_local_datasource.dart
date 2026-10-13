@@ -18,17 +18,16 @@ import 'package:ledgerly/features/transactions/domain/entities/transaction_total
 class TransactionLocalDataSource {
   TransactionLocalDataSource(
     this._database, {
-    Clock clock = const Clock(),
-    String Function() idGenerator = generateUuid,
-  }) : _clock = clock,
-       _idGenerator = idGenerator;
+    this.clock = const Clock(),
+    this.idGenerator = generateUuid,
+  });
 
   final db.AppDatabase _database;
-  final Clock _clock;
+  final Clock clock;
 
   /// Injected so a test can assert on a known id
   /// (`docs/Architecture.md` ADR #3: ids are client-generated UUIDv4).
-  final String Function() _idGenerator;
+  final String Function() idGenerator;
 
   /// Every live transaction on [date], newest write first.
   Stream<List<Transaction>> watchDay(LocalDate date) => _database
@@ -136,7 +135,7 @@ class TransactionLocalDataSource {
   Future<Transaction> create(TransactionDraft draft) =>
       _database.transaction(() async {
         final id = _generatedId();
-        final now = _clock.nowUtcMillis();
+        final now = clock.nowUtcMillis();
         await _database.transactionsDao.insert(
           id: id,
           nowUtcMillis: now,
@@ -157,7 +156,7 @@ class TransactionLocalDataSource {
   /// repository maps that to a `NotFoundFailure`.
   Future<Transaction> update(String id, TransactionDraft draft) =>
       _database.transaction(() async {
-        final now = _clock.nowUtcMillis();
+        final now = clock.nowUtcMillis();
         await _database.transactionsDao.updateById(
           id,
           nowUtcMillis: now,
@@ -191,7 +190,7 @@ class TransactionLocalDataSource {
 
   /// Clears `deletedAt` on [id] — the undo affordance.
   Future<void> restore(String id) {
-    final now = _clock.nowUtcMillis();
+    final now = clock.nowUtcMillis();
     return (_database.update(
       _database.transactions,
     )..where((t) => t.id.equals(id))).write(
@@ -233,7 +232,7 @@ class TransactionLocalDataSource {
   }
 
   String _generatedId() {
-    final id = _idGenerator();
+    final id = idGenerator();
     return id.isEmpty ? generateUuid() : id;
   }
 }

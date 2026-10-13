@@ -53,7 +53,7 @@ void main() {
   Future<List<String>> namesByType(AppDatabase db, String type) async {
     final rows = await db
         .customSelect(
-          "SELECT name FROM sqlite_master WHERE type = ? ORDER BY name",
+          'SELECT name FROM sqlite_master WHERE type = ? ORDER BY name',
           variables: [Variable<String>(type)],
         )
         .get();
@@ -327,13 +327,13 @@ void main() {
         'is_archived INTEGER NOT NULL DEFAULT 0)',
       );
       await v1.customStatement(
-        "INSERT INTO categories (id, name, icon_key, color_value, kind, "
-        "is_default, created_at, updated_at, sort_order, is_archived) "
+        'INSERT INTO categories (id, name, icon_key, color_value, kind, '
+        'is_default, created_at, updated_at, sort_order, is_archived) '
         "VALUES ('c1', 'Food', 'restaurant', 1, 'expense', 1, 1, 1, 0, 0)",
       );
       await v1.customStatement(
-        "INSERT INTO transactions (id, category_id, amount_minor, currency, "
-        "direction, date, created_at, updated_at, sort_order, is_archived) "
+        'INSERT INTO transactions (id, category_id, amount_minor, currency, '
+        'direction, date, created_at, updated_at, sort_order, is_archived) '
         "VALUES ('t1', 'c1', 250, 'mmk', 'expense', 20261003, 1, 1, 0, 0)",
       );
       await v1.customStatement('PRAGMA user_version = 1');

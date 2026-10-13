@@ -19,9 +19,9 @@ part 'app_settings_dao.g.dart';
 @DriftAccessor(tables: [AppSettings])
 class AppSettingsDao extends DatabaseAccessor<AppDatabase>
     with _$AppSettingsDaoMixin {
-  AppSettingsDao(super.db, {Clock clock = const Clock()}) : _clock = clock;
+  AppSettingsDao(super.db, {this.clock = const Clock()});
 
-  final Clock _clock;
+  final Clock clock;
 
   /// Every stored preference, as raw key→value pairs.
   ///
@@ -54,7 +54,7 @@ class AppSettingsDao extends DatabaseAccessor<AppDatabase>
         AppSettingsCompanion.insert(
           key: key,
           value: value,
-          updatedAt: _clock.nowUtcMillis(),
+          updatedAt: clock.nowUtcMillis(),
         ),
       );
 

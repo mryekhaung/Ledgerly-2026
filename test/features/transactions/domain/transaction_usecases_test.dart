@@ -29,7 +29,7 @@ void main() {
   group('SaveTransaction', () {
     final validDraft = (
       categoryId: 'cat-food',
-      amount: Money.minor(1500, CurrencyCode.mmk),
+      amount: const Money.minor(1500, CurrencyCode.mmk),
       direction: TransactionDirection.expense,
       date: LocalDate(2026, 10, 3),
       note: 'lunch',
@@ -63,7 +63,7 @@ void main() {
         id: null,
         draft: (
           categoryId: 'cat-food',
-          amount: Money.minor(-1500, CurrencyCode.mmk),
+          amount: const Money.minor(-1500, CurrencyCode.mmk),
           direction: TransactionDirection.expense,
           date: LocalDate(2026, 10, 3),
           note: null,
@@ -83,7 +83,7 @@ void main() {
         id: null,
         draft: (
           categoryId: 'cat-food',
-          amount: Money.minor(-1500, CurrencyCode.usd),
+          amount: const Money.minor(-1500, CurrencyCode.usd),
           direction: TransactionDirection.expense,
           date: LocalDate(2026, 10, 3),
           note: null,
@@ -98,7 +98,7 @@ void main() {
         id: null,
         draft: (
           categoryId: 'cat-food',
-          amount: Money.minor(100, CurrencyCode.mmk),
+          amount: const Money.minor(100, CurrencyCode.mmk),
           direction: TransactionDirection.expense,
           date: LocalDate(2026, 10, 3),
           note: '  lunch  ',
@@ -113,7 +113,7 @@ void main() {
         id: null,
         draft: (
           categoryId: 'cat-food',
-          amount: Money.minor(100, CurrencyCode.mmk),
+          amount: const Money.minor(100, CurrencyCode.mmk),
           direction: TransactionDirection.expense,
           date: LocalDate(2026, 10, 3),
           note: '   ',
@@ -130,7 +130,7 @@ void main() {
           id: null,
           draft: (
             categoryId: 'cat-food',
-            amount: Money.minor(0, CurrencyCode.mmk),
+            amount: const Money.minor(0, CurrencyCode.mmk),
             direction: TransactionDirection.expense,
             date: LocalDate(2026, 10, 3),
             note: null,
@@ -152,7 +152,7 @@ void main() {
           id: null,
           draft: (
             categoryId: '',
-            amount: Money.minor(100, CurrencyCode.mmk),
+            amount: const Money.minor(100, CurrencyCode.mmk),
             direction: TransactionDirection.expense,
             date: LocalDate(2026, 10, 3),
             note: null,
@@ -174,7 +174,7 @@ void main() {
           id: null,
           draft: (
             categoryId: 'cat-food',
-            amount: Money.minor(100, CurrencyCode.mmk),
+            amount: const Money.minor(100, CurrencyCode.mmk),
             direction: TransactionDirection.transfer,
             date: LocalDate(2026, 10, 3),
             note: null,
@@ -195,7 +195,7 @@ void main() {
           id: null,
           draft: (
             categoryId: 'cat-food',
-            amount: Money.minor(100, CurrencyCode.mmk),
+            amount: const Money.minor(100, CurrencyCode.mmk),
             direction: TransactionDirection.expense,
             date: LocalDate(2026, 10, 3),
             note: 'a' * (TransactionValidators.maxNoteLength + 1),
@@ -225,7 +225,7 @@ void main() {
         id: null,
         draft: (
           categoryId: '',
-          amount: Money.minor(0, CurrencyCode.mmk),
+          amount: const Money.minor(0, CurrencyCode.mmk),
           direction: TransactionDirection.transfer,
           date: LocalDate(2026, 10, 3),
           note: null,
@@ -301,7 +301,7 @@ void main() {
       final otherDay = LocalDate(2026, 10, 4);
       await repository.create((
         categoryId: 'cat-food',
-        amount: Money.minor(500, CurrencyCode.mmk),
+        amount: const Money.minor(500, CurrencyCode.mmk),
         direction: TransactionDirection.expense,
         date: otherDay,
         note: null,
@@ -333,7 +333,7 @@ void main() {
     test('should_sum_both_directions_when_watching_daily_totals', () async {
       await repository.create((
         categoryId: 'cat-food',
-        amount: Money.minor(500, CurrencyCode.mmk),
+        amount: const Money.minor(500, CurrencyCode.mmk),
         direction: TransactionDirection.income,
         date: LocalDate(2026, 10, 3),
         note: null,
@@ -356,7 +356,7 @@ void main() {
         // still light up, which is why income and expense are separate fields.
         await repository.create((
           categoryId: 'cat-food',
-          amount: Money.minor(1000, CurrencyCode.mmk),
+          amount: const Money.minor(1000, CurrencyCode.mmk),
           direction: TransactionDirection.income,
           date: LocalDate(2026, 10, 3),
           note: null,
@@ -438,7 +438,7 @@ void main() {
     test('should_scope_a_day_total_to_that_day_only', () async {
       await repository.create((
         categoryId: 'cat-food',
-        amount: Money.minor(500, CurrencyCode.mmk),
+        amount: const Money.minor(500, CurrencyCode.mmk),
         direction: TransactionDirection.income,
         date: LocalDate(2026, 10, 4),
         note: null,
@@ -464,7 +464,7 @@ void main() {
     test('should_sum_only_the_requested_direction', () async {
       await repository.create((
         categoryId: 'cat-food',
-        amount: Money.minor(700, CurrencyCode.mmk),
+        amount: const Money.minor(700, CurrencyCode.mmk),
         direction: TransactionDirection.income,
         date: LocalDate(2026, 10, 4),
         note: null,

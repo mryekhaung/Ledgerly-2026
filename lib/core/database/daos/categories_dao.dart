@@ -22,9 +22,9 @@ part 'categories_dao.g.dart';
 @DriftAccessor(tables: [Categories])
 class CategoriesDao extends DatabaseAccessor<AppDatabase>
     with _$CategoriesDaoMixin {
-  CategoriesDao(super.db, {Clock clock = const Clock()}) : _clock = clock;
+  CategoriesDao(super.db, {this.clock = const Clock()});
 
-  final Clock _clock;
+  final Clock clock;
 
   /// Active (non-deleted) categories in manual order, archived ones last.
   ///
@@ -99,7 +99,7 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
     int? nowUtcMillis,
   }) async {
     final newId = id ?? generateUuid();
-    final now = nowUtcMillis ?? _clock.nowUtcMillis();
+    final now = nowUtcMillis ?? clock.nowUtcMillis();
     await into(categories).insert(
       CategoriesCompanion.insert(
         id: Value(newId),
@@ -138,14 +138,14 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
             ? const Value.absent()
             : Value(colorValue),
         kind: kind == null ? const Value.absent() : Value(kind),
-        updatedAt: Value(nowUtcMillis ?? _clock.nowUtcMillis()),
+        updatedAt: Value(nowUtcMillis ?? clock.nowUtcMillis()),
       ),
     );
   }
 
   /// Soft-deletes [id] — no `DELETE` statement is ever issued.
   Future<void> softDelete(String id) {
-    final now = _clock.nowUtcMillis();
+    final now = clock.nowUtcMillis();
     return (update(categories)..where((t) => t.id.equals(id))).write(
       CategoriesCompanion(deletedAt: Value(now), updatedAt: Value(now)),
     );
@@ -160,7 +160,7 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
     return (update(categories)..where((t) => t.id.equals(id))).write(
       CategoriesCompanion(
         isArchived: Value(isArchived),
-        updatedAt: Value(_clock.nowUtcMillis()),
+        updatedAt: Value(clock.nowUtcMillis()),
       ),
     );
   }
@@ -171,7 +171,7 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
   /// no-op that writes the same value, so a double-tap on Undo cannot corrupt
   /// anything and the caller needs no read first.
   Future<void> restore(String id) {
-    final now = _clock.nowUtcMillis();
+    final now = clock.nowUtcMillis();
     return (update(categories)..where((t) => t.id.equals(id))).write(
       CategoriesCompanion(deletedAt: const Value(null), updatedAt: Value(now)),
     );
@@ -182,7 +182,7 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
   /// Runs in one transaction so the list can never be observed half-reordered.
   Future<void> reorder(List<String> orderedIds) {
     return transaction(() async {
-      final now = _clock.nowUtcMillis();
+      final now = clock.nowUtcMillis();
       for (var i = 0; i < orderedIds.length; i++) {
         await (update(
           categories,

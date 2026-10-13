@@ -56,7 +56,7 @@ class SettingsLocalDataSource {
   /// the user re-picks it. That is a far better outcome than an error screen the
   /// user cannot dismiss, which is what throwing here would produce.
   AppSettings _decode(Map<String, String> raw) {
-    final defaults = AppSettings.defaults;
+    const defaults = AppSettings.defaults;
     final locale = raw[SettingsKeys.locale];
 
     return AppSettings(

@@ -13,7 +13,7 @@ import 'package:ledgerly/features/settings/domain/usecases/watch_settings.dart';
 /// repository are lazy singletons (they hold no per-screen state, and rebuilding
 /// one per screen would reopen the watch stream); use cases are factories.
 ///
-/// Requires [registerCoreModule] to have run — the datasource resolves
+/// Requires `registerCoreModule` to have run — the datasource resolves
 /// `getIt<AppDatabase>()`.
 void registerSettingsModule(GetIt getIt) {
   getIt

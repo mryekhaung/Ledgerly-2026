@@ -27,7 +27,7 @@ void main() {
       supportedLocales: AppLocalization.supportedLocales
           .map(Locale.new)
           .toList(growable: false),
-      localizationsDelegates: <LocalizationsDelegate<Object?>>[
+      localizationsDelegates: const <LocalizationsDelegate<Object?>>[
         ...GlobalMaterialLocalizations.delegates,
         AppLocalizations.delegate,
       ],
@@ -147,7 +147,7 @@ void main() {
       expect(bar.duration, const Duration(seconds: 5));
 
       // And a plain confirm is shorter, which is the whole point of the pair.
-      expect(const Duration(seconds: 2), lessThan(bar.duration!));
+      expect(const Duration(seconds: 2), lessThan(bar.duration));
     });
 
     testWidgets('should_invoke_the_undo_callback', (tester) async {

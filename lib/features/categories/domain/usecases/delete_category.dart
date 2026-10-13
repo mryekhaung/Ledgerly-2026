@@ -13,7 +13,7 @@ typedef DeleteCategoryParams = ({String id});
 /// itself, not by a check here — the rows that reference it stay intact and the
 /// category still resolves by id (`docs/DataModel.md` §2).
 ///
-/// Returned separately from [SaveCategory] because the delete confirm flow and
+/// Returned separately from `SaveCategory` because the delete confirm flow and
 /// the undo affordance both need it in isolation (`docs/Design.md` §5.7).
 class DeleteCategory implements UseCase<void, DeleteCategoryParams> {
   const DeleteCategory(this._repository);

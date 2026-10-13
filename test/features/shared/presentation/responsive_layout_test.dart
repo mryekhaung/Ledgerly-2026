@@ -365,7 +365,7 @@ void main() {
               size: Size(width, 800),
               textScaler: const TextScaler.linear(2),
             ),
-            child: MaterialApp(
+            child: const MaterialApp(
               home: Scaffold(
                 body: TwoPaneLayout(
                   master: Text('master'),

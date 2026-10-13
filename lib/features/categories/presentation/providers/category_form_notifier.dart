@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
-import 'package:ledgerly/features/categories/domain/usecases/save_category.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 
 /// Immutable form state for the category create/edit page.

@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ledgerly/core/database/result_guard.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/result/result.dart';
-import 'package:ledgerly/core/database/result_guard.dart';
 
 /// Regression suite for [guardResultStream].
 ///
 /// The original implementation declared `_ResultSink implements
-/// EventSink<Result<T>>` and `add(Result<T> event)`. That type-checks — the
+/// `EventSink<Result<T>>` and `add(Result<T> event)`. That type-checks — the
 /// compiler unifies `eventTransformed`'s source and sink types — but it is
 /// wrong: [Stream.eventTransformed] hands the sink the **raw** source events, so
 /// the first `add` throws

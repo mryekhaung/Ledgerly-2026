@@ -30,7 +30,7 @@ void main() {
   }) {
     return ProviderScope(
       child: MaterialApp(
-        localizationsDelegates: <LocalizationsDelegate<Object?>>[
+        localizationsDelegates: const <LocalizationsDelegate<Object?>>[
           ...GlobalMaterialLocalizations.delegates,
           AppLocalizations.delegate,
         ],

@@ -1,8 +1,8 @@
-import 'package:ledgerly/features/categories/data/datasources/category_local_datasource.dart';
-import 'package:ledgerly/features/categories/data/repositories/category_repository_impl.dart';
 import 'package:ledgerly/core/database/app_database.dart';
 import 'package:ledgerly/core/database/daos/clock.dart';
 import 'package:ledgerly/core/result/result.dart';
+import 'package:ledgerly/features/categories/data/datasources/category_local_datasource.dart';
+import 'package:ledgerly/features/categories/data/repositories/category_repository_impl.dart';
 
 /// Shared harness for the category data-layer tests.
 ///
@@ -45,7 +45,7 @@ class CategoryDataHarness {
 ///
 /// Keeps a data test's happy path to one line and its failure message useful —
 /// `result.valueOrNull!` would report a null-check crash instead of the actual
-/// [Failure].
+/// `Failure`.
 T expectSuccess<T>(Result<T> result) {
   if (result case Success<T>(:final value)) return value;
   final failure = result.failureOrNull;

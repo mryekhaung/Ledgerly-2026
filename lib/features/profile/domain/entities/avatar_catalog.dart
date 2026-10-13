@@ -165,7 +165,7 @@ abstract final class AvatarCatalog {
   static List<int> optionIndices(AvatarPart part) =>
       List<int>.generate(optionCount(part), (index) => index);
 
-  /// A config where every slot is the given [indices]' first entry — a
+  /// A config where every slot is the given `indices`' first entry — a
   /// deterministic starting point for tests and previews.
   static const AvatarConfig initial = AvatarConfig.initial;
 

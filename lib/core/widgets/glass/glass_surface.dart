@@ -111,8 +111,6 @@ class FloatingGlassBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-
     return Padding(
       padding: EdgeInsets.fromLTRB(
         inset,

@@ -46,7 +46,7 @@ void main() {
 
       expect(stored.id, 'tx-0');
       expect(stored.categoryId, 'cat-1');
-      expect(stored.amount, Money.minor(2500, CurrencyCode.mmk));
+      expect(stored.amount, const Money.minor(2500, CurrencyCode.mmk));
       expect(stored.direction, TransactionDirection.income);
       expect(stored.date, LocalDate(2026, 3, 14));
       expect(stored.note, 'Payday');

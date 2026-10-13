@@ -1,4 +1,3 @@
-import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
@@ -60,13 +59,7 @@ class AmountKeypad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
-    // A `0`-exponent currency has no minor unit, so the key is rendered muted
-    // and inert rather than hidden — a missing key would make the tray's shape
-    // shift between currencies.
-    final decimalEnabled = currency.exponent > 0;
-
     return Container(
       color: colors.surfaceSunken,
       child: SafeArea(
@@ -207,7 +200,7 @@ class _Display extends StatelessWidget {
 
 /// Renders the raw keypad buffer in the display amount style.
 ///
-/// Distinct from `AmountText` because the buffer is *not* a [Money] — it is
+/// Distinct from `AmountText` because the buffer is *not* a `Money` — it is
 /// mid-entry and may be `'12.'` or `'0'`. Parsing it just to render would format
 /// a value the user has not finished typing, so this widget shows the digits
 /// verbatim with the currency symbol beside them, and lets the committed

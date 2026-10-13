@@ -30,7 +30,7 @@ void main() {
         supportedLocales: AppLocalization.supportedLocales
             .map(Locale.new)
             .toList(growable: false),
-        localizationsDelegates: <LocalizationsDelegate<Object?>>[
+        localizationsDelegates: const <LocalizationsDelegate<Object?>>[
           ...GlobalMaterialLocalizations.delegates,
           AppLocalizations.delegate,
         ],

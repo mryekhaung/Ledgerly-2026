@@ -1,6 +1,6 @@
 /// Which way money moved.
 ///
-/// Persisted as the enum's [name] (never an ordinal) so reordering this enum
+/// Persisted as the enum's `name` (never an ordinal) so reordering this enum
 /// cannot silently reinterpret existing rows — `docs/DataModel.md` §1.
 ///
 /// Pure Dart: no Flutter, no Drift (`docs/Agent.md` §3.1).

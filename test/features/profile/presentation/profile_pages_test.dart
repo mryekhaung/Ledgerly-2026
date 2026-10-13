@@ -44,7 +44,7 @@ void main() {
           supportedLocales: AppLocalization.supportedLocales
               .map(Locale.new)
               .toList(growable: false),
-          localizationsDelegates: <LocalizationsDelegate<Object?>>[
+          localizationsDelegates: const <LocalizationsDelegate<Object?>>[
             ...GlobalMaterialLocalizations.delegates,
             AppLocalizations.delegate,
           ],
@@ -204,9 +204,9 @@ void main() {
             darkTheme: AppTheme.dark(),
             themeMode: ThemeMode.dark,
             home: Builder(
-              builder: (context) => AppThemeColors(
+              builder: (context) => const AppThemeColors(
                 colors: AppColorsDark(),
-                child: const Center(
+                child: Center(
                   child: Avatar(config: AvatarConfig.initial, size: 96),
                 ),
               ),

@@ -29,7 +29,7 @@ final class PeriodCalculator {
 
   /// The period that contains [date].
   ///
-  /// If [date.day] >= [startDay] the period starts on [startDay] of [date]'s
+  /// If `date.day` >= [startDay] the period starts on [startDay] of [date]'s
   /// own month; otherwise it began in the previous calendar month. The end is
   /// the day before the next period's start (docs/DataModel.md §8).
   BudgetPeriod containing(LocalDate date) {
@@ -57,7 +57,7 @@ final class PeriodCalculator {
 
   /// Last day of the period that begins on [periodStart].
   ///
-  /// [periodStart.day] equals [startDay] by construction, and [startDay] ≤ 28,
+  /// `periodStart.day` equals [startDay] by construction, and [startDay] ≤ 28,
   /// so `addMonths(1)` always lands on the same day number in the following
   /// calendar month (every month has ≥ 28 days — no clamping). The end is one
   /// day before that next start.

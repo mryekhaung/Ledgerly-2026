@@ -1,11 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
-import 'package:ledgerly/features/profile/domain/entities/avatar_config.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
@@ -55,7 +52,7 @@ void main() {
           supportedLocales: AppLocalization.supportedLocales
               .map(Locale.new)
               .toList(),
-          localizationsDelegates: <LocalizationsDelegate<Object?>>[
+          localizationsDelegates: const <LocalizationsDelegate<Object?>>[
             ...GlobalMaterialLocalizations.delegates,
             AppLocalizations.delegate,
           ],

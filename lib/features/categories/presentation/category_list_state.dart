@@ -26,7 +26,7 @@ final class CategoryListState {
   /// A failed load yields empty lists *plus* the failure, so the page shows one
   /// banner rather than a banner over stale rows that are no longer valid.
   factory CategoryListState.from(Result<List<Category>> result) => result.fold(
-    onSuccess: (categories) => CategoryListState.of(categories),
+    onSuccess: CategoryListState.of,
     onErr: (failure) => CategoryListState(
       active: const <Category>[],
       archived: const <Category>[],

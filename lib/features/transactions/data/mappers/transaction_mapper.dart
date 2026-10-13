@@ -25,7 +25,7 @@ abstract final class TransactionMapper {
   /// Throws [StateError] when the stored currency code or direction name is not
   /// one this build knows.
   ///
-  /// Unlike [CategoryMapper], this one refuses to guess. A category with the
+  /// Unlike `CategoryMapper`, this one refuses to guess. A category with the
   /// wrong kind is a cosmetic mismatch; a transaction with the wrong *direction*
   /// flips the sign of the user's money in every total. The repository turns the
   /// throw into a `StorageFailure`, so the row surfaces as a problem instead of

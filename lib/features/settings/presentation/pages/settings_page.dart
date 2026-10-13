@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
-import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
@@ -12,7 +11,6 @@ import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
-import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// App settings: currency, language, appearance and week start.
@@ -148,9 +146,9 @@ class SettingsPage extends ConsumerWidget {
                       value: null,
                       label: strings('settingsLanguageSystem'),
                     ),
-                    _Choice<String?>(value: 'en', label: 'English'),
-                    _Choice<String?>(value: 'my', label: 'မြန်မာ'),
-                    _Choice<String?>(value: 'ja', label: '日本語'),
+                    const _Choice<String?>(value: 'en', label: 'English'),
+                    const _Choice<String?>(value: 'my', label: 'မြန်မာ'),
+                    const _Choice<String?>(value: 'ja', label: '日本語'),
                   ],
                   onChanged: (value) => _save(
                     context,

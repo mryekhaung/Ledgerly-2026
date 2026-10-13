@@ -52,8 +52,11 @@ final class LocalDate implements Comparable<LocalDate> {
   /// Returns null when [value] is not a real date — `20260230` is rejected, not
   /// silently rolled forward.
   static LocalDate? fromPacked(int value) {
-    // A packed date is 8 digits: at least 1000_01_01, at most 9999_12_31.
-    if (value < 10000101 || value > 99991231) return null;
+    // The packed range matches the `year` invariant (`[1, 9999]`): the smallest
+    // representable date is 1-01-01 → 10101, the largest is 9999-12-31.
+    // `tryCreate` re-validates the month/day, so a well-formed but impossible
+    // date (`20260230`) is still rejected rather than rolled forward.
+    if (value < 10101 || value > 99991231) return null;
     final year = value ~/ 10000;
     final month = (value ~/ 100) % 100;
     final day = value % 100;
@@ -63,7 +66,7 @@ final class LocalDate implements Comparable<LocalDate> {
   /// Creates a [LocalDate] from a [DateTime], discarding its time and zone.
   ///
   /// Uses the **local** calendar fields (`year`/`month`/`day`), which is what a
-  /// user means by "today". Use [fromUtc] to read a UTC instant's calendar day.
+  /// user means by "today". Use `fromUtc` to read a UTC instant's calendar day.
   factory LocalDate.fromDateTime(DateTime dateTime) =>
       LocalDate(dateTime.year, dateTime.month, dateTime.day);
 

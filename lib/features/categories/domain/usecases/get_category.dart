@@ -24,8 +24,8 @@ class GetCategory implements UseCase<Category, GetCategoryParams> {
     return result.flatMap(
       (category) => category.isActive
           ? Success(category)
-          : Err<Category>(
-              const NotFoundFailure('Category is deleted', cause: null),
+          : const Err<Category>(
+              NotFoundFailure('Category is deleted', cause: null),
             ),
     );
   }

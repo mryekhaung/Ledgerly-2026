@@ -34,7 +34,7 @@ abstract final class AppFeedback {
 
   /// Shows a confirmation snack bar, replacing any that is already up.
   ///
-  /// [action] renders as a trailing text button — the undo affordance. Passing
+  /// `action` renders as a trailing text button — the undo affordance. Passing
   /// null shows a plain confirmation.
   static void confirm(
     BuildContext context, {

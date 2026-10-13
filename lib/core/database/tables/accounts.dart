@@ -4,7 +4,7 @@ import 'package:ledgerly/core/database/tables/common_columns.dart';
 /// Where money sits — a wallet, bank account, card, or e-wallet.
 ///
 /// **Schema only in v1**: no UI, no seeds, no use cases until Phase 3
-/// (`docs/Roadmap.md`). Declared now so [Transactions.accountId] has a target and
+/// (`docs/Roadmap.md`). Declared now so `Transactions.accountId` has a target and
 /// the v1 → v2 migration stays purely additive.
 ///
 /// Spec: `docs/DataModel.md` §4.

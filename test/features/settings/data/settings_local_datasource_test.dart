@@ -82,7 +82,7 @@ void main() {
         );
 
         await harness.db.customStatement(
-          "INSERT INTO app_settings (key, value, updated_at) VALUES "
+          'INSERT INTO app_settings (key, value, updated_at) VALUES '
           "('${SettingsKeys.currency}', 'xxx', 1)",
         );
 
@@ -101,7 +101,7 @@ void main() {
       );
 
       await harness.db.customStatement(
-        "INSERT INTO app_settings (key, value, updated_at) VALUES "
+        'INSERT INTO app_settings (key, value, updated_at) VALUES '
         "('${SettingsKeys.themeMode}', 'sepia', 1)",
       );
 
@@ -120,7 +120,7 @@ void main() {
         );
 
         await harness.db.customStatement(
-          "INSERT INTO app_settings (key, value, updated_at) VALUES "
+          'INSERT INTO app_settings (key, value, updated_at) VALUES '
           "('${SettingsKeys.locale}', '', 1)",
         );
 
@@ -135,7 +135,7 @@ void main() {
       );
 
       await harness.db.customStatement(
-        "INSERT INTO app_settings (key, value, updated_at) VALUES "
+        'INSERT INTO app_settings (key, value, updated_at) VALUES '
         "('${SettingsKeys.currency}', 'usd', 1), "
         "('${SettingsKeys.themeMode}', 'bogus', 1)",
       );

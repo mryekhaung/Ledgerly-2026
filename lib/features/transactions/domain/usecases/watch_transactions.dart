@@ -38,7 +38,7 @@ class WatchMonthTransactions
 
 /// Parameters for the aggregate watches.
 ///
-/// Carries [currency] because a SQL `SUM` over minor units is meaningless
+/// Carries `currency` because a SQL `SUM` over minor units is meaningless
 /// without knowing what those units are — the repository stamps the result, so
 /// the UI never has to guess (`docs/DataModel.md` §1: money always travels with
 /// its currency).
@@ -82,7 +82,7 @@ class WatchMonthTotal
 
 /// Parameters for a single day's aggregate.
 ///
-/// Carries [currency] for the same reason [MonthAggregateParams] does: a SQL
+/// Carries `currency` for the same reason [MonthAggregateParams] does: a SQL
 /// `SUM` over minor units is meaningless without knowing what those units are.
 typedef DayAggregateParams = ({LocalDate date, CurrencyCode currency});
 

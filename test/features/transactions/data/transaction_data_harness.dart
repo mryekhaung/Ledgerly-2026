@@ -95,7 +95,7 @@ TransactionDraft txDraft({
 );
 
 /// Asserts [result] holds a value and returns it, failing with the actual
-/// [Failure] otherwise.
+/// `Failure` otherwise.
 ///
 /// `result.valueOrNull!` would surface a null-check crash instead of the failure
 /// that actually happened.

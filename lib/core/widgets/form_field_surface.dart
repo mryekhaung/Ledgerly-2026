@@ -1,4 +1,3 @@
-import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart';
@@ -30,7 +29,7 @@ class FormFieldSurface extends StatelessWidget {
   /// The field's label, shown above the value.
   final String label;
 
-  /// The field's current value as text, or null to show [placeholder] styling.
+  /// The field's current value as text, or null to show `placeholder` styling.
   final String? value;
 
   /// A richer value widget, used instead of [value] when the value is not plain

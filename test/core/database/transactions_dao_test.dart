@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ledgerly/core/database/daos/transactions_dao.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 
 import 'db_harness.dart';

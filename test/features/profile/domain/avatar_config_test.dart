@@ -209,7 +209,7 @@ void main() {
       // smiling mouth — is the universal emoji glyph, and a first-run profile
       // opening on it is exactly the "why do these look like emoji?" report
       // this default was changed to fix. The default must not be that trio.
-      final defaultConfig = AvatarConfig.initial;
+      const defaultConfig = AvatarConfig.initial;
       final isSmileyGlyph =
           defaultConfig.shapeIndex == 0 &&
           defaultConfig.eyesIndex == 0 &&

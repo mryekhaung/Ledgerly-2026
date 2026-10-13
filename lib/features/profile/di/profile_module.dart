@@ -14,7 +14,7 @@ import 'package:ledgerly/features/profile/domain/usecases/watch_user_profile.dar
 /// are lazy singletons (they hold no per-screen state, and rebuilding one per
 /// screen would reopen the watch stream); use cases are factories.
 ///
-/// Requires [registerCoreModule] to have run — the datasource resolves
+/// Requires `registerCoreModule` to have run — the datasource resolves
 /// `getIt<AppDatabase>()`.
 ///
 /// Registered alongside the settings module because both read the same

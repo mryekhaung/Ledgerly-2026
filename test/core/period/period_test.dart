@@ -5,8 +5,9 @@
 /// to a calendar month, `startDay == 28`, the `previous(next(p)) == p` round
 /// trip over many dates, and the guarantee that a boundary-day transaction
 /// lands in exactly one period.
+library;
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 

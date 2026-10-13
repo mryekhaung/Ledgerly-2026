@@ -1,11 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_totals.dart';
-import 'package:ledgerly/features/transactions/domain/usecases/watch_transactions.dart'
-    as watch;
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
 
 /// The calendar page's mutable state: which month and day are visible.

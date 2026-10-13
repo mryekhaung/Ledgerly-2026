@@ -1,6 +1,5 @@
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_catalog.dart';
-import 'package:ledgerly/features/profile/domain/entities/avatar_config.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The concrete colours an avatar part is drawn with.

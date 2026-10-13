@@ -26,7 +26,7 @@ void main() {
     test('should_report_too_large_when_digits_exceed_max', () {
       // One digit past the cap: `Money.maxDigits` keeps intermediates inside
       // ±2^53 on web, where `int` is a JS number.
-      final digits = Money.maxDigits + 1;
+      const digits = Money.maxDigits + 1;
       final overflow = int.parse('1' * digits);
       expect(
         TransactionValidators.amountError(mmk(overflow)),

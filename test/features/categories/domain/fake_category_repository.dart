@@ -75,7 +75,7 @@ class FakeCategoryRepository implements CategoryRepository {
     if (forcedFailure case final failure?) return Err<Category>(failure);
     final match = _items.where((c) => c.id == id && c.isActive).firstOrNull;
     return match == null
-        ? Err<Category>(const NotFoundFailure('not found'))
+        ? const Err<Category>(NotFoundFailure('not found'))
         : Success(match);
   }
 
@@ -106,7 +106,7 @@ class FakeCategoryRepository implements CategoryRepository {
     if (forcedFailure case final failure?) return Err<Category>(failure);
     final index = _items.indexWhere((c) => c.id == id);
     if (index == -1) {
-      return Err<Category>(const NotFoundFailure('not found'));
+      return const Err<Category>(NotFoundFailure('not found'));
     }
     final updated = _items[index].copyWith(
       name: draft.name,
@@ -124,7 +124,7 @@ class FakeCategoryRepository implements CategoryRepository {
   Future<Result<void>> delete(String id) async {
     if (forcedFailure case final failure?) return Err<void>(failure);
     final index = _items.indexWhere((c) => c.id == id);
-    if (index == -1) return Err<void>(const NotFoundFailure('not found'));
+    if (index == -1) return const Err<void>(NotFoundFailure('not found'));
     _items[index] = _items[index].copyWith(deletedAt: 3000);
     emit();
     return const Success<void>(null);
@@ -135,7 +135,7 @@ class FakeCategoryRepository implements CategoryRepository {
     restoredIds.add(id);
     if (forcedFailure case final failure?) return Err<void>(failure);
     final index = _items.indexWhere((c) => c.id == id);
-    if (index == -1) return Err<void>(const NotFoundFailure('not found'));
+    if (index == -1) return const Err<void>(NotFoundFailure('not found'));
     _items[index] = _items[index].copyWith(
       clearDeletedAt: true,
       updatedAt: 3200,
@@ -151,7 +151,7 @@ class FakeCategoryRepository implements CategoryRepository {
   }) async {
     if (forcedFailure case final failure?) return Err<void>(failure);
     final index = _items.indexWhere((c) => c.id == id);
-    if (index == -1) return Err<void>(const NotFoundFailure('not found'));
+    if (index == -1) return const Err<void>(NotFoundFailure('not found'));
     _items[index] = _items[index].copyWith(
       isArchived: isArchived,
       updatedAt: 3100,

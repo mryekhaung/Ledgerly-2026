@@ -3,7 +3,6 @@ import 'package:ledgerly/app/router/nav_destinations.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/adaptive_style.dart';
-import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/glass/glass_surface.dart';
 import 'package:material_ui/material_ui.dart';
@@ -267,7 +266,7 @@ class _NavRail extends StatelessWidget {
             // Labels always visible: an icon-only rail is a guessing game, and
             // Design.md §5.10 says the label stays visible.
             labelType: NavigationRailLabelType.all,
-            selectedIndex: current == null ? null : current!.index,
+            selectedIndex: current?.index,
             onDestinationSelected: (index) =>
                 onSelect(NavDestination.all[index]),
             destinations: <NavigationRailDestination>[

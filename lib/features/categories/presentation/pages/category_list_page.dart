@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
@@ -59,8 +58,8 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
       AsyncData(:final value) => _CategoryListBody(
         state: value,
         onEdit: (category) => _openForm(existing: category),
-        onDelete: (category) => _delete(category),
-        onToggleArchive: (category) => _toggleArchive(category),
+        onDelete: _delete,
+        onToggleArchive: _toggleArchive,
         selectedId: _paneEditing ? _paneCategory?.id : null,
       ),
       AsyncError() => StatePlaceholder(
@@ -81,7 +80,7 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
       return Scaffold(
         appBar: AppBar(title: Text(strings('categoriesTitle'))),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => _openForm(),
+          onPressed: _openForm,
           icon: const Icon(Icons.add),
           label: Text(strings('categoriesNew')),
         ),
@@ -102,7 +101,7 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
     return Scaffold(
       appBar: AppBar(title: Text(strings('categoriesTitle'))),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openForm(),
+        onPressed: _openForm,
         icon: const Icon(Icons.add),
         label: Text(strings('categoriesNew')),
       ),

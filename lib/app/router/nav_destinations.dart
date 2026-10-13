@@ -1,5 +1,4 @@
 import 'package:ledgerly/app/router/app_routes.dart';
-import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// One primary destination in the app shell.

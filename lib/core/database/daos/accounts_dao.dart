@@ -22,9 +22,9 @@ part 'accounts_dao.g.dart';
 @DriftAccessor(tables: [Accounts])
 class AccountsDao extends DatabaseAccessor<AppDatabase>
     with _$AccountsDaoMixin {
-  AccountsDao(super.db, {Clock clock = const Clock()}) : _clock = clock;
+  AccountsDao(super.db, {this.clock = const Clock()});
 
-  final Clock _clock;
+  final Clock clock;
 
   /// Live accounts in manual order, archived last.
   Stream<List<Account>> watchAll() {
@@ -56,7 +56,7 @@ class AccountsDao extends DatabaseAccessor<AppDatabase>
     bool isArchived = false,
   }) async {
     final id = generateUuid();
-    final now = _clock.nowUtcMillis();
+    final now = clock.nowUtcMillis();
     await into(accounts).insert(
       AccountsCompanion.insert(
         id: Value(id),
@@ -103,13 +103,13 @@ class AccountsDao extends DatabaseAccessor<AppDatabase>
         includeInTotal: includeInTotal == null
             ? const Value.absent()
             : Value(includeInTotal),
-        updatedAt: Value(_clock.nowUtcMillis()),
+        updatedAt: Value(clock.nowUtcMillis()),
       ),
     );
   }
 
   Future<void> softDelete(String id) {
-    final now = _clock.nowUtcMillis();
+    final now = clock.nowUtcMillis();
     return (update(accounts)..where((t) => t.id.equals(id))).write(
       AccountsCompanion(deletedAt: Value(now), updatedAt: Value(now)),
     );
@@ -125,7 +125,7 @@ class AccountsDao extends DatabaseAccessor<AppDatabase>
     return (update(accounts)..where((t) => t.id.equals(id))).write(
       AccountsCompanion(
         isArchived: Value(isArchived),
-        updatedAt: Value(_clock.nowUtcMillis()),
+        updatedAt: Value(clock.nowUtcMillis()),
       ),
     );
   }

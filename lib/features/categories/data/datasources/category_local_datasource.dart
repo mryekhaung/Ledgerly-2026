@@ -16,17 +16,16 @@ import 'package:ledgerly/features/categories/domain/entities/category_kind.dart'
 class CategoryLocalDataSource {
   CategoryLocalDataSource(
     this._database, {
-    Clock clock = const Clock(),
-    String Function() idGenerator = generateUuid,
-  }) : _clock = clock,
-       _idGenerator = idGenerator;
+    this.clock = const Clock(),
+    this.idGenerator = generateUuid,
+  });
 
   final db.AppDatabase _database;
-  final Clock _clock;
+  final Clock clock;
 
   /// Injected so a test can assert on a known id — the production default is a
   /// UUIDv4 (`docs/Architecture.md` ADR #3).
-  final String Function() _idGenerator;
+  final String Function() idGenerator;
 
   /// Active and archived categories in manual order, archived ones last.
   Stream<List<Category>> watchAll() =>
@@ -52,7 +51,7 @@ class CategoryLocalDataSource {
   Future<Category> create(CategoryDraft draft) =>
       _database.transaction(() async {
         final id = _generatedId();
-        final now = _clock.nowUtcMillis();
+        final now = clock.nowUtcMillis();
         await _database.categoriesDao.insert(
           id: id,
           nowUtcMillis: now,
@@ -73,7 +72,7 @@ class CategoryLocalDataSource {
   /// repository maps that to a `NotFoundFailure` (`docs/Architecture.md` §8).
   Future<Category> update(String id, CategoryDraft draft) =>
       _database.transaction(() async {
-        final now = _clock.nowUtcMillis();
+        final now = clock.nowUtcMillis();
         await _database.categoriesDao.updateById(
           id,
           nowUtcMillis: now,
@@ -111,7 +110,7 @@ class CategoryLocalDataSource {
   /// a mis-wired test fixture cannot write an empty primary key and shadow the
   /// real failure with a constraint violation.
   String _generatedId() {
-    final id = _idGenerator();
+    final id = idGenerator();
     return id.isEmpty ? generateUuid() : id;
   }
 }

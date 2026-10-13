@@ -1,6 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ledgerly/core/database/daos/categories_dao.dart';
-import 'package:ledgerly/core/database/seed.dart';
 
 import 'db_harness.dart';
 

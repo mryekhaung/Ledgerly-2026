@@ -1,10 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
-import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -13,7 +13,6 @@ import 'package:ledgerly/core/utils/month_grid_layout.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/month_year_picker_page.dart';
-import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
@@ -25,7 +24,6 @@ import 'package:ledgerly/features/transactions/domain/entities/transaction_direc
 import 'package:ledgerly/features/transactions/domain/entities/transaction_totals.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/calendar_notifier.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
-import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The calendar / home page.
@@ -75,7 +73,8 @@ class CalendarPage extends ConsumerWidget {
               month: state.visibleMonth,
               onPrevious: () => notifier.shiftMonth(-1),
               onNext: () => notifier.shiftMonth(1),
-              onPickMonth: () => _pickMonth(context, notifier),
+              onPickMonth: () =>
+                  _pickMonth(context, notifier, state.visibleMonth),
             ),
             const SizedBox(height: AppSpacing.md),
             _WeekdayHeader(weekStart: weekStart),
@@ -119,20 +118,25 @@ class CalendarPage extends ConsumerWidget {
               ],
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _openTransactionForm(context, state.selectedDay),
+        onPressed: () =>
+            unawaited(_openTransactionForm(context, state.selectedDay)),
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  void _openTransactionForm(BuildContext context, LocalDate day) {
-    context.pushNamed(
+  Future<void> _openTransactionForm(BuildContext context, LocalDate day) {
+    return context.pushNamed(
       AppRoutes.transactionNewName,
       queryParameters: <String, String>{'date': '${day.value}'},
     );
   }
 
   /// Opens the month/year picker and jumps the calendar to the chosen month.
+  ///
+  /// [currentMonth] is the month the page is already showing — passed in rather
+  /// than read back off the notifier, because a `Notifier`'s `state` is not part
+  /// of its public contract (`invalid_use_of_protected_member`).
   ///
   /// Only the *month* is applied: the selected day is left to the notifier's
   /// own clamping, because 31 March has no counterpart in February and
@@ -141,11 +145,11 @@ class CalendarPage extends ConsumerWidget {
   Future<void> _pickMonth(
     BuildContext context,
     CalendarNotifier notifier,
+    LocalDate currentMonth,
   ) async {
     final chosen = await Navigator.of(context).push<LocalDate>(
       MaterialPageRoute<LocalDate>(
-        builder: (_) =>
-            MonthYearPickerPage(initialMonth: notifier.state.visibleMonth),
+        builder: (_) => MonthYearPickerPage(initialMonth: currentMonth),
       ),
     );
     if (chosen == null) return;
@@ -187,7 +191,7 @@ class _WideBody extends StatelessWidget {
             children: monthPane,
           ),
         ),
-        SizedBox(width: AppSpacing.xl),
+        const SizedBox(width: AppSpacing.xl),
         Expanded(
           flex: 6,
           child: ListView(
@@ -793,7 +797,7 @@ class _DayListState extends ConsumerState<_DayList> {
               );
       },
       loading: () => const LoadingPlaceholder(),
-      error: (_, __) => ErrorBanner(
+      error: (_, _) => ErrorBanner(
         message: strings('stateErrorBody'),
         onRetry: () => ref.invalidate(selectedDayTransactionsProvider),
       ),
@@ -850,12 +854,12 @@ class _TransactionRow extends ConsumerWidget {
 
   final Transaction transaction;
 
-  /// Adds [transaction.id] to the parent's locally-dismissed set when a delete
+  /// Adds `transaction.id` to the parent's locally-dismissed set when a delete
   /// swipe completes, so the row leaves the tree before the provider stream
   /// confirms the soft delete.
   final ValueChanged<String> onRemoved;
 
-  /// Removes [transaction.id] from that set when an undo restores it, letting
+  /// Removes `transaction.id` from that set when an undo restores it, letting
   /// the row reappear from the provider data.
   final ValueChanged<String> onRestored;
 
@@ -874,7 +878,7 @@ class _TransactionRow extends ConsumerWidget {
       // never disappears for an action that keeps it.
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
-          _editTransaction(context, transaction);
+          unawaited(_editTransaction(context, transaction));
           return false;
         }
         return true;
@@ -882,7 +886,7 @@ class _TransactionRow extends ConsumerWidget {
       onDismissed: (direction) {
         if (direction == DismissDirection.endToStart) {
           onRemoved(transaction.id);
-          _deleteTransaction(context, ref, transaction);
+          unawaited(_deleteTransaction(context, ref, transaction));
         }
       },
       background: _SwipeAffordance(
@@ -900,7 +904,7 @@ class _TransactionRow extends ConsumerWidget {
         iconColor: colors.moneyOut,
       ),
       child: ListTile(
-        onTap: () => _editTransaction(context, transaction),
+        onTap: () => unawaited(_editTransaction(context, transaction)),
         leading: category == null
             ? const SizedBox.square(dimension: 40)
             : CategoryGem(
@@ -935,14 +939,11 @@ class _TransactionRow extends ConsumerWidget {
             PopupMenuButton<_TransactionAction>(
               icon: Icon(Icons.more_horiz, color: colors.textSecondary),
               onSelected: (action) => switch (action) {
-                _TransactionAction.edit => _editTransaction(
-                  context,
-                  transaction,
+                _TransactionAction.edit => unawaited(
+                  _editTransaction(context, transaction),
                 ),
-                _TransactionAction.delete => _deleteTransaction(
-                  context,
-                  ref,
-                  transaction,
+                _TransactionAction.delete => unawaited(
+                  _deleteTransaction(context, ref, transaction),
                 ),
               },
               itemBuilder: (context) => <PopupMenuEntry<_TransactionAction>>[
@@ -962,8 +963,8 @@ class _TransactionRow extends ConsumerWidget {
     );
   }
 
-  void _editTransaction(BuildContext context, Transaction transaction) {
-    context.pushNamed(
+  Future<void> _editTransaction(BuildContext context, Transaction transaction) {
+    return context.pushNamed(
       AppRoutes.transactionEditName,
       pathParameters: <String, String>{'id': transaction.id},
     );

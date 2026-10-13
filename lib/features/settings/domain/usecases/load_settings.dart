@@ -5,7 +5,7 @@ import 'package:ledgerly/features/settings/domain/repositories/settings_reposito
 
 /// Loads the current preferences once, at startup.
 ///
-/// The app reads settings through the *stream* ([WatchSettings]) for everything
+/// The app reads settings through the *stream* (`WatchSettings`) for everything
 /// that must react to a change; this one-shot read exists for the pre-first-frame
 /// path in `app.dart`, where a stream's initial `null` would flash the wrong
 /// theme for a frame.

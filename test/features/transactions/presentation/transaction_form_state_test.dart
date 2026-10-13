@@ -41,7 +41,7 @@ void main() {
     test('should_parse_whole_units_for_a_zero_exponent_currency', () {
       final state = blank().copyWith(entryBuffer: '1250');
 
-      expect(state.amount, Money.minor(1250, CurrencyCode.mmk));
+      expect(state.amount, const Money.minor(1250, CurrencyCode.mmk));
     });
 
     test('should_scale_minor_units_for_a_two_exponent_currency', () {
@@ -50,7 +50,7 @@ void main() {
       final state = blank(currency: CurrencyCode.usd)
           .copyWith(entryBuffer: '12.50');
 
-      expect(state.amount, Money.minor(1250, CurrencyCode.usd));
+      expect(state.amount, const Money.minor(1250, CurrencyCode.usd));
       expect(state.amount!.amountMinor, 1250);
     });
 
@@ -58,13 +58,13 @@ void main() {
       final state = blank(currency: CurrencyCode.usd)
           .copyWith(entryBuffer: '12.');
 
-      expect(state.amount, Money.minor(1200, CurrencyCode.usd));
+      expect(state.amount, const Money.minor(1200, CurrencyCode.usd));
     });
 
     test('should_treat_a_lone_zero_as_zero_not_null', () {
       final state = blank().copyWith(entryBuffer: '0');
 
-      expect(state.amount, Money.zero(CurrencyCode.mmk));
+      expect(state.amount, const Money.zero(CurrencyCode.mmk));
       expect(state.hasEntry, isTrue);
     });
   });
@@ -138,7 +138,7 @@ void main() {
         Transaction(
           id: 'tx-9',
           categoryId: 'cat-1',
-          amount: Money.minor(500, CurrencyCode.mmk),
+          amount: const Money.minor(500, CurrencyCode.mmk),
           direction: TransactionDirection.expense,
           date: LocalDate(2026, 3, 14),
           createdAt: 1,
@@ -158,7 +158,7 @@ void main() {
         Transaction(
           id: 'tx-1',
           categoryId: 'cat-1',
-          amount: Money.minor(1250, CurrencyCode.mmk),
+          amount: const Money.minor(1250, CurrencyCode.mmk),
           direction: TransactionDirection.expense,
           date: LocalDate(2026, 3, 14),
           createdAt: 1,
@@ -176,7 +176,7 @@ void main() {
         Transaction(
           id: 'tx-1',
           categoryId: 'cat-1',
-          amount: Money.minor(1250, CurrencyCode.usd),
+          amount: const Money.minor(1250, CurrencyCode.usd),
           direction: TransactionDirection.expense,
           date: LocalDate(2026, 3, 14),
           createdAt: 1,
@@ -185,7 +185,7 @@ void main() {
       );
 
       expect(state.entryBuffer, '12.50');
-      expect(state.amount, Money.minor(1250, CurrencyCode.usd));
+      expect(state.amount, const Money.minor(1250, CurrencyCode.usd));
     });
 
     test('should_left_pad_a_sub_unit_amount_so_it_round_trips', () {
@@ -194,7 +194,7 @@ void main() {
         Transaction(
           id: 'tx-1',
           categoryId: 'cat-1',
-          amount: Money.minor(5, CurrencyCode.usd),
+          amount: const Money.minor(5, CurrencyCode.usd),
           direction: TransactionDirection.expense,
           date: LocalDate(2026, 3, 14),
           createdAt: 1,
@@ -203,7 +203,7 @@ void main() {
       );
 
       expect(state.entryBuffer, '0.05');
-      expect(state.amount, Money.minor(5, CurrencyCode.usd));
+      expect(state.amount, const Money.minor(5, CurrencyCode.usd));
     });
 
     test('should_carry_note_and_direction', () {
@@ -211,7 +211,7 @@ void main() {
         Transaction(
           id: 'tx-1',
           categoryId: 'cat-1',
-          amount: Money.minor(500, CurrencyCode.mmk),
+          amount: const Money.minor(500, CurrencyCode.mmk),
           direction: TransactionDirection.income,
           date: LocalDate(2026, 3, 14),
           note: 'salary',
@@ -230,7 +230,7 @@ void main() {
         Transaction(
           id: 'tx-1',
           categoryId: 'cat-1',
-          amount: Money.minor(500, CurrencyCode.mmk),
+          amount: const Money.minor(500, CurrencyCode.mmk),
           direction: TransactionDirection.expense,
           date: LocalDate(2026, 3, 14),
           createdAt: 1,

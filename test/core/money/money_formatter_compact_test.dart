@@ -111,21 +111,24 @@ void main() {
     test('should_render_padded_cents_when_currency_has_two_decimals', () {
       expect(
         formatter.format(const Money.minor(1250, CurrencyCode.usd)),
-        r'$' + '\u200912.50',
+        r'$'
+        '\u200912.50',
       );
     });
 
     test('should_render_zero_cents_when_amount_is_whole', () {
       expect(
         formatter.format(const Money.minor(1200, CurrencyCode.usd)),
-        r'$' + '\u200912.00',
+        r'$'
+        '\u200912.00',
       );
     });
 
     test('should_render_single_digit_cents_with_leading_zero', () {
       expect(
         formatter.format(const Money.minor(7, CurrencyCode.usd)),
-        r'$' + '\u20090.07',
+        r'$'
+        '\u20090.07',
       );
     });
   });
@@ -307,7 +310,8 @@ void main() {
           const Money.minor(125000, CurrencyCode.usd),
           format: MoneyFormat.compact,
         ),
-        r'$' + '\u20091.3k',
+        r'$'
+        '\u20091.3k',
       );
     });
 
@@ -416,7 +420,8 @@ void main() {
           const Money.minor(1250000, CurrencyCode.usd),
           format: MoneyFormat.compactMyriad,
         ),
-        r'$' + '\u20091.3\u4E07',
+        r'$'
+        '\u20091.3\u4E07',
       );
     });
   });
@@ -450,7 +455,8 @@ void main() {
     test('should_render_zero_when_amount_is_zero', () {
       expect(
         formatter.format(const Money.minor(0, CurrencyCode.usd)),
-        r'$' + '\u20090.00',
+        r'$'
+        '\u20090.00',
       );
       expect(
         formatter.format(const Money.minor(0, CurrencyCode.mmk)),

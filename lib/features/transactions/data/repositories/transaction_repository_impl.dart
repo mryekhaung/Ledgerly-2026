@@ -1,7 +1,7 @@
+import 'package:ledgerly/core/database/result_guard.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/result/result.dart';
-import 'package:ledgerly/core/database/result_guard.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/transactions/data/datasources/transaction_local_datasource.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
@@ -96,7 +96,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
   /// generic storage failure.
   ///
   /// An unrecognised stored currency or direction also becomes a domain-visible
-  /// failure rather than a crash — see [TransactionMapper.toEntity] for why this
+  /// failure rather than a crash — see `TransactionMapper.toEntity` for why this
   /// one refuses to guess (`docs/Architecture.md` §8).
   static Failure _notFoundAsFailure(Object error, StackTrace stackTrace) =>
       error is TransactionNotFoundException

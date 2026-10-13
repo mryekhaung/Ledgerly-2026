@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
@@ -20,7 +18,7 @@ import 'package:material_ui/material_ui.dart';
 /// profile that changes under a swipe-back.
 ///
 /// Because the draft is local, the page **must** be seeded from the stored
-/// avatar exactly once, in [initState]'s equivalent for a `ConsumerStatefulWidget`.
+/// avatar exactly once, in `initState`'s equivalent for a `ConsumerStatefulWidget`.
 /// Watching [currentAvatarProvider] in `build` and copying it into state would
 /// discard the user's edits on the next stream emission — a stale-write bug that
 /// only shows up when a save lands mid-edit.

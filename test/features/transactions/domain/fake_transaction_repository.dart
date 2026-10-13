@@ -21,12 +21,13 @@ import 'package:ledgerly/features/transactions/domain/repositories/transaction_r
 class FakeTransactionRepository implements TransactionRepository {
   FakeTransactionRepository({
     List<Transaction> seed = const <Transaction>[],
-    CurrencyCode currency = CurrencyCode.mmk,
-  }) : _items = List<Transaction>.of(seed),
-       _currency = currency;
+    this.currency = CurrencyCode.mmk,
+  }) : _items = List<Transaction>.of(seed);
 
   final List<Transaction> _items;
-  final CurrencyCode _currency;
+
+  /// The currency this fake's aggregates are denominated in.
+  final CurrencyCode currency;
 
   /// Every draft passed to [create], in order.
   final List<TransactionDraft> createdDrafts = <TransactionDraft>[];
@@ -194,7 +195,7 @@ class FakeTransactionRepository implements TransactionRepository {
     if (forcedFailure case final failure?) return Err<Transaction>(failure);
     final match = _items.where((t) => t.id == id && t.isActive).firstOrNull;
     return match == null
-        ? Err<Transaction>(const NotFoundFailure('not found'))
+        ? const Err<Transaction>(NotFoundFailure('not found'))
         : Success(match);
   }
 
@@ -222,7 +223,7 @@ class FakeTransactionRepository implements TransactionRepository {
     updatedIds.add(id);
     if (forcedFailure case final failure?) return Err<Transaction>(failure);
     final index = _items.indexWhere((t) => t.id == id);
-    if (index == -1) return Err<Transaction>(const NotFoundFailure('nope'));
+    if (index == -1) return const Err<Transaction>(NotFoundFailure('nope'));
     final updated = _items[index].copyWith(
       categoryId: draft.categoryId,
       amount: draft.amount,
@@ -240,7 +241,7 @@ class FakeTransactionRepository implements TransactionRepository {
   Future<Result<void>> delete(String id) async {
     if (forcedFailure case final failure?) return Err<void>(failure);
     final index = _items.indexWhere((t) => t.id == id);
-    if (index == -1) return Err<void>(const NotFoundFailure('nope'));
+    if (index == -1) return const Err<void>(NotFoundFailure('nope'));
     _items[index] = _items[index].copyWith(deletedAt: 3000);
     emit();
     return const Success<void>(null);
@@ -262,7 +263,7 @@ class FakeTransactionRepository implements TransactionRepository {
     restoredIds.add(id);
     if (forcedFailure case final failure?) return Err<void>(failure);
     final index = _items.indexWhere((t) => t.id == id);
-    if (index == -1) return Err<void>(const NotFoundFailure('nope'));
+    if (index == -1) return const Err<void>(NotFoundFailure('nope'));
     _items[index] = _items[index].copyWith(
       clearDeletedAt: true,
       updatedAt: 3100,
@@ -270,9 +271,6 @@ class FakeTransactionRepository implements TransactionRepository {
     emit();
     return const Success<void>(null);
   }
-
-  /// The currency this fake's aggregates are denominated in.
-  CurrencyCode get currency => _currency;
 }
 
 /// Builds a [Transaction] with sensible defaults, so a test states only the

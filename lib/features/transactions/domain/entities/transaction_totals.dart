@@ -5,7 +5,7 @@ import 'package:ledgerly/features/transactions/domain/entities/transaction_direc
 /// A per-day net total, produced by a SQL `GROUP BY`
 /// (`docs/Architecture.md` §7 — aggregation happens in SQL, never a Dart loop).
 ///
-/// Deliberately a distinct type from [Transaction]: it has no id, no category
+/// Deliberately a distinct type from `Transaction`: it has no id, no category
 /// and no note, and conflating the two would make it possible to pass a summary
 /// where a row is expected.
 final class DailyTotal {

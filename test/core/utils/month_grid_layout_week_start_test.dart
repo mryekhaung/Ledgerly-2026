@@ -48,13 +48,15 @@ void main() {
       );
     });
 
-    test('a Monday 1st needs six blanks', () {
+    test('a Monday 1st needs one blank', () {
+      // 2026-06-01 is a Monday (ISO weekday 1) → only Sunday precedes it, so a
+      // Sunday-first grid leaves exactly one leading blank.
       expect(
         MonthGridLayout.leadingBlanks(
           LocalDate(2026, 6, 1),
           weekStart: GridWeekStart.sunday,
         ),
-        6,
+        1,
       );
     });
 
@@ -70,8 +72,8 @@ void main() {
     });
 
     test('rotates the Monday-first offset by exactly one for every day', () {
-      // For any month, Sunday-first leading blanks is Monday-first minus
-      // one, wrapped: Monday(0) → 6, Tue(1) → 0, …, Sunday(6) → 5.
+      // Sunday-first is Monday-first shifted one forward, wrapped: Monday(0) →
+      // 1, Tuesday(1) → 2, …, Sunday(6) → 0.
       for (var day = 1; day <= 28; day++) {
         final month = LocalDate(2026, 1, day);
         final monday = MonthGridLayout.leadingBlanks(month);
@@ -81,7 +83,7 @@ void main() {
         );
         expect(
           sunday,
-          (monday + 6) % 7,
+          (monday + 1) % 7,
           reason: 'rotation wrong for day $day (monday=$monday)',
         );
       }
