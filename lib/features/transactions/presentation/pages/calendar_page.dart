@@ -932,13 +932,23 @@ class _TransactionRow extends ConsumerWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            AmountText(
-              transaction.amount,
-              style: AmountStyle.row,
-              signed: true,
-              color: transaction.direction == TransactionDirection.income
-                  ? colors.moneyIn
-                  : colors.moneyOut,
+            // `Flexible`, not a bare child: `ListTile` hands `trailing` a
+            // bounded width, but a `Row` sizes its non-flexible children to
+            // their intrinsic width — and a `Text` with `ellipsis` still
+            // *reports* its full width at layout time. So at a narrow width with
+            // a large text scale (360 px × 2.0) the amount plus the overflow
+            // button exceeded the trailing budget and the `RenderFlex`
+            // overflowed. Flexible lets the Row shrink the amount, which is the
+            // only child that can give, and the ellipsis then does its job.
+            Flexible(
+              child: AmountText(
+                transaction.amount,
+                style: AmountStyle.row,
+                signed: true,
+                color: transaction.direction == TransactionDirection.income
+                    ? colors.moneyIn
+                    : colors.moneyOut,
+              ),
             ),
             const SizedBox(width: AppSpacing.xs),
             PopupMenuButton<_TransactionAction>(
