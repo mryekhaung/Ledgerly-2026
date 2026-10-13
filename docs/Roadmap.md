@@ -180,7 +180,7 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
 - ℹ **On this dev box, `flutter run` / `flutter build` can be blocked by OS-level named-pipe exhaustion** (`CreateFile failed 231 (All pipe instances are busy.)`) — `CreateNamedPipeW` runs out of instances machine-wide, so the tool cannot spawn its first child process. Proved with a bare `Process.run` probe that fails even outside the sandbox and after `adb kill-server`. Unrelated to the project. Run the build from a terminal outside the agent's process tree, or reboot to reset the pipe instance table.
   - Shortcut while the localizations are already generated: temporarily `mv l10n.yaml .l10n.yaml.buildskip` so the build skips the `gen_localizations` target (which spawns `dart format`), then move it back.
   - After a failed attempt, `rm -rf .dart_tool/flutter_build` — the abandoned `--incremental --initialize-from-dill` step leaves a 0-byte `app.dill` that breaks the next run.
-- ☐ **`WatchDayTotal` use case** — a day-level income/expense/net aggregate, so the calendar summary card can show the selected day rather than the month. Needs a `TransactionsDao` day-total query alongside the existing month ones; the repository interface and the stream bridge follow the same shape as `WatchMonthTotal`.
+- ✅ **`WatchDayTotal` use case** — a day-level income/expense/net aggregate, so the calendar summary card can show the selected day rather than the month. Built alongside the calendar summary card with `TransactionsDao.sumForDay`, repository methods, and `watchDayTotalProvider`.
 
 ## Phase 2 — "Understand & Account" (v0.2) — NOT STARTED
 
