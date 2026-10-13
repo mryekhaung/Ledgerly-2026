@@ -81,11 +81,11 @@ Future<int> physicalRowCount(
   AppDatabase db,
   TableInfo<Table, dynamic> table,
 ) async {
-  final count = table.$columns.first;
-  final row = await db.selectOnly(table).addColumns([
-    count.count(),
-  ]).getSingle();
-  return row.read(count.count())!;
+  final column = table.$columns.first;
+  final countExp = column.count();
+  final query = db.selectOnly(table)..addColumns([countExp]);
+  final row = await query.getSingle();
+  return row.read(countExp)!;
 }
 
 /// Looks a raw column up by name, bypassing the DAO's filters and converters.

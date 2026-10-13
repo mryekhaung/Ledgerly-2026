@@ -19,35 +19,30 @@ import '../../../support/app_test_host.dart';
 /// [AppSpacing.proseMaxWidth] — the same cap the transaction form uses, so the
 /// two read as one product rather than two layout systems.
 void main() {
-  Widget host(double width, {double textScale = 1}) {
-    return ProviderScope(
-      child: MaterialApp(
-        theme: AppTheme.light(),
-        supportedLocales: AppLocalization.supportedLocales
-            .map(Locale.new)
-            .toList(growable: false),
-        localizationsDelegates: const <LocalizationsDelegate<Object?>>[
-          ...GlobalMaterialLocalizations.delegates,
-          AppLocalizations.delegate,
-        ],
-        builder: (context, child) =>
-            AppTestScopes(child: child ?? const SizedBox.shrink()),
-        home: MediaQuery(
-          data: MediaQueryData(
-            size: Size(width, 900),
-            textScaler: TextScaler.linear(textScale),
-          ),
-          child: const SettingsPage(),
-        ),
-      ),
-    );
-  }
+  /// Hosts [SettingsPage] at a real surface [width] wide.
+  ///
+  /// The width has to be a genuine surface, not just `MediaQuery` data: the
+  /// assertions below measure a [ConstrainedPane], which is an `Align` and so is
+  /// exactly as wide as its parent. With only `MediaQuery` overridden the layout
+  /// still runs against the 800 px test window and every measurement comes back
+  /// 800 regardless of the width asked for.
+  Future<void> host(
+    WidgetTester tester,
+    double width, {
+    double textScale = 1,
+  }) => pumpAppHost(
+    tester,
+    size: Size(width, 900),
+    textScaler: TextScaler.linear(textScale),
+    overrides: const <Override>[],
+    home: const SettingsPage(),
+  );
 
   group('width cap', () {
     testWidgets('should_cap_the_content_column_on_a_wide_window', (
       tester,
     ) async {
-      await tester.pumpWidget(host(TestWidths.wide));
+      await host(tester, TestWidths.wide);
       await tester.pumpAndSettle();
 
       // The pane exists at every width; on wide it is what stops the rows
@@ -59,7 +54,7 @@ void main() {
     });
 
     testWidgets('should_not_stretch_rows_past_the_prose_cap', (tester) async {
-      await tester.pumpWidget(host(TestWidths.wide));
+      await host(tester, TestWidths.wide);
       await tester.pumpAndSettle();
 
       final paneSize = tester.getSize(find.byType(ConstrainedPane));
@@ -67,7 +62,7 @@ void main() {
     });
 
     testWidgets('should_use_the_full_width_of_a_phone', (tester) async {
-      await tester.pumpWidget(host(TestWidths.smallPhone));
+      await host(tester, TestWidths.smallPhone);
       await tester.pumpAndSettle();
 
       // 360 px is narrower than the cap, so nothing should be wasted.
@@ -81,7 +76,7 @@ void main() {
       tester,
     ) async {
       for (final width in TestWidths.all) {
-        await tester.pumpWidget(host(width));
+        await host(tester, width);
         await tester.pump();
 
         expect(
@@ -96,7 +91,7 @@ void main() {
       tester,
     ) async {
       for (final width in TestWidths.all) {
-        await tester.pumpWidget(host(width, textScale: 2));
+        await host(tester, width, textScale: 2);
         await tester.pump();
 
         expect(

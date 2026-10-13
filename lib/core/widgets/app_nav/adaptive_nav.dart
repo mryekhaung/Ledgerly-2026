@@ -101,19 +101,31 @@ class _MaterialNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
 
+    // `NavigationBar.selectedIndex` is a non-nullable `int` (unlike
+    // `NavigationRail.selectedIndex`, which is an `int?`), so the bar has no way
+    // to say "nothing is selected" the way the rail does with `null`. Passing 0
+    // unconditionally would light up the first destination and contradict this
+    // widget's contract — a route that is not a destination must not claim to be
+    // one. So when [current] is null the bar still needs a valid in-range index,
+    // but everything that *reads* as selected is painted neutral: the pill is
+    // transparent and every destination keeps its unselected icon.
+    final hasSelection = current != null;
+
     return DockedBottomBar(
       child: NavigationBarTheme(
         data: NavigationBarThemeData(
           // Brand-derived colours rather than Material's defaults, so the
           // selected pill matches the rest of the app (docs/Design.md §2.2).
-          indicatorColor: colors.brandSubtle,
+          indicatorColor: hasSelection
+              ? colors.brandSubtle
+              : const Color(0x00000000),
           backgroundColor: colors.surfaceRaised,
           labelTextStyle: WidgetStateProperty.resolveWith(
             (states) => Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: states.contains(WidgetState.selected)
+              color: states.contains(WidgetState.selected) && hasSelection
                   ? colors.brandPrimary
                   : colors.textSecondary,
-              fontWeight: states.contains(WidgetState.selected)
+              fontWeight: states.contains(WidgetState.selected) && hasSelection
                   ? FontWeight.w600
                   : null,
             ),
@@ -131,7 +143,7 @@ class _MaterialNavBar extends StatelessWidget {
                 icon: Icon(destination.icon),
                 selectedIcon: Icon(
                   destination.selectedIcon,
-                  color: colors.brandPrimary,
+                  color: hasSelection ? colors.brandPrimary : null,
                 ),
                 label: destinationLabel(destination),
               ),

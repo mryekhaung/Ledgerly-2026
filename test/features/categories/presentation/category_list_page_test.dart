@@ -21,38 +21,32 @@ import '../domain/fake_category_repository.dart';
 /// form itself is not driven here — `category_form_state_test.dart` owns its
 /// logic — so this focuses on the geometry and the wiring.
 void main() {
-  /// Hosts [CategoryListPage] at a given logical width with a fixed list.
+  /// Hosts [CategoryListPage] at a real surface [width] wide with a fixed list.
   ///
   /// `categoryListProvider` is overridden so the page never reaches the get_it
   /// locator (not configured in a widget test) while still exercising the real
   /// page, rows and layout.
-  Widget host(List<Category> categories, double width, {Locale? locale}) {
-    return ProviderScope(
-      overrides: [
-        categoryListProvider.overrideWith(
-          () => _FixedCategoryListNotifier(CategoryListState.of(categories)),
-        ),
-      ],
-      child: MaterialApp(
-        locale: locale ?? const Locale('en'),
-        supportedLocales: AppLocalization.supportedLocales
-            .map(Locale.new)
-            .toList(growable: false),
-        localizationsDelegates: const <LocalizationsDelegate<Object?>>[
-          ...GlobalMaterialLocalizations.delegates,
-          AppLocalizations.delegate,
-        ],
-        // `builder` so the app's scopes sit above the `Navigator` — the page
-        // pushes a form route that reads the same scopes.
-        builder: (context, child) =>
-            AppTestScopes(child: child ?? const SizedBox.shrink()),
-        home: MediaQuery(
-          data: MediaQueryData(size: Size(width, 900)),
-          child: const CategoryListPage(),
-        ),
+  ///
+  /// The width is a genuine surface rather than `MediaQuery` data alone: several
+  /// assertions measure the panes, and a `ConstrainedPane` is an `Align` that
+  /// fills whatever it is given, so only a real resize moves the measurement off
+  /// the 800 px test window.
+  Future<void> host(
+    WidgetTester tester,
+    List<Category> categories,
+    double width, {
+    Locale? locale,
+  }) => pumpAppHost(
+    tester,
+    size: Size(width, 900),
+    locale: locale ?? const Locale('en'),
+    overrides: <Override>[
+      categoryListProvider.overrideWith(
+        () => _FixedCategoryListNotifier(CategoryListState.of(categories)),
       ),
-    );
-  }
+    ],
+    home: const CategoryListPage(),
+  );
 
   final categories = <Category>[
     fakeCategory(id: 'a', name: 'Food'),
@@ -62,7 +56,7 @@ void main() {
 
   group('compact', () {
     testWidgets('should_show_the_list_without_a_detail_pane', (tester) async {
-      await tester.pumpWidget(host(categories, TestWidths.smallPhone));
+      await host(tester, categories, TestWidths.smallPhone);
       await tester.pumpAndSettle();
 
       expect(find.text('Food'), findsOneWidget);
@@ -77,14 +71,14 @@ void main() {
     testWidgets('should_not_show_a_form_inline_before_anything_is_tapped', (
       tester,
     ) async {
-      await tester.pumpWidget(host(categories, TestWidths.smallPhone));
+      await host(tester, categories, TestWidths.smallPhone);
       await tester.pumpAndSettle();
 
       expect(find.byType(CategoryFormBody), findsNothing);
     });
 
     testWidgets('should_show_the_archived_section', (tester) async {
-      await tester.pumpWidget(host(categories, TestWidths.smallPhone));
+      await host(tester, categories, TestWidths.smallPhone);
       await tester.pumpAndSettle();
 
       expect(find.text('ARCHIVED'), findsOneWidget);
@@ -92,7 +86,7 @@ void main() {
     });
 
     testWidgets('should_show_the_new_category_action', (tester) async {
-      await tester.pumpWidget(host(categories, TestWidths.smallPhone));
+      await host(tester, categories, TestWidths.smallPhone);
       await tester.pumpAndSettle();
 
       expect(find.text('New category'), findsOneWidget);
@@ -103,7 +97,7 @@ void main() {
     testWidgets('should_show_the_detail_hint_before_a_selection', (
       tester,
     ) async {
-      await tester.pumpWidget(host(categories, TestWidths.desktop));
+      await host(tester, categories, TestWidths.desktop);
       await tester.pumpAndSettle();
 
       // The pane is not dead space: it says what to do.
@@ -114,7 +108,7 @@ void main() {
     });
 
     testWidgets('should_keep_the_list_visible_beside_the_pane', (tester) async {
-      await tester.pumpWidget(host(categories, TestWidths.desktop));
+      await host(tester, categories, TestWidths.desktop);
       await tester.pumpAndSettle();
 
       // Master–detail means the list never disappears while editing.
@@ -125,7 +119,7 @@ void main() {
     testWidgets('should_open_the_form_in_the_pane_when_a_row_is_tapped', (
       tester,
     ) async {
-      await tester.pumpWidget(host(categories, TestWidths.desktop));
+      await host(tester, categories, TestWidths.desktop);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Food'));
@@ -140,7 +134,7 @@ void main() {
     });
 
     testWidgets('should_highlight_the_open_row', (tester) async {
-      await tester.pumpWidget(host(categories, TestWidths.desktop));
+      await host(tester, categories, TestWidths.desktop);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Food'));
@@ -167,7 +161,7 @@ void main() {
     });
 
     testWidgets('should_show_the_edit_title_in_the_pane', (tester) async {
-      await tester.pumpWidget(host(categories, TestWidths.desktop));
+      await host(tester, categories, TestWidths.desktop);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Food'));
@@ -179,8 +173,11 @@ void main() {
     testWidgets('should_render_the_myanmar_pane_hint_under_the_my_locale', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        host(categories, TestWidths.desktop, locale: const Locale('my')),
+      await host(
+        tester,
+        categories,
+        TestWidths.desktop,
+        locale: const Locale('my'),
       );
       await tester.pumpAndSettle();
 
@@ -198,7 +195,7 @@ void main() {
       tester,
     ) async {
       for (final width in TestWidths.all) {
-        await tester.pumpWidget(host(categories, width));
+        await host(tester, categories, width);
         await tester.pump();
 
         expect(
@@ -258,7 +255,7 @@ void main() {
       tester,
     ) async {
       for (final width in <double>[TestWidths.smallPhone, TestWidths.desktop]) {
-        await tester.pumpWidget(host(const <Category>[], width));
+        await host(tester, const <Category>[], width);
         await tester.pumpAndSettle();
 
         expect(

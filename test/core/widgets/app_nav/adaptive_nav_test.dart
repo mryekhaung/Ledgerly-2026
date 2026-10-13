@@ -1,10 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/router/nav_destinations.dart';
-import 'package:ledgerly/core/platform/adaptive_style.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
-import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_nav/adaptive_nav.dart';
 import 'package:ledgerly/core/widgets/glass/glass_surface.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
@@ -170,12 +168,33 @@ void main() {
     testWidgets('should_select_nothing_when_the_route_is_not_a_destination', (
       tester,
     ) async {
+      final semantics = tester.ensureSemantics();
+      addTearDown(semantics.dispose);
+
       await tester.pumpWidget(host(width: TestWidths.phone, current: null));
       await tester.pumpAndSettle();
 
-      // `selectedIndex: null` renders no active item rather than guessing.
-      final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
-      expect(bar.selectedIndex, isNull);
+      // `NavigationBar.selectedIndex` is a non-nullable `int`, so it can never
+      // report "nothing selected" the way `NavigationRail.selectedIndex` (an
+      // `int?`) can. The bar is driven by that index, so the honest assertion is
+      // on what it *publishes*: no destination may be marked selected.
+      final selected = <String>[];
+      void collect(SemanticsNode node) {
+        if (node.hasFlag(SemanticsFlag.isSelected)) {
+          selected.add(node.label);
+        }
+        node.visitChildren((child) {
+          collect(child);
+          return true;
+        });
+      }
+
+      collect(tester.getSemantics(find.byType(NavigationBar)));
+      expect(
+        selected,
+        isEmpty,
+        reason: 'a route that is not a destination must not read as selected',
+      );
     });
   });
 

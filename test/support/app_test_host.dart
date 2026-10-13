@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/adaptive_style.dart';
@@ -21,8 +22,8 @@ import 'package:material_ui/material_ui.dart';
 /// drift out of sync with `app.dart` again), tests compose it from here. Keep
 /// this in step with `LedgerlyApp.build`.
 ///
-/// [lightColors] / [darkColors] are the real token sets, so a test asserting on
-/// a colour sees the shipped palette.
+/// The light/dark token sets come from the real `AppColorsLight` /
+/// `AppColorsDark`, so a test asserting on a colour sees the shipped palette.
 class AppTestScopes extends StatelessWidget {
   /// Wraps [child] in the app's inherited scopes.
   const AppTestScopes({
@@ -46,19 +47,24 @@ class AppTestScopes extends StatelessWidget {
     const lightColors = AppColorsLight();
     const darkColors = AppColorsDark();
 
+    // `AppLocalizations.of` returns null when the host `MaterialApp` was built
+    // without the app's delegates — some focused tests do exactly that, since
+    // they do not care about copy. Resolving through the generated
+    // `lookupAppLocalizations` keeps the lookup on the *shipped* strings either
+    // way, rather than null-crashing the whole subtree.
+    final l10n =
+        AppLocalizations.of(context) ??
+        lookupAppLocalizations(
+          Localizations.maybeLocaleOf(context) ?? const Locale('en'),
+        );
+
     return AdaptiveStyleScope(
       platformOverride: platform,
-      child: Builder(
-        // The inner `Builder` matters: `AppStringsScope` and `AppThemeColors`
-        // need a context *below* `Localizations`, which the caller's
-        // `MaterialApp` provides — reading it here keeps this widget usable
-        // directly under `MaterialApp.home`.
-        builder: (context) => AppStringsScope(
-          lookup: AppStringLookup.of(AppLocalizations.of(context)),
-          child: AppThemeColors(
-            colors: brightness == Brightness.dark ? darkColors : lightColors,
-            child: child,
-          ),
+      child: AppStringsScope(
+        lookup: AppStringLookup.of(l10n),
+        child: AppThemeColors(
+          colors: brightness == Brightness.dark ? darkColors : lightColors,
+          child: child,
         ),
       ),
     );
@@ -69,10 +75,15 @@ class AppTestScopes extends StatelessWidget {
 /// app's scopes already installed.
 ///
 /// This is the one-line host most widget tests want: pass the widget under test
-/// as [home] (or [builder]) and it behaves like the real app.
+/// as `home` and it behaves like the real app.
 ///
-/// [size] overrides `MediaQuery.size` so a test can exercise an exact
-/// breakpoint without depending on the harness's 800×600 default.
+/// [size] supplies `MediaQuery.size`. That is enough for a widget that only
+/// *branches* on the size class (a nav bar choosing bar/rail/sidebar), because
+/// such a widget reads `MediaQuery` and never measures itself. It is **not**
+/// enough for a test that calls `tester.getSize` on a child which shrinks to fit
+/// — `MediaQuery` provides data, not constraints, so the render tree still lays
+/// out against the 800×600 test window. Use [pumpAppHost] when the assertion is
+/// about measured geometry.
 Widget appTestHost({
   required Widget home,
   Size? size,
@@ -108,4 +119,49 @@ Widget appTestHost({
     app = ProviderScope(overrides: overrides, child: app);
   }
   return app;
+}
+
+/// Pumps [appTestHost] with the **real** surface resized to [size].
+///
+/// `appTestHost` alone only overrides `MediaQuery.size`; the layout still runs
+/// against `tester.view`'s 800×600. A widget that branches on the size class
+/// does not care, but one that is measured — a `ConstrainedPane` inside an
+/// `Align` is as wide as its parent, so `tester.getSize` reports the window, not
+/// the width the test asked for — does. This resizes the view so `MediaQuery`
+/// and the constraints agree, which is what a real device does.
+///
+/// The view is restored by `addTearDown`, so a test can call this repeatedly
+/// (e.g. walking `TestWidths.all`) without leaking a size into the next case.
+Future<void> pumpAppHost(
+  WidgetTester tester, {
+  required Widget home,
+  Size size = const Size(800, 600),
+  Locale locale = const Locale('en'),
+  AppPlatform? platform,
+  Brightness brightness = Brightness.light,
+  TextScaler? textScaler,
+  List<Override> overrides = const <Override>[],
+}) async {
+  final view = tester.view;
+  final previousSize = view.physicalSize;
+  final previousRatio = view.devicePixelRatio;
+  addTearDown(() {
+    view.physicalSize = previousSize;
+    view.devicePixelRatio = previousRatio;
+  });
+
+  view.devicePixelRatio = 1;
+  view.physicalSize = size;
+
+  await tester.pumpWidget(
+    appTestHost(
+      home: home,
+      size: size,
+      locale: locale,
+      platform: platform,
+      brightness: brightness,
+      textScaler: textScaler,
+      overrides: overrides,
+    ),
+  );
 }
