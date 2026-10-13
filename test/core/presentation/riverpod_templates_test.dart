@@ -18,7 +18,7 @@ class _TestStreamNotifier extends TemplateStreamNotifier<int> {
 void main() {
   group('TemplateCounterNotifier', () {
     test('should_start_at_zero_and_support_increment_and_reset', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer(retry: (_, _) => null);
       addTearDown(container.dispose);
 
       final provider = NotifierProvider<TemplateCounterNotifier, int>(
@@ -40,7 +40,7 @@ void main() {
 
   group('TemplateAsyncNotifier', () {
     test('should_load_successfully_when_initial_fetch_succeeds', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(retry: (_, _) => null);
       addTearDown(container.dispose);
 
       final provider =
@@ -60,7 +60,7 @@ void main() {
     });
 
     test('should_fail_when_initial_fetch_returns_error', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(retry: (_, _) => null);
       addTearDown(container.dispose);
 
       const testFailure = UnexpectedFailure('fetch failed');
@@ -79,7 +79,7 @@ void main() {
     });
 
     test('should_transition_to_error_when_mutation_fails', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(retry: (_, _) => null);
       addTearDown(container.dispose);
 
       const testFailure = ValidationFailure(
@@ -105,26 +105,35 @@ void main() {
 
   group('TemplateStreamNotifier', () {
     test('should_emit_stream_events_and_handle_refresh', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(retry: (_, _) => null);
       addTearDown(container.dispose);
 
-      var count = 0;
+      final controller = StreamController<int>.broadcast();
+      addTearDown(controller.close);
+
       final provider = StreamNotifierProvider<_TestStreamNotifier, int>(
-        () => _TestStreamNotifier(() => Stream.value(++count)),
+        () => _TestStreamNotifier(() => controller.stream),
       );
 
-      final first = await container.read(provider.future);
-      expect(first, 1);
+      final sub = container.listen(provider, (_, _) {});
+      addTearDown(sub.close);
+
+      controller.add(42);
+      await pumpEventQueue();
+      expect(container.read(provider).value, 42);
 
       container.read(provider.notifier).refresh();
-      final second = await container.read(provider.future);
-      expect(second, 2);
+      expect(container.read(provider).isLoading, isTrue);
+
+      controller.add(100);
+      await pumpEventQueue();
+      expect(container.read(provider).value, 100);
     });
   });
 
   group('createUseCaseBridge', () {
     test('should_provide_resolved_instance', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer(retry: (_, _) => null);
       addTearDown(container.dispose);
 
       final bridge = createUseCaseBridge<String>(() => 'use-case-instance');
