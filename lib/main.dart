@@ -26,7 +26,9 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       child: LedgerlyApp(
-        router: initialRoute == null ? null : createRouter(initialLocation: initialRoute),
+        router: initialRoute == null
+            ? null
+            : createRouter(initialLocation: initialRoute),
       ),
     ),
   );

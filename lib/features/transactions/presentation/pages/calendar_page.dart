@@ -258,8 +258,7 @@ class _MonthSwipeAreaState extends State<_MonthSwipeArea> {
       onHorizontalDragUpdate: (details) => _dragged += details.delta.dx,
       onHorizontalDragEnd: (details) {
         final velocity = details.primaryVelocity ?? 0;
-        final threshold =
-            MediaQuery.sizeOf(context).width * _distanceFraction;
+        final threshold = MediaQuery.sizeOf(context).width * _distanceFraction;
         final draggedFarEnough = _dragged.abs() > threshold;
 
         // Negative = finger moved left = advance to the next month. Matches
@@ -324,9 +323,7 @@ class _MonthSwitcher extends StatelessWidget {
               child: Tooltip(
                 message: strings('calendarPickMonth'),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppSpacing.sm,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -771,10 +768,9 @@ class _DayListState extends ConsumerState<_DayList> {
 
     return transactionsAsync.when(
       data: (transactions) {
-        final visible =
-            transactions
-                .where((t) => !_dismissed.contains(t.id))
-                .toList(growable: false);
+        final visible = transactions
+            .where((t) => !_dismissed.contains(t.id))
+            .toList(growable: false);
 
         return visible.isEmpty
             ? StatePlaceholder(
@@ -791,8 +787,7 @@ class _DayListState extends ConsumerState<_DayList> {
                     _TransactionRow(
                       transaction: transaction,
                       onRemoved: (id) => setState(() => _dismissed.add(id)),
-                      onRestored:
-                          (id) => setState(() => _dismissed.remove(id)),
+                      onRestored: (id) => setState(() => _dismissed.remove(id)),
                     ),
                 ],
               );
@@ -940,10 +935,15 @@ class _TransactionRow extends ConsumerWidget {
             PopupMenuButton<_TransactionAction>(
               icon: Icon(Icons.more_horiz, color: colors.textSecondary),
               onSelected: (action) => switch (action) {
-                _TransactionAction.edit =>
-                  _editTransaction(context, transaction),
-                _TransactionAction.delete =>
-                  _deleteTransaction(context, ref, transaction),
+                _TransactionAction.edit => _editTransaction(
+                  context,
+                  transaction,
+                ),
+                _TransactionAction.delete => _deleteTransaction(
+                  context,
+                  ref,
+                  transaction,
+                ),
               },
               itemBuilder: (context) => <PopupMenuEntry<_TransactionAction>>[
                 PopupMenuItem<_TransactionAction>(
@@ -978,9 +978,9 @@ class _TransactionRow extends ConsumerWidget {
     // A destructive action buzzes before the snack bar is read, so deleting
     // feels different from tapping a row.
     AppFeedback.destructive();
-    final result = await ref
-        .read(deleteTransactionProvider)
-        .call((id: transaction.id));
+    final result = await ref.read(deleteTransactionProvider).call((
+      id: transaction.id,
+    ));
     if (!context.mounted) return;
 
     if (result.isErr) {
@@ -1003,9 +1003,9 @@ class _TransactionRow extends ConsumerWidget {
     WidgetRef ref,
     Transaction transaction,
   ) async {
-    final result = await ref
-        .read(restoreTransactionProvider)
-        .call((id: transaction.id));
+    final result = await ref.read(restoreTransactionProvider).call((
+      id: transaction.id,
+    ));
     if (!context.mounted) return;
 
     if (result.isSuccess) {
@@ -1049,16 +1049,16 @@ class _SwipeAffordance extends StatelessWidget {
     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
     child: Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment:
-          alignStart ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+      crossAxisAlignment: alignStart
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.end,
       children: <Widget>[
         Icon(icon, color: iconColor),
         const SizedBox(height: AppSpacing.xs),
         Text(
           label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: iconColor,
-          ),
+          style: Theme.of(context).textTheme.labelSmall
+              ?.copyWith(color: iconColor),
         ),
       ],
     ),

@@ -82,7 +82,8 @@ class _MonthYearPickerPageState extends State<MonthYearPickerPage> {
         actions: <Widget>[
           TextButton(
             onPressed: () =>
-                Navigator.of(context).pop(LocalDate.fromDateTime(DateTime.now())),
+                Navigator.of(context)
+                    .pop(LocalDate.fromDateTime(DateTime.now())),
             child: Text(strings('calendarToday')),
           ),
         ],
@@ -112,13 +113,10 @@ class _MonthYearPickerPageState extends State<MonthYearPickerPage> {
                   // 12 names x 3 locales is data the platform already has right,
                   // and duplicating it in the ARB would be 36 strings to keep
                   // in sync for no gain (matches `MonthDayPickerPage`).
-                  label: localizations.formatMonthYear(
-                    DateTime(_year, month),
-                  ),
+                  label: localizations.formatMonthYear(DateTime(_year, month)),
                   isSelected: month == _month,
-                  onTap: () => Navigator.of(
-                    context,
-                  ).pop(LocalDate(_year, month, 1)),
+                  onTap: () =>
+                      Navigator.of(context).pop(LocalDate(_year, month, 1)),
                 ),
             ],
           ),

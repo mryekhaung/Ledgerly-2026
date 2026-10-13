@@ -73,10 +73,12 @@ class AvatarPainter extends CustomPainter {
 
     final background = AvatarPalette.resolve(
       colors,
-      AvatarCatalog.backgroundColors[config.backgroundColorIndex.clamp(
-        0,
-        AvatarCatalog.backgroundColors.length - 1,
-      )].palette,
+      AvatarCatalog
+          .backgroundColors[config.backgroundColorIndex.clamp(
+            0,
+            AvatarCatalog.backgroundColors.length - 1,
+          )]
+          .palette,
     );
 
     _paintBackground(canvas, rect, background);

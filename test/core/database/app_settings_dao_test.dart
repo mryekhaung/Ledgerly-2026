@@ -81,10 +81,7 @@ void main() {
   group('putAll', () {
     test('writes every pair', () async {
       await dao.putAll({'currency': 'usd', 'theme_mode': 'dark'});
-      expect(await dao.readAll(), {
-        'currency': 'usd',
-        'theme_mode': 'dark',
-      });
+      expect(await dao.readAll(), {'currency': 'usd', 'theme_mode': 'dark'});
     });
 
     test('an empty map is a no-op', () async {

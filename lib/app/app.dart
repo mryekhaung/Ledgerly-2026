@@ -139,7 +139,9 @@ class LedgerlyApp extends ConsumerWidget {
   /// pinning the UI to a locale with no ARB.
   static Locale? _localeFromCode(String? code) {
     if (code == null) return null;
-    return AppLocalization.supportedLocales.contains(code) ? Locale(code) : null;
+    return AppLocalization.supportedLocales.contains(code)
+        ? Locale(code)
+        : null;
   }
 
   /// Maps the domain enum onto Flutter's `ThemeMode`.

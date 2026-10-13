@@ -103,9 +103,8 @@ class CalendarNotifier extends Notifier<CalendarState> {
   /// The selected day follows via [CalendarState.withMonth], which clamps it
   /// into the new month — so jumping from 31 March to February lands on the
   /// 28th/29th rather than throwing.
-  void jumpToMonth(LocalDate month) => state = state.withMonth(
-    month.firstDayOfMonth,
-  );
+  void jumpToMonth(LocalDate month) =>
+      state = state.withMonth(month.firstDayOfMonth);
 
   /// Selects a specific day, scrolling the month if needed.
   void selectDay(LocalDate day) => state = state.withDay(day);

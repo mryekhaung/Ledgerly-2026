@@ -277,108 +277,105 @@ void main() {
       expect(await namesByType(h.db, 'index'), contains('idx_settings_key'));
     });
 
-    test(
-      'should_upgrade_v1_to_v2_keeping_categories_and_transactions',
-      () async {
-        // The real upgrade proof.
-        //
-        // A v1 database is built **by hand** with the exact v1 DDL and
-        // `PRAGMA user_version = 1`, using the same in-memory connection that is
-        // then handed to the *current* [AppDatabase]. Opening it at version 2 is
-        // what makes drift run `onUpgrade(from: 1, to: 2)` — the code path this
-        // test exists to exercise.
-        //
-        // Building v1 by hand (rather than opening an old AppDatabase) is what
-        // makes this honest: the handwritten DDL is frozen at v1 forever and
-        // cannot drift along with the current schema.
-        final connection = NativeDatabase.memory();
+    test('should_upgrade_v1_to_v2_keeping_categories_and_transactions', () async {
+      // The real upgrade proof.
+      //
+      // A v1 database is built **by hand** with the exact v1 DDL and
+      // `PRAGMA user_version = 1`, using the same in-memory connection that is
+      // then handed to the *current* [AppDatabase]. Opening it at version 2 is
+      // what makes drift run `onUpgrade(from: 1, to: 2)` — the code path this
+      // test exists to exercise.
+      //
+      // Building v1 by hand (rather than opening an old AppDatabase) is what
+      // makes this honest: the handwritten DDL is frozen at v1 forever and
+      // cannot drift along with the current schema.
+      final connection = NativeDatabase.memory();
 
-        final v1 = AppDatabase(connection);
-        await v1.customStatement('DROP TABLE IF EXISTS app_settings');
-        await v1.customStatement('DROP TABLE IF EXISTS transactions');
-        await v1.customStatement('DROP TABLE IF EXISTS categories');
-        await v1.customStatement('DROP TABLE IF EXISTS accounts');
-        await v1.customStatement(
-          'CREATE TABLE categories ('
-          'id TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, '
-          'icon_key TEXT NOT NULL, color_value INTEGER NOT NULL, '
-          'kind TEXT NOT NULL DEFAULT \'expense\', '
-          'is_default INTEGER NOT NULL DEFAULT 0, '
-          'created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, '
-          'deleted_at INTEGER, sort_order INTEGER NOT NULL DEFAULT 0, '
-          'is_archived INTEGER NOT NULL DEFAULT 0)',
-        );
-        await v1.customStatement(
-          'CREATE TABLE transactions ('
-          'id TEXT NOT NULL PRIMARY KEY, category_id TEXT NOT NULL, '
-          'amount_minor INTEGER NOT NULL, currency TEXT NOT NULL, '
-          'direction TEXT NOT NULL, date INTEGER NOT NULL, note TEXT, '
-          'account_id TEXT, created_at INTEGER NOT NULL, '
-          'updated_at INTEGER NOT NULL, deleted_at INTEGER, '
-          'sort_order INTEGER NOT NULL DEFAULT 0, '
-          'is_archived INTEGER NOT NULL DEFAULT 0, '
-          'FOREIGN KEY (category_id) REFERENCES categories (id))',
-        );
-        await v1.customStatement(
-          'CREATE TABLE accounts ('
-          'id TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, '
-          'kind TEXT NOT NULL, currency TEXT NOT NULL, '
-          'opening_balance_minor INTEGER NOT NULL, '
-          'created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, '
-          'deleted_at INTEGER, sort_order INTEGER NOT NULL DEFAULT 0, '
-          'is_archived INTEGER NOT NULL DEFAULT 0)',
-        );
-        await v1.customStatement(
-          "INSERT INTO categories (id, name, icon_key, color_value, kind, "
-          "is_default, created_at, updated_at, sort_order, is_archived) "
-          "VALUES ('c1', 'Food', 'restaurant', 1, 'expense', 1, 1, 1, 0, 0)",
-        );
-        await v1.customStatement(
-          "INSERT INTO transactions (id, category_id, amount_minor, currency, "
-          "direction, date, created_at, updated_at, sort_order, is_archived) "
-          "VALUES ('t1', 'c1', 250, 'mmk', 'expense', 20261003, 1, 1, 0, 0)",
-        );
-        await v1.customStatement('PRAGMA user_version = 1');
-        await v1.close();
+      final v1 = AppDatabase(connection);
+      await v1.customStatement('DROP TABLE IF EXISTS app_settings');
+      await v1.customStatement('DROP TABLE IF EXISTS transactions');
+      await v1.customStatement('DROP TABLE IF EXISTS categories');
+      await v1.customStatement('DROP TABLE IF EXISTS accounts');
+      await v1.customStatement(
+        'CREATE TABLE categories ('
+        'id TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, '
+        'icon_key TEXT NOT NULL, color_value INTEGER NOT NULL, '
+        'kind TEXT NOT NULL DEFAULT \'expense\', '
+        'is_default INTEGER NOT NULL DEFAULT 0, '
+        'created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, '
+        'deleted_at INTEGER, sort_order INTEGER NOT NULL DEFAULT 0, '
+        'is_archived INTEGER NOT NULL DEFAULT 0)',
+      );
+      await v1.customStatement(
+        'CREATE TABLE transactions ('
+        'id TEXT NOT NULL PRIMARY KEY, category_id TEXT NOT NULL, '
+        'amount_minor INTEGER NOT NULL, currency TEXT NOT NULL, '
+        'direction TEXT NOT NULL, date INTEGER NOT NULL, note TEXT, '
+        'account_id TEXT, created_at INTEGER NOT NULL, '
+        'updated_at INTEGER NOT NULL, deleted_at INTEGER, '
+        'sort_order INTEGER NOT NULL DEFAULT 0, '
+        'is_archived INTEGER NOT NULL DEFAULT 0, '
+        'FOREIGN KEY (category_id) REFERENCES categories (id))',
+      );
+      await v1.customStatement(
+        'CREATE TABLE accounts ('
+        'id TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, '
+        'kind TEXT NOT NULL, currency TEXT NOT NULL, '
+        'opening_balance_minor INTEGER NOT NULL, '
+        'created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, '
+        'deleted_at INTEGER, sort_order INTEGER NOT NULL DEFAULT 0, '
+        'is_archived INTEGER NOT NULL DEFAULT 0)',
+      );
+      await v1.customStatement(
+        "INSERT INTO categories (id, name, icon_key, color_value, kind, "
+        "is_default, created_at, updated_at, sort_order, is_archived) "
+        "VALUES ('c1', 'Food', 'restaurant', 1, 'expense', 1, 1, 1, 0, 0)",
+      );
+      await v1.customStatement(
+        "INSERT INTO transactions (id, category_id, amount_minor, currency, "
+        "direction, date, created_at, updated_at, sort_order, is_archived) "
+        "VALUES ('t1', 'c1', 250, 'mmk', 'expense', 20261003, 1, 1, 0, 0)",
+      );
+      await v1.customStatement('PRAGMA user_version = 1');
+      await v1.close();
 
-        // --- Open through the current database: onUpgrade v1→v2 must run ---
-        final upgraded = AppDatabase(connection);
+      // --- Open through the current database: onUpgrade v1→v2 must run ---
+      final upgraded = AppDatabase(connection);
 
-        // ...existing rows survived...
-        final categories = await upgraded.categoriesDao.watchAll().first;
-        expect(categories, hasLength(1));
-        expect(categories.single.name, 'Food');
+      // ...existing rows survived...
+      final categories = await upgraded.categoriesDao.watchAll().first;
+      expect(categories, hasLength(1));
+      expect(categories.single.name, 'Food');
 
-        // The transaction was written on 2026-10-03, so it lives in the
-        // October 2026 month bucket — `watchMonth` is the DAO's month read.
-        final transactions = await upgraded.transactionsDao
-            .watchMonth(october(3))
-            .first;
-        expect(transactions, hasLength(1));
-        expect(transactions.single.amountMinor, 250);
+      // The transaction was written on 2026-10-03, so it lives in the
+      // October 2026 month bucket — `watchMonth` is the DAO's month read.
+      final transactions = await upgraded.transactionsDao
+          .watchMonth(october(3))
+          .first;
+      expect(transactions, hasLength(1));
+      expect(transactions.single.amountMinor, 250);
 
-        // ...and the v2 table exists, is empty, and is writable.
-        expect(await upgraded.appSettingsDao.readAll(), isEmpty);
-        await upgraded.appSettingsDao.put(key: 'currency', value: 'usd');
-        expect(await upgraded.appSettingsDao.read('currency'), 'usd');
+      // ...and the v2 table exists, is empty, and is writable.
+      expect(await upgraded.appSettingsDao.readAll(), isEmpty);
+      await upgraded.appSettingsDao.put(key: 'currency', value: 'usd');
+      expect(await upgraded.appSettingsDao.read('currency'), 'usd');
 
-        // ...and the v2 *index* exists too. This is the subtle half: drift's
-        // `Migrator.createTable` emits only the `CREATE TABLE` statement and
-        // silently skips `@TableIndex` declarations, so an upgraded database
-        // would end up with a weaker schema than a freshly created one. The
-        // `onUpgrade` step has to ask for the index explicitly, and this is the
-        // assertion that keeps it honest.
-        expect(
-          await namesByType(upgraded, 'index'),
-          contains('idx_settings_key'),
-          reason:
-              'onUpgrade must create idx_settings_key explicitly — '
-              'createTable alone does not emit @TableIndex indexes',
-        );
+      // ...and the v2 *index* exists too. This is the subtle half: drift's
+      // `Migrator.createTable` emits only the `CREATE TABLE` statement and
+      // silently skips `@TableIndex` declarations, so an upgraded database
+      // would end up with a weaker schema than a freshly created one. The
+      // `onUpgrade` step has to ask for the index explicitly, and this is the
+      // assertion that keeps it honest.
+      expect(
+        await namesByType(upgraded, 'index'),
+        contains('idx_settings_key'),
+        reason:
+            'onUpgrade must create idx_settings_key explicitly — '
+            'createTable alone does not emit @TableIndex indexes',
+      );
 
-        await upgraded.close();
-      },
-    );
+      await upgraded.close();
+    });
 
     test('should_keep_the_seeded_rows_readable_after_a_reopen', () async {
       // The closest thing to an upgrade test that v1 can honestly support: seed,

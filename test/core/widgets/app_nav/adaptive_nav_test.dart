@@ -38,9 +38,7 @@ void main() {
         home: Builder(
           builder: (context) => MediaQuery(
             // A tall surface so nothing overflows; the nav is what is under test.
-            data: MediaQuery.of(context).copyWith(
-              size: Size(width, 900),
-            ),
+            data: MediaQuery.of(context).copyWith(size: Size(width, 900)),
             child: AdaptiveStyleScope(
               platformOverride: platform,
               child: Scaffold(
@@ -91,48 +89,54 @@ void main() {
       expect(find.byType(BackdropFilter), findsWidgets);
     });
 
-    testWidgets('should_fall_back_to_a_solid_surface_when_transparency_is_reduced', (
-      tester,
-    ) async {
-      // Reduce Transparency must degrade the glass to a solid surface — a
-      // legibility requirement, not a nicety.
-      await tester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            home: MediaQuery(
-              data: const MediaQueryData(
-                size: Size(390, 900),
-                highContrast: true,
-              ),
-              child: AdaptiveStyleScope(
-                platformOverride: AppPlatform.ios,
-                child: Builder(
-                  builder: (context) => AppStringsScope(
-                    lookup: AppStringLookup.of(AppLocalizations.of(context)),
-                    child: AdaptiveNav(
-                      current: NavDestination.calendar,
-                      onSelect: (_) {},
+    testWidgets(
+      'should_fall_back_to_a_solid_surface_when_transparency_is_reduced',
+      (tester) async {
+        // Reduce Transparency must degrade the glass to a solid surface — a
+        // legibility requirement, not a nicety.
+        await tester.pumpWidget(
+          ProviderScope(
+            child: MaterialApp(
+              home: MediaQuery(
+                data: const MediaQueryData(
+                  size: Size(390, 900),
+                  highContrast: true,
+                ),
+                child: AdaptiveStyleScope(
+                  platformOverride: AppPlatform.ios,
+                  child: Builder(
+                    builder: (context) => AppStringsScope(
+                      lookup: AppStringLookup.of(AppLocalizations.of(context)),
+                      child: AdaptiveNav(
+                        current: NavDestination.calendar,
+                        onSelect: (_) {},
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      // No blur at all: `canUseGlass` is false, so GlassSurface takes the solid
-      // branch.
-      expect(find.byType(BackdropFilter), findsNothing);
-    });
+        // No blur at all: `canUseGlass` is false, so GlassSurface takes the solid
+        // branch.
+        expect(find.byType(BackdropFilter), findsNothing);
+      },
+    );
 
     testWidgets('should_show_every_destination_label', (tester) async {
       await tester.pumpWidget(host(width: TestWidths.phone));
       await tester.pumpAndSettle();
 
       // The English labels from the ARB, in destination order.
-      const expected = <String>['Calendar', 'Insights', 'Categories', 'Settings'];
+      const expected = <String>[
+        'Calendar',
+        'Insights',
+        'Categories',
+        'Settings',
+      ];
       for (final label in expected) {
         expect(
           find.text(label),

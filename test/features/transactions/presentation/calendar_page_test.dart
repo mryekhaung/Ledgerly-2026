@@ -70,9 +70,9 @@ void main() {
     FakeTransactionRepository? repository,
     List<Override> extraOverrides = const <Override>[],
   }) {
-    final fakes = repository ?? FakeTransactionRepository(
-      seed: transactions ?? dayTransactions(),
-    );
+    final fakes =
+        repository ??
+        FakeTransactionRepository(seed: transactions ?? dayTransactions());
 
     return ProviderScope(
       overrides: [
@@ -396,9 +396,7 @@ void main() {
       repository: fakes,
       extraOverrides: <Override>[
         deleteTransactionProvider.overrideWithValue(DeleteTransaction(fakes)),
-        restoreTransactionProvider.overrideWithValue(
-          RestoreTransaction(fakes),
-        ),
+        restoreTransactionProvider.overrideWithValue(RestoreTransaction(fakes)),
       ],
     );
 

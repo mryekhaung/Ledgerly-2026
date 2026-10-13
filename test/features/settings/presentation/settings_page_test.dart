@@ -24,7 +24,8 @@ void main() {
     return ProviderScope(
       overrides: [
         settingsProvider.overrideWith((ref) => Stream.value(settings)),
-      ],      child: MaterialApp(
+      ],
+      child: MaterialApp(
         locale: locale,
         supportedLocales: AppLocalization.supportedLocales
             .map(Locale.new)

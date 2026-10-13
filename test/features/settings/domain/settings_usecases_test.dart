@@ -82,7 +82,9 @@ void main() {
     test('a failure surfaces as a stream error value, not a throw', () async {
       repository.failure = const StorageFailure('unreadable', cause: null);
 
-      final result = await WatchSettings(repository).call(const NoParams()).first;
+      final result = await WatchSettings(repository)
+          .call(const NoParams())
+          .first;
 
       expect(result.isErr, isTrue);
       expect(result.failureOrNull, isA<StorageFailure>());
@@ -97,35 +99,32 @@ void main() {
         weekStart: WeekStart.sunday,
       );
 
-      final result = await SaveSettings(repository).call((
-        settings: next,
-        partial: false,
-      ));
+      final result = await SaveSettings(repository)
+          .call((settings: next, partial: false));
 
       expect(result.valueOrNull, next);
       expect(repository.lastSaved, next);
       expect(repository.saveCount, 1);
     });
 
-    test('a partial save is refused rather than silently doing a full write', () async {
-      final result = await SaveSettings(repository).call((
-        settings: AppSettings.defaults,
-        partial: true,
-      ));
+    test(
+      'a partial save is refused rather than silently doing a full write',
+      () async {
+        final result = await SaveSettings(repository)
+            .call((settings: AppSettings.defaults, partial: true));
 
-      expect(result.isErr, isTrue);
-      expect(result.failureOrNull, isA<ValidationFailure>());
-      // The important half: nothing was written.
-      expect(repository.saveCount, 0);
-    });
+        expect(result.isErr, isTrue);
+        expect(result.failureOrNull, isA<ValidationFailure>());
+        // The important half: nothing was written.
+        expect(repository.saveCount, 0);
+      },
+    );
 
     test('propagates a storage failure', () async {
       repository.failure = const StorageFailure('read-only', cause: null);
 
-      final result = await SaveSettings(repository).call((
-        settings: AppSettings.defaults,
-        partial: false,
-      ));
+      final result = await SaveSettings(repository)
+          .call((settings: AppSettings.defaults, partial: false));
 
       expect(result.isErr, isTrue);
       expect(result.failureOrNull, isA<StorageFailure>());

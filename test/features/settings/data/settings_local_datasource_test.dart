@@ -56,11 +56,10 @@ void main() {
       final keys = (await dao.readAll()).keys.toSet();
       expect(keys, isNot(contains(SettingsKeys.locale)));
       expect(keys, contains(SettingsKeys.currency));
-      expect(await datasource.read(), isA<AppSettings>().having(
-        (s) => s.localeCode,
-        'localeCode',
-        isNull,
-      ));
+      expect(
+        await datasource.read(),
+        isA<AppSettings>().having((s) => s.localeCode, 'localeCode', isNull),
+      );
     });
 
     test('clearing a previously-set locale removes the row', () async {
@@ -74,20 +73,26 @@ void main() {
   });
 
   group('decode resilience', () {
-    test('an unknown currency falls back to the default, not a failure', () async {
-      final harness = useDbHarness();
-      final datasource = SettingsLocalDataSource(
-        AppSettingsDao(harness.db, clock: harness.clock),
-      );
+    test(
+      'an unknown currency falls back to the default, not a failure',
+      () async {
+        final harness = useDbHarness();
+        final datasource = SettingsLocalDataSource(
+          AppSettingsDao(harness.db, clock: harness.clock),
+        );
 
-      await harness.db.customStatement(
-        "INSERT INTO app_settings (key, value, updated_at) VALUES "
-        "('${SettingsKeys.currency}', 'xxx', 1)",
-      );
+        await harness.db.customStatement(
+          "INSERT INTO app_settings (key, value, updated_at) VALUES "
+          "('${SettingsKeys.currency}', 'xxx', 1)",
+        );
 
-      // Must not throw: this runs before the first frame.
-      expect((await datasource.read()).currency, AppSettings.defaults.currency);
-    });
+        // Must not throw: this runs before the first frame.
+        expect(
+          (await datasource.read()).currency,
+          AppSettings.defaults.currency,
+        );
+      },
+    );
 
     test('an unknown theme mode falls back to the default', () async {
       final harness = useDbHarness();
@@ -106,19 +111,22 @@ void main() {
       );
     });
 
-    test('an empty locale string decodes to null, not to an empty tag', () async {
-      final harness = useDbHarness();
-      final datasource = SettingsLocalDataSource(
-        AppSettingsDao(harness.db, clock: harness.clock),
-      );
+    test(
+      'an empty locale string decodes to null, not to an empty tag',
+      () async {
+        final harness = useDbHarness();
+        final datasource = SettingsLocalDataSource(
+          AppSettingsDao(harness.db, clock: harness.clock),
+        );
 
-      await harness.db.customStatement(
-        "INSERT INTO app_settings (key, value, updated_at) VALUES "
-        "('${SettingsKeys.locale}', '', 1)",
-      );
+        await harness.db.customStatement(
+          "INSERT INTO app_settings (key, value, updated_at) VALUES "
+          "('${SettingsKeys.locale}', '', 1)",
+        );
 
-      expect((await datasource.read()).localeCode, isNull);
-    });
+        expect((await datasource.read()).localeCode, isNull);
+      },
+    );
 
     test('a good value survives alongside a corrupt one', () async {
       final harness = useDbHarness();

@@ -20,18 +20,12 @@ void main() {
   group('leadingBlanks with Monday-first (the default)', () {
     test('a Monday 1st needs no blanks', () {
       // 2026-06-01 is a Monday.
-      expect(
-        MonthGridLayout.leadingBlanks(LocalDate(2026, 6, 1)),
-        0,
-      );
+      expect(MonthGridLayout.leadingBlanks(LocalDate(2026, 6, 1)), 0);
     });
 
     test('a Sunday 1st needs six blanks', () {
       // 2026-11-01 is a Sunday.
-      expect(
-        MonthGridLayout.leadingBlanks(LocalDate(2026, 11, 1)),
-        6,
-      );
+      expect(MonthGridLayout.leadingBlanks(LocalDate(2026, 11, 1)), 6);
     });
 
     test('the default equals an explicit monday', () {

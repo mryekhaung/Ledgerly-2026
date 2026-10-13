@@ -122,9 +122,10 @@ void main() {
       const colors = AppColorsLight();
 
       expect(
-        AvatarPainter(config: config, colors: colors).shouldRepaint(
-          AvatarPainter(config: config, colors: colors),
-        ),
+        AvatarPainter(
+          config: config,
+          colors: colors,
+        ).shouldRepaint(AvatarPainter(config: config, colors: colors)),
         isFalse,
       );
     });
@@ -147,9 +148,10 @@ void main() {
       );
 
       expect(
-        AvatarPainter(config: before, colors: colors).shouldRepaint(
-          AvatarPainter(config: after, colors: colors),
-        ),
+        AvatarPainter(
+          config: before,
+          colors: colors,
+        ).shouldRepaint(AvatarPainter(config: after, colors: colors)),
         isTrue,
       );
     });
@@ -171,9 +173,10 @@ void main() {
         config: AvatarConfig.initial,
         colors: const AppColorsLight(),
       ).paint(canvas, const ui.Size.square(size));
-      final image = await recorder
-          .endRecording()
-          .toImage(size.toInt(), size.toInt());
+      final image = await recorder.endRecording().toImage(
+        size.toInt(),
+        size.toInt(),
+      );
       final bytes = await image.toByteData();
       expect(bytes, isNotNull);
 
@@ -210,7 +213,12 @@ void main() {
 }
 
 /// Reads the pixel at ([x], [y]) from RGBA [bytes] of the given [width].
-({int r, int g, int b, int a}) pixelAt(ByteData bytes, int width, int x, int y) {
+({int r, int g, int b, int a}) pixelAt(
+  ByteData bytes,
+  int width,
+  int x,
+  int y,
+) {
   final i = (y * width + x) * 4;
   return (
     r: bytes.getUint8(i),
@@ -254,9 +262,9 @@ Future<void> _paint(
 }) async {
   const size = 96.0;
   final recorder = ui.PictureRecorder();
-  AvatarPainter(config: config, colors: colors).paint(
-    ui.Canvas(recorder),
-    const ui.Size.square(size),
-  );
+  AvatarPainter(
+    config: config,
+    colors: colors,
+  ).paint(ui.Canvas(recorder), const ui.Size.square(size));
   await recorder.endRecording().toImage(size.toInt(), size.toInt());
 }
