@@ -1,9 +1,9 @@
-import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -91,9 +91,8 @@ class _ListRowState extends State<ListRow> {
     Widget? trailingWidget = widget.trailing;
     if (widget.amount != null) {
       trailingWidget = AmountText(
-        money: widget.amount!,
+        widget.amount!,
         signed: widget.isExpense != null,
-        showSign: widget.isExpense != null,
       );
     }
 

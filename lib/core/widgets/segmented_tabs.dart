@@ -1,4 +1,3 @@
-import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -66,7 +65,7 @@ class SegmentedTabs<T> extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final selectedIndex = tabs.indexWhere((tab) => tab.value == selected);
 
-    Widget content = LayoutBuilder(
+    final content = LayoutBuilder(
       builder: (context, constraints) {
         final totalWidth = isExpanded
             ? constraints.maxWidth

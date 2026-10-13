@@ -1,4 +1,3 @@
-import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -122,7 +121,7 @@ class _AppButtonState extends State<AppButton> {
       fontWeight: FontWeight.w600,
     );
 
-    Widget childContent = widget.isLoading
+    final childContent = widget.isLoading
         ? SizedBox(
             width: 20,
             height: 20,
