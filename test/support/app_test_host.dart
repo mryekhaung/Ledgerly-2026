@@ -79,20 +79,31 @@ class AppTestScopes extends StatelessWidget {
 /// This is the one-line host most widget tests want: pass the widget under test
 /// as `home` and it behaves like the real app.
 ///
-/// [size] supplies `MediaQuery.size`. That is enough for a widget that only
-/// *branches* on the size class (a nav bar choosing bar/rail/sidebar), because
-/// such a widget reads `MediaQuery` and never measures itself. It is **not**
-/// enough for a test that calls `tester.getSize` on a child which shrinks to fit
-/// — `MediaQuery` provides data, not constraints, so the render tree still lays
-/// out against the 800×600 test window. Use [pumpAppHost] when the assertion is
-/// about measured geometry.
+/// The theme is the **shipped** `AppTheme.light()`/`dark()`, matching
+/// `app.dart`, so a test asserting on a themed colour sees the real palette
+/// rather than `MaterialApp`'s default one.
 ///
-/// `ProviderScope` is installed **unconditionally**, because a real app always
-/// has one. Installing it only when `overrides` is non-empty is a trap: the
-/// first test to forget an override would fail with `Bad state: No ProviderScope
-/// found` from deep inside the page, which reads like a page bug rather than a
-/// harness one — and a `ref.watch` that happens to be short-circuited by a
-/// synchronous cache hit would mask it until the odd test that misses.
+/// Two things here are load-bearing rather than cosmetic, and both were learned
+/// from CI failures:
+///
+/// 1. The size/text-scale override lives in `MaterialApp.builder`, **not** as a
+///    `MediaQuery` wrapping `home`. `builder` inserts its widget above the
+///    `Navigator` but still *inside* the `MaterialApp`'s tight constraints, so
+///    the page's `Scaffold` receives a bounded box. Wrapping `home` directly
+///    does not: it replaces the constraint chain with one whose child is
+///    measured loosely, so a page containing a scrollable fails immediately with
+///    "Vertical viewport was given unbounded height" — a stack that points into
+///    `material_ui` and reads like a page bug.
+/// 2. `pumpAppHost` also resizes `tester.view`, because `MediaQuery` only
+///    overrides *data*. A widget that measures itself (a `ConstrainedPane`,
+///    which is an `Align` and so as wide as its parent) still lays out against
+///    the real window and would report 800 regardless of the requested width.
+///
+/// Why the `StretchingOverscrollIndicator` shows up at all: the widget-test
+/// binding reports `TargetPlatform.android` on desktop hosts, and with Material 3
+/// the default `ScrollBehavior` wraps every vertical scrollable in one. That is
+/// correct app behaviour — it just makes an unbounded parent fatal instead of
+/// merely wrong-looking, which is how the wrapping bug above surfaced.
 Widget appTestHost({
   required Widget home,
   Size? size,
@@ -102,15 +113,15 @@ Widget appTestHost({
   TextScaler? textScaler,
   List<Override> overrides = const <Override>[],
 }) {
-  final mediaQuery = MediaQueryData(
-    size: size ?? const Size(800, 600),
-    textScaler: textScaler ?? TextScaler.noScaling,
-  );
-
   return ProviderScope(
     overrides: overrides,
     child: MaterialApp(
       locale: locale,
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: brightness == Brightness.dark
+          ? ThemeMode.dark
+          : ThemeMode.light,
       supportedLocales: const <Locale>[
         Locale('en'),
         Locale('my'),
@@ -120,14 +131,21 @@ Widget appTestHost({
         ...GlobalMaterialLocalizations.delegates,
         AppLocalizations.delegate,
       ],
-      home: MediaQuery(
-        data: mediaQuery,
+      builder: (context, child) => MediaQuery(
+        // Only `size` and `textScaler` are overridden; padding, viewInsets and
+        // devicePixelRatio keep the binding's values, so the page sees one
+        // coherent surface rather than a half-specified one.
+        data: MediaQuery.of(context).copyWith(
+          size: size ?? MediaQuery.sizeOf(context),
+          textScaler: textScaler ?? TextScaler.noScaling,
+        ),
         child: AppTestScopes(
           platform: platform,
           brightness: brightness,
-          child: home,
+          child: child ?? const SizedBox.shrink(),
         ),
       ),
+      home: home,
     ),
   );
 }

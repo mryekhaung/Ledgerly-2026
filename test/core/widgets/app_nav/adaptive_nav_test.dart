@@ -181,7 +181,10 @@ void main() {
       // on what it *publishes*: no destination may be marked selected.
       final selected = <String>[];
       void collect(SemanticsNode node) {
-        if (node.flagsCollection.isSelected) {
+        // `flagsCollection.isSelected` is a `Tristate` (none / isFalse / isTrue),
+        // not a `bool` — the old `hasFlag(SemanticsFlag.isSelected)` helper was
+        // deprecated after 3.32 in favour of this richer representation.
+        if (node.flagsCollection.isSelected == Tristate.isTrue) {
           selected.add(node.label);
         }
         node.visitChildren((SemanticsNode child) {
