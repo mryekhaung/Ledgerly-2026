@@ -625,7 +625,7 @@ void main(List<String> args) {
 
   try {
     if (!sourceFile.existsSync()) {
-      throw ExtractionException('source not found: tool/avatar/source/');
+      throw const ExtractionException('source not found: tool/avatar/source/');
     }
     final decoded = jsonDecode(sourceFile.readAsStringSync());
     final plan = buildPlan(_map(decoded, 'document'));
