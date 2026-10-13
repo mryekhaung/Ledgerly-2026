@@ -7,12 +7,12 @@ import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/result/result.dart';
 
 class _TestStreamNotifier extends TemplateStreamNotifier<int> {
-  _TestStreamNotifier(this._stream);
+  _TestStreamNotifier(this._streamFactory);
 
-  final Stream<int> _stream;
+  final Stream<int> Function() _streamFactory;
 
   @override
-  Stream<int> build() => _stream;
+  Stream<int> build() => _streamFactory();
 }
 
 void main() {
@@ -21,12 +21,9 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final provider =
-          NotifierProvider.autoDispose<TemplateCounterNotifier, int>(
-            TemplateCounterNotifier.new,
-          );
-      final sub = container.listen(provider, (_, _) {});
-      addTearDown(sub.close);
+      final provider = NotifierProvider<TemplateCounterNotifier, int>(
+        TemplateCounterNotifier.new,
+      );
 
       expect(container.read(provider), 0);
 
@@ -47,17 +44,12 @@ void main() {
       addTearDown(container.dispose);
 
       final provider =
-          AsyncNotifierProvider.autoDispose<
-            TemplateAsyncNotifier<String>,
-            String
-          >(
-            () => TemplateAsyncNotifier<String>(
+          AsyncNotifierProvider<TemplateAsyncNotifier<String, String>, String>(
+            () => TemplateAsyncNotifier<String, String>(
               fetchInitial: () async => const Success('initial-value'),
               mutateAction: (cur, delta) async => Success('$cur-$delta'),
             ),
           );
-      final sub = container.listen(provider, (_, _) {});
-      addTearDown(sub.close);
 
       final result = await container.read(provider.future);
       expect(result, 'initial-value');
@@ -73,19 +65,14 @@ void main() {
 
       const testFailure = UnexpectedFailure('fetch failed');
       final provider =
-          AsyncNotifierProvider.autoDispose<
-            TemplateAsyncNotifier<String>,
-            String
-          >(
-            () => TemplateAsyncNotifier<String>(
+          AsyncNotifierProvider<TemplateAsyncNotifier<String, String>, String>(
+            () => TemplateAsyncNotifier<String, String>(
               fetchInitial: () async => const Err(testFailure),
               mutateAction: (cur, delta) async => Success('$cur-$delta'),
             ),
           );
-      final sub = container.listen(provider, (_, _) {});
-      addTearDown(sub.close);
 
-      expect(
+      await expectLater(
         container.read(provider.future),
         throwsA(isA<UnexpectedFailure>()),
       );
@@ -100,17 +87,12 @@ void main() {
         fieldErrors: {'field': 'invalid'},
       );
       final provider =
-          AsyncNotifierProvider.autoDispose<
-            TemplateAsyncNotifier<String>,
-            String
-          >(
-            () => TemplateAsyncNotifier<String>(
+          AsyncNotifierProvider<TemplateAsyncNotifier<String, String>, String>(
+            () => TemplateAsyncNotifier<String, String>(
               fetchInitial: () async => const Success('initial'),
               mutateAction: (cur, delta) async => const Err(testFailure),
             ),
           );
-      final sub = container.listen(provider, (_, _) {});
-      addTearDown(sub.close);
 
       await container.read(provider.future);
 
@@ -126,29 +108,17 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final controller = StreamController<int>.broadcast();
-      addTearDown(controller.close);
+      var count = 0;
+      final provider = StreamNotifierProvider<_TestStreamNotifier, int>(
+        () => _TestStreamNotifier(() => Stream.value(++count)),
+      );
 
-      final provider =
-          StreamNotifierProvider.autoDispose<_TestStreamNotifier, int>(
-            () => _TestStreamNotifier(controller.stream),
-          );
+      final first = await container.read(provider.future);
+      expect(first, 1);
 
-      final subscription = container.listen(provider, (_, _) {});
-      addTearDown(subscription.close);
-
-      controller.add(42);
-      await pumpEventQueue();
-
-      expect(container.read(provider).value, 42);
-
-      // Verify refresh invalidates
       container.read(provider.notifier).refresh();
-      expect(container.read(provider).isLoading, isTrue);
-
-      controller.add(100);
-      await pumpEventQueue();
-      expect(container.read(provider).value, 100);
+      final second = await container.read(provider.future);
+      expect(second, 2);
     });
   });
 

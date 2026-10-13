@@ -67,14 +67,14 @@ class TemplateCounterNotifier extends Notifier<int> {
 /// - Mutations use `state = const AsyncLoading()` while in flight.
 /// - Asynchronous gaps are guarded with `if (!ref.mounted) return;`.
 /// - Failures are cleanly folded into [AsyncError].
-class TemplateAsyncNotifier<T> extends AsyncNotifier<T> {
+class TemplateAsyncNotifier<T, D> extends AsyncNotifier<T> {
   TemplateAsyncNotifier({
     required this.fetchInitial,
     required this.mutateAction,
   });
 
   final Future<Result<T>> Function() fetchInitial;
-  final Future<Result<T>> Function(T current, dynamic delta) mutateAction;
+  final Future<Result<T>> Function(T current, D delta) mutateAction;
 
   @override
   Future<T> build() async {
@@ -88,11 +88,11 @@ class TemplateAsyncNotifier<T> extends AsyncNotifier<T> {
   /// Mutates the current value using the provided [delta].
   ///
   /// Demonstrates the safe mutation pattern with `ref.mounted` guard.
-  Future<bool> mutate(dynamic delta) async {
+  Future<bool> mutate(D delta) async {
     final currentValue = state.value;
     if (currentValue == null || state.isLoading) return false;
 
-    state = const AsyncLoading();
+    state = AsyncLoading<T>();
 
     final result = await mutateAction(currentValue, delta);
 
@@ -101,11 +101,11 @@ class TemplateAsyncNotifier<T> extends AsyncNotifier<T> {
 
     return result.fold(
       onSuccess: (updated) {
-        state = AsyncData(updated);
+        state = AsyncData<T>(updated);
         return true;
       },
       onErr: (failure) {
-        state = AsyncError(failure, StackTrace.current);
+        state = AsyncError<T>(failure, StackTrace.current);
         return false;
       },
     );
