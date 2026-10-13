@@ -184,7 +184,7 @@ class _ListRowState extends State<ListRow> {
       );
     }
 
-    if (widget.semanticsLabel != null) {
+    if (widget.semanticsLabel != null || widget.onTap != null) {
       content = Semantics(
         label: widget.semanticsLabel,
         button: widget.onTap != null,

@@ -350,11 +350,14 @@ class _MonthSwitcher extends StatelessWidget {
               // month name gives no clue that it opens a picker.
               child: Tooltip(
                 message: strings('calendarPickMonth'),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 44.0),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
@@ -393,7 +396,9 @@ class _MonthSwitcher extends StatelessWidget {
             ),
           ),
         ),
-        IconButton(
+      ),
+    ),
+    IconButton(
           onPressed: onNext,
           icon: const Icon(Icons.chevron_right),
           tooltip: strings('calendarNextMonth'),
@@ -624,29 +629,45 @@ class _DayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
+    final strings = AppStrings.of(context);
+    final locale = Localizations.localeOf(context);
 
-    return SizedBox(
-      height: 48,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          customBorder: const CircleBorder(),
-          child: Center(
-            child: Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: isSelected ? colors.brandSubtle : null,
-                shape: BoxShape.circle,
-                border: isToday
-                    ? Border.all(color: colors.brandPrimary, width: 1.5)
-                    : null,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
+    String dateStr;
+    try {
+      dateStr = DateFormat.yMMMMd(locale.toLanguageTag()).format(day.toDateTime());
+    } catch (_) {
+      dateStr = '${day.year}-${day.month}-${day.day}';
+    }
+    final semanticLabel = isToday
+        ? '$dateStr, ${strings('calendarToday')}'
+        : dateStr;
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: semanticLabel,
+      child: SizedBox(
+        height: 48,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            customBorder: const CircleBorder(),
+            child: Center(
+              child: Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected ? colors.brandSubtle : null,
+                  shape: BoxShape.circle,
+                  border: isToday
+                      ? Border.all(color: colors.brandPrimary, width: 1.5)
+                      : null,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
                   if (showMonthLabel)
                     Text(
                       DateFormat.MMM(
@@ -683,7 +704,8 @@ class _DayCell extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
 

@@ -176,28 +176,33 @@ class _DayChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: isSelected ? colors.brandSubtle : colors.surfaceSubtle,
-      borderRadius: AppRadius.borderMd,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          width: size,
-          height: 48,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.borderMd,
-            border: Border.all(
-              color: isSelected ? colors.brandPrimary : colors.border,
-              width: isSelected ? 1.5 : 1.0,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '$day',
+      child: Material(
+        color: isSelected ? colors.brandSubtle : colors.surfaceSubtle,
+        borderRadius: AppRadius.borderMd,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            width: size,
+            height: 48,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: AppRadius.borderMd,
+              border: Border.all(
+                color: isSelected ? colors.brandPrimary : colors.border,
+                width: isSelected ? 1.5 : 1.0,
+              ),
             ),
-          ),
-          child: Text(
-            '$day',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: isSelected ? colors.brandPrimary : colors.textPrimary,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            child: Text(
+              '$day',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: isSelected ? colors.brandPrimary : colors.textPrimary,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
             ),
           ),
         ),

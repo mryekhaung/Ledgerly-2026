@@ -563,9 +563,11 @@ class _NavRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
 
-    return InkWell(
-      onTap: onTap,
-      child: ConstrainedBox(
+    return Semantics(
+      button: true,
+      child: InkWell(
+        onTap: onTap,
+        child: ConstrainedBox(
         constraints: const BoxConstraints(
           minHeight: AppRowHeight.absoluteMinimum,
         ),
@@ -615,7 +617,8 @@ class _NavRow extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
 
