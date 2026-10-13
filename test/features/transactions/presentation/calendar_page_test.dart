@@ -12,6 +12,7 @@ import 'package:ledgerly/features/transactions/domain/entities/transaction_direc
 import 'package:ledgerly/features/transactions/domain/usecases/delete_transaction.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/watch_transactions.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
+import 'package:ledgerly/features/transactions/presentation/providers/calendar_notifier.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -99,6 +100,15 @@ void main() {
         ),
         currencyProvider.overrideWithValue(CurrencyCode.mmk),
         weekStartProvider.overrideWithValue(WeekStart.monday),
+        // Pin the calendar to [day] instead of the real "today".
+        //
+        // `CalendarNotifier.build()` starts on `DateTime.now()`, but the seed
+        // data below is dated [day]. Without this the day list would query the
+        // real today, find nothing, and every "the row is there" assertion would
+        // depend on the wall clock — passing only when the suite happened to run
+        // on 3 Oct. Overriding the notifier makes the tests deterministic and
+        // is what lets the day list and the swipe tests see their rows at all.
+        calendarProvider.overrideWith(() => _SeededCalendarNotifier(day)),
         ...extraOverrides,
       ],
       home: const CalendarPage(),
@@ -334,19 +344,19 @@ void main() {
       // flex 4 / 6 — the day list is the wider pane, matching the
       // single-column emphasis where it is the primary content.
       //
-      // Scoped to the `Flexible`s that are siblings of the split's divider
-      // rather than to `find.byType(Row)` at large: that finder resolves to
-      // every Row on the page and `find.descendant` unions them, so an
-      // unrelated flex-1 deeper in the tree would be collected and the
-      // assertion would compare a list having nothing to do with the split.
-      // Both pane wrappers are `Expanded`s (flex 4 and 6) and are direct
-      // children of the same Row as the `SizedBox` divider between them.
+      // `Expanded`, not `Flexible`: the panes are built as `Expanded(flex: …)`,
+      // and `find.byType` matches an exact runtime type, so `find.byType(
+      // Flexible)` never sees an `Expanded` (they are parent and child in the
+      // class hierarchy, not the same runtime type) and the list came back
+      // empty. Scoped to the `Expanded`s that wrap the two pane `ListView`s
+      // rather than `find.byType(Row)` at large, so an unrelated flex deeper in
+      // the tree cannot be collected.
       final flexes =
           tester
-              .widgetList<Flexible>(
+              .widgetList<Expanded>(
                 find.ancestor(
                   of: find.byType(ListView),
-                  matching: find.byType(Flexible),
+                  matching: find.byType(Expanded),
                 ),
               )
               .map((f) => f.flex)
@@ -532,4 +542,23 @@ void main() {
       expect(find.text('Delete'), findsOneWidget);
     });
   });
+}
+
+/// A [CalendarNotifier] that starts on a fixed [day] rather than the real
+/// "today".
+///
+/// Test-only. The page's own notifier pins itself to `DateTime.now()`, which
+/// makes any assertion about the day list depend on the wall clock; seeding the
+/// visible month and selected day here removes that dependency entirely.
+class _SeededCalendarNotifier extends CalendarNotifier {
+  _SeededCalendarNotifier(this._day);
+
+  final LocalDate _day;
+
+  @override
+  CalendarState build() => CalendarState(
+    visibleMonth: _day.firstDayOfMonth,
+    selectedDay: _day,
+    isTodaySelected: false,
+  );
 }

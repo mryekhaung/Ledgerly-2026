@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -22,13 +24,20 @@ final _may2026 = LocalDate(2026, 5, 1);
 /// the arrow rather than offering a tap that does nothing.
 void main() {
   /// Hosts the picker over [initialMonth] and captures whatever it pops.
-  Future<LocalDate?> Function() host(
+  ///
+  /// Returns two handles because opening and choosing are separate events:
+  /// - `open()` pumps the shell, taps the trigger and settles, so the picker
+  ///   is on screen. Awaited by every test.
+  /// - `result` completes only when the picker finally pops. Tests that merely
+  ///   browse the picker must *not* await it (nothing pops), so it is a
+  ///   separate future rather than the return value of `open()`.
+  ({Future<void> Function() open, Future<LocalDate?> result}) host(
     WidgetTester tester,
     LocalDate initialMonth, {
     int range = 50,
     Locale? locale,
   }) {
-    LocalDate? popped;
+    final popped = Completer<LocalDate?>();
 
     final app = MaterialApp(
       theme: AppTheme.light(),
@@ -49,7 +58,7 @@ void main() {
           child: Builder(
             builder: (inner) => TextButton(
               onPressed: () async {
-                popped = await Navigator.of(inner).push<LocalDate>(
+                final chosen = await Navigator.of(inner).push<LocalDate>(
                   MaterialPageRoute<LocalDate>(
                     builder: (_) => MonthYearPickerPage(
                       initialMonth: initialMonth,
@@ -57,6 +66,7 @@ void main() {
                     ),
                   ),
                 );
+                if (!popped.isCompleted) popped.complete(chosen);
               },
               child: const Text('open'),
             ),
@@ -65,18 +75,20 @@ void main() {
       ),
     );
 
-    return () async {
-      await tester.pumpWidget(app);
-      await tester.tap(find.text('open'));
-      await tester.pumpAndSettle();
-      return popped;
-    };
+    return (
+      open: () async {
+        await tester.pumpWidget(app);
+        await tester.tap(find.text('open'));
+        await tester.pumpAndSettle();
+      },
+      result: popped.future,
+    );
   }
 
   testWidgets('should_highlight_the_initial_month_and_its_year', (
     tester,
   ) async {
-    await host(tester, LocalDate(2026, 5, 1))();
+    await host(tester, LocalDate(2026, 5, 1)).open();
     await tester.pumpAndSettle();
 
     // The year header.
@@ -93,17 +105,16 @@ void main() {
   testWidgets('should_return_the_first_day_of_the_tapped_month', (
     tester,
   ) async {
-    final read = host(tester, LocalDate(2026, 5, 17));
-    final popped = read();
-    await tester.pumpAndSettle();
+    final picker = host(tester, LocalDate(2026, 5, 17));
+    await picker.open();
+    final popped = picker.result;
 
     await tester.tap(find.text('August 2026'));
     await tester.pumpAndSettle();
 
-    // `read` pops the picker with the chosen month, so it only completes once
-    // the tap lands. It must be called exactly once: a second call re-enters
-    // `pumpWidget` while the first is still on the stack, which trips the
-    // test-async guard ("the first method had not yet finished executing").
+    // `result` completes only once the picker pops, which the tap below does.
+    // Reading it *after* the tap keeps the test-async guard happy: `open()`
+    // has fully finished before any further guarded call runs.
     //
     // Key assertion: the *17th* was the initial day, but the result must be the
     // 1st — the calendar's `visibleMonth` invariant is a first-of-month.
@@ -111,8 +122,8 @@ void main() {
   });
 
   testWidgets('should_move_the_year_without_choosing_a_month', (tester) async {
-    final read = host(tester, LocalDate(2026, 5, 1));
-    await read();
+    final picker = host(tester, LocalDate(2026, 5, 1));
+    await picker.open();
     await tester.pumpAndSettle();
 
     // Tap "next year" — the picker is still open, so nothing has popped.
@@ -126,7 +137,7 @@ void main() {
   });
 
   testWidgets('should_go_back_a_year_too', (tester) async {
-    await host(tester, LocalDate(2026, 5, 1))();
+    await host(tester, LocalDate(2026, 5, 1)).open();
     await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.chevron_left));
@@ -139,7 +150,7 @@ void main() {
     tester,
   ) async {
     // Range 0 puts both bounds on the initial year.
-    await host(tester, LocalDate(2026, 5, 1), range: 0)();
+    await host(tester, LocalDate(2026, 5, 1), range: 0).open();
     await tester.pumpAndSettle();
 
     final back = tester.widget<IconButton>(
@@ -161,7 +172,7 @@ void main() {
 
   testWidgets('should_clamp_the_lower_bound_to_year_1', (tester) async {
     // A 50-year range around year 10 would reach year -40; it must stop at 1.
-    await host(tester, LocalDate(10, 5, 1))();
+    await host(tester, LocalDate(10, 5, 1)).open();
     await tester.pumpAndSettle();
 
     // Tap back until the arrow disables, then assert we stopped at year 1.
@@ -188,7 +199,11 @@ void main() {
   });
 
   testWidgets('should_render_the_myanmar_title', (tester) async {
-    await host(tester, LocalDate(2026, 5, 1), locale: const Locale('my'))();
+    await host(
+      tester,
+      LocalDate(2026, 5, 1),
+      locale: const Locale('my'),
+    ).open();
     await tester.pumpAndSettle();
 
     expect(find.text('လသို့ ခုန်ရန်'), findsOneWidget);
@@ -201,7 +216,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await host(tester, LocalDate(2026, 5, 1))();
+    await host(tester, LocalDate(2026, 5, 1)).open();
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);

@@ -54,6 +54,20 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
     final state = ref.watch(categoryListProvider);
     final sizeClass = WindowSizeClass.of(context);
 
+    // Keep the pane's form draft alive for as long as this page is mounted.
+    //
+    // `categoryFormProvider` is `autoDispose` (a half-typed draft must not leak
+    // out of the form), and on the wide layout the pane is its only listener —
+    // but the pane only starts listening once `_paneEditing` flips true.
+    // `_openForm` seeds the draft *before* that, on purpose: the pane's very
+    // first build must already show the tapped category. With no listener at
+    // that instant the provider is disposed the moment `ref.read` returns, so
+    // the seed is dropped and the pane comes up as a blank "New category" form —
+    // the wrong category, silently. Subscribing here, on the page that owns the
+    // pane, pins the provider for the page's lifetime without requesting a
+    // rebuild of this widget.
+    ref.listen(categoryFormProvider, (previous, next) {});
+
     final body = switch (state) {
       AsyncData(:final value) => _CategoryListBody(
         state: value,

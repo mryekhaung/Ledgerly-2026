@@ -197,7 +197,7 @@ void main() {
 
       // And the labels must not be tinted with the brand colour as if the route
       // were a destination.
-      final colors = AppColorsLight();
+      const colors = AppColorsLight();
       for (final state in <Set<WidgetState>>[
         <WidgetState>{WidgetState.selected},
         <WidgetState>{},

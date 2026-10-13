@@ -99,12 +99,14 @@ void main() {
       // The page title and the preview share the label "Avatar" by design
       // (both are the thing the screen is about), so a bare semantics-label
       // finder resolves to the AppBar title at y≈9 and the assertion below
-      // would measure the header instead of the preview. Scope to the preview
-      // widget itself.
-      final preview = find.descendant(
-        of: find.byType(Avatar),
-        matching: find.bySemanticsLabel('Avatar'),
-      );
+      // would measure the header instead of the preview.
+      //
+      // `Avatar` wraps its paint in its *own* `Semantics(label: …, image: true)`
+      // root, so the labelled node is the `Avatar` itself — a
+      // `find.descendant(of: Avatar, …)` search would exclude it and match
+      // nothing. Match the preview widget directly; the header title is a
+      // `Text`, not an `Avatar`, so this stays unambiguous.
+      final preview = find.byType(Avatar);
       expect(preview, findsOneWidget);
 
       final rect = tester.getRect(preview);

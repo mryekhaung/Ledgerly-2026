@@ -40,12 +40,18 @@ void main() {
     /// as its parent — measuring it reports the window (1440 on a desktop) and
     /// would pass or fail for the wrong reason. The cap lives on the
     /// `ConstrainedBox` inside, so that is what the assertions below measure.
+    ///
+    /// `.first` because the pane is `Align → ConstrainedBox(child: …)` and the
+    /// rows themselves contain further `ConstrainedBox`es; the descendant
+    /// search finds them all, and only the outermost one carries the pane cap.
     double cappedWidth(WidgetTester tester) => tester
         .getSize(
-          find.descendant(
-            of: find.byType(ConstrainedPane),
-            matching: find.byType(ConstrainedBox),
-          ),
+          find
+              .descendant(
+                of: find.byType(ConstrainedPane),
+                matching: find.byType(ConstrainedBox),
+              )
+              .first,
         )
         .width;
 

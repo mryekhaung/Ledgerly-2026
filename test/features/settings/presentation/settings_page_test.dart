@@ -57,9 +57,20 @@ void main() {
       ];
       final seen = <String>{};
 
+      // Match case-insensitively: section headers are upper-cased by
+      // `_SectionHeader` (so "Language" renders as "LANGUAGE"), while row
+      // titles keep their sentence case. The test's claim is "this text is on
+      // screen", not "it has this exact casing" — the design system owns
+      // casing, and pinning it here would fail the moment a header stops being
+      // upper-cased for a legitimate styling reason.
       void recordVisible() {
+        final onScreen = tester
+            .widgetList<Text>(find.byType(Text))
+            .map((widget) => widget.data?.toLowerCase())
+            .whereType<String>()
+            .toSet();
         for (final label in labels) {
-          if (find.text(label).evaluate().isNotEmpty) seen.add(label);
+          if (onScreen.contains(label.toLowerCase())) seen.add(label);
         }
       }
 
