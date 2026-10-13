@@ -45,6 +45,16 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  # Avatar v2 art (docs/Avatar.md §3). Subdirs are listed explicitly: a directory entry is not recursive.
+  assets:
+    - assets/avatar/open_peeps/
+    - assets/avatar/open_peeps/head/
+    - assets/avatar/open_peeps/expression/
+    - assets/avatar/open_peeps/facial_hair/
+    - assets/avatar/open_peeps/accessories/
+    - assets/avatar/open_peeps/mask/
+    - assets/avatar/open_peeps/base/
+
   # Required by `flutter gen-l10n` with an explicit `output-dir` (Flutter ≥3.32):
   # without it the tool warns that the generated sources "will not be importable".
   # The generated files are committed, so CI needs no extra step to build them.

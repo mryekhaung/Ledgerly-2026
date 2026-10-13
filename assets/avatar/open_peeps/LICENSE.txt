@@ -1,0 +1,11 @@
+Open Peeps - avatar art
+
+License: CC0 1.0
+         https://creativecommons.org/publicdomain/zero/1.0/
+Creator: Pablo Stanley (https://twitter.com/pablostanley)
+Source:  Open Peeps (https://www.openpeeps.com/)
+
+Remix of „Open Peeps” (https://www.openpeeps.com/) by „Pablo Stanley”, licensed under „CC0 1.0” (https://creativecommons.org/publicdomain/zero/1.0/)
+
+The SVG parts in this directory are extracted at build time from the
+DiceBear "open-peeps" style definition by tool/avatar/extract_open_peeps.dart.
