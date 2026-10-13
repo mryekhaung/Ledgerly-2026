@@ -1,7 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -9,14 +7,13 @@ import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
+import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/delete_transaction.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/watch_transactions.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
-import 'package:ledgerly/l10n/app_localization.dart';
-import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
@@ -109,6 +106,24 @@ void main() {
     );
   }
 
+  /// Scrolls the compact body until [target] is on screen, or gives up quietly.
+  ///
+  /// The calendar is one lazy `ListView`: on a phone the month grid pushes the
+  /// day rows below the fold, so they are never built until scrolled to.
+  /// `scrollUntilVisible` is unsuitable here because it throws
+  /// `Bad state: No element` when its target never materialises, which hides
+  /// whether the row was missing or merely far down. A bounded drag loop lets
+  /// the assertion that follows produce the meaningful failure instead.
+  Future<void> revealOnCompact(WidgetTester tester, String target) async {
+    for (var step = 0; step < 12; step++) {
+      if (find.text(target).evaluate().isNotEmpty) return;
+      final scrollable = find.byType(ListView);
+      if (scrollable.evaluate().isEmpty) return;
+      await tester.drag(scrollable.first, const Offset(0, -150));
+      await tester.pump();
+    }
+  }
+
   group('compact single column', () {
     testWidgets('should_scroll_the_month_grid_and_the_day_list_together', (
       tester,
@@ -121,11 +136,7 @@ void main() {
       // The grid sits above the day list in the same scrollable, so the day's
       // rows start below the fold on a phone and only exist once scrolled to —
       // a lazy list never builds what is off-screen.
-      await tester.scrollUntilVisible(
-        find.text('Food'),
-        150,
-        scrollable: find.byType(Scrollable).first,
-      );
+      await revealOnCompact(tester, 'Food');
       expect(find.text('Food'), findsOneWidget);
     });
 
@@ -136,11 +147,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Spent today'), findsOneWidget);
-      await tester.scrollUntilVisible(
-        find.text('Morning coffee'),
-        150,
-        scrollable: find.byType(Scrollable).first,
-      );
+      await revealOnCompact(tester, 'Morning coffee');
       expect(find.text('Morning coffee'), findsOneWidget);
     });
   });
@@ -310,12 +317,21 @@ void main() {
 
       // flex 4 / 6 — the list is the wider pane, matching the single-column
       // emphasis where the day list is the primary content.
+      //
+      // Scoped to the split `Row` itself (`TwoPaneLayout`'s direct child), not
+      // to `find.byType(Row)` at large: that finder resolves to every Row in the
+      // page, and `find.descendant` unions them, so an unrelated flex-1
+      // `Flexible` further up would be collected and the assertion would fail
+      // with a list that has nothing to do with the split.
+      final splitRow = find.descendant(
+        of: find.byType(TwoPaneLayout),
+        matching: find.byType(Row),
+      );
+      expect(splitRow, findsOneWidget);
+
       final flexible = tester
           .widgetList<Flexible>(
-            find.descendant(
-              of: find.byType(Row),
-              matching: find.byType(Flexible),
-            ),
+            find.descendant(of: splitRow, matching: find.byType(Flexible)),
           )
           .toList(growable: false);
       final flexes = flexible.map((f) => f.flex).toList()..sort();
@@ -413,11 +429,7 @@ void main() {
     /// until they are scrolled to. Every test in this group acts on a row, so
     /// they all begin here rather than assuming the row is already on screen.
     Future<void> revealRows(WidgetTester tester) async {
-      await tester.scrollUntilVisible(
-        find.text('Morning coffee'),
-        150,
-        scrollable: find.byType(Scrollable).first,
-      );
+      await revealOnCompact(tester, 'Morning coffee');
       await tester.pumpAndSettle();
     }
 

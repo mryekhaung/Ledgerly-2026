@@ -181,7 +181,7 @@ void main() {
       // on what it *publishes*: no destination may be marked selected.
       final selected = <String>[];
       void collect(SemanticsNode node) {
-        if (node.hasFlag(SemanticsFlag.isSelected)) {
+        if (node.flagsCollection.isSelected) {
           selected.add(node.label);
         }
         node.visitChildren((SemanticsNode child) {

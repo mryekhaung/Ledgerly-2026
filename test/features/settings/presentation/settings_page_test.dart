@@ -1,11 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
-import 'package:ledgerly/l10n/app_localization.dart';
-import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
@@ -19,60 +17,70 @@ import '../../../support/app_test_host.dart';
 void main() {
   /// Hosts [SettingsPage] with a fixed settings snapshot.
   ///
-  /// The string lookup is wired the way `app.dart` wires it, so the page's
+  /// The string lookup comes from the shared harness, so the page's
   /// `AppStrings.of` resolves real translations rather than being stubbed.
-  Widget host(AppSettings settings, {Locale locale = const Locale('en')}) {
-    return ProviderScope(
-      overrides: [
-        settingsProvider.overrideWith((ref) => Stream.value(settings)),
-      ],
-      child: MaterialApp(
-        locale: locale,
-        supportedLocales: AppLocalization.supportedLocales
-            .map(Locale.new)
-            .toList(growable: false),
-        localizationsDelegates: const <LocalizationsDelegate<Object?>>[
-          ...GlobalMaterialLocalizations.delegates,
-          AppLocalizations.delegate,
-        ],
-        // `builder` so the scopes sit above the `Navigator` and are available
-        // to any route the page pushes.
-        builder: (context, child) =>
-            AppTestScopes(child: child ?? const SizedBox.shrink()),
-        home: const SettingsPage(),
-      ),
-    );
-  }
+  Future<void> host(
+    WidgetTester tester,
+    AppSettings settings, {
+    Locale locale = const Locale('en'),
+  }) => pumpAppHost(
+    tester,
+    locale: locale,
+    overrides: <Override>[
+      settingsProvider.overrideWith((ref) => Stream.value(settings)),
+    ],
+    home: const SettingsPage(),
+  );
 
   group('render', () {
     testWidgets('shows every section and row', (tester) async {
-      await tester.pumpWidget(host(AppSettings.defaults));
+      await host(tester, AppSettings.defaults);
       await tester.pumpAndSettle();
 
       // A lazy `ListView` only builds the rows in (and just past) the viewport,
       // so the service rows at the bottom do not exist until they are scrolled
-      // into range. Scroll to each in turn rather than assuming a 600 px window
-      // happens to fit the whole list.
-      for (final label in <String>[
+      // into range. Walk the list down in steps and assert each label the first
+      // time it appears, rather than assuming a 600 px window fits the whole
+      // list.
+      //
+      // `scrollUntilVisible` is deliberately not used: it drags until its target
+      // resolves, and throws `Bad state: No element` if the target never
+      // materialises — which turns a "the row is missing" bug into an opaque
+      // framework error. A bounded `drag` loop keeps the failure message on the
+      // assertion that actually matters.
+      const labels = <String>[
         'Settings',
         'Currency',
         'Appearance',
         'Week starts on',
         'Language',
         'Version',
-      ]) {
-        await tester.scrollUntilVisible(
-          find.text(label),
-          120,
-          scrollable: find.byType(Scrollable).first,
+      ];
+      final missing = <String>{...labels};
+
+      for (var step = 0; step < 12 && missing.isNotEmpty; step++) {
+        for (final label in labels.toList(growable: false)) {
+          if (find.text(label).evaluate().isNotEmpty) missing.remove(label);
+        }
+        if (missing.isEmpty) break;
+        await tester.dragUntilVisible(
+          find.text(labels.last),
+          find.byType(ListView),
+          const Offset(0, -120),
         );
-        expect(find.text(label), findsOneWidget, reason: 'missing row $label');
+        await tester.pump();
+      }
+
+      expect(missing, isEmpty, reason: 'rows never built: $missing');
+      for (final label in labels) {
+        expect(find.text(label), findsWidgets, reason: 'missing row $label');
       }
     });
 
     testWidgets('shows the current currency', (tester) async {
-      await tester.pumpWidget(
-        host(AppSettings.defaults.copyWith(currency: CurrencyCode.usd)),
+      await host(
+        tester,
+        AppSettings.defaults.copyWith(currency: CurrencyCode.usd),
       );
       await tester.pumpAndSettle();
 
@@ -82,16 +90,14 @@ void main() {
     testWidgets('shows System default when no language is pinned', (
       tester,
     ) async {
-      await tester.pumpWidget(host(AppSettings.defaults));
+      await host(tester, AppSettings.defaults);
       await tester.pumpAndSettle();
 
       expect(find.text('System default'), findsOneWidget);
     });
 
     testWidgets('shows the pinned language name, not the tag', (tester) async {
-      await tester.pumpWidget(
-        host(AppSettings.defaults.copyWith(localeCode: 'ja')),
-      );
+      await host(tester, AppSettings.defaults.copyWith(localeCode: 'ja'));
       await tester.pumpAndSettle();
 
       expect(find.text('日本語'), findsOneWidget);
@@ -101,9 +107,7 @@ void main() {
 
   group('localization', () {
     testWidgets('renders Burmese labels under the my locale', (tester) async {
-      await tester.pumpWidget(
-        host(AppSettings.defaults, locale: const Locale('my')),
-      );
+      await host(tester, AppSettings.defaults, locale: const Locale('my'));
       await tester.pumpAndSettle();
 
       expect(find.text('ဆက်တင်'), findsOneWidget);
@@ -111,9 +115,7 @@ void main() {
     });
 
     testWidgets('renders Japanese labels under the ja locale', (tester) async {
-      await tester.pumpWidget(
-        host(AppSettings.defaults, locale: const Locale('ja')),
-      );
+      await host(tester, AppSettings.defaults, locale: const Locale('ja'));
       await tester.pumpAndSettle();
 
       expect(find.text('設定'), findsOneWidget);
@@ -123,7 +125,7 @@ void main() {
 
   group('segmented controls', () {
     testWidgets('exposes the three appearance options', (tester) async {
-      await tester.pumpWidget(host(AppSettings.defaults));
+      await host(tester, AppSettings.defaults);
       await tester.pumpAndSettle();
 
       expect(find.text('System'), findsOneWidget);
@@ -132,7 +134,7 @@ void main() {
     });
 
     testWidgets('exposes both week-start options', (tester) async {
-      await tester.pumpWidget(host(AppSettings.defaults));
+      await host(tester, AppSettings.defaults);
       await tester.pumpAndSettle();
 
       expect(find.text('Monday'), findsOneWidget);
@@ -140,8 +142,9 @@ void main() {
     });
 
     testWidgets('marks the stored week start as selected', (tester) async {
-      await tester.pumpWidget(
-        host(AppSettings.defaults.copyWith(weekStart: WeekStart.sunday)),
+      await host(
+        tester,
+        AppSettings.defaults.copyWith(weekStart: WeekStart.sunday),
       );
       await tester.pumpAndSettle();
 

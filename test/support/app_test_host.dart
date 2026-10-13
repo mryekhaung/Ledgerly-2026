@@ -86,6 +86,13 @@ class AppTestScopes extends StatelessWidget {
 /// — `MediaQuery` provides data, not constraints, so the render tree still lays
 /// out against the 800×600 test window. Use [pumpAppHost] when the assertion is
 /// about measured geometry.
+///
+/// `ProviderScope` is installed **unconditionally**, because a real app always
+/// has one. Installing it only when `overrides` is non-empty is a trap: the
+/// first test to forget an override would fail with `Bad state: No ProviderScope
+/// found` from deep inside the page, which reads like a page bug rather than a
+/// harness one — and a `ref.watch` that happens to be short-circuited by a
+/// synchronous cache hit would mask it until the odd test that misses.
 Widget appTestHost({
   required Widget home,
   Size? size,
@@ -100,27 +107,29 @@ Widget appTestHost({
     textScaler: textScaler ?? TextScaler.noScaling,
   );
 
-  Widget app = MaterialApp(
-    locale: locale,
-    supportedLocales: const <Locale>[Locale('en'), Locale('my'), Locale('ja')],
-    localizationsDelegates: const <LocalizationsDelegate<Object?>>[
-      ...GlobalMaterialLocalizations.delegates,
-      AppLocalizations.delegate,
-    ],
-    home: MediaQuery(
-      data: mediaQuery,
-      child: AppTestScopes(
-        platform: platform,
-        brightness: brightness,
-        child: home,
+  return ProviderScope(
+    overrides: overrides,
+    child: MaterialApp(
+      locale: locale,
+      supportedLocales: const <Locale>[
+        Locale('en'),
+        Locale('my'),
+        Locale('ja'),
+      ],
+      localizationsDelegates: const <LocalizationsDelegate<Object?>>[
+        ...GlobalMaterialLocalizations.delegates,
+        AppLocalizations.delegate,
+      ],
+      home: MediaQuery(
+        data: mediaQuery,
+        child: AppTestScopes(
+          platform: platform,
+          brightness: brightness,
+          child: home,
+        ),
       ),
     ),
   );
-
-  if (overrides.isNotEmpty) {
-    app = ProviderScope(overrides: overrides, child: app);
-  }
-  return app;
 }
 
 /// Pumps [appTestHost] with the **real** surface resized to [size].
