@@ -25,6 +25,8 @@ void main() {
           NotifierProvider.autoDispose<TemplateCounterNotifier, int>(
             TemplateCounterNotifier.new,
           );
+      final sub = container.listen(provider, (_, _) {});
+      addTearDown(sub.close);
 
       expect(container.read(provider), 0);
 
@@ -54,6 +56,8 @@ void main() {
               mutateAction: (cur, delta) async => Success('$cur-$delta'),
             ),
           );
+      final sub = container.listen(provider, (_, _) {});
+      addTearDown(sub.close);
 
       final result = await container.read(provider.future);
       expect(result, 'initial-value');
@@ -78,6 +82,8 @@ void main() {
               mutateAction: (cur, delta) async => Success('$cur-$delta'),
             ),
           );
+      final sub = container.listen(provider, (_, _) {});
+      addTearDown(sub.close);
 
       expect(
         container.read(provider.future),
@@ -103,6 +109,8 @@ void main() {
               mutateAction: (cur, delta) async => const Err(testFailure),
             ),
           );
+      final sub = container.listen(provider, (_, _) {});
+      addTearDown(sub.close);
 
       await container.read(provider.future);
 
