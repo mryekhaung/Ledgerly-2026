@@ -54,6 +54,7 @@ void main() {
         'Week starts on',
         'Language',
         'Version',
+        'Credits',
       ];
       final seen = <String>{};
 
@@ -109,6 +110,30 @@ void main() {
 
       expect(find.text('日本語'), findsOneWidget);
       expect(find.text('System default'), findsNothing);
+    });
+
+    testWidgets('shows credits entry and opens credits dialog', (tester) async {
+      await host(tester, AppSettings.defaults);
+      await tester.pumpAndSettle();
+
+      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Credits'), findsOneWidget);
+      expect(find.textContaining('Open Peeps'), findsOneWidget);
+
+      await tester.tap(find.text('Credits'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text(
+            'Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear',
+          ),
+        ),
+        findsOneWidget,
+      );
     });
   });
 

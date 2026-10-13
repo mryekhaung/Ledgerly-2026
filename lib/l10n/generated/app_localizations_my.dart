@@ -445,4 +445,11 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get avatarEditorKeepEditing => 'ဆက်လက်ပြင်ဆင်မည်';
+
+  @override
+  String get settingsCreditsTitle => 'ဂုဏ်ပြုမှတ်တမ်း';
+
+  @override
+  String get settingsCreditsAvatar =>
+      'Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear';
 }

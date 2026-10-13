@@ -179,6 +179,12 @@ class SettingsPage extends ConsumerWidget {
                   label: strings('settingsVersionLabel'),
                   value: _AppVersion.display,
                 ),
+                const _GroupDivider(),
+                _NavRow(
+                  label: strings('settingsCreditsTitle'),
+                  subtitle: strings('settingsCreditsAvatar'),
+                  onTap: () => _showCreditsDialog(context, strings),
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.xxl),
@@ -219,6 +225,25 @@ class SettingsPage extends ConsumerWidget {
     }
     AppFeedback.destructive();
     AppFeedback.failure(context, message: strings('settingsSaveFailed'));
+  }
+
+  static void _showCreditsDialog(
+    BuildContext context,
+    String Function(String key) strings,
+  ) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(strings('settingsCreditsTitle')),
+        content: Text(strings('settingsCreditsAvatar')),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(strings('actionDone')),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -502,13 +527,21 @@ class _ChoiceRow<T> extends StatelessWidget {
 /// giving a guest profile a top-level section would promise an account system
 /// that does not exist yet.
 class _NavRow extends StatelessWidget {
-  const _NavRow({required this.label, required this.onTap, this.leading});
+  const _NavRow({
+    required this.label,
+    required this.onTap,
+    this.leading,
+    this.subtitle,
+  });
 
   final String label;
   final VoidCallback onTap;
 
   /// Shown before the label — the user's avatar, for the profile row.
   final Widget? leading;
+
+  /// Optional supporting text below the label.
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -532,10 +565,24 @@ class _NavRow extends StatelessWidget {
                 const SizedBox(width: AppSpacing.md),
               ],
               Expanded(
-                child: Text(
-                  label,
-                  style: Theme.of(context).textTheme.bodyLarge
-                      ?.copyWith(color: colors.textPrimary),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      label,
+                      style: Theme.of(context).textTheme.bodyLarge
+                          ?.copyWith(color: colors.textPrimary),
+                    ),
+                    if (subtitle case final subtitle?) ...<Widget>[
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: colors.textSecondary),
+                      ),
+                    ],
+                  ],
                 ),
               ),
               const SizedBox(width: AppSpacing.xs),

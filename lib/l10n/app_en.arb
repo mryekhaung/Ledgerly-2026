@@ -571,5 +571,13 @@
   "avatarEditorKeepEditing": "Keep editing",
   "@avatarEditorKeepEditing": {
     "description": "Cancel button label to stay in the avatar editor."
+  },
+  "settingsCreditsTitle": "Credits",
+  "@settingsCreditsTitle": {
+    "description": "Label for the credits and attributions entry in Settings."
+  },
+  "settingsCreditsAvatar": "Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear",
+  "@settingsCreditsAvatar": {
+    "description": "Attribution credit for Open Peeps avatar artwork."
   }
 }

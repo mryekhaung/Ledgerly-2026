@@ -211,6 +211,8 @@ abstract final class AppStringLookup {
     'settingsSaveFailed' => l10n.settingsSaveFailed,
     'settingsAboutSection' => l10n.settingsAboutSection,
     'settingsVersionLabel' => l10n.settingsVersionLabel,
+    'settingsCreditsTitle' => l10n.settingsCreditsTitle,
+    'settingsCreditsAvatar' => l10n.settingsCreditsAvatar,
     'profileTitle' => l10n.profileTitle,
     'profileGuestBadge' => l10n.profileGuestBadge,
     'profileGuestBody' => l10n.profileGuestBody,

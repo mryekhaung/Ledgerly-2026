@@ -138,5 +138,7 @@
   "avatarEditorDiscardTitle": "အပြောင်းအလဲများကို ဖျက်မည်လား။",
   "avatarEditorDiscardMessage": "သိမ်းဆည်းမထားသော အပြောင်းအလဲများ ရှိနေပါသည်။ ဖျက်ပစ်လိုပါသလား။",
   "avatarEditorDiscardConfirm": "ဖျက်မည်",
-  "avatarEditorKeepEditing": "ဆက်လက်ပြင်ဆင်မည်"
+  "avatarEditorKeepEditing": "ဆက်လက်ပြင်ဆင်မည်",
+  "settingsCreditsTitle": "ဂုဏ်ပြုမှတ်တမ်း",
+  "settingsCreditsAvatar": "Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear"
 }

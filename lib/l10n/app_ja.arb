@@ -138,5 +138,7 @@
   "avatarEditorDiscardTitle": "変更を破棄しますか？",
   "avatarEditorDiscardMessage": "保存されていない変更があります。破棄してもよろしいですか？",
   "avatarEditorDiscardConfirm": "破棄",
-  "avatarEditorKeepEditing": "編集を続ける"
+  "avatarEditorKeepEditing": "編集を続ける",
+  "settingsCreditsTitle": "クレジット",
+  "settingsCreditsAvatar": "Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear"
 }

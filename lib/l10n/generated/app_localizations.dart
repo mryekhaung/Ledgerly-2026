@@ -933,6 +933,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep editing'**
   String get avatarEditorKeepEditing;
+
+  /// Label for the credits and attributions entry in Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits'**
+  String get settingsCreditsTitle;
+
+  /// Attribution credit for Open Peeps avatar artwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear'**
+  String get settingsCreditsAvatar;
 }
 
 class _AppLocalizationsDelegate

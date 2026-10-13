@@ -444,4 +444,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get avatarEditorKeepEditing => 'Keep editing';
+
+  @override
+  String get settingsCreditsTitle => 'Credits';
+
+  @override
+  String get settingsCreditsAvatar =>
+      'Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear';
 }
