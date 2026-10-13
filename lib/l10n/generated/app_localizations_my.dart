@@ -396,4 +396,53 @@ class AppLocalizationsMy extends AppLocalizations {
   String avatarEditorPartSelected(String part, String value) {
     return '$part: $value';
   }
+
+  @override
+  String get avatarEditorTabHead => 'ဆံပင်';
+
+  @override
+  String get avatarEditorTabFace => 'မျက်နှာ';
+
+  @override
+  String get avatarEditorTabGlasses => 'မျက်မှန်';
+
+  @override
+  String get avatarEditorTabItem => 'ပစ္စည်း';
+
+  @override
+  String get avatarEditorTabColors => 'အရောင်';
+
+  @override
+  String get avatarEditorBeard => 'မုတ်ဆိတ် / နှုတ်ခမ်းမွေး';
+
+  @override
+  String get avatarEditorColorOutline => 'မျဉ်းကြောင်း';
+
+  @override
+  String get avatarEditorColorHair => 'ဆံပင်အရောင်';
+
+  @override
+  String get avatarEditorColorSkin => 'အသားအရောင်';
+
+  @override
+  String get avatarEditorColorOutfit => 'အဝတ်အစား';
+
+  @override
+  String get avatarEditorNone => 'မရှိ';
+
+  @override
+  String get avatarEditorItemsComingSoon => 'ပစ္စည်းအသစ်များ မကြာမီလာမည်';
+
+  @override
+  String get avatarEditorDiscardTitle => 'အပြောင်းအလဲများကို ဖျက်မည်လား။';
+
+  @override
+  String get avatarEditorDiscardMessage =>
+      'သိမ်းဆည်းမထားသော အပြောင်းအလဲများ ရှိနေပါသည်။ ဖျက်ပစ်လိုပါသလား။';
+
+  @override
+  String get avatarEditorDiscardConfirm => 'ဖျက်မည်';
+
+  @override
+  String get avatarEditorKeepEditing => 'ဆက်လက်ပြင်ဆင်မည်';
 }

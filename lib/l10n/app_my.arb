@@ -122,5 +122,21 @@
   "avatarEditorPreview": "ကြိုတင်ကြည့်ရန်",
   "avatarEditorSave": "သိမ်းရန်",
   "avatarEditorOptionLabel": "{part} ရွေးချယ်စရာ {number}",
-  "avatarEditorPartSelected": "{part}: {value}"
+  "avatarEditorPartSelected": "{part}: {value}",
+  "avatarEditorTabHead": "ဆံပင်",
+  "avatarEditorTabFace": "မျက်နှာ",
+  "avatarEditorTabGlasses": "မျက်မှန်",
+  "avatarEditorTabItem": "ပစ္စည်း",
+  "avatarEditorTabColors": "အရောင်",
+  "avatarEditorBeard": "မုတ်ဆိတ် / နှုတ်ခမ်းမွေး",
+  "avatarEditorColorOutline": "မျဉ်းကြောင်း",
+  "avatarEditorColorHair": "ဆံပင်အရောင်",
+  "avatarEditorColorSkin": "အသားအရောင်",
+  "avatarEditorColorOutfit": "အဝတ်အစား",
+  "avatarEditorNone": "မရှိ",
+  "avatarEditorItemsComingSoon": "ပစ္စည်းအသစ်များ မကြာမီလာမည်",
+  "avatarEditorDiscardTitle": "အပြောင်းအလဲများကို ဖျက်မည်လား။",
+  "avatarEditorDiscardMessage": "သိမ်းဆည်းမထားသော အပြောင်းအလဲများ ရှိနေပါသည်။ ဖျက်ပစ်လိုပါသလား။",
+  "avatarEditorDiscardConfirm": "ဖျက်မည်",
+  "avatarEditorKeepEditing": "ဆက်လက်ပြင်ဆင်မည်"
 }

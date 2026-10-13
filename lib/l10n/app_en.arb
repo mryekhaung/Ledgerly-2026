@@ -507,5 +507,69 @@
         "type": "String"
       }
     }
+  },
+  "avatarEditorTabHead": "Head",
+  "@avatarEditorTabHead": {
+    "description": "Tab label for head and hair variants in the avatar editor."
+  },
+  "avatarEditorTabFace": "Face",
+  "@avatarEditorTabFace": {
+    "description": "Tab label for facial expression variants in the avatar editor."
+  },
+  "avatarEditorTabGlasses": "Glasses",
+  "@avatarEditorTabGlasses": {
+    "description": "Tab label for glasses and accessories in the avatar editor."
+  },
+  "avatarEditorTabItem": "Item",
+  "@avatarEditorTabItem": {
+    "description": "Tab label for item props in the avatar editor."
+  },
+  "avatarEditorTabColors": "Colors",
+  "@avatarEditorTabColors": {
+    "description": "Tab label for palette colors in the avatar editor."
+  },
+  "avatarEditorBeard": "Facial Hair",
+  "@avatarEditorBeard": {
+    "description": "Section label for facial hair options in the avatar editor."
+  },
+  "avatarEditorColorOutline": "Outline",
+  "@avatarEditorColorOutline": {
+    "description": "Color swatch section label for outline ink."
+  },
+  "avatarEditorColorHair": "Hair",
+  "@avatarEditorColorHair": {
+    "description": "Color swatch section label for hair color."
+  },
+  "avatarEditorColorSkin": "Skin tone",
+  "@avatarEditorColorSkin": {
+    "description": "Color swatch section label for skin tone."
+  },
+  "avatarEditorColorOutfit": "Outfit",
+  "@avatarEditorColorOutfit": {
+    "description": "Color swatch section label for outfit color."
+  },
+  "avatarEditorNone": "None",
+  "@avatarEditorNone": {
+    "description": "Option label to remove an optional accessory or overlay."
+  },
+  "avatarEditorItemsComingSoon": "More items coming soon",
+  "@avatarEditorItemsComingSoon": {
+    "description": "Empty state hint for the avatar Item tab."
+  },
+  "avatarEditorDiscardTitle": "Discard changes?",
+  "@avatarEditorDiscardTitle": {
+    "description": "Confirmation title when leaving avatar editor with unsaved changes."
+  },
+  "avatarEditorDiscardMessage": "You have unsaved changes. Do you want to discard them?",
+  "@avatarEditorDiscardMessage": {
+    "description": "Confirmation message when leaving avatar editor with unsaved changes."
+  },
+  "avatarEditorDiscardConfirm": "Discard",
+  "@avatarEditorDiscardConfirm": {
+    "description": "Confirm button label to discard unsaved avatar edits."
+  },
+  "avatarEditorKeepEditing": "Keep editing",
+  "@avatarEditorKeepEditing": {
+    "description": "Cancel button label to stay in the avatar editor."
   }
 }

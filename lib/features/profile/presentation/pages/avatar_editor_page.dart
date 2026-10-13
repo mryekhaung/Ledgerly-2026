@@ -1,27 +1,31 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
+import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_catalog.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_config.dart';
+import 'package:ledgerly/features/profile/domain/entities/avatar_palette.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
 import 'package:ledgerly/features/profile/presentation/widgets/avatar.dart';
+import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
+import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Builds an avatar one slot at a time.
+/// The 5 tabs of the Avatar Editor (docs/Avatar.md §6).
+enum AvatarEditorTab { head, face, glasses, item, colors }
+
+/// Builds an Open Peeps avatar through the 5-tab editor.
 ///
-/// The only piece of local state is the **draft** config: the user is composing
-/// something, and until they save it nothing should reach the settings table.
-/// That is the one legitimate exception to "the stream is the source of truth"
-/// (`docs/Architecture.md` §5) — the alternative is five writes per tap and a
-/// profile that changes under a swipe-back.
-///
-/// Because the draft is local, the page **must** be seeded from the stored
-/// avatar exactly once, in `initState`'s equivalent for a `ConsumerStatefulWidget`.
-/// Watching [currentAvatarProvider] in `build` and copying it into state would
-/// discard the user's edits on the next stream emission — a stale-write bug that
-/// only shows up when a save lands mid-edit.
+/// Spec: `docs/Avatar.md` §6.
+/// - Top bar: ✕ (cancel with confirmation if unsaved edits exist) · title · Save footer.
+/// - Pinned circular preview (160 px) + Generate randomly button.
+/// - Tabs: Head · Face · Glasses · Item · Colors.
+/// - Responsive: compact = stacked under preview; medium+ = two panes via [TwoPaneLayout].
+/// - Haptics: [AppFeedback.selection] on change, [AppFeedback.success] on save.
 class AvatarEditorPage extends ConsumerStatefulWidget {
   /// Creates the page.
   const AvatarEditorPage({super.key});
@@ -31,23 +35,24 @@ class AvatarEditorPage extends ConsumerStatefulWidget {
 }
 
 class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
-  /// Null until seeded on the first build.
+  /// The working draft. Null until lazily seeded.
   AvatarConfig? _draft;
 
-  /// Whether a save is in flight, so the button can show progress and cannot be
-  /// double-tapped.
+  /// The original config loaded on open, used for unsaved discard check.
+  AvatarConfig? _initialConfig;
+
+  /// Currently active tab.
+  AvatarEditorTab _currentTab = AvatarEditorTab.head;
+
+  /// Whether a save write is in flight.
   bool _saving = false;
 
-  /// The config being edited.
-  ///
-  /// Seeded lazily from the stored avatar on the first build rather than watched
-  /// in `build`: watching [currentAvatarProvider] would let the next stream
-  /// emission overwrite whatever the user had picked, which is the classic
-  /// stale-write bug and only shows up when a save lands mid-edit.
+  /// Seeded lazily from [currentAvatarProvider] on the first build.
   AvatarConfig get _draft$ {
     final existing = _draft;
     if (existing != null) return existing;
     final seeded = ref.read(currentAvatarProvider);
+    _initialConfig = seeded;
     _draft = seeded;
     return seeded;
   }
@@ -58,6 +63,7 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
     final colors = AppThemeColors.of(context);
     final config = _draft$;
     final width = MediaQuery.sizeOf(context).width;
+    final isWide = WindowSizeClass.of(context).isTwoPaneCapable;
 
     final saveButton = FilledButton(
       onPressed: _saving ? null : () => _save(config, strings),
@@ -72,71 +78,135 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
           : Text(strings('avatarEditorSave')),
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(strings('avatarEditorTitle')),
-        actions: <Widget>[
-          TextButton(
-            onPressed: _saving ? null : _shuffle,
-            child: Text(strings('avatarEditorRandom')),
+    final Widget bodyContent;
+    if (isWide) {
+      bodyContent = Expanded(
+        child: TwoPaneLayout(
+          master: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.pageHorizontal(width),
+              vertical: AppSpacing.lg,
+            ),
+            child: _PreviewSection(
+              config: config,
+              onShuffle: _shuffle,
+              saving: _saving,
+            ),
           ),
-        ],
-      ),
-      // The editor is a full-screen route outside the shell (docs/Avatar.md §2
-      // step 0), so the only bottom edge it must clear is the system gesture
-      // area. One SafeArea wraps the column: the scrollable content respects the
-      // top, and the pinned Save bar respects the bottom.
-      body: SafeArea(
+          detail: Column(
+            children: <Widget>[
+              const SizedBox(height: AppSpacing.lg),
+              _TabChipsRow(
+                currentTab: _currentTab,
+                onTabSelected: (tab) => setState(() => _currentTab = tab),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Expanded(
+                child: _TabBody(
+                  currentTab: _currentTab,
+                  config: config,
+                  onConfigChanged: (updated) =>
+                      setState(() => _draft = updated),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      bodyContent = Expanded(
         child: Column(
           children: <Widget>[
+            _PreviewSection(
+              config: config,
+              onShuffle: _shuffle,
+              saving: _saving,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _TabChipsRow(
+              currentTab: _currentTab,
+              onTabSelected: (tab) => setState(() => _currentTab = tab),
+            ),
+            const SizedBox(height: AppSpacing.sm),
             Expanded(
-              child: ListView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppSpacing.pageHorizontal(width),
-                  vertical: AppSpacing.lg,
-                ),
-                children: <Widget>[
-                  // Top breathing room so the preview never tucks under the
-                  // header, even at text scale 2.0 (docs/Avatar.md §2 step 0).
-                  const SizedBox(height: AppSpacing.xl),
-                  _Preview(config: config, colors: colors),
-                  const SizedBox(height: AppSpacing.xl),
-                  // Every slot is a row of swatches: one tap = one choice, no
-                  // sheet, because the whole point of the editor is to see
-                  // combinations.
-                  for (final part in AvatarPart.values) ...<Widget>[
-                    _PartRow(
-                      part: part,
-                      selectedIndex: config.indexOf(part),
-                      onSelected: (index) =>
-                          setState(() => _draft = config.withPart(part, index)),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
-                ],
+              child: _TabBody(
+                currentTab: _currentTab,
+                config: config,
+                onConfigChanged: (updated) => setState(() => _draft = updated),
               ),
             ),
-            // Pinned Save bar: always visible and clear of the gesture area.
-            _SaveBar(child: saveButton),
           ],
+        ),
+      );
+    }
+
+    return PopScope(
+      canPop: _draft$ == _initialConfig || _saving,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        unawaited(_onCancel());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.close_rounded),
+            onPressed: _saving ? null : () => unawaited(_onCancel()),
+            tooltip: strings('actionCancel'),
+          ),
+          title: Text(strings('avatarEditorTitle')),
+        ),
+        body: SafeArea(
+          child: Column(
+            children: <Widget>[
+              bodyContent,
+              _SaveBar(child: saveButton),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  /// Replaces every slot with a random pick.
-  ///
-  /// Seeded from [avatarRandomProvider] so the shuffle is reproducible under
-  /// test; in production it is a plain `Random()`.
   void _shuffle() {
+    AppFeedback.selection();
     final random = ref.read(avatarRandomProvider);
     setState(() => _draft = AvatarCatalog.random(random));
   }
 
-  /// Persists the draft and pops on success.
-  ///
-  /// Pops only after the write succeeds: leaving the page on a failure would
-  /// show the *old* avatar on the profile and read as a silent data loss.
+  Future<void> _onCancel() async {
+    if (_draft$ == _initialConfig || _saving) {
+      Navigator.of(context).pop();
+      return;
+    }
+    await _showDiscardConfirmDialog();
+  }
+
+  Future<void> _showDiscardConfirmDialog() async {
+    final strings = AppStrings.of(context);
+    final discard = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(strings('avatarEditorDiscardTitle')),
+        content: Text(strings('avatarEditorDiscardMessage')),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(strings('avatarEditorKeepEditing')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(strings('avatarEditorDiscardConfirm')),
+          ),
+        ],
+      ),
+    );
+
+    if (discard == true && mounted) {
+      AppFeedback.destructive();
+      Navigator.of(context).pop();
+    }
+  }
+
   Future<void> _save(
     AvatarConfig config,
     String Function(String key) strings,
@@ -148,33 +218,17 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
     setState(() => _saving = false);
 
     if (result.isErr) {
-      // Same message for every failure: the user's only recovery is to try
-      // again, and naming the storage engine would not change that.
-      _notify(strings('profileAvatarSaveFailed'));
+      AppFeedback.failure(context, message: strings('profileAvatarSaveFailed'));
       return;
     }
 
+    AppFeedback.success();
     Navigator.of(context).pop();
-    _notify(strings('profileAvatarSaved'));
-  }
-
-  /// Shows a short-lived confirmation or failure message.
-  void _notify(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(
-        SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
-      );
+    AppFeedback.confirm(context, message: strings('profileAvatarSaved'));
   }
 }
 
-/// The pinned Save footer of the editor.
-///
-/// Lives outside the scrollable content so the button is always on screen and
-/// never slides under the system gesture area, even on a long list of part rows
-/// (docs/Avatar.md §2 step 0). The hairline divides it from the scrolling
-/// options; the page's outer [SafeArea] owns the system bottom inset.
+/// The pinned Save footer of the editor (docs/Avatar.md §2 step 0).
 class _SaveBar extends StatelessWidget {
   const _SaveBar({required this.child});
 
@@ -200,12 +254,17 @@ class _SaveBar extends StatelessWidget {
   }
 }
 
-/// The live preview at the top of the editor.
-class _Preview extends StatelessWidget {
-  const _Preview({required this.config, required this.colors});
+/// The 160 px circular live preview + Shuffle button.
+class _PreviewSection extends StatelessWidget {
+  const _PreviewSection({
+    required this.config,
+    required this.onShuffle,
+    required this.saving,
+  });
 
   final AvatarConfig config;
-  final AppColors colors;
+  final VoidCallback onShuffle;
+  final bool saving;
 
   @override
   Widget build(BuildContext context) {
@@ -213,19 +272,20 @@ class _Preview extends StatelessWidget {
 
     return Center(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
+          const SizedBox(height: AppSpacing.xxl),
           Avatar(
             config: config,
             size: 160,
-            // The avatar is a picture: without a label a screen reader reads
-            // the surrounding rows and never says what was just generated.
+            shape: AvatarShape.circle,
             semanticLabel: strings('profileAvatarLabel'),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            strings('avatarEditorPreview'),
-            style: Theme.of(context).textTheme.labelSmall
-                ?.copyWith(color: colors.textSecondary, letterSpacing: 0.8),
+          OutlinedButton.icon(
+            onPressed: saving ? null : onShuffle,
+            icon: const Icon(Icons.shuffle_rounded, size: 18),
+            label: Text(strings('avatarEditorRandom')),
           ),
         ],
       ),
@@ -233,95 +293,618 @@ class _Preview extends StatelessWidget {
   }
 }
 
-/// One slot: a label plus a horizontal strip of tappable swatches.
-///
-/// A strip rather than a dropdown because every option is a *picture*, and a
-/// list of names ("Circle, Rounded square, Teardrop, Hexagon") makes the user
-/// translate words into shapes instead of recognising them.
-class _PartRow extends StatelessWidget {
-  const _PartRow({
-    required this.part,
-    required this.selectedIndex,
-    required this.onSelected,
+/// Horizontal scrollable chip row for the 5 tabs (docs/Design.md §5.5).
+class _TabChipsRow extends StatelessWidget {
+  const _TabChipsRow({required this.currentTab, required this.onTabSelected});
+
+  final AvatarEditorTab currentTab;
+  final ValueChanged<AvatarEditorTab> onTabSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    final width = MediaQuery.sizeOf(context).width;
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.pageHorizontal(width),
+      ),
+      child: Row(
+        children: <Widget>[
+          for (final tab in AvatarEditorTab.values) ...<Widget>[
+            _TabChip(
+              tab: tab,
+              label: strings(_tabLabelKey(tab)),
+              isSelected: tab == currentTab,
+              onTap: () {
+                AppFeedback.selection();
+                onTabSelected(tab);
+              },
+            ),
+            if (tab != AvatarEditorTab.colors)
+              const SizedBox(width: AppSpacing.sm),
+          ],
+        ],
+      ),
+    );
+  }
+
+  static String _tabLabelKey(AvatarEditorTab tab) => switch (tab) {
+    AvatarEditorTab.head => 'avatarEditorTabHead',
+    AvatarEditorTab.face => 'avatarEditorTabFace',
+    AvatarEditorTab.glasses => 'avatarEditorTabGlasses',
+    AvatarEditorTab.item => 'avatarEditorTabItem',
+    AvatarEditorTab.colors => 'avatarEditorTabColors',
+  };
+}
+
+class _TabChip extends StatelessWidget {
+  const _TabChip({
+    required this.tab,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
   });
 
-  final AvatarPart part;
-  final int selectedIndex;
-  final ValueChanged<int> onSelected;
+  final AvatarEditorTab tab;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.borderFull,
+        child: AnimatedContainer(
+          duration: AppMotion.short,
+          curve: AppMotion.standard,
+          height: 36,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.xs,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: AppRadius.borderFull,
+            color: isSelected ? colors.brandSubtle : Colors.transparent,
+            border: Border.all(
+              color: isSelected ? colors.brandPrimary : colors.border,
+              width: isSelected ? 1.5 : 1.0,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: AppTypography.label.copyWith(
+              color: isSelected ? colors.brandPrimary : colors.textSecondary,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The main content area of the selected tab.
+class _TabBody extends StatelessWidget {
+  const _TabBody({
+    required this.currentTab,
+    required this.config,
+    required this.onConfigChanged,
+  });
+
+  final AvatarEditorTab currentTab;
+  final AvatarConfig config;
+  final ValueChanged<AvatarConfig> onConfigChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (currentTab) {
+      AvatarEditorTab.head => _HeadTab(
+        config: config,
+        onConfigChanged: onConfigChanged,
+      ),
+      AvatarEditorTab.face => _FaceTab(
+        config: config,
+        onConfigChanged: onConfigChanged,
+      ),
+      AvatarEditorTab.glasses => _GlassesTab(
+        config: config,
+        onConfigChanged: onConfigChanged,
+      ),
+      AvatarEditorTab.item => _ItemTab(
+        config: config,
+        onConfigChanged: onConfigChanged,
+      ),
+      AvatarEditorTab.colors => _ColorsTab(
+        config: config,
+        onConfigChanged: onConfigChanged,
+      ),
+    };
+  }
+}
+
+/// Head options (48 variants).
+class _HeadTab extends StatelessWidget {
+  const _HeadTab({required this.config, required this.onConfigChanged});
+
+  final AvatarConfig config;
+  final ValueChanged<AvatarConfig> onConfigChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+
+    return GridView.builder(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.pageHorizontal(width),
+        vertical: AppSpacing.md,
+      ),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: AppSpacing.md,
+        mainAxisSpacing: AppSpacing.md,
+        childAspectRatio: 1.0,
+      ),
+      itemCount: AvatarCatalog.heads.length,
+      itemBuilder: (context, index) {
+        final headId = AvatarCatalog.heads[index];
+        final isSelected = config.headId == headId;
+        return _PartTile(
+          group: 'head',
+          id: headId,
+          isSelected: isSelected,
+          config: config.copyWith(headId: headId),
+          semanticLabel: AppStrings.fill(context, 'avatarEditorOptionLabel', {
+            'part': AppStrings.of(context)('avatarEditorTabHead'),
+            'number': index + 1,
+          }),
+          onTap: () {
+            AppFeedback.selection();
+            onConfigChanged(config.copyWith(headId: headId));
+          },
+        );
+      },
+    );
+  }
+}
+
+/// Face tab: Expressions (30 variants) + Facial Hair (16 variants + None).
+class _FaceTab extends StatelessWidget {
+  const _FaceTab({required this.config, required this.onConfigChanged});
+
+  final AvatarConfig config;
+  final ValueChanged<AvatarConfig> onConfigChanged;
 
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final colors = AppThemeColors.of(context);
-    final label = strings(_labelKey(part));
-    final count = AvatarCatalog.optionCount(part);
+    final width = MediaQuery.sizeOf(context).width;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          label.toUpperCase(),
-          style: Theme.of(context).textTheme.labelSmall
-              ?.copyWith(color: colors.textSecondary, letterSpacing: 0.8),
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverPadding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.pageHorizontal(width),
+            vertical: AppSpacing.md,
+          ),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: AppSpacing.md,
+              mainAxisSpacing: AppSpacing.md,
+              childAspectRatio: 1.0,
+            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final faceId = AvatarCatalog.expressions[index];
+              final isSelected = config.faceId == faceId;
+              return _PartTile(
+                group: 'expression',
+                id: faceId,
+                isSelected: isSelected,
+                config: config.copyWith(faceId: faceId),
+                semanticLabel: AppStrings.fill(
+                  context,
+                  'avatarEditorOptionLabel',
+                  {'part': strings('avatarEditorTabFace'), 'number': index + 1},
+                ),
+                onTap: () {
+                  AppFeedback.selection();
+                  onConfigChanged(config.copyWith(faceId: faceId));
+                },
+              );
+            }, childCount: AvatarCatalog.expressions.length),
+          ),
         ),
-        const SizedBox(height: AppSpacing.sm),
-        SizedBox(
-          height: 72,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: count,
-            separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
-            itemBuilder: (context, index) => _Swatch(
-              part: part,
-              index: index,
-              selected: index == selectedIndex,
-              // The swatch shows the *whole* avatar with only this slot changed,
-              // so the effect of the choice is visible in context rather than as
-              // an abstract chip.
-              config: AvatarConfig.initial.withPart(part, index),
-              // Filled through the ARB placeholder pair rather than a
-              // concatenation, so a translator controls the word order
-              // (`docs/Conventions.md` §5).
-              semanticLabel: AppStrings.fill(
-                context,
-                'avatarEditorOptionLabel',
-                {'part': label, 'number': index + 1},
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.pageHorizontal(width),
+              vertical: AppSpacing.md,
+            ),
+            child: Text(
+              strings('avatarEditorBeard').toUpperCase(),
+              style: AppTypography.overline.copyWith(
+                color: colors.textSecondary,
               ),
-              onTap: () => onSelected(index),
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.only(
+            left: AppSpacing.pageHorizontal(width),
+            right: AppSpacing.pageHorizontal(width),
+            bottom: AppSpacing.lg,
+          ),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: AppSpacing.md,
+              mainAxisSpacing: AppSpacing.md,
+              childAspectRatio: 1.0,
+            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              if (index == 0) {
+                final isNone = config.facialHairId == null;
+                return _NoneTile(
+                  isSelected: isNone,
+                  onTap: () {
+                    AppFeedback.selection();
+                    onConfigChanged(config.copyWith(facialHairId: null));
+                  },
+                );
+              }
+              final beardId = AvatarCatalog.facialHairs[index - 1];
+              final isSelected = config.facialHairId == beardId;
+              return _PartTile(
+                group: 'facial_hair',
+                id: beardId,
+                isSelected: isSelected,
+                config: config.copyWith(facialHairId: beardId),
+                semanticLabel: AppStrings.fill(
+                  context,
+                  'avatarEditorOptionLabel',
+                  {'part': strings('avatarEditorBeard'), 'number': index},
+                ),
+                onTap: () {
+                  AppFeedback.selection();
+                  onConfigChanged(config.copyWith(facialHairId: beardId));
+                },
+              );
+            }, childCount: AvatarCatalog.facialHairs.length + 1),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Glasses tab (8 accessory variants + None).
+class _GlassesTab extends StatelessWidget {
+  const _GlassesTab({required this.config, required this.onConfigChanged});
+
+  final AvatarConfig config;
+  final ValueChanged<AvatarConfig> onConfigChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    final width = MediaQuery.sizeOf(context).width;
+
+    return GridView.builder(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.pageHorizontal(width),
+        vertical: AppSpacing.md,
+      ),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: AppSpacing.md,
+        mainAxisSpacing: AppSpacing.md,
+        childAspectRatio: 1.0,
+      ),
+      itemCount: AvatarCatalog.accessories.length + 1,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          final isNone = config.accessoryId == null;
+          return _NoneTile(
+            isSelected: isNone,
+            onTap: () {
+              AppFeedback.selection();
+              onConfigChanged(config.copyWith(accessoryId: null));
+            },
+          );
+        }
+        final accId = AvatarCatalog.accessories[index - 1];
+        final isSelected = config.accessoryId == accId;
+        return _PartTile(
+          group: 'accessories',
+          id: accId,
+          isSelected: isSelected,
+          config: config.copyWith(accessoryId: accId),
+          semanticLabel: AppStrings.fill(context, 'avatarEditorOptionLabel', {
+            'part': strings('avatarEditorTabGlasses'),
+            'number': index,
+          }),
+          onTap: () {
+            AppFeedback.selection();
+            onConfigChanged(config.copyWith(accessoryId: accId));
+          },
+        );
+      },
+    );
+  }
+}
+
+/// Item tab (None + Coming Soon placeholder).
+class _ItemTab extends StatelessWidget {
+  const _ItemTab({required this.config, required this.onConfigChanged});
+
+  final AvatarConfig config;
+  final ValueChanged<AvatarConfig> onConfigChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    final colors = AppThemeColors.of(context);
+    final width = MediaQuery.sizeOf(context).width;
+
+    return ListView(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.pageHorizontal(width),
+        vertical: AppSpacing.md,
+      ),
+      children: <Widget>[
+        SizedBox(
+          height: 100,
+          child: Row(
+            children: <Widget>[
+              SizedBox.square(
+                dimension: 100,
+                child: _NoneTile(
+                  isSelected: config.itemId == null,
+                  onTap: () {
+                    AppFeedback.selection();
+                    onConfigChanged(config.copyWith(itemId: null));
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xxl),
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(
+                  Icons.auto_awesome_rounded,
+                  size: 48,
+                  color: colors.textSecondary.withValues(alpha: 0.6),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  strings('avatarEditorItemsComingSoon'),
+                  style: AppTypography.body.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ),
       ],
     );
   }
-
-  /// The ARB key naming [part].
-  ///
-  /// A switch rather than a `part.name` interpolation so a renamed enum value
-  /// becomes a compile error instead of a missing translation.
-  static String _labelKey(AvatarPart part) => switch (part) {
-    AvatarPart.background => 'avatarEditorBackground',
-    AvatarPart.backdrop => 'avatarEditorBackdrop',
-    AvatarPart.shape => 'avatarEditorShape',
-    AvatarPart.eyes => 'avatarEditorEyes',
-    AvatarPart.mouth => 'avatarEditorMouth',
-  };
 }
 
-/// A single tappable option.
-class _Swatch extends StatelessWidget {
-  const _Swatch({
-    required this.part,
-    required this.index,
-    required this.selected,
+/// Colors tab (Background, Outline, Hair, Skin tone, Outfit).
+class _ColorsTab extends StatelessWidget {
+  const _ColorsTab({required this.config, required this.onConfigChanged});
+
+  final AvatarConfig config;
+  final ValueChanged<AvatarConfig> onConfigChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+      children: <Widget>[
+        _ColorSection(
+          label: strings('avatarEditorBackground'),
+          colors: AvatarPalette.backgrounds,
+          selectedColor: config.colors.background,
+          onColorSelected: (argb) {
+            AppFeedback.selection();
+            onConfigChanged(
+              config.copyWith(colors: config.colors.copyWith(background: argb)),
+            );
+          },
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _ColorSection(
+          label: strings('avatarEditorColorOutline'),
+          colors: AvatarPalette.inks,
+          selectedColor: config.colors.ink,
+          onColorSelected: (argb) {
+            AppFeedback.selection();
+            onConfigChanged(
+              config.copyWith(colors: config.colors.copyWith(ink: argb)),
+            );
+          },
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _ColorSection(
+          label: strings('avatarEditorColorHair'),
+          colors: AvatarPalette.hairs,
+          selectedColor: config.colors.hair,
+          onColorSelected: (argb) {
+            AppFeedback.selection();
+            onConfigChanged(
+              config.copyWith(colors: config.colors.copyWith(hair: argb)),
+            );
+          },
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _ColorSection(
+          label: strings('avatarEditorColorSkin'),
+          colors: AvatarPalette.skins,
+          selectedColor: config.colors.skin,
+          onColorSelected: (argb) {
+            AppFeedback.selection();
+            onConfigChanged(
+              config.copyWith(colors: config.colors.copyWith(skin: argb)),
+            );
+          },
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _ColorSection(
+          label: strings('avatarEditorColorOutfit'),
+          colors: AvatarPalette.outfits,
+          selectedColor: config.colors.clothing,
+          onColorSelected: (argb) {
+            AppFeedback.selection();
+            onConfigChanged(
+              config.copyWith(colors: config.colors.copyWith(clothing: argb)),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+/// One swatch section: header + horizontal strip of circles.
+class _ColorSection extends StatelessWidget {
+  const _ColorSection({
+    required this.label,
+    required this.colors,
+    required this.selectedColor,
+    required this.onColorSelected,
+  });
+
+  final String label;
+  final List<int> colors;
+  final int selectedColor;
+  final ValueChanged<int> onColorSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final themeColors = AppThemeColors.of(context);
+    final width = MediaQuery.sizeOf(context).width;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.pageHorizontal(width),
+          ),
+          child: Text(
+            label.toUpperCase(),
+            style: AppTypography.overline.copyWith(
+              color: themeColors.textSecondary,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        SizedBox(
+          height: 48,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.pageHorizontal(width),
+            ),
+            itemCount: colors.length,
+            separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
+            itemBuilder: (context, index) {
+              final argb = colors[index];
+              final isSelected = argb == selectedColor;
+              return _ColorSwatch(
+                argb: argb,
+                isSelected: isSelected,
+                onTap: () => onColorSelected(argb),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// A circular color swatch with selected ring.
+class _ColorSwatch extends StatelessWidget {
+  const _ColorSwatch({
+    required this.argb,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final int argb;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final themeColors = AppThemeColors.of(context);
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.borderFull,
+        child: Container(
+          width: 44,
+          height: 44,
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isSelected ? themeColors.brandPrimary : themeColors.border,
+              width: isSelected ? 2.5 : 1.0,
+            ),
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(argb),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A single option tile in a 3-column grid.
+class _PartTile extends StatelessWidget {
+  const _PartTile({
+    required this.group,
+    required this.id,
+    required this.isSelected,
     required this.config,
     required this.semanticLabel,
     required this.onTap,
   });
 
-  final AvatarPart part;
-  final int index;
-  final bool selected;
+  final String group;
+  final String id;
+  final bool isSelected;
   final AvatarConfig config;
   final String semanticLabel;
   final VoidCallback onTap;
@@ -332,7 +915,7 @@ class _Swatch extends StatelessWidget {
 
     return Semantics(
       button: true,
-      selected: selected,
+      selected: isSelected,
       label: semanticLabel,
       child: InkWell(
         onTap: onTap,
@@ -340,17 +923,80 @@ class _Swatch extends StatelessWidget {
         child: AnimatedContainer(
           duration: AppMotion.short,
           curve: AppMotion.standard,
-          // The border is the selection indicator, not a background: a filled
-          // background would fight the swatch's own colours.
           decoration: BoxDecoration(
             borderRadius: AppRadius.borderLg,
+            color: colors.surfaceSubtle,
             border: Border.all(
-              color: selected ? colors.brandPrimary : colors.border,
-              width: selected ? 2 : 1,
+              color: isSelected ? colors.brandPrimary : colors.border,
+              width: isSelected ? 2.0 : 1.0,
             ),
           ),
-          padding: const EdgeInsets.all(AppSpacing.xs + AppSpacing.xxs),
-          child: Avatar(config: config, size: 52),
+          padding: const EdgeInsets.all(AppSpacing.xs),
+          alignment: Alignment.center,
+          child: Avatar(
+            config: config,
+            size: 64,
+            shape: AvatarShape.circle,
+            thumbnailGroup: group,
+            thumbnailId: id,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The "None" (⊘) tile for optional layers.
+class _NoneTile extends StatelessWidget {
+  const _NoneTile({required this.isSelected, required this.onTap});
+
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final strings = AppStrings.of(context);
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: strings('avatarEditorNone'),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.borderLg,
+        child: AnimatedContainer(
+          duration: AppMotion.short,
+          curve: AppMotion.standard,
+          decoration: BoxDecoration(
+            borderRadius: AppRadius.borderLg,
+            color: colors.surfaceSubtle,
+            border: Border.all(
+              color: isSelected ? colors.brandPrimary : colors.border,
+              width: isSelected ? 2.0 : 1.0,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                Icons.block_rounded,
+                color: isSelected ? colors.brandPrimary : colors.textSecondary,
+                size: 28,
+              ),
+              const SizedBox(height: AppSpacing.xxs),
+              Text(
+                strings('avatarEditorNone'),
+                style: AppTypography.caption.copyWith(
+                  color: isSelected
+                      ? colors.brandPrimary
+                      : colors.textSecondary,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

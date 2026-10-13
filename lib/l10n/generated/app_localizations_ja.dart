@@ -381,4 +381,52 @@ class AppLocalizationsJa extends AppLocalizations {
   String avatarEditorPartSelected(String part, String value) {
     return '$part: $value';
   }
+
+  @override
+  String get avatarEditorTabHead => '髪型';
+
+  @override
+  String get avatarEditorTabFace => '顔';
+
+  @override
+  String get avatarEditorTabGlasses => 'メガネ';
+
+  @override
+  String get avatarEditorTabItem => 'アイテム';
+
+  @override
+  String get avatarEditorTabColors => 'カラー';
+
+  @override
+  String get avatarEditorBeard => 'ヒゲ';
+
+  @override
+  String get avatarEditorColorOutline => '輪郭';
+
+  @override
+  String get avatarEditorColorHair => '髪色';
+
+  @override
+  String get avatarEditorColorSkin => '肌の色';
+
+  @override
+  String get avatarEditorColorOutfit => '服装';
+
+  @override
+  String get avatarEditorNone => 'なし';
+
+  @override
+  String get avatarEditorItemsComingSoon => 'アイテムは近日追加予定';
+
+  @override
+  String get avatarEditorDiscardTitle => '変更を破棄しますか？';
+
+  @override
+  String get avatarEditorDiscardMessage => '保存されていない変更があります。破棄してもよろしいですか？';
+
+  @override
+  String get avatarEditorDiscardConfirm => '破棄';
+
+  @override
+  String get avatarEditorKeepEditing => '編集を続ける';
 }

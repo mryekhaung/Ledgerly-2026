@@ -57,6 +57,9 @@ final class AvatarColors {
     ink: ink ?? this.ink,
   );
 
+  /// Compact string representation used for cache keys.
+  String encode() => '${background}_${skin}_${hair}_${clothing}_$ink';
+
   /// Encodes colors to a JSON-serializable map.
   Map<String, dynamic> toJson() => <String, dynamic>{
     'background': background,

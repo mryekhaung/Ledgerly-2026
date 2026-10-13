@@ -18,6 +18,8 @@ class Avatar extends StatelessWidget {
     this.size = 48,
     this.shape = AvatarShape.circle,
     this.semanticLabel,
+    this.thumbnailGroup,
+    this.thumbnailId,
     super.key,
   });
 
@@ -33,19 +35,38 @@ class Avatar extends StatelessWidget {
   /// An optional accessibility label.
   final String? semanticLabel;
 
+  /// Optional group name when used as a part thumbnail in the editor.
+  final String? thumbnailGroup;
+
+  /// Optional part ID when used as a part thumbnail in the editor.
+  final String? thumbnailId;
+
   @override
   Widget build(BuildContext context) {
-    final cachedSvg = AvatarSvgComposer.instance.getCached(
-      config,
-      shape: shape,
-    );
+    final String? cachedSvg;
+    final Future<String> svgFuture;
+    if (thumbnailGroup != null && thumbnailId != null) {
+      cachedSvg = AvatarSvgComposer.instance.getCachedPartThumbnail(
+        group: thumbnailGroup!,
+        id: thumbnailId!,
+        config: config,
+      );
+      svgFuture = AvatarSvgComposer.instance.composePartThumbnail(
+        group: thumbnailGroup!,
+        id: thumbnailId!,
+        config: config,
+      );
+    } else {
+      cachedSvg = AvatarSvgComposer.instance.getCached(config, shape: shape);
+      svgFuture = AvatarSvgComposer.instance.compose(config, shape: shape);
+    }
 
     final Widget content;
     if (cachedSvg != null) {
       content = SvgPicture.string(cachedSvg, width: size, height: size);
     } else {
       content = FutureBuilder<String>(
-        future: AvatarSvgComposer.instance.compose(config, shape: shape),
+        future: svgFuture,
         builder: (context, snapshot) {
           final svg = snapshot.data;
           if (svg != null) {

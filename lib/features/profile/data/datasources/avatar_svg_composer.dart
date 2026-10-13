@@ -79,6 +79,7 @@ class AvatarSvgComposer {
   final Future<String> Function(String assetPath) _assetLoader;
   final AvatarSvgLruCache _cache;
   final Map<String, String> _rawAssetCache = <String, String>{};
+  final Map<String, String> _partThumbnailCache = <String, String>{};
 
   /// The LRU cache used by this composer.
   AvatarSvgLruCache get cache => _cache;
@@ -91,6 +92,35 @@ class AvatarSvgComposer {
     final key = _cacheKey(config, shape);
     return _cache.get(key);
   }
+
+  /// Returns the cached thumbnail SVG string for [group], [id], and [config] if available.
+  ///
+  /// Spec: `docs/Avatar.md` §5: "Part thumbnails in the editor are also cached by (group, id, colors)."
+  String? getCachedPartThumbnail({
+    required String group,
+    required String id,
+    required AvatarConfig config,
+  }) {
+    final key = _thumbnailKey(group, id, config);
+    return _partThumbnailCache[key];
+  }
+
+  /// Composes a part thumbnail for [group], [id], and [config], caching the result.
+  Future<String> composePartThumbnail({
+    required String group,
+    required String id,
+    required AvatarConfig config,
+  }) async {
+    final key = _thumbnailKey(group, id, config);
+    final cached = _partThumbnailCache[key];
+    if (cached != null) return cached;
+    final composed = await compose(config, shape: AvatarShape.circle);
+    _partThumbnailCache[key] = composed;
+    return composed;
+  }
+
+  String _thumbnailKey(String group, String id, AvatarConfig config) =>
+      '$group:$id:${config.colors.encode()}';
 
   /// Composes a single SVG string for [config] and [shape].
   ///

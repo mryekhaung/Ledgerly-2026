@@ -395,4 +395,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String avatarEditorPartSelected(String part, String value) {
     return '$part: $value';
   }
+
+  @override
+  String get avatarEditorTabHead => 'Head';
+
+  @override
+  String get avatarEditorTabFace => 'Face';
+
+  @override
+  String get avatarEditorTabGlasses => 'Glasses';
+
+  @override
+  String get avatarEditorTabItem => 'Item';
+
+  @override
+  String get avatarEditorTabColors => 'Colors';
+
+  @override
+  String get avatarEditorBeard => 'Facial Hair';
+
+  @override
+  String get avatarEditorColorOutline => 'Outline';
+
+  @override
+  String get avatarEditorColorHair => 'Hair';
+
+  @override
+  String get avatarEditorColorSkin => 'Skin tone';
+
+  @override
+  String get avatarEditorColorOutfit => 'Outfit';
+
+  @override
+  String get avatarEditorNone => 'None';
+
+  @override
+  String get avatarEditorItemsComingSoon => 'More items coming soon';
+
+  @override
+  String get avatarEditorDiscardTitle => 'Discard changes?';
+
+  @override
+  String get avatarEditorDiscardMessage =>
+      'You have unsaved changes. Do you want to discard them?';
+
+  @override
+  String get avatarEditorDiscardConfirm => 'Discard';
+
+  @override
+  String get avatarEditorKeepEditing => 'Keep editing';
 }

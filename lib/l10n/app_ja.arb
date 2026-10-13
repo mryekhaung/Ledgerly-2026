@@ -122,5 +122,21 @@
   "avatarEditorPreview": "プレビュー",
   "avatarEditorSave": "保存",
   "avatarEditorOptionLabel": "{part} の選択肢 {number}",
-  "avatarEditorPartSelected": "{part}: {value}"
+  "avatarEditorPartSelected": "{part}: {value}",
+  "avatarEditorTabHead": "髪型",
+  "avatarEditorTabFace": "顔",
+  "avatarEditorTabGlasses": "メガネ",
+  "avatarEditorTabItem": "アイテム",
+  "avatarEditorTabColors": "カラー",
+  "avatarEditorBeard": "ヒゲ",
+  "avatarEditorColorOutline": "輪郭",
+  "avatarEditorColorHair": "髪色",
+  "avatarEditorColorSkin": "肌の色",
+  "avatarEditorColorOutfit": "服装",
+  "avatarEditorNone": "なし",
+  "avatarEditorItemsComingSoon": "アイテムは近日追加予定",
+  "avatarEditorDiscardTitle": "変更を破棄しますか？",
+  "avatarEditorDiscardMessage": "保存されていない変更があります。破棄してもよろしいですか？",
+  "avatarEditorDiscardConfirm": "破棄",
+  "avatarEditorKeepEditing": "編集を続ける"
 }

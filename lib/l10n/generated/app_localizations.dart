@@ -837,6 +837,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{part}: {value}'**
   String avatarEditorPartSelected(String part, String value);
+
+  /// Tab label for head and hair variants in the avatar editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Head'**
+  String get avatarEditorTabHead;
+
+  /// Tab label for facial expression variants in the avatar editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Face'**
+  String get avatarEditorTabFace;
+
+  /// Tab label for glasses and accessories in the avatar editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Glasses'**
+  String get avatarEditorTabGlasses;
+
+  /// Tab label for item props in the avatar editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Item'**
+  String get avatarEditorTabItem;
+
+  /// Tab label for palette colors in the avatar editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Colors'**
+  String get avatarEditorTabColors;
+
+  /// Section label for facial hair options in the avatar editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Facial Hair'**
+  String get avatarEditorBeard;
+
+  /// Color swatch section label for outline ink.
+  ///
+  /// In en, this message translates to:
+  /// **'Outline'**
+  String get avatarEditorColorOutline;
+
+  /// Color swatch section label for hair color.
+  ///
+  /// In en, this message translates to:
+  /// **'Hair'**
+  String get avatarEditorColorHair;
+
+  /// Color swatch section label for skin tone.
+  ///
+  /// In en, this message translates to:
+  /// **'Skin tone'**
+  String get avatarEditorColorSkin;
+
+  /// Color swatch section label for outfit color.
+  ///
+  /// In en, this message translates to:
+  /// **'Outfit'**
+  String get avatarEditorColorOutfit;
+
+  /// Option label to remove an optional accessory or overlay.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get avatarEditorNone;
+
+  /// Empty state hint for the avatar Item tab.
+  ///
+  /// In en, this message translates to:
+  /// **'More items coming soon'**
+  String get avatarEditorItemsComingSoon;
+
+  /// Confirmation title when leaving avatar editor with unsaved changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes?'**
+  String get avatarEditorDiscardTitle;
+
+  /// Confirmation message when leaving avatar editor with unsaved changes.
+  ///
+  /// In en, this message translates to:
+  /// **'You have unsaved changes. Do you want to discard them?'**
+  String get avatarEditorDiscardMessage;
+
+  /// Confirm button label to discard unsaved avatar edits.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get avatarEditorDiscardConfirm;
+
+  /// Cancel button label to stay in the avatar editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get avatarEditorKeepEditing;
 }
 
 class _AppLocalizationsDelegate
