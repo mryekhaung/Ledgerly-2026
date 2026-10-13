@@ -407,42 +407,49 @@ void main() {
   });
 
   group('every mandated width', () {
-    testWidgets('should_lay_out_without_overflowing_at_any_width', (
-      tester,
-    ) async {
+    /// Pumps [CalendarPage] at every mandated width and asserts nothing threw.
+    ///
+    /// Each width is pumped into a **fresh** tree: the app is unmounted with a
+    /// `SizedBox` between iterations. Re-pumping on top of the previous tree
+    /// instead trips a framework assertion in
+    /// `_RenderObjectSemantics._collectChildMergeUpAndSiblingGroup`
+    /// ("!childSemantics.renderObject._needsLayout is not true") — a lazy
+    /// scrollable carrying `MergeSemantics` rows (the day list) has its
+    /// semantics updated while a render object is still dirty. Unmounting is
+    /// what a separate `testWidgets` per width would do for free.
+    ///
+    /// `pumpAndSettle` cannot be used here: the page shows a
+    /// `CircularProgressIndicator` while a provider resolves, and an
+    /// indeterminate spinner never settles.
+    Future<void> laysOutAtEveryWidth(
+      WidgetTester tester, {
+      required double textScale,
+    }) async {
       for (final width in TestWidths.all) {
-        await host(tester, width);
+        await host(tester, width, textScale: textScale);
         await tester.pump();
 
         expect(
           tester.takeException(),
           isNull,
-          reason: 'CalendarPage threw at width $width',
+          reason: 'CalendarPage threw at width $width, text scale $textScale',
         );
+
+        // Unmount so the next width starts from a clean tree.
+        await tester.pumpWidget(const SizedBox.shrink());
       }
+    }
+
+    testWidgets('should_lay_out_without_overflowing_at_any_width', (
+      tester,
+    ) async {
+      await laysOutAtEveryWidth(tester, textScale: 1);
     });
 
     testWidgets('should_lay_out_without_overflowing_at_text_scale_2', (
       tester,
     ) async {
-      for (final width in TestWidths.all) {
-        await host(tester, width, textScale: 2);
-        // `pumpAndSettle`, not a bare `pump`. Re-pumping the whole app on the
-        // next iteration *while* the semantics tree is still being assembled
-        // trips a framework assertion in
-        // `_RenderObjectSemantics._collectChildMergeUpAndSiblingGroup`
-        // ("!childSemantics.renderObject._needsLayout is not true") when a lazy
-        // scrollable carries `MergeSemantics` rows — as this page's day list
-        // does. Settling drains the scheduler and finalises semantics before the
-        // next rebuild, which is what the scale-1 loop above gets for free.
-        await tester.pumpAndSettle();
-
-        expect(
-          tester.takeException(),
-          isNull,
-          reason: 'CalendarPage threw at width $width, text scale 2.0',
-        );
-      }
+      await laysOutAtEveryWidth(tester, textScale: 2);
     });
   });
 
@@ -538,6 +545,19 @@ void main() {
             builder: (context, state) => const Scaffold(
               body: Center(child: Text('Edit transaction form')),
             ),
+            // A right swipe edits *an existing* row, so the destination is the
+            // nested edit route (`:id/edit`), not the create one. Both are
+            // stubbed to the same marker: the assertion is that the swipe routed
+            // to the form at all.
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutes.transactionEditRelative,
+                name: AppRoutes.transactionEditName,
+                builder: (context, state) => const Scaffold(
+                  body: Center(child: Text('Edit transaction form')),
+                ),
+              ),
+            ],
           ),
         ],
       );
