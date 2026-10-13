@@ -102,21 +102,20 @@ void main() {
       expect(container.read(provider).error, equals(testFailure));
     });
   });
-
   group('TemplateStreamNotifier', () {
     test('should_emit_stream_events_and_handle_refresh', () async {
       final container = ProviderContainer(retry: (_, _) => null);
-      addTearDown(container.dispose);
-
       final controller = StreamController<int>.broadcast();
-      addTearDown(controller.close);
-
       final provider = StreamNotifierProvider<_TestStreamNotifier, int>(
         () => _TestStreamNotifier(() => controller.stream),
       );
 
       final sub = container.listen(provider, (_, _) {});
-      addTearDown(sub.close);
+      addTearDown(() async {
+        sub.close();
+        container.dispose();
+        await controller.close();
+      });
 
       controller.add(42);
       await pumpEventQueue();
