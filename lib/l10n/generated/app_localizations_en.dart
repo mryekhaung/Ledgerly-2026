@@ -493,4 +493,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calendarSpentThisPeriod => 'Spent this period';
+
+  @override
+  String get insightsTitle => 'Insights';
+
+  @override
+  String get insightsTotalIncome => 'Total Income';
+
+  @override
+  String get insightsTotalExpense => 'Total Expense';
+
+  @override
+  String get insightsNetSavings => 'Net Balance';
+
+  @override
+  String get insightsVsPreviousPeriod => 'vs previous period';
+
+  @override
+  String get insightsSpendingByCategory => 'Spending Breakdown';
+
+  @override
+  String get insightsIncomeVsExpense => 'Income vs Expense';
+
+  @override
+  String get insightsCashFlowTrend => 'Cash Flow Trend';
+
+  @override
+  String get insightsTopCategories => 'Top Categories';
+
+  @override
+  String get insightsNoDataTitle => 'No transactions yet';
+
+  @override
+  String get insightsNoDataBody =>
+      'Add transactions in this period to see your financial analytics.';
+
+  @override
+  String get insightsPreviousPeriod => 'Previous period';
+
+  @override
+  String get insightsNextPeriod => 'Next period';
 }

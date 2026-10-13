@@ -151,5 +151,18 @@
   "monthStartsOnDayFormat": "{day}日",
   "calendarPayCycle": "給与サイクル",
   "calendarThisPeriod": "今期",
-  "calendarSpentThisPeriod": "今期の支出"
+  "calendarSpentThisPeriod": "今期の支出",
+  "insightsTitle": "分析",
+  "insightsTotalIncome": "総収入",
+  "insightsTotalExpense": "総支出",
+  "insightsNetSavings": "純収支",
+  "insightsVsPreviousPeriod": "前期比",
+  "insightsSpendingByCategory": "支出の内訳",
+  "insightsIncomeVsExpense": "収支の比較",
+  "insightsCashFlowTrend": "キャッシュフロートレンド",
+  "insightsTopCategories": "支出上位カテゴリ",
+  "insightsNoDataTitle": "取引データがありません",
+  "insightsNoDataBody": "この期間の取引を登録すると、支出分析が表示されます。",
+  "insightsPreviousPeriod": "前の期間",
+  "insightsNextPeriod": "次の期間"
 }

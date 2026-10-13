@@ -1011,6 +1011,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Spent this period'**
   String get calendarSpentThisPeriod;
+
+  /// App bar title for the Insights screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights'**
+  String get insightsTitle;
+
+  /// Label for period total income.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Income'**
+  String get insightsTotalIncome;
+
+  /// Label for period total expense.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Expense'**
+  String get insightsTotalExpense;
+
+  /// Label for period net balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Balance'**
+  String get insightsNetSavings;
+
+  /// Caption comparing current period figures to previous period.
+  ///
+  /// In en, this message translates to:
+  /// **'vs previous period'**
+  String get insightsVsPreviousPeriod;
+
+  /// Heading for category spending donut chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Breakdown'**
+  String get insightsSpendingByCategory;
+
+  /// Heading for income vs expense bar chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Income vs Expense'**
+  String get insightsIncomeVsExpense;
+
+  /// Heading for cumulative cash flow trend line chart.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash Flow Trend'**
+  String get insightsCashFlowTrend;
+
+  /// Heading for top spending categories list.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Categories'**
+  String get insightsTopCategories;
+
+  /// Empty state title when period has no transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions yet'**
+  String get insightsNoDataTitle;
+
+  /// Empty state body for insights.
+  ///
+  /// In en, this message translates to:
+  /// **'Add transactions in this period to see your financial analytics.'**
+  String get insightsNoDataBody;
+
+  /// Tooltip for previous period button.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous period'**
+  String get insightsPreviousPeriod;
+
+  /// Tooltip for next period button.
+  ///
+  /// In en, this message translates to:
+  /// **'Next period'**
+  String get insightsNextPeriod;
 }
 
 class _AppLocalizationsDelegate

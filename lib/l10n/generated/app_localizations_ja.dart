@@ -476,4 +476,43 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get calendarSpentThisPeriod => '今期の支出';
+
+  @override
+  String get insightsTitle => '分析';
+
+  @override
+  String get insightsTotalIncome => '総収入';
+
+  @override
+  String get insightsTotalExpense => '総支出';
+
+  @override
+  String get insightsNetSavings => '純収支';
+
+  @override
+  String get insightsVsPreviousPeriod => '前期比';
+
+  @override
+  String get insightsSpendingByCategory => '支出の内訳';
+
+  @override
+  String get insightsIncomeVsExpense => '収支の比較';
+
+  @override
+  String get insightsCashFlowTrend => 'キャッシュフロートレンド';
+
+  @override
+  String get insightsTopCategories => '支出上位カテゴリ';
+
+  @override
+  String get insightsNoDataTitle => '取引データがありません';
+
+  @override
+  String get insightsNoDataBody => 'この期間の取引を登録すると、支出分析が表示されます。';
+
+  @override
+  String get insightsPreviousPeriod => '前の期間';
+
+  @override
+  String get insightsNextPeriod => '次の期間';
 }

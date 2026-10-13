@@ -4,6 +4,7 @@ import 'package:ledgerly/core/database/app_database.dart';
 import 'package:ledgerly/core/database/seed.dart';
 import 'package:ledgerly/core/di/core_module.dart';
 import 'package:ledgerly/features/categories/di/categories_module.dart';
+import 'package:ledgerly/features/insights/di/insights_module.dart';
 import 'package:ledgerly/features/profile/di/profile_module.dart';
 import 'package:ledgerly/features/settings/di/settings_module.dart';
 import 'package:ledgerly/features/transactions/di/transactions_module.dart';
@@ -47,6 +48,7 @@ Future<void> configureDependencies({
   registerCoreModule(getIt);
   registerCategoriesModule(getIt);
   registerTransactionsModule(getIt);
+  registerInsightsModule(getIt);
   // Registered last because its only cross-feature dependency is the database;
   // nothing else depends on it at wiring time, and it must be available before
   // the first frame reads a currency or a theme (`app.dart`).

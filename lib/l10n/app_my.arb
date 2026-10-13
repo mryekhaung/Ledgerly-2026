@@ -151,5 +151,18 @@
   "monthStartsOnDayFormat": "ရက် {day}",
   "calendarPayCycle": "လစာစက်ဝန်း",
   "calendarThisPeriod": "ယခုကာလ",
-  "calendarSpentThisPeriod": "ယခုကာလအတွင်း သုံးစွဲငွေ"
+  "calendarSpentThisPeriod": "ယခုကာလအတွင်း သုံးစွဲငွေ",
+  "insightsTitle": "သုံးသပ်ချက်",
+  "insightsTotalIncome": "စုစုပေါင်း ဝင်ငွေ",
+  "insightsTotalExpense": "စုစုပေါင်း အသုံးစရိတ်",
+  "insightsNetSavings": "အသားတင် ကျန်ငွေ",
+  "insightsVsPreviousPeriod": "ယခင်ကာလနှင့် နှိုင်းယှဉ်ချက်",
+  "insightsSpendingByCategory": "အသုံးစရိတ် ခွဲခြမ်းစိတ်ဖြာချက်",
+  "insightsIncomeVsExpense": "ဝင်ငွေနှင့် အသုံးစရိတ် နှိုင်းယှဉ်ချက်",
+  "insightsCashFlowTrend": "ငွေစီးဆင်းမှု လားရာ",
+  "insightsTopCategories": "အသုံးအများဆုံး ကဏ္ဍများ",
+  "insightsNoDataTitle": "စာရင်းမှတ်တမ်း မရှိသေးပါ",
+  "insightsNoDataBody": "ဤကာလအတွင်း ငွေစာရင်းများ ထည့်သွင်းပြီး သုံးသပ်ချက်များကို ကြည့်ရှုပါ။",
+  "insightsPreviousPeriod": "ယခင် ကာလ",
+  "insightsNextPeriod": "နောက် ကာလ"
 }

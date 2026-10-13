@@ -10,9 +10,9 @@ import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/widgets/app_nav/adaptive_nav.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
+import 'package:ledgerly/features/insights/presentation/pages/insights_page.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
-import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -106,16 +106,7 @@ void main() {
       await tester.pumpWidget(hostApp(initialLocation: AppRoutes.insights));
       await tester.pumpAndSettle();
 
-      // Insights is still a placeholder — it renders the shared coming-soon
-      // state rather than a bespoke page. Assert on the shipped string
-      // (`stateComingSoon`), not a fragment of it: the copy has already changed
-      // once, and a `textContaining` on a phrase that no longer exists fails
-      // silently as "nothing found".
-      expect(find.byType(StatePlaceholder), findsOneWidget);
-      expect(
-        find.text("This part isn't built yet. It's planned and coming."),
-        findsOneWidget,
-      );
+      expect(find.byType(InsightsPage), findsOneWidget);
     });
 
     testWidgets('should_navigate_when_router_pushed_to_categories', (

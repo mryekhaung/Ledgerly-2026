@@ -638,5 +638,57 @@
   "calendarSpentThisPeriod": "Spent this period",
   "@calendarSpentThisPeriod": {
     "description": "Hero label for period summary when viewing in pay-cycle mode."
+  },
+  "insightsTitle": "Insights",
+  "@insightsTitle": {
+    "description": "App bar title for the Insights screen."
+  },
+  "insightsTotalIncome": "Total Income",
+  "@insightsTotalIncome": {
+    "description": "Label for period total income."
+  },
+  "insightsTotalExpense": "Total Expense",
+  "@insightsTotalExpense": {
+    "description": "Label for period total expense."
+  },
+  "insightsNetSavings": "Net Balance",
+  "@insightsNetSavings": {
+    "description": "Label for period net balance."
+  },
+  "insightsVsPreviousPeriod": "vs previous period",
+  "@insightsVsPreviousPeriod": {
+    "description": "Caption comparing current period figures to previous period."
+  },
+  "insightsSpendingByCategory": "Spending Breakdown",
+  "@insightsSpendingByCategory": {
+    "description": "Heading for category spending donut chart."
+  },
+  "insightsIncomeVsExpense": "Income vs Expense",
+  "@insightsIncomeVsExpense": {
+    "description": "Heading for income vs expense bar chart."
+  },
+  "insightsCashFlowTrend": "Cash Flow Trend",
+  "@insightsCashFlowTrend": {
+    "description": "Heading for cumulative cash flow trend line chart."
+  },
+  "insightsTopCategories": "Top Categories",
+  "@insightsTopCategories": {
+    "description": "Heading for top spending categories list."
+  },
+  "insightsNoDataTitle": "No transactions yet",
+  "@insightsNoDataTitle": {
+    "description": "Empty state title when period has no transactions."
+  },
+  "insightsNoDataBody": "Add transactions in this period to see your financial analytics.",
+  "@insightsNoDataBody": {
+    "description": "Empty state body for insights."
+  },
+  "insightsPreviousPeriod": "Previous period",
+  "@insightsPreviousPeriod": {
+    "description": "Tooltip for previous period button."
+  },
+  "insightsNextPeriod": "Next period",
+  "@insightsNextPeriod": {
+    "description": "Tooltip for next period button."
   }
 }

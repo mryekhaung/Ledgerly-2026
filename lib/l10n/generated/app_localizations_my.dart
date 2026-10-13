@@ -494,4 +494,45 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get calendarSpentThisPeriod => 'ယခုကာလအတွင်း သုံးစွဲငွေ';
+
+  @override
+  String get insightsTitle => 'သုံးသပ်ချက်';
+
+  @override
+  String get insightsTotalIncome => 'စုစုပေါင်း ဝင်ငွေ';
+
+  @override
+  String get insightsTotalExpense => 'စုစုပေါင်း အသုံးစရိတ်';
+
+  @override
+  String get insightsNetSavings => 'အသားတင် ကျန်ငွေ';
+
+  @override
+  String get insightsVsPreviousPeriod => 'ယခင်ကာလနှင့် နှိုင်းယှဉ်ချက်';
+
+  @override
+  String get insightsSpendingByCategory => 'အသုံးစရိတ် ခွဲခြမ်းစိတ်ဖြာချက်';
+
+  @override
+  String get insightsIncomeVsExpense =>
+      'ဝင်ငွေနှင့် အသုံးစရိတ် နှိုင်းယှဉ်ချက်';
+
+  @override
+  String get insightsCashFlowTrend => 'ငွေစီးဆင်းမှု လားရာ';
+
+  @override
+  String get insightsTopCategories => 'အသုံးအများဆုံး ကဏ္ဍများ';
+
+  @override
+  String get insightsNoDataTitle => 'စာရင်းမှတ်တမ်း မရှိသေးပါ';
+
+  @override
+  String get insightsNoDataBody =>
+      'ဤကာလအတွင်း ငွေစာရင်းများ ထည့်သွင်းပြီး သုံးသပ်ချက်များကို ကြည့်ရှုပါ။';
+
+  @override
+  String get insightsPreviousPeriod => 'ယခင် ကာလ';
+
+  @override
+  String get insightsNextPeriod => 'နောက် ကာလ';
 }

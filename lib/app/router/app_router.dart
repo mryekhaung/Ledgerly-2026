@@ -6,6 +6,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
+import 'package:ledgerly/features/insights/presentation/pages/insights_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/profile_page.dart';
 import 'package:ledgerly/features/settings/presentation/pages/month_starts_on_page.dart';
@@ -45,10 +46,7 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
           GoRoute(
             path: AppRoutes.insights,
             name: AppRoutes.insightsName,
-            builder: (context, state) => const _PlaceholderPage(
-              titleKey: 'navigationInsights',
-              icon: Icons.pie_chart_outline,
-            ),
+            builder: (context, state) => const InsightsPage(),
           ),
           GoRoute(
             path: AppRoutes.categories,
@@ -165,32 +163,8 @@ class _TransactionEditLoader extends ConsumerWidget {
 class _EditLoadingScaffold extends StatelessWidget {
   const _EditLoadingScaffold();
 
+
   @override
   Widget build(BuildContext context) =>
       const Scaffold(body: SafeArea(child: LoadingPlaceholder()));
-}
-
-/// Not-yet-built destination. States plainly that the feature is missing — no
-/// Lorem, no fake data (`docs/Agent.md` §8) — through the same
-/// [StatePlaceholder] every other empty state uses, so it matches the design
-/// system instead of being a bespoke one-off.
-class _PlaceholderPage extends StatelessWidget {
-  const _PlaceholderPage({required this.titleKey, required this.icon});
-
-  final String titleKey;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final strings = AppStrings.of(context);
-
-    return Scaffold(
-      appBar: AppBar(title: Text(strings(titleKey))),
-      body: StatePlaceholder(
-        icon: icon,
-        title: strings(titleKey),
-        body: strings('stateComingSoon'),
-      ),
-    );
-  }
 }

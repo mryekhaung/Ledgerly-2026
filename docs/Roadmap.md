@@ -185,13 +185,13 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
   - After a failed attempt, `rm -rf .dart_tool/flutter_build` — the abandoned `--incremental --initialize-from-dill` step leaves a 0-byte `app.dill` that breaks the next run.
 - ✅ **`WatchDayTotal` use case** — a day-level income/expense/net aggregate, so the calendar summary card can show the selected day rather than the month. Built alongside the calendar summary card with `TransactionsDao.sumForDay`, repository methods, and `watchDayTotalProvider`.
 
-## Phase 2 — "Understand & Account" (v0.2) — NOT STARTED
+## Phase 2 — "Understand & Account" (v0.2) — IN PROGRESS
 
+- ☑ **Insights & Financial Analytics** — Donut chart, income vs expense bar chart, cash flow trend line chart, and top categories breakdown cards by `BudgetPeriod`; period switcher, comparison deltas ("previous period" delta using `PeriodCalculator.previous`), responsive 1 → 2 → 3 column grid layouts, SQL aggregations.
 - ☐ Firebase project + flavors; `AuthRepository` + Firebase adapter
 - ☐ Welcome / Sign in with Apple / Google (/ Email) / Account pages — and the first-run **"When does your month start?"** question (default 1, skippable; `Design.md` §6.6)
 - ☐ Guest → account linking + merge prompt
 - ☐ Sign out + **Delete account** (re-auth, Apple token revoke) — store requirement
-- ☐ Insights: donut, bar, line, top categories (SQL aggregations) — all by `BudgetPeriod`; "previous period" delta uses `PeriodCalculator.previous`
 - ☐ Transactions list page: search, filters, paging
 - ☐ Export CSV/JSON (+ share) — range presets ("this period", "last period") come from `PeriodCalculator`
 - ☐ Import CSV/JSON with mapping, preview, dedupe (isolate)
