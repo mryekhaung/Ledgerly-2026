@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -74,6 +76,7 @@ void main() {
     List<Transaction>? transactions,
     FakeTransactionRepository? repository,
     List<Override> extraOverrides = const <Override>[],
+    GoRouter? router,
   }) {
     final fakes =
         repository ??
@@ -81,6 +84,7 @@ void main() {
 
     return pumpAppHost(
       tester,
+      router: router,
       size: Size(width, 900),
       locale: locale ?? const Locale('en'),
       textScaler: TextScaler.linear(textScale),
@@ -111,7 +115,9 @@ void main() {
         calendarProvider.overrideWith(() => _SeededCalendarNotifier(day)),
         ...extraOverrides,
       ],
-      home: const CalendarPage(),
+      // `pumpAppHost` takes exactly one of `home` or `router`; the router owns
+      // its own tree, so the page is supplied by the router's route instead.
+      home: router == null ? const CalendarPage() : null,
     );
   }
 
@@ -421,7 +427,15 @@ void main() {
     ) async {
       for (final width in TestWidths.all) {
         await host(tester, width, textScale: 2);
-        await tester.pump();
+        // `pumpAndSettle`, not a bare `pump`. Re-pumping the whole app on the
+        // next iteration *while* the semantics tree is still being assembled
+        // trips a framework assertion in
+        // `_RenderObjectSemantics._collectChildMergeUpAndSiblingGroup`
+        // ("!childSemantics.renderObject._needsLayout is not true") when a lazy
+        // scrollable carries `MergeSemantics` rows — as this page's day list
+        // does. Settling drains the scheduler and finalises semantics before the
+        // next rebuild, which is what the scale-1 loop above gets for free.
+        await tester.pumpAndSettle();
 
         expect(
           tester.takeException(),
@@ -438,11 +452,13 @@ void main() {
     /// page mutates.
     Future<void> hostWithFakes(
       WidgetTester tester,
-      FakeTransactionRepository fakes,
-    ) => host(
+      FakeTransactionRepository fakes, {
+      GoRouter? router,
+    }) => host(
       tester,
       TestWidths.phone,
       repository: fakes,
+      router: router,
       extraOverrides: <Override>[
         deleteTransactionProvider.overrideWithValue(DeleteTransaction(fakes)),
         restoreTransactionProvider.overrideWithValue(RestoreTransaction(fakes)),
@@ -502,7 +518,32 @@ void main() {
       tester,
     ) async {
       final fakes = FakeTransactionRepository(seed: dayTransactions());
-      await hostWithFakes(tester, fakes);
+      // A right swipe *navigates* to the edit form (`context.pushNamed`), so the
+      // page needs a router above it — without one the swipe throws "No GoRouter
+      // found in context" before the assertion runs, and the test would be
+      // measuring the missing router rather than the swipe. The destination is
+      // a stub: the point is that the swipe routes to *edit* and leaves the row
+      // in place, not what the form looks like.
+      final router = GoRouter(
+        initialLocation: AppRoutes.calendar,
+        routes: <RouteBase>[
+          GoRoute(
+            path: AppRoutes.calendar,
+            name: AppRoutes.calendarName,
+            builder: (context, state) => const CalendarPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.transactionNew,
+            name: AppRoutes.transactionNewName,
+            builder: (context, state) => const Scaffold(
+              body: Center(child: Text('Edit transaction form')),
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await hostWithFakes(tester, fakes, router: router);
       await tester.pumpAndSettle();
       await revealRows(tester);
 
@@ -516,7 +557,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Morning coffee'), findsOneWidget);
+      // The edit route opened — that is the swipe's actual effect.
+      expect(find.text('Edit transaction form'), findsOneWidget);
       expect(fakes.items.where((t) => t.isActive).length, before);
     });
 
@@ -544,7 +586,7 @@ void main() {
   });
 }
 
-/// A [CalendarNotifier] that starts on a fixed [day] rather than the real
+/// A [CalendarNotifier] that starts on a fixed day rather than the real
 /// "today".
 ///
 /// Test-only. The page's own notifier pins itself to `DateTime.now()`, which

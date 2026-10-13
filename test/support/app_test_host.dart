@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/adaptive_style.dart';
@@ -112,40 +113,101 @@ Widget appTestHost({
   Brightness brightness = Brightness.light,
   TextScaler? textScaler,
   List<Override> overrides = const <Override>[],
+  GoRouter? router,
 }) {
   return ProviderScope(
     overrides: overrides,
-    child: MaterialApp(
-      locale: locale,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: brightness == Brightness.dark
-          ? ThemeMode.dark
-          : ThemeMode.light,
-      supportedLocales: const <Locale>[
-        Locale('en'),
-        Locale('my'),
-        Locale('ja'),
-      ],
-      localizationsDelegates: const <LocalizationsDelegate<Object?>>[
-        ...GlobalMaterialLocalizations.delegates,
-        AppLocalizations.delegate,
-      ],
-      builder: (context, child) => MediaQuery(
-        // Only `size` and `textScaler` are overridden; padding, viewInsets and
-        // devicePixelRatio keep the binding's values, so the page sees one
-        // coherent surface rather than a half-specified one.
-        data: MediaQuery.of(context).copyWith(
-          size: size ?? MediaQuery.sizeOf(context),
-          textScaler: textScaler ?? TextScaler.noScaling,
-        ),
-        child: AppTestScopes(
-          platform: platform,
-          brightness: brightness,
-          child: child ?? const SizedBox.shrink(),
-        ),
-      ),
-      home: home,
+    child: router == null
+        ? MaterialApp(
+            locale: locale,
+            theme: AppTheme.light(),
+            darkTheme: AppTheme.dark(),
+            themeMode: brightness == Brightness.dark
+                ? ThemeMode.dark
+                : ThemeMode.light,
+            supportedLocales: const <Locale>[
+              Locale('en'),
+              Locale('my'),
+              Locale('ja'),
+            ],
+            localizationsDelegates: const <LocalizationsDelegate<Object?>>[
+              ...GlobalMaterialLocalizations.delegates,
+              AppLocalizations.delegate,
+            ],
+            builder: (context, child) => _TestSurround(
+              size: size,
+              textScaler: textScaler,
+              platform: platform,
+              brightness: brightness,
+              child: child,
+            ),
+            home: home,
+          )
+        // A page that navigates with `context.pushNamed` needs a router above
+        // it; a bare `MaterialApp` has none, so the tap throws "No GoRouter
+        // found in context" instead of exercising the page. Tests that assert on
+        // a *navigation* pass a `router` and drop `home` (the router owns the
+        // tree). `GoRouter` takes the same `builder`-position surround through
+        // its own `builder`, so the scopes and the surface override still apply.
+        : MaterialApp.router(
+            locale: locale,
+            theme: AppTheme.light(),
+            darkTheme: AppTheme.dark(),
+            themeMode: brightness == Brightness.dark
+                ? ThemeMode.dark
+                : ThemeMode.light,
+            supportedLocales: const <Locale>[
+              Locale('en'),
+              Locale('my'),
+              Locale('ja'),
+            ],
+            localizationsDelegates: const <LocalizationsDelegate<Object?>>[
+              ...GlobalMaterialLocalizations.delegates,
+              AppLocalizations.delegate,
+            ],
+            routerConfig: router,
+            builder: (context, child) => _TestSurround(
+              size: size,
+              textScaler: textScaler,
+              platform: platform,
+              brightness: brightness,
+              child: child,
+            ),
+          ),
+  );
+}
+
+/// The `MediaQuery` + scope wrapper both host shapes need.
+///
+/// Extracted so the `MaterialApp` and `MaterialApp.router` branches cannot
+/// drift: the size/text-scale override must sit in the `builder` (inside the
+/// app's tight constraints, above the `Navigator`) in both cases, and the same
+/// scopes must wrap the pushed routes in both cases.
+class _TestSurround extends StatelessWidget {
+  const _TestSurround({
+    required this.child,
+    required this.size,
+    required this.textScaler,
+    required this.platform,
+    required this.brightness,
+  });
+
+  final Widget? child;
+  final Size? size;
+  final TextScaler? textScaler;
+  final AppPlatform? platform;
+  final Brightness brightness;
+
+  @override
+  Widget build(BuildContext context) => MediaQuery(
+    data: MediaQuery.of(context).copyWith(
+      size: size ?? MediaQuery.sizeOf(context),
+      textScaler: textScaler ?? TextScaler.noScaling,
+    ),
+    child: AppTestScopes(
+      platform: platform,
+      brightness: brightness,
+      child: child ?? const SizedBox.shrink(),
     ),
   );
 }
@@ -161,9 +223,15 @@ Widget appTestHost({
 ///
 /// The view is restored by `addTearDown`, so a test can call this repeatedly
 /// (e.g. walking `TestWidths.all`) without leaking a size into the next case.
+///
+/// Pass exactly one of [home] or [router]: [home] is the usual case, while
+/// [router] is for a page that navigates with `context.pushNamed` — with no
+/// router in the tree such a tap throws "No GoRouter found in context", so the
+/// test would be measuring the missing router rather than the page.
 Future<void> pumpAppHost(
   WidgetTester tester, {
-  required Widget home,
+  Widget? home,
+  GoRouter? router,
   Size size = const Size(800, 600),
   Locale locale = const Locale('en'),
   AppPlatform? platform,
@@ -171,6 +239,10 @@ Future<void> pumpAppHost(
   TextScaler? textScaler,
   List<Override> overrides = const <Override>[],
 }) async {
+  assert(
+    (home == null) != (router == null),
+    'pumpAppHost needs exactly one of `home` or `router`.',
+  );
   final view = tester.view;
   final previousSize = view.physicalSize;
   final previousRatio = view.devicePixelRatio;
@@ -184,7 +256,8 @@ Future<void> pumpAppHost(
 
   await tester.pumpWidget(
     appTestHost(
-      home: home,
+      home: home ?? const SizedBox.shrink(),
+      router: router,
       size: size,
       locale: locale,
       platform: platform,

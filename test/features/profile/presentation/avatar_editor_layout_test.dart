@@ -96,17 +96,22 @@ void main() {
 
     testWidgets('preview sits clear of the header', (tester) async {
       await pumpAt(tester, 360, 2.0);
-      // The page title and the preview share the label "Avatar" by design
-      // (both are the thing the screen is about), so a bare semantics-label
-      // finder resolves to the AppBar title at y≈9 and the assertion below
-      // would measure the header instead of the preview.
+      // Three things on this page are called "Avatar": the AppBar title
+      // (`avatarEditorTitle`), the preview's semantics label
+      // (`profileAvatarLabel`) and the type of every artwork thumbnail. So:
       //
-      // `Avatar` wraps its paint in its *own* `Semantics(label: …, image: true)`
-      // root, so the labelled node is the `Avatar` itself — a
-      // `find.descendant(of: Avatar, …)` search would exclude it and match
-      // nothing. Match the preview widget directly; the header title is a
-      // `Text`, not an `Avatar`, so this stays unambiguous.
-      final preview = find.byType(Avatar);
+      // - a bare `find.bySemanticsLabel('Avatar')` resolves to the header,
+      // - `find.byType(Avatar)` resolves to the preview *and* every thumbnail
+      //   in the tab grid,
+      // - `find.descendant(of: Avatar, matching: bySemanticsLabel(...))` finds
+      //   nothing, because `Avatar` wraps its paint in its own `Semantics` root
+      //   and a descendant search excludes the root.
+      //
+      // The preview is the only `Avatar` given a `semanticLabel` (the tab
+      // thumbnails pass none), so matching on that pinpoints it exactly.
+      final preview = find.byWidgetPredicate(
+        (widget) => widget is Avatar && widget.semanticLabel != null,
+      );
       expect(preview, findsOneWidget);
 
       final rect = tester.getRect(preview);
