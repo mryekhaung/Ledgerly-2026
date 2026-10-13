@@ -85,7 +85,14 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
           label: Text(strings('categoriesNew')),
         ),
         body: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          // `stretch`, not `start`: the detail pane hosts `CategoryFormBody`,
+          // which is a `ListView`. `start` sizes each child to its intrinsic
+          // height, so the moment a row is tapped and the form appears the
+          // viewport is handed an unbounded box and throws "Vertical viewport
+          // was given unbounded height". `stretch` gives both panes the row's
+          // full height, which is also what lets the list and the form scroll
+          // independently.
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Expanded(flex: 4, child: body),
             VerticalDivider(width: 1, color: AppThemeColors.of(context).border),

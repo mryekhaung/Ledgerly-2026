@@ -177,7 +177,12 @@ class _WideBody extends StatelessWidget {
     );
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      // `stretch`, not `start`: both panes are `ListView`s, so `start` hands
+      // each one an unbounded box and the first frame throws "Vertical viewport
+      // was given unbounded height". `stretch` gives them the row's height,
+      // which is what makes the two panes scroll independently — the whole
+      // point of the wide layout.
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Expanded(
           flex: 4,

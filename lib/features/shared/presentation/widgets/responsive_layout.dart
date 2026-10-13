@@ -75,7 +75,15 @@ class TwoPaneLayout extends StatelessWidget {
     }
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      // `stretch`, not `start`: a pane may contain a scrollable — the category
+      // editor's form body is a `ListView`, and the detail pane is exactly where
+      // a form goes. `start` leaves each child at its intrinsic height, so a
+      // scrollable there is handed an unbounded box and throws
+      // "Vertical viewport was given unbounded height" as soon as the pane
+      // appears. `stretch` gives both panes the row's full height, which is also
+      // what makes each pane scroll independently — the behaviour the two-pane
+      // layout exists to provide.
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Flexible(
           flex: masterFlex,

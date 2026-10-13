@@ -94,15 +94,20 @@ void main() {
     tester,
   ) async {
     final read = host(tester, LocalDate(2026, 5, 17));
-    await read();
+    final popped = read();
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('August 2026'));
     await tester.pumpAndSettle();
 
+    // `read` pops the picker with the chosen month, so it only completes once
+    // the tap lands. It must be called exactly once: a second call re-enters
+    // `pumpWidget` while the first is still on the stack, which trips the
+    // test-async guard ("the first method had not yet finished executing").
+    //
     // Key assertion: the *17th* was the initial day, but the result must be the
     // 1st — the calendar's `visibleMonth` invariant is a first-of-month.
-    expect(read(), completion(LocalDate(2026, 8, 1)));
+    expect(await popped, LocalDate(2026, 8, 1));
   });
 
   testWidgets('should_move_the_year_without_choosing_a_month', (tester) async {
