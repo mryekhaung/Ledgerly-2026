@@ -1,19 +1,22 @@
-import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ledgerly/features/profile/data/datasources/avatar_svg_composer.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_config.dart';
-import 'package:ledgerly/features/profile/presentation/widgets/avatar_painter.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Renders an [AvatarConfig] at a given size.
+export 'package:ledgerly/features/profile/data/datasources/avatar_svg_composer.dart'
+    show AvatarShape;
+
+/// Renders an [AvatarConfig] as an Open Peeps SVG vector graphic at a given size.
 ///
-/// The single entry point for drawing an avatar anywhere in the app — the profile
-/// list, the editor preview, and every option swatch. Going through one widget is
-/// what keeps those three from drifting apart as the painter gains parts
-/// (`docs/Agent.md` §6: one widget per visual concept).
+/// Spec: `docs/Avatar.md` §5.
+/// Wrapped in a [RepaintBoundary], clipped to a circle or squircle, and memoized
+/// via [AvatarSvgComposer].
 class Avatar extends StatelessWidget {
   /// Creates an avatar.
   const Avatar({
     required this.config,
     this.size = 48,
+    this.shape = AvatarShape.circle,
     this.semanticLabel,
     super.key,
   });
@@ -21,31 +24,69 @@ class Avatar extends StatelessWidget {
   /// The composition to draw.
   final AvatarConfig config;
 
-  /// The edge length of the square. The avatar is always square; a non-square
-  /// box would stretch the face.
+  /// The edge length of the square box.
   final double size;
 
+  /// The clipping shape (circle by default, or squircle).
+  final AvatarShape shape;
+
   /// An optional accessibility label.
-  ///
-  /// Null leaves the avatar decorative — correct for a swatch in a picker, where
-  /// announcing "avatar" per option is noise. The profile surfaces pass a label
-  /// because there the avatar *is* the user's identity.
   final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-
-    final painted = CustomPaint(
-      size: Size.square(size),
-      painter: AvatarPainter(config: config, colors: colors),
-      // The painter never paints outside its box, and marking the layer opaque
-      // lets the compositor skip blending it against what's behind.
-      isComplex: false,
+    final cachedSvg = AvatarSvgComposer.instance.getCached(
+      config,
+      shape: shape,
     );
 
-    if (semanticLabel == null) return painted;
+    final Widget content;
+    if (cachedSvg != null) {
+      content = SvgPicture.string(cachedSvg, width: size, height: size);
+    } else {
+      content = FutureBuilder<String>(
+        future: AvatarSvgComposer.instance.compose(config, shape: shape),
+        builder: (context, snapshot) {
+          final svg = snapshot.data;
+          if (svg != null) {
+            return SvgPicture.string(svg, width: size, height: size);
+          }
+          return SizedBox.square(
+            dimension: size,
+            child: ColoredBox(color: Color(config.colors.background)),
+          );
+        },
+      );
+    }
 
-    return Semantics(label: semanticLabel, image: true, child: painted);
+    final clipped = RepaintBoundary(
+      child: ClipPath(clipper: _AvatarClipper(shape), child: content),
+    );
+
+    if (semanticLabel == null) return clipped;
+
+    return Semantics(label: semanticLabel, image: true, child: clipped);
   }
+}
+
+class _AvatarClipper extends CustomClipper<Path> {
+  const _AvatarClipper(this.shape);
+
+  final AvatarShape shape;
+
+  @override
+  Path getClip(Size size) {
+    final rect = Offset.zero & size;
+    return switch (shape) {
+      AvatarShape.circle => Path()..addOval(rect),
+      AvatarShape.squircle =>
+        Path()..addRRect(
+          RRect.fromRectAndRadius(rect, Radius.circular(size.width * 0.28)),
+        ),
+    };
+  }
+
+  @override
+  bool shouldReclip(covariant _AvatarClipper oldClipper) =>
+      oldClipper.shape != shape;
 }

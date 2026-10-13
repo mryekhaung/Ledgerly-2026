@@ -127,6 +127,7 @@ constraints below rather than `any`.
 | `go_router` | **17.5.0** | `^17.5.0` | Routing |
 | `get_it` | **9.3.0** | `^9.3.0` | DI for data/domain |
 | `intl` | **0.20.3** | `^0.20.3` | Date/number formatting |
+| `flutter_svg` | **2.3.0** | `^2.3.0` | Avatar v2 vector rendering (`docs/Avatar.md` §5; Apache 2.0; supports iOS/Android/web) |
 | `flutter_lints` | template default | `^6.0.0` | Dev dependency |
 
 Gotcha worth recording: **`cupertino_ui` re-exports `package:flutter/widgets.dart`**, and both
