@@ -55,11 +55,10 @@ void main() {
     });
 
     testWidgets('should_assert_against_nested_app_cards', (tester) async {
-      expect(() async {
-        await tester.pumpWidget(
-          host(const AppCard(child: AppCard(child: Text('Nested')))),
-        );
-      }, throwsAssertionError);
+      await tester.pumpWidget(
+        host(const AppCard(child: AppCard(child: Text('Nested')))),
+      );
+      expect(tester.takeException(), isAssertionError);
     });
   });
 
