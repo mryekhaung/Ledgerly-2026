@@ -46,7 +46,7 @@ class RecurringItemCard extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       color: colors.surfaceRaised,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.borderLg,
         side: BorderSide(
           color: isDue
               ? colors.warning.withValues(alpha: 0.6)
@@ -55,7 +55,7 @@ class RecurringItemCard extends ConsumerWidget {
         ),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.borderLg,
         onTap: () => context.pushNamed(
           AppRoutes.recurringEditName,
           pathParameters: {'id': item.id},
@@ -250,7 +250,7 @@ class RecurringItemCard extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: colors.brandPrimary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: AppRadius.borderSm,
                     ),
                     child: Text(
                       frequencyLabel,
@@ -272,7 +272,7 @@ class RecurringItemCard extends ConsumerWidget {
                       color:
                           (item.autoAdd ? colors.moneyIn : colors.textSecondary)
                               .withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: AppRadius.borderSm,
                     ),
                     child: Text(
                       item.autoAdd ? 'Auto' : 'Manual',
@@ -296,7 +296,7 @@ class RecurringItemCard extends ConsumerWidget {
                       color: isDue
                           ? colors.warning.withValues(alpha: 0.15)
                           : colors.surface,
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: AppRadius.borderSm,
                       border: Border.all(
                         color: isDue
                             ? colors.warning

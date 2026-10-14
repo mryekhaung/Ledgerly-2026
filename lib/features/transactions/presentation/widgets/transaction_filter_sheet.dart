@@ -223,7 +223,7 @@ class _TransactionFilterSheetState
                 height: 4,
                 decoration: BoxDecoration(
                   color: colors.border,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: AppRadius.borderSm,
                 ),
               ),
             ),

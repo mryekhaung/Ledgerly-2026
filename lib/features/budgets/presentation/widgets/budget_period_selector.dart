@@ -45,7 +45,7 @@ class BudgetPeriodSelector extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: colors.surfaceRaised,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.borderLg,
         border: Border.all(color: colors.border.withValues(alpha: 0.5)),
       ),
       child: Row(

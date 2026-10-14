@@ -197,7 +197,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   decoration: BoxDecoration(
                     color: colors.surfaceSubtle,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadius.borderLg,
                     border: Border.all(color: colors.border),
                   ),
                   child: Column(

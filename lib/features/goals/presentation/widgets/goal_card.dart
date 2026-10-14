@@ -100,7 +100,7 @@ class GoalCard extends ConsumerWidget {
         vertical: AppSpacing.sm,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.borderLg,
         side: BorderSide(
           color: isCompleted
               ? colors.moneyIn.withValues(alpha: 0.5)
@@ -111,7 +111,7 @@ class GoalCard extends ConsumerWidget {
       color: colors.surfaceRaised,
       child: InkWell(
         onTap: onTap ?? () => GoalContributionDialog.show(context, goal: goal),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.borderLg,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
@@ -153,7 +153,7 @@ class GoalCard extends ConsumerWidget {
                                 ),
                                 decoration: BoxDecoration(
                                   color: colors.moneyIn.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: AppRadius.borderSm,
                                 ),
                                 child: Text(
                                   '100%',
@@ -323,7 +323,7 @@ class GoalCard extends ConsumerWidget {
 
               // Progress Bar
               ClipRRect(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppRadius.borderSm,
                 child: LinearProgressIndicator(
                   value: goal.progress,
                   minHeight: 8,

@@ -27,7 +27,7 @@ class RecurringPendingBanner extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: colors.warning.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.borderLg,
         border: Border.all(color: colors.warning.withValues(alpha: 0.4)),
       ),
       child: Row(

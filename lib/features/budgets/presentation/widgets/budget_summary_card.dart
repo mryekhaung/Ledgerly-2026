@@ -33,7 +33,7 @@ class BudgetSummaryCard extends StatelessWidget {
       return Card(
         color: colors.surfaceRaised,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.borderLg,
           side: BorderSide(color: colors.border.withValues(alpha: 0.4)),
         ),
         child: Padding(

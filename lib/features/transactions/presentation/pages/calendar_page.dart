@@ -748,7 +748,7 @@ class _Capsule extends StatelessWidget {
       margin: const EdgeInsets.only(top: 2),
       decoration: BoxDecoration(
         color: baseColor.withAlpha(alpha.clamp(0, 255)),
-        borderRadius: const BorderRadius.all(Radius.circular(2)),
+        borderRadius: const BorderRadius.all(AppRadius.radiusSm),
       ),
     );
   }

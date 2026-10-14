@@ -253,31 +253,8 @@ void main() {
         'off-scale radius',
         'docs/Design.md §4.2 — only AppRadius.sm(8)/md(12)/lg(20)/xl(28)/full(999)',
         sites,
-        const <String, int>{
-          'lib/features/recurring/presentation/widgets/recurring_item_card.dart':
-              5,
-          'lib/features/auth/presentation/pages/account_page.dart': 4,
-          'lib/features/goals/presentation/widgets/goal_card.dart': 4,
-          'lib/features/budgets/presentation/widgets/budget_category_row.dart':
-              3,
-          'lib/features/budgets/presentation/pages/budget_form_page.dart': 2,
-          'lib/features/goals/presentation/widgets/goal_contribution_dialog.dart':
-              2,
-          'lib/features/transactions/presentation/pages/transactions_list_page.dart':
-              2,
-          'lib/features/accounts/presentation/pages/account_form_page.dart': 1,
-          'lib/features/auth/presentation/pages/welcome_page.dart': 1,
-          'lib/features/budgets/presentation/pages/budgets_page.dart': 1,
-          'lib/features/budgets/presentation/widgets/budget_period_selector.dart':
-              1,
-          'lib/features/budgets/presentation/widgets/budget_summary_card.dart':
-              1,
-          'lib/features/recurring/presentation/widgets/recurring_pending_banner.dart':
-              1,
-          'lib/features/transactions/presentation/pages/calendar_page.dart': 1,
-          'lib/features/transactions/presentation/widgets/transaction_filter_sheet.dart':
-              1,
-        },
+        // Burned to zero. Any new off-scale radius now fails immediately.
+        const <String, int>{},
       );
     });
   });

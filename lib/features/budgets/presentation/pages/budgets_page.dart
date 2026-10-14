@@ -136,7 +136,7 @@ class BudgetsPage extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: colors.brandPrimary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: AppRadius.borderMd,
                     ),
                     child: Text(
                       '${categoryProgresses.length}',

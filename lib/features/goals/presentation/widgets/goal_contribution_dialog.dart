@@ -166,7 +166,7 @@ class _GoalContributionDialogState
       ),
       decoration: BoxDecoration(
         color: colors.surfaceRaised,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: AppRadius.radiusXl),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -180,7 +180,7 @@ class _GoalContributionDialogState
               margin: const EdgeInsets.only(bottom: AppSpacing.md),
               decoration: BoxDecoration(
                 color: colors.border,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.borderSm,
               ),
             ),
           ),

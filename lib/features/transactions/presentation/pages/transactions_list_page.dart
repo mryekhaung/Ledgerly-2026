@@ -174,11 +174,11 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
                       vertical: AppSpacing.sm,
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppRadius.borderMd,
                       borderSide: BorderSide(color: colors.border),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppRadius.borderMd,
                       borderSide: BorderSide(color: colors.border),
                     ),
                   ),

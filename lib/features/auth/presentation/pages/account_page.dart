@@ -140,7 +140,7 @@ class AccountPage extends ConsumerWidget {
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
                 color: colors.surfaceSubtle,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: AppRadius.borderLg,
                 border: Border.all(color: colors.border),
               ),
               child: Column(
@@ -216,7 +216,7 @@ class AccountPage extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   color: colors.surfaceRaised,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: AppRadius.borderLg,
                   border: Border.all(color: colors.brandPrimary.withAlpha(80)),
                 ),
                 child: Column(
@@ -261,7 +261,7 @@ class AccountPage extends ConsumerWidget {
                         foregroundColor: colors.textPrimary,
                         minimumSize: const Size.fromHeight(44),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: AppRadius.borderMd,
                         ),
                       ),
                       icon: const Icon(Icons.g_mobiledata_rounded, size: 26),
@@ -280,7 +280,7 @@ class AccountPage extends ConsumerWidget {
                         foregroundColor: colors.textPrimary,
                         minimumSize: const Size.fromHeight(44),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: AppRadius.borderMd,
                         ),
                       ),
                       icon: const Icon(Icons.apple_rounded, size: 22),

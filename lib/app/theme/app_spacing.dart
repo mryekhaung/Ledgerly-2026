@@ -71,6 +71,11 @@ abstract final class AppRadius {
     Radius.circular(full),
   );
 
+  /// The same value as [borderSm], for widgets that need a single [Radius]
+  /// (progress-bar clips, drag handles). Add more variants only when a call
+  /// site actually needs one.
+  static const Radius radiusSm = Radius.circular(sm);
+
   /// The same value as [borderXl], for widgets that need a single [Radius]
   /// (`showModalBottomSheet` / `BorderRadius.vertical` shapes). Add more
   /// variants only when a call site actually needs one.

@@ -44,12 +44,12 @@ class BudgetCategoryRow extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: AppRadius.borderLg,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: colors.surfaceRaised,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.borderLg,
           border: Border.all(
             color: p.isOverBudget
                 ? colors.moneyOut.withValues(alpha: 0.4)
@@ -152,7 +152,7 @@ class BudgetCategoryRow extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.sm),
             ClipRRect(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppRadius.borderSm,
               child: LinearProgressIndicator(
                 value: p.progressFraction,
                 minHeight: 7,

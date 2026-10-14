@@ -489,7 +489,7 @@ class _ColorSwatch extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: AppRadius.borderFull,
       child: Container(
         width: 44,
         height: 44,

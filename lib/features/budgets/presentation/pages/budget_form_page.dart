@@ -374,7 +374,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
           Card(
             color: colors.surfaceRaised,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppRadius.borderLg,
               side: BorderSide(color: colors.border.withValues(alpha: 0.4)),
             ),
             child: Padding(
@@ -419,7 +419,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: AppRadius.borderSm,
                     child: LinearProgressIndicator(
                       value: formState.alertThreshold,
                       minHeight: 8,
