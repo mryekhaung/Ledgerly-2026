@@ -915,4 +915,94 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get accountsTransferAmountInvalid => '振替金額は0より大きい必要があります';
+
+  @override
+  String get budgetsTitle => '予算管理';
+
+  @override
+  String get budgetsTotal => '全体予算';
+
+  @override
+  String get budgetsCategory => 'カテゴリー別予算';
+
+  @override
+  String get budgetsNew => '予算を追加';
+
+  @override
+  String get budgetsEdit => '予算を編集';
+
+  @override
+  String get budgetsDelete => '予算を削除';
+
+  @override
+  String get budgetsEmptyTitle => '予算が設定されていません';
+
+  @override
+  String get budgetsEmptyBody => '支出を管理するために、カテゴリー別や月全体の支出限度額を設定しましょう。';
+
+  @override
+  String get budgetFieldCategory => 'カテゴリー';
+
+  @override
+  String get budgetFieldAmount => '予算限度額';
+
+  @override
+  String get budgetFieldPeriod => '期間';
+
+  @override
+  String get budgetFieldThreshold => '警告アラートのしきい値';
+
+  @override
+  String get budgetTotalOption => '全体（すべての支出）';
+
+  @override
+  String get budgetSpent => '支出額';
+
+  @override
+  String get budgetRemaining => '残額';
+
+  @override
+  String get budgetDailyRemaining => '1日あたりの使用可能額';
+
+  @override
+  String get budgetStatusSafe => '順調';
+
+  @override
+  String get budgetStatusWarning => '限度額目前';
+
+  @override
+  String get budgetStatusExceeded => '予算超過';
+
+  @override
+  String get budgetSavedSuccess => '予算を保存しました';
+
+  @override
+  String get budgetDeletedSuccess => '予算を削除しました';
+
+  @override
+  String get budgetArchiveSuccess => '予算をアーカイブしました';
+
+  @override
+  String get budgetUnarchiveSuccess => '予算のアーカイブを解除しました';
+
+  @override
+  String get budgetConfirmDelete => '予算を削除しますか？';
+
+  @override
+  String get budgetConfirmDeleteMessage => 'この予算を削除してもよろしいですか？';
+
+  @override
+  String get budgetAmountInvalid => '予算額は0より大きい必要があります';
+
+  @override
+  String get budgetThresholdInvalid => 'しきい値は10%から100%の間で指定してください';
+
+  @override
+  String get budgetDuplicateCategory => 'このカテゴリーには既にこの期間の予算が存在します';
+
+  @override
+  String get budgetDuplicateTotal => 'この期間の全体予算は既に設定されています';
+
+  @override
+  String get budgetOverallSummary => '今月の全体予算';
 }

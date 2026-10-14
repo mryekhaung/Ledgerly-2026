@@ -959,4 +959,100 @@ class AppLocalizationsMy extends AppLocalizations {
   @override
   String get accountsTransferAmountInvalid =>
       'လွှဲပြောင်းငွေပမာဏသည် သုညထက် ကြီးရပါမည်';
+
+  @override
+  String get budgetsTitle => 'ဘတ်ဂျက်များ';
+
+  @override
+  String get budgetsTotal => 'စုစုပေါင်း ဘတ်ဂျက်';
+
+  @override
+  String get budgetsCategory => 'အမျိုးအစားအလိုက် ဘတ်ဂျက်';
+
+  @override
+  String get budgetsNew => 'ဘတ်ဂျက်အသစ် သတ်မှတ်ရန်';
+
+  @override
+  String get budgetsEdit => 'ဘတ်ဂျက် ပြင်ဆင်ရန်';
+
+  @override
+  String get budgetsDelete => 'ဘတ်ဂျက် ဖျက်မည်';
+
+  @override
+  String get budgetsEmptyTitle => 'ဘတ်ဂျက် သတ်မှတ်ထားခြင်း မရှိသေးပါ';
+
+  @override
+  String get budgetsEmptyBody =>
+      'သုံးစွဲငွေ ပမာဏကို ထိန်းညှိနိုင်ရန် အမျိုးအစားအလိုက် သို့မဟုတ် လစဥ် စုစုပေါင်း သုံးစွဲနိုင်သော ကန့်သတ်ငွေပမာဏကို သတ်မှတ်ပါ။';
+
+  @override
+  String get budgetFieldCategory => 'အမျိုးအစား';
+
+  @override
+  String get budgetFieldAmount => 'ကန့်သတ်ငွေပမာဏ';
+
+  @override
+  String get budgetFieldPeriod => 'ကာလ';
+
+  @override
+  String get budgetFieldThreshold => 'သတိပေးချက် ထုတ်ပြန်မည့် ရာခိုင်နှုန်း';
+
+  @override
+  String get budgetTotalOption => 'စုစုပေါင်း သုံးစွဲငွေ (အားလုံးအတွက်)';
+
+  @override
+  String get budgetSpent => 'သုံးစွဲပြီးငွေ';
+
+  @override
+  String get budgetRemaining => 'ကျန်ရှိငွေ';
+
+  @override
+  String get budgetDailyRemaining => 'နေ့စဥ် သုံးစွဲရန် ကျန်ငွေ';
+
+  @override
+  String get budgetStatusSafe => 'ပုံမှန် အခြေအနေ';
+
+  @override
+  String get budgetStatusWarning => 'ကန့်သတ်ငွေ နီးကပ်နေပြီ';
+
+  @override
+  String get budgetStatusExceeded => 'ဘတ်ဂျက် ကျော်လွန်သွားပါပြီ';
+
+  @override
+  String get budgetSavedSuccess => 'ဘတ်ဂျက်ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ';
+
+  @override
+  String get budgetDeletedSuccess => 'ဘတ်ဂျက်ကို ဖျက်ပြီးပါပြီ';
+
+  @override
+  String get budgetArchiveSuccess => 'ဘတ်ဂျက်ကို သိမ်းဆည်းခန်းထဲ ထည့်ပြီးပါပြီ';
+
+  @override
+  String get budgetUnarchiveSuccess =>
+      'ဘတ်ဂျက်ကို ပြန်လည်အသုံးပြုနိုင်ရန် ပြင်ဆင်ပြီးပါပြီ';
+
+  @override
+  String get budgetConfirmDelete => 'ဘတ်ဂျက်ကို ဖျက်မှာ သေချာပါသလား?';
+
+  @override
+  String get budgetConfirmDeleteMessage =>
+      'ဤဘတ်ဂျက် ကန့်သတ်ချက်ကို ဖျက်ရန် သေချာပါသလား?';
+
+  @override
+  String get budgetAmountInvalid => 'ဘတ်ဂျက်ပမာဏသည် သုညထက် ကြီးရပါမည်';
+
+  @override
+  String get budgetThresholdInvalid =>
+      'သတိပေးချက် ရာခိုင်နှုန်းသည် ၁၀% မှ ၁၀၀% အတွင်း ဖြစ်ရပါမည်';
+
+  @override
+  String get budgetDuplicateCategory =>
+      'ဤအမျိုးအစားအတွက် ဤကာလတွင် ဘတ်ဂျက် သတ်မှတ်ပြီးသား ဖြစ်ပါသည်';
+
+  @override
+  String get budgetDuplicateTotal =>
+      'ဤကာလအတွက် စုစုပေါင်း ဘတ်ဂျက် သတ်မှတ်ပြီးသား ဖြစ်ပါသည်';
+
+  @override
+  String get budgetOverallSummary => 'လစဥ် စုစုပေါင်း ဘတ်ဂျက်';
 }

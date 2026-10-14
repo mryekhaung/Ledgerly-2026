@@ -1887,6 +1887,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Transfer amount must be greater than zero'**
   String get accountsTransferAmountInvalid;
+
+  /// App bar title and page title for Budgets feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Budgets'**
+  String get budgetsTitle;
+
+  /// Label for overall total spending limit budget.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Budget'**
+  String get budgetsTotal;
+
+  /// Label for category specific budget.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Budget'**
+  String get budgetsCategory;
+
+  /// Title for new budget creation page.
+  ///
+  /// In en, this message translates to:
+  /// **'New Budget'**
+  String get budgetsNew;
+
+  /// Title for edit budget page.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Budget'**
+  String get budgetsEdit;
+
+  /// Label for delete budget action.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Budget'**
+  String get budgetsDelete;
+
+  /// Title shown when no budgets are defined for the period.
+  ///
+  /// In en, this message translates to:
+  /// **'No budgets yet'**
+  String get budgetsEmptyTitle;
+
+  /// Body message shown when no budgets are defined.
+  ///
+  /// In en, this message translates to:
+  /// **'Set spending limits for categories or an overall cap to stay on track with your finances.'**
+  String get budgetsEmptyBody;
+
+  /// Form label for budget category selection.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get budgetFieldCategory;
+
+  /// Form label for budget limit amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Limit'**
+  String get budgetFieldAmount;
+
+  /// Form label for budget period.
+  ///
+  /// In en, this message translates to:
+  /// **'Period'**
+  String get budgetFieldPeriod;
+
+  /// Form label for budget alert threshold slider.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert Warning Threshold'**
+  String get budgetFieldThreshold;
+
+  /// Option in category picker to set an overall total budget.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall (Total Expenses)'**
+  String get budgetTotalOption;
+
+  /// Label for spent amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get budgetSpent;
+
+  /// Label for remaining budget amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get budgetRemaining;
+
+  /// Label for daily remaining spending capacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Safe Spend'**
+  String get budgetDailyRemaining;
+
+  /// Status text for safe budget level.
+  ///
+  /// In en, this message translates to:
+  /// **'On Track'**
+  String get budgetStatusSafe;
+
+  /// Status text for budget near alert threshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Near Limit'**
+  String get budgetStatusWarning;
+
+  /// Status text for exceeded budget.
+  ///
+  /// In en, this message translates to:
+  /// **'Over Budget'**
+  String get budgetStatusExceeded;
+
+  /// Snackbar shown when budget is saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget saved successfully'**
+  String get budgetSavedSuccess;
+
+  /// Snackbar shown when budget is deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget deleted'**
+  String get budgetDeletedSuccess;
+
+  /// Snackbar shown when budget is archived.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget archived'**
+  String get budgetArchiveSuccess;
+
+  /// Snackbar shown when budget is restored.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget restored'**
+  String get budgetUnarchiveSuccess;
+
+  /// Title for budget delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Budget?'**
+  String get budgetConfirmDelete;
+
+  /// Message for budget delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this budget?'**
+  String get budgetConfirmDeleteMessage;
+
+  /// Validation error when budget amount is non-positive.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget limit must be greater than zero'**
+  String get budgetAmountInvalid;
+
+  /// Validation error when threshold is outside 0.1 to 1.0.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert threshold must be between 10% and 100%'**
+  String get budgetThresholdInvalid;
+
+  /// Validation error when budget already exists for category.
+  ///
+  /// In en, this message translates to:
+  /// **'A budget already exists for this category in this period'**
+  String get budgetDuplicateCategory;
+
+  /// Validation error when total budget already exists.
+  ///
+  /// In en, this message translates to:
+  /// **'A total budget already exists for this period'**
+  String get budgetDuplicateTotal;
+
+  /// Header for overall period budget card.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall Budget'**
+  String get budgetOverallSummary;
 }
 
 class _AppLocalizationsDelegate

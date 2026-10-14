@@ -85,4 +85,16 @@ abstract final class AppRoutes {
   /// Transfer funds between accounts (Phase 3).
   static const String accountTransfer = '/accounts/transfer';
   static const String accountTransferName = 'accountTransfer';
+
+  /// Budgets management (Phase 3).
+  static const String budgets = '/budgets';
+  static const String budgetsName = 'budgets';
+
+  /// Add new budget (Phase 3).
+  static const String budgetNew = '/budgets/new';
+  static const String budgetNewName = 'budgetNew';
+
+  /// Edit budget (Phase 3).
+  static const String budgetEdit = '/budgets/:id/edit';
+  static const String budgetEditName = 'budgetEdit';
 }

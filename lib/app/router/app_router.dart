@@ -11,6 +11,8 @@ import 'package:ledgerly/features/accounts/presentation/pages/transfer_page.dart
 import 'package:ledgerly/features/auth/presentation/pages/account_page.dart';
 import 'package:ledgerly/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:ledgerly/features/auth/presentation/pages/welcome_page.dart';
+import 'package:ledgerly/features/budgets/presentation/pages/budget_form_page.dart';
+import 'package:ledgerly/features/budgets/presentation/pages/budgets_page.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
 import 'package:ledgerly/features/data_transfer/presentation/pages/data_transfer_page.dart';
 import 'package:ledgerly/features/insights/presentation/pages/insights_page.dart';
@@ -96,6 +98,11 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             name: AppRoutes.accountsName,
             builder: (context, state) => const AccountsPage(),
           ),
+          GoRoute(
+            path: AppRoutes.budgets,
+            name: AppRoutes.budgetsName,
+            builder: (context, state) => const BudgetsPage(),
+          ),
         ],
       ),
 
@@ -163,6 +170,20 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
           initialFromId: state.uri.queryParameters['from'],
           initialToId: state.uri.queryParameters['to'],
         ),
+      ),
+
+      // Budget forms (Phase 3).
+      GoRoute(
+        path: AppRoutes.budgetNew,
+        name: AppRoutes.budgetNewName,
+        builder: (context, state) =>
+            BudgetFormPage(initialType: state.uri.queryParameters['type']),
+      ),
+      GoRoute(
+        path: AppRoutes.budgetEdit,
+        name: AppRoutes.budgetEditName,
+        builder: (context, state) =>
+            BudgetFormPage(budgetId: state.pathParameters['id']),
       ),
     ],
   );

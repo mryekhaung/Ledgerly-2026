@@ -179,6 +179,13 @@ class SettingsPage extends ConsumerWidget {
                   leading: const Icon(Icons.account_balance_wallet_outlined),
                   onTap: () => context.pushNamed(AppRoutes.accountsName),
                 ),
+                const _GroupDivider(),
+                _NavRow(
+                  label: strings('budgetsTitle'),
+                  subtitle: strings('budgetsTotal'),
+                  leading: const Icon(Icons.pie_chart_outline),
+                  onTap: () => context.pushNamed(AppRoutes.budgetsName),
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),

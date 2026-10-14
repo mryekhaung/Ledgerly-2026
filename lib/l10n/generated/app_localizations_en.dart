@@ -945,4 +945,99 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get accountsTransferAmountInvalid =>
       'Transfer amount must be greater than zero';
+
+  @override
+  String get budgetsTitle => 'Budgets';
+
+  @override
+  String get budgetsTotal => 'Total Budget';
+
+  @override
+  String get budgetsCategory => 'Category Budget';
+
+  @override
+  String get budgetsNew => 'New Budget';
+
+  @override
+  String get budgetsEdit => 'Edit Budget';
+
+  @override
+  String get budgetsDelete => 'Delete Budget';
+
+  @override
+  String get budgetsEmptyTitle => 'No budgets yet';
+
+  @override
+  String get budgetsEmptyBody =>
+      'Set spending limits for categories or an overall cap to stay on track with your finances.';
+
+  @override
+  String get budgetFieldCategory => 'Category';
+
+  @override
+  String get budgetFieldAmount => 'Budget Limit';
+
+  @override
+  String get budgetFieldPeriod => 'Period';
+
+  @override
+  String get budgetFieldThreshold => 'Alert Warning Threshold';
+
+  @override
+  String get budgetTotalOption => 'Overall (Total Expenses)';
+
+  @override
+  String get budgetSpent => 'Spent';
+
+  @override
+  String get budgetRemaining => 'Remaining';
+
+  @override
+  String get budgetDailyRemaining => 'Daily Safe Spend';
+
+  @override
+  String get budgetStatusSafe => 'On Track';
+
+  @override
+  String get budgetStatusWarning => 'Near Limit';
+
+  @override
+  String get budgetStatusExceeded => 'Over Budget';
+
+  @override
+  String get budgetSavedSuccess => 'Budget saved successfully';
+
+  @override
+  String get budgetDeletedSuccess => 'Budget deleted';
+
+  @override
+  String get budgetArchiveSuccess => 'Budget archived';
+
+  @override
+  String get budgetUnarchiveSuccess => 'Budget restored';
+
+  @override
+  String get budgetConfirmDelete => 'Delete Budget?';
+
+  @override
+  String get budgetConfirmDeleteMessage =>
+      'Are you sure you want to delete this budget?';
+
+  @override
+  String get budgetAmountInvalid => 'Budget limit must be greater than zero';
+
+  @override
+  String get budgetThresholdInvalid =>
+      'Alert threshold must be between 10% and 100%';
+
+  @override
+  String get budgetDuplicateCategory =>
+      'A budget already exists for this category in this period';
+
+  @override
+  String get budgetDuplicateTotal =>
+      'A total budget already exists for this period';
+
+  @override
+  String get budgetOverallSummary => 'Overall Budget';
 }

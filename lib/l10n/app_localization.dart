@@ -58,6 +58,10 @@ abstract final class AppLocalization {
     'transferSameAccount' => 'accountsTransferSameAccount',
     'transferAmountNonPositive' => 'accountsTransferAmountInvalid',
     'transferAmountZero' => 'accountsTransferAmountInvalid',
+    'budgetAmountInvalid' => 'budgetAmountInvalid',
+    'budgetThresholdInvalid' => 'budgetThresholdInvalid',
+    'budgetDuplicateCategory' => 'budgetDuplicateCategory',
+    'budgetDuplicateTotal' => 'budgetDuplicateTotal',
     _ => 'failureValidation',
   };
 }

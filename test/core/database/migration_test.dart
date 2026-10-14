@@ -34,6 +34,7 @@ void main() {
   const schemaTables = <String>[
     'accounts',
     'app_settings',
+    'budgets',
     'categories',
     'transactions',
   ];
@@ -41,6 +42,9 @@ void main() {
   /// The `@TableIndex` names declared across `tables/`.
   const schemaIndexes = <String>[
     'idx_accounts_list',
+    'idx_budgets_category',
+    'idx_budgets_list',
+    'idx_budgets_period',
     'idx_categories_list',
     'idx_categories_kind',
     'idx_settings_key',
@@ -273,13 +277,13 @@ void main() {
   });
 
   group('upgrade path', () {
-    test('should_be_at_v2', () {
+    test('should_be_at_v3', () {
       final h = useDbHarness();
       expect(
         h.db.schemaVersion,
-        2,
+        3,
         reason:
-            'v2 added app_settings; bumping again requires a new onUpgrade step '
+            'v3 added budgets; bumping again requires a new onUpgrade step '
             'and a real upgrade test here (docs/DataModel.md §5)',
       );
     });
@@ -292,21 +296,21 @@ void main() {
       expect(await namesByType(h.db, 'index'), contains('idx_settings_key'));
     });
 
-    test('should_upgrade_v1_to_v2_keeping_categories_and_transactions', () async {
-      // The real upgrade proof.
-      //
-      // A v1 database is built **by hand** with the exact v1 DDL and
-      // `PRAGMA user_version = 1`, then closed. Opening the *same file* through
-      // the current [AppDatabase] at version 2 is what makes drift run
-      // `onUpgrade(from: 1, to: 2)` — the code path this test exists to
-      // exercise.
-      //
-      // Building v1 by hand (rather than opening an old AppDatabase) is what
-      // makes this honest: the handwritten DDL is frozen at v1 forever and
-      // cannot drift along with the current schema.
-      //
-      // A file, not `NativeDatabase.memory()`: an in-memory executor cannot be
-      // reopened after `close()`, and the reopen is the whole test.
+    test('should_declare_the_budgets_table_and_its_indexes', () async {
+      final h = useDbHarness();
+      await h.db.customSelect('SELECT 1').get();
+
+      expect(await namesByType(h.db, 'table'), contains('budgets'));
+      expect(await namesByType(h.db, 'index'), contains('idx_budgets_list'));
+      expect(await namesByType(h.db, 'index'), contains('idx_budgets_period'));
+      expect(
+        await namesByType(h.db, 'index'),
+        contains('idx_budgets_category'),
+      );
+    });
+
+    test('should_upgrade_v1_to_v3_keeping_categories_and_transactions', () async {
+      // The real upgrade proof from v1.
       final temp = useTempDbFile();
       addTearDown(temp.dispose);
 
@@ -314,6 +318,7 @@ void main() {
       // management is bypassed with raw DDL, but the file is then closed and
       // reopened by the real database below.
       final v1 = AppDatabase(NativeDatabase(temp.file));
+      await v1.customStatement('DROP TABLE IF EXISTS budgets');
       await v1.customStatement('DROP TABLE IF EXISTS app_settings');
       await v1.customStatement('DROP TABLE IF EXISTS transactions');
       await v1.customStatement('DROP TABLE IF EXISTS categories');
@@ -382,18 +387,32 @@ void main() {
       await upgraded.appSettingsDao.put(key: 'currency', value: 'usd');
       expect(await upgraded.appSettingsDao.read('currency'), 'usd');
 
-      // ...and the v2 *index* exists too. This is the subtle half: drift's
-      // `Migrator.createTable` emits only the `CREATE TABLE` statement and
-      // silently skips `@TableIndex` declarations, so an upgraded database
-      // would end up with a weaker schema than a freshly created one. The
-      // `onUpgrade` step has to ask for the index explicitly, and this is the
-      // assertion that keeps it honest.
       expect(
         await namesByType(upgraded, 'index'),
         contains('idx_settings_key'),
-        reason:
-            'onUpgrade must create idx_settings_key explicitly — '
-            'createTable alone does not emit @TableIndex indexes',
+      );
+
+      // ...and the v3 budgets table exists, is empty, and is writable.
+      expect(await upgraded.budgetsDao.watchAll().first, isEmpty);
+      final budgetId = await upgraded.budgetsDao.insert(
+        amountMinor: 500000,
+        currency: 'mmk',
+      );
+      final readBudget = await upgraded.budgetsDao.findById(budgetId);
+      expect(readBudget, isNotNull);
+      expect(readBudget!.amountMinor, 500000);
+
+      expect(
+        await namesByType(upgraded, 'index'),
+        contains('idx_budgets_list'),
+      );
+      expect(
+        await namesByType(upgraded, 'index'),
+        contains('idx_budgets_period'),
+      );
+      expect(
+        await namesByType(upgraded, 'index'),
+        contains('idx_budgets_category'),
       );
 
       await upgraded.close();
