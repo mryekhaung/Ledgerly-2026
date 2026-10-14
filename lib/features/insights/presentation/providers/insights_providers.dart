@@ -14,8 +14,8 @@ final watchPeriodInsightsProvider = Provider<WatchPeriodInsights>(
 /// The active budget period browsed on the Insights page.
 final insightsPeriodProvider =
     NotifierProvider<InsightsPeriodNotifier, BudgetPeriod>(
-  InsightsPeriodNotifier.new,
-);
+      InsightsPeriodNotifier.new,
+    );
 
 class InsightsPeriodNotifier extends Notifier<BudgetPeriod> {
   @override

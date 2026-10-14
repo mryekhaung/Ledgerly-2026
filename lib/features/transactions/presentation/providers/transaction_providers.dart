@@ -74,4 +74,3 @@ final restoreTransactionProvider = Provider<RestoreTransaction>(
 final searchTransactionsProvider = Provider<SearchTransactions>(
   (_) => getIt<SearchTransactions>(),
 );
-

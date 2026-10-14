@@ -45,29 +45,33 @@ void main() {
     await repository.dispose();
   });
 
-  test('loads initial page with default page size and hasMore is true',
-      () async {
-    final notifier = container.read(transactionsListProvider.notifier);
-    await notifier.loadInitial();
+  test(
+    'loads initial page with default page size and hasMore is true',
+    () async {
+      final notifier = container.read(transactionsListProvider.notifier);
+      await notifier.loadInitial();
 
-    final state = container.read(transactionsListProvider);
-    expect(state.isLoading, isFalse);
-    expect(state.items.length, 20);
-    expect(state.hasMore, isTrue);
-    expect(state.error, isNull);
-  });
+      final state = container.read(transactionsListProvider);
+      expect(state.isLoading, isFalse);
+      expect(state.items.length, 20);
+      expect(state.hasMore, isTrue);
+      expect(state.error, isNull);
+    },
+  );
 
-  test('loadMore appends the remaining items and marks hasMore false',
-      () async {
-    final notifier = container.read(transactionsListProvider.notifier);
-    await notifier.loadInitial();
-    await notifier.loadMore();
+  test(
+    'loadMore appends the remaining items and marks hasMore false',
+    () async {
+      final notifier = container.read(transactionsListProvider.notifier);
+      await notifier.loadInitial();
+      await notifier.loadMore();
 
-    final state = container.read(transactionsListProvider);
-    expect(state.items.length, 25);
-    expect(state.hasMore, isFalse);
-    expect(state.isLoadingMore, isFalse);
-  });
+      final state = container.read(transactionsListProvider);
+      expect(state.items.length, 25);
+      expect(state.hasMore, isFalse);
+      expect(state.isLoadingMore, isFalse);
+    },
+  );
 
   test('search updates filter and fetches matching items', () async {
     final notifier = container.read(transactionsListProvider.notifier);
@@ -80,18 +84,20 @@ void main() {
     expect(state.items.first.note, 'Item 3');
   });
 
-  test('applyFilter updates direction filter and fetches only matching items',
-      () async {
-    final notifier = container.read(transactionsListProvider.notifier);
-    notifier.applyFilter(
-      const TransactionFilter(direction: TransactionDirection.income),
-    );
-    await notifier.loadInitial();
+  test(
+    'applyFilter updates direction filter and fetches only matching items',
+    () async {
+      final notifier = container.read(transactionsListProvider.notifier);
+      notifier.applyFilter(
+        const TransactionFilter(direction: TransactionDirection.income),
+      );
+      await notifier.loadInitial();
 
-    final state = container.read(transactionsListProvider);
-    expect(state.filter.direction, TransactionDirection.income);
-    expect(state.items.every((t) => t.isIncome), isTrue);
-  });
+      final state = container.read(transactionsListProvider);
+      expect(state.filter.direction, TransactionDirection.income);
+      expect(state.items.every((t) => t.isIncome), isTrue);
+    },
+  );
 
   test('clearFilter resets filter back to empty', () async {
     final notifier = container.read(transactionsListProvider.notifier);
@@ -121,14 +127,16 @@ void main() {
     expect(state.items.any((t) => t.id == firstId), isFalse);
   });
 
-  test('handles repository failure gracefully by setting state.error',
-      () async {
-    repository.forcedFailure = const StorageFailure('db error');
-    final notifier = container.read(transactionsListProvider.notifier);
-    await notifier.loadInitial();
+  test(
+    'handles repository failure gracefully by setting state.error',
+    () async {
+      repository.forcedFailure = const StorageFailure('db error');
+      final notifier = container.read(transactionsListProvider.notifier);
+      await notifier.loadInitial();
 
-    final state = container.read(transactionsListProvider);
-    expect(state.isLoading, isFalse);
-    expect(state.error, isNotNull);
-  });
+      final state = container.read(transactionsListProvider);
+      expect(state.isLoading, isFalse);
+      expect(state.error, isNotNull);
+    },
+  );
 }

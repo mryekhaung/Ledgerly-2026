@@ -84,11 +84,7 @@ class TopCategoriesCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
-                      AmountText(
-                        money,
-                        style: AmountStyle.row,
-                        signed: false,
-                      ),
+                      AmountText(money, style: AmountStyle.row, signed: false),
                     ],
                   ),
                   const SizedBox(height: 6),

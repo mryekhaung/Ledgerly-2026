@@ -31,9 +31,8 @@ class InsightPeriodSwitcher extends StatelessWidget {
     if (isPayCycle) {
       label = _formatPeriod(period, locale);
     } else {
-      label = MaterialLocalizations.of(context).formatMonthYear(
-        DateTime(period.start.year, period.start.month),
-      );
+      label = MaterialLocalizations.of(context)
+          .formatMonthYear(DateTime(period.start.year, period.start.month));
     }
 
     return Row(

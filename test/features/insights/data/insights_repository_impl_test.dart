@@ -20,8 +20,7 @@ class _FakeLocalDataSource implements InsightsLocalDataSource {
     required BudgetPeriod period,
     required BudgetPeriod previousPeriod,
     required CurrencyCode currency,
-  }) =>
-      _stream;
+  }) => _stream;
 }
 
 void main() {
@@ -51,11 +50,13 @@ void main() {
     );
     final repository = InsightsRepositoryImpl(dataSource);
 
-    final result = await repository.watchPeriodInsights(
-      period: period,
-      previousPeriod: previousPeriod,
-      currency: CurrencyCode.usd,
-    ).first;
+    final result = await repository
+        .watchPeriodInsights(
+          period: period,
+          previousPeriod: previousPeriod,
+          currency: CurrencyCode.usd,
+        )
+        .first;
 
     expect(result, equals(expectedInsights));
   });

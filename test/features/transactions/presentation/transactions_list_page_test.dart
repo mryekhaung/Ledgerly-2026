@@ -28,37 +28,44 @@ void main() {
   ];
 
   List<Transaction> seedTransactions() => <Transaction>[
-        fakeTransaction(
-          id: 'txn-1',
-          categoryId: 'cat-food',
-          amountMinor: 4500,
-          direction: TransactionDirection.expense,
-          date: day,
-          note: 'Morning coffee',
-        ),
-        fakeTransaction(
-          id: 'txn-2',
-          categoryId: 'cat-salary',
-          amountMinor: 750000,
-          direction: TransactionDirection.income,
-          date: day,
-          note: 'Monthly salary',
-        ),
-      ];
+    fakeTransaction(
+      id: 'txn-1',
+      categoryId: 'cat-food',
+      amountMinor: 4500,
+      direction: TransactionDirection.expense,
+      date: day,
+      note: 'Morning coffee',
+    ),
+    fakeTransaction(
+      id: 'txn-2',
+      categoryId: 'cat-salary',
+      amountMinor: 750000,
+      direction: TransactionDirection.income,
+      date: day,
+      note: 'Monthly salary',
+    ),
+  ];
 
   Future<void> host(
     WidgetTester tester, {
     FakeTransactionRepository? repository,
   }) {
-    final fakeRepo = repository ?? FakeTransactionRepository(seed: seedTransactions());
+    final fakeRepo =
+        repository ?? FakeTransactionRepository(seed: seedTransactions());
 
     return pumpAppHost(
       tester,
       size: const Size(400, 800),
       overrides: <Override>[
-        searchTransactionsProvider.overrideWithValue(SearchTransactions(fakeRepo)),
-        deleteTransactionProvider.overrideWithValue(DeleteTransaction(fakeRepo)),
-        restoreTransactionProvider.overrideWithValue(RestoreTransaction(fakeRepo)),
+        searchTransactionsProvider.overrideWithValue(
+          SearchTransactions(fakeRepo),
+        ),
+        deleteTransactionProvider.overrideWithValue(
+          DeleteTransaction(fakeRepo),
+        ),
+        restoreTransactionProvider.overrideWithValue(
+          RestoreTransaction(fakeRepo),
+        ),
         categoryByIdProvider.overrideWith(
           (ref, id) async => categories.firstWhere((c) => c.id == id),
         ),
@@ -69,18 +76,21 @@ void main() {
   }
 
   group('TransactionsListPage', () {
-    testWidgets('renders search field, direction filter chips, and transaction rows', (tester) async {
-      await host(tester);
-      await tester.pumpAndSettle();
+    testWidgets(
+      'renders search field, direction filter chips, and transaction rows',
+      (tester) async {
+        await host(tester);
+        await tester.pumpAndSettle();
 
-      expect(find.byType(TextField), findsOneWidget);
-      expect(find.widgetWithText(FilterChip, 'All'), findsOneWidget);
-      expect(find.widgetWithText(FilterChip, 'Expense'), findsOneWidget);
-      expect(find.widgetWithText(FilterChip, 'Income'), findsOneWidget);
+        expect(find.byType(TextField), findsOneWidget);
+        expect(find.widgetWithText(FilterChip, 'All'), findsOneWidget);
+        expect(find.widgetWithText(FilterChip, 'Expense'), findsOneWidget);
+        expect(find.widgetWithText(FilterChip, 'Income'), findsOneWidget);
 
-      expect(find.text('Morning coffee'), findsOneWidget);
-      expect(find.text('Monthly salary'), findsOneWidget);
-    });
+        expect(find.text('Morning coffee'), findsOneWidget);
+        expect(find.text('Monthly salary'), findsOneWidget);
+      },
+    );
 
     testWidgets('filters by search text input with debounce', (tester) async {
       await host(tester);
@@ -129,7 +139,9 @@ void main() {
       expect(find.text('Monthly salary'), findsOneWidget);
     });
 
-    testWidgets('displays empty state when query returns no results', (tester) async {
+    testWidgets('displays empty state when query returns no results', (
+      tester,
+    ) async {
       await host(tester);
       await tester.pumpAndSettle();
 

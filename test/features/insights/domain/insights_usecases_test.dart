@@ -23,8 +23,7 @@ class _FakeInsightsRepository implements InsightsRepository {
     required BudgetPeriod period,
     required BudgetPeriod previousPeriod,
     required CurrencyCode currency,
-  }) =>
-      _stream;
+  }) => _stream;
 }
 
 void main() {
@@ -52,10 +51,7 @@ void main() {
         currency: CurrencyCode.usd,
       );
 
-      final comparison = PeriodComparison(
-        current: current,
-        previous: previous,
-      );
+      final comparison = PeriodComparison(current: current, previous: previous);
 
       expect(comparison.expenseDeltaMinor, equals(100000));
       expect(comparison.incomeDeltaMinor, equals(100000));
@@ -73,10 +69,7 @@ void main() {
       );
       final previous = PeriodTotal.empty(prevPeriod, CurrencyCode.usd);
 
-      final comparison = PeriodComparison(
-        current: current,
-        previous: previous,
-      );
+      final comparison = PeriodComparison(current: current, previous: previous);
 
       expect(comparison.expenseDeltaPercentage, isNull);
       expect(comparison.incomeDeltaPercentage, isNull);

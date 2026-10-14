@@ -150,23 +150,25 @@ void main() {
 
     tearDown(() => repository.dispose());
 
-    test('returns all transactions when filter is empty, sorted newest first',
-        () async {
-      final result = await useCase((
-        filter: const TransactionFilter.empty(),
-        limit: 20,
-        offset: 0,
-      ));
+    test(
+      'returns all transactions when filter is empty, sorted newest first',
+      () async {
+        final result = await useCase((
+          filter: const TransactionFilter.empty(),
+          limit: 20,
+          offset: 0,
+        ));
 
-      expect(result.isSuccess, isTrue);
-      final list = (result as Success<List<Transaction>>).value;
-      expect(list.length, 4);
-      // Sorted by date descending (15th, 10th, 5th, 1st)
-      expect(list[0].id, 'txn-4');
-      expect(list[1].id, 'txn-3');
-      expect(list[2].id, 'txn-2');
-      expect(list[3].id, 'txn-1');
-    });
+        expect(result.isSuccess, isTrue);
+        final list = (result as Success<List<Transaction>>).value;
+        expect(list.length, 4);
+        // Sorted by date descending (15th, 10th, 5th, 1st)
+        expect(list[0].id, 'txn-4');
+        expect(list[1].id, 'txn-3');
+        expect(list[2].id, 'txn-2');
+        expect(list[3].id, 'txn-1');
+      },
+    );
 
     test('filters by search query matching note', () async {
       final result = await useCase((

@@ -132,11 +132,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
     int limit = 20,
     int offset = 0,
   }) => guardResult(
-    () => _local.searchTransactions(
-      filter: filter,
-      limit: limit,
-      offset: offset,
-    ),
+    () =>
+        _local.searchTransactions(filter: filter, limit: limit, offset: offset),
   );
 
   /// Maps "row is gone" to a domain `NotFoundFailure` and everything else to the

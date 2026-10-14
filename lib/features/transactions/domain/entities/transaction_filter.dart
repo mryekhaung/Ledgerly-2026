@@ -17,13 +17,13 @@ class TransactionFilter {
 
   /// An empty filter with no criteria applied.
   const TransactionFilter.empty()
-      : searchQuery = null,
-        startDate = null,
-        endDate = null,
-        categoryId = null,
-        direction = null,
-        minAmountMinor = null,
-        maxAmountMinor = null;
+    : searchQuery = null,
+      startDate = null,
+      endDate = null,
+      categoryId = null,
+      direction = null,
+      minAmountMinor = null,
+      maxAmountMinor = null;
 
   /// Text query matching note or category name.
   final String? searchQuery;
@@ -82,10 +82,12 @@ class TransactionFilter {
       endDate: clearEndDate ? null : (endDate ?? this.endDate),
       categoryId: clearCategoryId ? null : (categoryId ?? this.categoryId),
       direction: clearDirection ? null : (direction ?? this.direction),
-      minAmountMinor:
-          clearMinAmount ? null : (minAmountMinor ?? this.minAmountMinor),
-      maxAmountMinor:
-          clearMaxAmount ? null : (maxAmountMinor ?? this.maxAmountMinor),
+      minAmountMinor: clearMinAmount
+          ? null
+          : (minAmountMinor ?? this.minAmountMinor),
+      maxAmountMinor: clearMaxAmount
+          ? null
+          : (maxAmountMinor ?? this.maxAmountMinor),
     );
   }
 
@@ -106,14 +108,14 @@ class TransactionFilter {
 
   @override
   int get hashCode => Object.hash(
-        searchQuery,
-        startDate,
-        endDate,
-        categoryId,
-        direction,
-        minAmountMinor,
-        maxAmountMinor,
-      );
+    searchQuery,
+    startDate,
+    endDate,
+    categoryId,
+    direction,
+    minAmountMinor,
+    maxAmountMinor,
+  );
 
   @override
   String toString() =>

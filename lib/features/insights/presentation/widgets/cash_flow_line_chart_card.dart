@@ -51,11 +51,7 @@ class CashFlowLineChartCard extends StatelessWidget {
                 strings('insightsCashFlowTrend'),
                 style: theme.textTheme.titleMedium,
               ),
-              AmountText(
-                latestMoney,
-                style: AmountStyle.row,
-                signed: true,
-              ),
+              AmountText(latestMoney, style: AmountStyle.row, signed: true),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),

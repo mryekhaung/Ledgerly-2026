@@ -110,10 +110,7 @@ class DonutChartCard extends StatelessWidget {
                       size: CategoryGemSize.sm,
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      item.category.name,
-                      style: theme.textTheme.bodySmall,
-                    ),
+                    Text(item.category.name, style: theme.textTheme.bodySmall),
                     const SizedBox(width: 4),
                     Text(
                       '$pct%',
@@ -168,8 +165,16 @@ class _DonutChartPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..color = Color(item.category.colorValue);
 
-      final effectiveSweep = sweepAngle > gapAngle ? sweepAngle - gapAngle : sweepAngle;
-      canvas.drawArc(rect, startAngle + (gapAngle / 2), effectiveSweep, false, paint);
+      final effectiveSweep = sweepAngle > gapAngle
+          ? sweepAngle - gapAngle
+          : sweepAngle;
+      canvas.drawArc(
+        rect,
+        startAngle + (gapAngle / 2),
+        effectiveSweep,
+        false,
+        paint,
+      );
       startAngle += sweepAngle;
     }
   }

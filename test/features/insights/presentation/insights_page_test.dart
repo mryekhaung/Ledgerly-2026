@@ -103,7 +103,9 @@ void main() {
       overrides: <Override>[
         currencyProvider.overrideWith((ref) => CurrencyCode.usd),
         monthStartDayProvider.overrideWith((ref) => 1),
-        insightsPeriodProvider.overrideWith(() => _FixedPeriodNotifier(testPeriod)),
+        insightsPeriodProvider.overrideWith(
+          () => _FixedPeriodNotifier(testPeriod),
+        ),
         insightsDataProvider.overrideWith((ref) => stream),
       ],
       home: const InsightsPage(),
@@ -112,16 +114,15 @@ void main() {
 
   group('InsightsPage states', () {
     testWidgets('shows loading placeholder initially', (tester) async {
-      await hostInsights(
-        tester,
-        stream: const Stream<PeriodInsights>.empty(),
-      );
+      await hostInsights(tester, stream: const Stream<PeriodInsights>.empty());
       await tester.pump();
 
       expect(find.byType(LoadingPlaceholder), findsOneWidget);
     });
 
-    testWidgets('shows empty state placeholder when no transactions exist', (tester) async {
+    testWidgets('shows empty state placeholder when no transactions exist', (
+      tester,
+    ) async {
       await hostInsights(
         tester,
         stream: Stream<PeriodInsights>.value(emptyInsights),

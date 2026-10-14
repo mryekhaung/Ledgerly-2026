@@ -359,51 +359,53 @@ class _MonthSwitcher extends StatelessWidget {
                   constraints: const BoxConstraints(minHeight: 44.0),
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.xs,
+                      ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Flexible(
-                            child: Text(
-                              label,
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.titleMedium,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Flexible(
+                                child: Text(
+                                  label,
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.titleMedium,
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              // The caret is the affordance; without it the label reads
+                              // as a heading, not a control.
+                              Icon(
+                                Icons.arrow_drop_down,
+                                size: 20,
+                                color: colors.textSecondary,
+                              ),
+                            ],
+                          ),
+                          if (isPayCycle) ...<Widget>[
+                            const SizedBox(height: 2),
+                            Text(
+                              strings('calendarPayCycle'),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: colors.textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: AppSpacing.xs),
-                          // The caret is the affordance; without it the label reads
-                          // as a heading, not a control.
-                          Icon(
-                            Icons.arrow_drop_down,
-                            size: 20,
-                            color: colors.textSecondary,
-                          ),
+                          ],
                         ],
                       ),
-                      if (isPayCycle) ...<Widget>[
-                        const SizedBox(height: 2),
-                        Text(
-                          strings('calendarPayCycle'),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: colors.textSecondary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-    ),
-    IconButton(
+        IconButton(
           onPressed: onNext,
           icon: const Icon(Icons.chevron_right),
           tooltip: strings('calendarNextMonth'),
@@ -639,7 +641,8 @@ class _DayCell extends StatelessWidget {
 
     String dateStr;
     try {
-      dateStr = DateFormat.yMMMMd(locale.toLanguageTag()).format(day.toDateTime());
+      dateStr = DateFormat.yMMMMd(locale.toLanguageTag())
+          .format(day.toDateTime());
     } catch (_) {
       dateStr = '${day.year}-${day.month}-${day.day}';
     }
@@ -673,44 +676,44 @@ class _DayCell extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                  if (showMonthLabel)
-                    Text(
-                      DateFormat.MMM(
-                        Localizations.localeOf(context).toLanguageTag(),
-                      ).format(day.toDateTime()),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontSize: 8,
-                        height: 1.0,
-                        color: isSelected
-                            ? colors.brandPrimary
-                            : colors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  SizedBox(
-                    height: showMonthLabel ? 14 : 20,
-                    child: Center(
-                      child: Text(
-                        '${day.day}',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontSize: showMonthLabel ? 12 : null,
+                    if (showMonthLabel)
+                      Text(
+                        DateFormat.MMM(
+                          Localizations.localeOf(context).toLanguageTag(),
+                        ).format(day.toDateTime()),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontSize: 8,
+                          height: 1.0,
                           color: isSelected
                               ? colors.brandPrimary
-                              : colors.textPrimary,
-                          fontWeight: isSelected ? FontWeight.w600 : null,
+                              : colors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    SizedBox(
+                      height: showMonthLabel ? 14 : 20,
+                      child: Center(
+                        child: Text(
+                          '${day.day}',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontSize: showMonthLabel ? 12 : null,
+                            color: isSelected
+                                ? colors.brandPrimary
+                                : colors.textPrimary,
+                            fontWeight: isSelected ? FontWeight.w600 : null,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  if (intensity case final i?) _Capsule(intensity: i),
-                ],
+                    if (intensity case final i?) _Capsule(intensity: i),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
-    ),
-  );
+    );
   }
 }
 

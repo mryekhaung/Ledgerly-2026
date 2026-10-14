@@ -13,10 +13,9 @@ final class WatchPeriodInsights {
     required BudgetPeriod period,
     required BudgetPeriod previousPeriod,
     required CurrencyCode currency,
-  }) =>
-      _repository.watchPeriodInsights(
-        period: period,
-        previousPeriod: previousPeriod,
-        currency: currency,
-      );
+  }) => _repository.watchPeriodInsights(
+    period: period,
+    previousPeriod: previousPeriod,
+    currency: currency,
+  );
 }

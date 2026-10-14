@@ -100,9 +100,9 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
     );
 
     if (chosen != null && mounted) {
-      ref.read(transactionsListProvider.notifier).applyFilter(
-            currentFilter.copyWith(categoryId: chosen.id),
-          );
+      ref
+          .read(transactionsListProvider.notifier)
+          .applyFilter(currentFilter.copyWith(categoryId: chosen.id));
     }
   }
 
@@ -149,10 +149,8 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
             children: <Widget>[
               // Search input
               Padding(
-                padding: ResponsiveInsets.pageHorizontal(context).copyWith(
-                  top: AppSpacing.sm,
-                  bottom: AppSpacing.xs,
-                ),
+                padding: ResponsiveInsets.pageHorizontal(context)
+                    .copyWith(top: AppSpacing.sm, bottom: AppSpacing.xs),
                 child: TextField(
                   controller: _searchController,
                   onChanged: _onSearchChanged,
@@ -214,9 +212,7 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
               const Divider(height: 1),
 
               // Transaction list body
-              Expanded(
-                child: _buildBody(context, state, notifier),
-              ),
+              Expanded(child: _buildBody(context, state, notifier)),
             ],
           ),
         ),
@@ -257,19 +253,15 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
       child: ListView.separated(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: ResponsiveInsets.pageHorizontal(context).copyWith(
-          top: AppSpacing.sm,
-          bottom: AppSpacing.xl,
-        ),
+        padding: ResponsiveInsets.pageHorizontal(context)
+            .copyWith(top: AppSpacing.sm, bottom: AppSpacing.xl),
         itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
         separatorBuilder: (_, _) => const Divider(height: 1),
         itemBuilder: (context, index) {
           if (index >= state.items.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-              child: Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
+              child: Center(child: CircularProgressIndicator.adaptive()),
             );
           }
 
@@ -314,10 +306,7 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
           unawaited(notifier.refresh());
           AppFeedback.success();
         } else if (mounted) {
-          AppFeedback.failure(
-            context,
-            message: strings('stateErrorBody'),
-          );
+          AppFeedback.failure(context, message: strings('stateErrorBody'));
         }
       },
     );
@@ -354,10 +343,8 @@ class _FilterChipsBar extends ConsumerWidget {
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: ResponsiveInsets.pageHorizontal(context).copyWith(
-        top: AppSpacing.xs,
-        bottom: AppSpacing.sm,
-      ),
+      padding: ResponsiveInsets.pageHorizontal(context)
+          .copyWith(top: AppSpacing.xs, bottom: AppSpacing.sm),
       child: Row(
         children: <Widget>[
           // Direction Chips
@@ -418,7 +405,8 @@ class _FilterChipsBar extends ConsumerWidget {
                   ? '${filter.startDate?.toString() ?? '...'} ~ ${filter.endDate?.toString() ?? '...'}'
                   : strings('filterDateRange'),
             ),
-            backgroundColor: (filter.startDate != null || filter.endDate != null)
+            backgroundColor:
+                (filter.startDate != null || filter.endDate != null)
                 ? colors.brandSubtle
                 : null,
             onPressed: onOpenFilterSheet,
@@ -426,7 +414,8 @@ class _FilterChipsBar extends ConsumerWidget {
           const SizedBox(width: AppSpacing.xs),
 
           // Amount Chip
-          if (filter.minAmountMinor != null || filter.maxAmountMinor != null) ...<Widget>[
+          if (filter.minAmountMinor != null ||
+              filter.maxAmountMinor != null) ...<Widget>[
             ActionChip(
               avatar: const Icon(Icons.attach_money, size: 16),
               label: Text(
@@ -469,8 +458,9 @@ class _TransactionRow extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
     final dateFormat = DateFormat.yMMMd(locale);
-    final category =
-        ref.watch(categoryByIdProvider(transaction.categoryId)).value;
+    final category = ref
+        .watch(categoryByIdProvider(transaction.categoryId))
+        .value;
 
     return Dismissible(
       key: ValueKey(transaction.id),
@@ -531,9 +521,8 @@ class _TransactionRow extends ConsumerWidget {
             ],
             Text(
               dateFormat.format(transaction.date.toDateTime()),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.textSecondary,
-                  ),
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: colors.textSecondary),
             ),
           ],
         ),
@@ -561,15 +550,15 @@ class _TransactionRow extends ConsumerWidget {
               },
               itemBuilder: (context) =>
                   <PopupMenuEntry<_TransactionMenuAction>>[
-                PopupMenuItem<_TransactionMenuAction>(
-                  value: _TransactionMenuAction.edit,
-                  child: Text(strings('transactionEdit')),
-                ),
-                PopupMenuItem<_TransactionMenuAction>(
-                  value: _TransactionMenuAction.delete,
-                  child: Text(strings('actionDelete')),
-                ),
-              ],
+                    PopupMenuItem<_TransactionMenuAction>(
+                      value: _TransactionMenuAction.edit,
+                      child: Text(strings('transactionEdit')),
+                    ),
+                    PopupMenuItem<_TransactionMenuAction>(
+                      value: _TransactionMenuAction.delete,
+                      child: Text(strings('actionDelete')),
+                    ),
+                  ],
             ),
           ],
         ),

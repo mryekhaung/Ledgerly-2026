@@ -30,123 +30,132 @@ class InsightsLocalDataSource {
   }) {
     // We watch transactionsDao.watchPeriodCategoryTotals(period).
     // In Drift, any change to transactions emits a new event.
-    return _database.transactionsDao
-        .watchPeriodCategoryTotals(period)
-        .asyncMap((categoryRows) async {
-      // 1. Fetch current daily totals from SQL
-      final dailyTotals = await _database.transactionsDao
-          .watchPeriodDailyTotals(period)
-          .first;
+    return _database.transactionsDao.watchPeriodCategoryTotals(period).asyncMap(
+      (categoryRows) async {
+        // 1. Fetch current daily totals from SQL
+        final dailyTotals = await _database.transactionsDao
+            .watchPeriodDailyTotals(period)
+            .first;
 
-      final currentIncome = await _database.transactionsDao
-          .sumForPeriod(period, 'income');
-      final currentExpense = await _database.transactionsDao
-          .sumForPeriod(period, 'expense');
-
-      // 2. Fetch previous period totals from SQL
-      final prevIncome = await _database.transactionsDao
-          .sumForPeriod(previousPeriod, 'income');
-      final prevExpense = await _database.transactionsDao
-          .sumForPeriod(previousPeriod, 'expense');
-
-      final currentSummary = PeriodTotal(
-        period: period,
-        incomeMinor: currentIncome,
-        expenseMinor: currentExpense,
-        currency: currency,
-      );
-
-      final prevSummary = PeriodTotal(
-        period: previousPeriod,
-        incomeMinor: prevIncome,
-        expenseMinor: prevExpense,
-        currency: currency,
-      );
-
-      final comparison = PeriodComparison(
-        current: currentSummary,
-        previous: prevSummary,
-      );
-
-      // 3. Resolve categories for category breakdowns
-      final categoryEntities = await _database.categoriesDao
-          .watchAll()
-          .first
-          .then(CategoryMapper.toEntities);
-
-      final categoryMap = <String, Category>{
-        for (final cat in categoryEntities) cat.id: cat,
-      };
-
-      final breakdowns = <CategoryBreakdown>[];
-      for (final row in categoryRows) {
-        if (row.direction != 'expense' || row.totalMinor <= 0) continue;
-
-        final category = categoryMap[row.categoryId] ??
-            Category(
-              id: row.categoryId,
-              name: 'Other',
-              iconKey: 'category',
-              colorValue: 0xFF9E9E9E,
-              kind: CategoryKind.expense,
-              sortOrder: 999,
-              isArchived: false,
-              isDefault: false,
-              createdAt: 0,
-              updatedAt: 0,
-            );
-
-        final percentage = currentExpense > 0
-            ? (row.totalMinor / currentExpense)
-            : 0.0;
-
-        breakdowns.add(
-          CategoryBreakdown(
-            category: category,
-            amountMinor: row.totalMinor,
-            percentage: percentage,
-            currency: currency,
-          ),
+        final currentIncome = await _database.transactionsDao.sumForPeriod(
+          period,
+          'income',
         );
-      }
-
-      breakdowns.sort((a, b) => b.amountMinor.compareTo(a.amountMinor));
-
-      // 4. Build continuous daily trend points across the entire period
-      final dailyMap = <LocalDate, ({int income, int expense})>{
-        for (final row in dailyTotals)
-          row.date: (income: row.incomeMinor, expense: row.expenseMinor),
-      };
-
-      final trendPoints = <DailyTrendPoint>[];
-      var runningCumulativeNet = 0;
-
-      for (var i = 0; i < period.length; i++) {
-        final day = period.start.addDays(i)!;
-        final entry = dailyMap[day];
-        final dayIncome = entry?.income ?? 0;
-        final dayExpense = entry?.expense ?? 0;
-        final dayNet = dayIncome - dayExpense;
-        runningCumulativeNet += dayNet;
-
-        trendPoints.add(
-          DailyTrendPoint(
-            date: day,
-            incomeMinor: dayIncome,
-            expenseMinor: dayExpense,
-            cumulativeNetMinor: runningCumulativeNet,
-            currency: currency,
-          ),
+        final currentExpense = await _database.transactionsDao.sumForPeriod(
+          period,
+          'expense',
         );
-      }
 
-      return PeriodInsights(
-        period: period,
-        summary: currentSummary,
-        comparison: comparison,
-        categoryBreakdowns: breakdowns,
-        trendPoints: trendPoints,
-      );
-    });
+        // 2. Fetch previous period totals from SQL
+        final prevIncome = await _database.transactionsDao.sumForPeriod(
+          previousPeriod,
+          'income',
+        );
+        final prevExpense = await _database.transactionsDao.sumForPeriod(
+          previousPeriod,
+          'expense',
+        );
+
+        final currentSummary = PeriodTotal(
+          period: period,
+          incomeMinor: currentIncome,
+          expenseMinor: currentExpense,
+          currency: currency,
+        );
+
+        final prevSummary = PeriodTotal(
+          period: previousPeriod,
+          incomeMinor: prevIncome,
+          expenseMinor: prevExpense,
+          currency: currency,
+        );
+
+        final comparison = PeriodComparison(
+          current: currentSummary,
+          previous: prevSummary,
+        );
+
+        // 3. Resolve categories for category breakdowns
+        final categoryEntities = await _database.categoriesDao
+            .watchAll()
+            .first
+            .then(CategoryMapper.toEntities);
+
+        final categoryMap = <String, Category>{
+          for (final cat in categoryEntities) cat.id: cat,
+        };
+
+        final breakdowns = <CategoryBreakdown>[];
+        for (final row in categoryRows) {
+          if (row.direction != 'expense' || row.totalMinor <= 0) continue;
+
+          final category =
+              categoryMap[row.categoryId] ??
+              Category(
+                id: row.categoryId,
+                name: 'Other',
+                iconKey: 'category',
+                colorValue: 0xFF9E9E9E,
+                kind: CategoryKind.expense,
+                sortOrder: 999,
+                isArchived: false,
+                isDefault: false,
+                createdAt: 0,
+                updatedAt: 0,
+              );
+
+          final percentage = currentExpense > 0
+              ? (row.totalMinor / currentExpense)
+              : 0.0;
+
+          breakdowns.add(
+            CategoryBreakdown(
+              category: category,
+              amountMinor: row.totalMinor,
+              percentage: percentage,
+              currency: currency,
+            ),
+          );
+        }
+
+        breakdowns.sort((a, b) => b.amountMinor.compareTo(a.amountMinor));
+
+        // 4. Build continuous daily trend points across the entire period
+        final dailyMap = <LocalDate, ({int income, int expense})>{
+          for (final row in dailyTotals)
+            row.date: (income: row.incomeMinor, expense: row.expenseMinor),
+        };
+
+        final trendPoints = <DailyTrendPoint>[];
+        var runningCumulativeNet = 0;
+
+        for (var i = 0; i < period.length; i++) {
+          final day = period.start.addDays(i)!;
+          final entry = dailyMap[day];
+          final dayIncome = entry?.income ?? 0;
+          final dayExpense = entry?.expense ?? 0;
+          final dayNet = dayIncome - dayExpense;
+          runningCumulativeNet += dayNet;
+
+          trendPoints.add(
+            DailyTrendPoint(
+              date: day,
+              incomeMinor: dayIncome,
+              expenseMinor: dayExpense,
+              cumulativeNetMinor: runningCumulativeNet,
+              currency: currency,
+            ),
+          );
+        }
+
+        return PeriodInsights(
+          period: period,
+          summary: currentSummary,
+          comparison: comparison,
+          categoryBreakdowns: breakdowns,
+          trendPoints: trendPoints,
+        );
+      },
+    );
   }
 }

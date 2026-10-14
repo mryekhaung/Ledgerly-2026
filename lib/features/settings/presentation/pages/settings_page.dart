@@ -568,57 +568,57 @@ class _NavRow extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          minHeight: AppRowHeight.absoluteMinimum,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.md,
+          constraints: const BoxConstraints(
+            minHeight: AppRowHeight.absoluteMinimum,
           ),
-          child: Row(
-            children: <Widget>[
-              if (leading case final leading?) ...<Widget>[
-                leading,
-                const SizedBox(width: AppSpacing.md),
-              ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      label,
-                      style: Theme.of(context).textTheme.bodyLarge
-                          ?.copyWith(color: colors.textPrimary),
-                    ),
-                    if (subtitle case final subtitle?) ...<Widget>[
-                      const SizedBox(height: AppSpacing.xxs),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
+            ),
+            child: Row(
+              children: <Widget>[
+                if (leading case final leading?) ...<Widget>[
+                  leading,
+                  const SizedBox(width: AppSpacing.md),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
                       Text(
-                        subtitle,
-                        style: Theme.of(context).textTheme.bodySmall
-                            ?.copyWith(color: colors.textSecondary),
+                        label,
+                        style: Theme.of(context).textTheme.bodyLarge
+                            ?.copyWith(color: colors.textPrimary),
                       ),
+                      if (subtitle case final subtitle?) ...<Widget>[
+                        const SizedBox(height: AppSpacing.xxs),
+                        Text(
+                          subtitle,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: colors.textSecondary),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              if (trailingText case final trailingText?) ...<Widget>[
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  trailingText,
-                  style: Theme.of(context).textTheme.bodyMedium
-                      ?.copyWith(color: colors.textSecondary),
-                ),
+                if (trailingText case final trailingText?) ...<Widget>[
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(
+                    trailingText,
+                    style: Theme.of(context).textTheme.bodyMedium
+                        ?.copyWith(color: colors.textSecondary),
+                  ),
+                ],
+                const SizedBox(width: AppSpacing.xs),
+                Icon(Icons.chevron_right, size: 20, color: colors.textTertiary),
               ],
-              const SizedBox(width: AppSpacing.xs),
-              Icon(Icons.chevron_right, size: 20, color: colors.textTertiary),
-            ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
   }
 }
 

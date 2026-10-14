@@ -46,8 +46,9 @@ class InsightSummaryCard extends StatelessWidget {
             children: <Widget>[
               Text(
                 strings('insightsNetSavings'),
-                style: theme.textTheme.labelSmall
-                    ?.copyWith(color: colors.textSecondary),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colors.textSecondary,
+                ),
               ),
               if (deltaPct != null) _ComparisonBadge(deltaPct: deltaPct),
             ],
@@ -65,8 +66,9 @@ class InsightSummaryCard extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       strings('insightsTotalIncome'),
-                      style: theme.textTheme.labelSmall
-                          ?.copyWith(color: colors.textSecondary),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colors.textSecondary,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     AmountText(
@@ -84,8 +86,9 @@ class InsightSummaryCard extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       strings('insightsTotalExpense'),
-                      style: theme.textTheme.labelSmall
-                          ?.copyWith(color: colors.textSecondary),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colors.textSecondary,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     AmountText(

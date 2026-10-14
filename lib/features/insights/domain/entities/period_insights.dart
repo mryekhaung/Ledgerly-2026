@@ -43,12 +43,12 @@ final class PeriodInsights {
 
   @override
   int get hashCode => Object.hash(
-        period,
-        summary,
-        comparison,
-        Object.hashAll(categoryBreakdowns),
-        Object.hashAll(trendPoints),
-      );
+    period,
+    summary,
+    comparison,
+    Object.hashAll(categoryBreakdowns),
+    Object.hashAll(trendPoints),
+  );
 
   static bool _listEquals<T>(List<T> a, List<T> b) {
     if (identical(a, b)) return true;

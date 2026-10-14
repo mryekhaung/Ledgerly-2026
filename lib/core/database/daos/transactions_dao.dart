@@ -358,9 +358,11 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     List<String>? matchingCategoryIds;
     final queryText = searchQuery?.trim();
     if (queryText != null && queryText.isNotEmpty) {
-      final matchingCategories = await (db.select(db.categories)
-            ..where((c) => c.deletedAt.isNull() & c.name.like('%$queryText%')))
-          .get();
+      final matchingCategories =
+          await (db.select(db.categories)..where(
+                (c) => c.deletedAt.isNull() & c.name.like('%$queryText%'),
+              ))
+              .get();
       matchingCategoryIds = matchingCategories.map((c) => c.id).toList();
     }
 
@@ -408,4 +410,3 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     return query.get();
   }
 }
-

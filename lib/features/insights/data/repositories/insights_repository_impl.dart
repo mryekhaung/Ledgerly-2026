@@ -15,10 +15,9 @@ final class InsightsRepositoryImpl implements InsightsRepository {
     required BudgetPeriod period,
     required BudgetPeriod previousPeriod,
     required CurrencyCode currency,
-  }) =>
-      _localDataSource.watchPeriodInsights(
-        period: period,
-        previousPeriod: previousPeriod,
-        currency: currency,
-      );
+  }) => _localDataSource.watchPeriodInsights(
+    period: period,
+    previousPeriod: previousPeriod,
+    currency: currency,
+  );
 }

@@ -68,9 +68,15 @@ class IncomeExpenseBarChartCard extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  _LegendDot(color: colors.moneyIn, label: strings('calendarIncome')),
+                  _LegendDot(
+                    color: colors.moneyIn,
+                    label: strings('calendarIncome'),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  _LegendDot(color: colors.moneyOut, label: strings('calendarExpense')),
+                  _LegendDot(
+                    color: colors.moneyOut,
+                    label: strings('calendarExpense'),
+                  ),
                 ],
               ),
             ],
@@ -158,7 +164,11 @@ class _BarChartPainter extends CustomPainter {
     final axisPaint = Paint()
       ..color = gridColor.withValues(alpha: 0.5)
       ..strokeWidth = 1.0;
-    canvas.drawLine(Offset(0, bottomAxisY), Offset(size.width, bottomAxisY), axisPaint);
+    canvas.drawLine(
+      Offset(0, bottomAxisY),
+      Offset(size.width, bottomAxisY),
+      axisPaint,
+    );
 
     final groupWidth = size.width / chunks.length;
     final barWidth = math.min(groupWidth * 0.28, 24.0);

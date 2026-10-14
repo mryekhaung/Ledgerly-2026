@@ -2,10 +2,7 @@ import 'package:ledgerly/features/transactions/domain/entities/transaction_total
 
 /// Comparative analytics comparing the current budget period with the previous one.
 final class PeriodComparison {
-  const PeriodComparison({
-    required this.current,
-    required this.previous,
-  });
+  const PeriodComparison({required this.current, required this.previous});
 
   /// The headline figures for the active budget period.
   final PeriodTotal current;

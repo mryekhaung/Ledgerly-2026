@@ -34,10 +34,7 @@ class InsightsPage extends ConsumerWidget {
     final currency = ref.watch(currencyProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(strings('insightsTitle')),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(strings('insightsTitle')), elevation: 0),
       body: SafeArea(
         child: Column(
           children: <Widget>[
@@ -51,8 +48,7 @@ class InsightsPage extends ConsumerWidget {
                 isPayCycle: isPayCycle,
                 onPrevious: () =>
                     ref.read(insightsPeriodProvider.notifier).previous(),
-                onNext: () =>
-                    ref.read(insightsPeriodProvider.notifier).next(),
+                onNext: () => ref.read(insightsPeriodProvider.notifier).next(),
               ),
             ),
             Divider(height: 1, color: AppThemeColors.of(context).border),
@@ -109,22 +105,13 @@ class _ResponsiveInsightsContent extends StatelessWidget {
           return Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1200),
-              child: _ThreeColumnLayout(
-                insights: insights,
-                currency: currency,
-              ),
+              child: _ThreeColumnLayout(insights: insights, currency: currency),
             ),
           );
         } else if (width >= 600) {
-          return _TwoColumnLayout(
-            insights: insights,
-            currency: currency,
-          );
+          return _TwoColumnLayout(insights: insights, currency: currency);
         } else {
-          return _SingleColumnLayout(
-            insights: insights,
-            currency: currency,
-          );
+          return _SingleColumnLayout(insights: insights, currency: currency);
         }
       },
     );
@@ -132,10 +119,7 @@ class _ResponsiveInsightsContent extends StatelessWidget {
 }
 
 class _SingleColumnLayout extends StatelessWidget {
-  const _SingleColumnLayout({
-    required this.insights,
-    required this.currency,
-  });
+  const _SingleColumnLayout({required this.insights, required this.currency});
 
   final PeriodInsights insights;
   final CurrencyCode currency;
@@ -177,10 +161,7 @@ class _SingleColumnLayout extends StatelessWidget {
 }
 
 class _TwoColumnLayout extends StatelessWidget {
-  const _TwoColumnLayout({
-    required this.insights,
-    required this.currency,
-  });
+  const _TwoColumnLayout({required this.insights, required this.currency});
 
   final PeriodInsights insights;
   final CurrencyCode currency;
@@ -237,10 +218,7 @@ class _TwoColumnLayout extends StatelessWidget {
 }
 
 class _ThreeColumnLayout extends StatelessWidget {
-  const _ThreeColumnLayout({
-    required this.insights,
-    required this.currency,
-  });
+  const _ThreeColumnLayout({required this.insights, required this.currency});
 
   final PeriodInsights insights;
   final CurrencyCode currency;

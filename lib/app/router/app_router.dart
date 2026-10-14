@@ -169,7 +169,6 @@ class _TransactionEditLoader extends ConsumerWidget {
 class _EditLoadingScaffold extends StatelessWidget {
   const _EditLoadingScaffold();
 
-
   @override
   Widget build(BuildContext context) =>
       const Scaffold(body: SafeArea(child: LoadingPlaceholder()));

@@ -41,12 +41,12 @@ final class DailyTrendPoint {
 
   @override
   int get hashCode => Object.hash(
-        date,
-        incomeMinor,
-        expenseMinor,
-        cumulativeNetMinor,
-        currency,
-      );
+    date,
+    incomeMinor,
+    expenseMinor,
+    cumulativeNetMinor,
+    currency,
+  );
 
   @override
   String toString() =>

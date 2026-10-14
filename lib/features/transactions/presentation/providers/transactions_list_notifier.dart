@@ -86,10 +86,7 @@ class TransactionsListNotifier extends Notifier<TransactionsListState> {
         );
       },
       onErr: (failure) {
-        state = state.copyWith(
-          isLoading: false,
-          error: failure.toString(),
-        );
+        state = state.copyWith(isLoading: false, error: failure.toString());
       },
     );
   }
@@ -118,10 +115,7 @@ class TransactionsListNotifier extends Notifier<TransactionsListState> {
         );
       },
       onErr: (failure) {
-        state = state.copyWith(
-          isLoadingMore: false,
-          error: failure.toString(),
-        );
+        state = state.copyWith(isLoadingMore: false, error: failure.toString());
       },
     );
   }
@@ -161,6 +155,7 @@ class TransactionsListNotifier extends Notifier<TransactionsListState> {
 
 /// Provider for [TransactionsListNotifier].
 final transactionsListProvider =
-    NotifierProvider.autoDispose<TransactionsListNotifier, TransactionsListState>(
-  TransactionsListNotifier.new,
-);
+    NotifierProvider.autoDispose<
+      TransactionsListNotifier,
+      TransactionsListState
+    >(TransactionsListNotifier.new);

@@ -37,7 +37,9 @@ void main() {
       settingsProvider.overrideWith((_) => Stream.value(AppSettings.defaults)),
       currencyProvider.overrideWithValue(CurrencyCode.usd),
       monthStartDayProvider.overrideWithValue(1),
-      userProfileProvider.overrideWith((_) => Stream.value(UserProfile.initial)),
+      userProfileProvider.overrideWith(
+        (_) => Stream.value(UserProfile.initial),
+      ),
       calendarProvider.overrideWith(
         () => _FakeCalendarNotifier(
           CalendarState(
@@ -214,5 +216,6 @@ class _FixedCategoryListNotifier extends CategoryListNotifier {
   final CategoryListState _initial;
 
   @override
-  Stream<CategoryListState> build() => Stream<CategoryListState>.value(_initial);
+  Stream<CategoryListState> build() =>
+      Stream<CategoryListState>.value(_initial);
 }

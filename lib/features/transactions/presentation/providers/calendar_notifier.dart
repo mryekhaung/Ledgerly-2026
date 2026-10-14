@@ -19,13 +19,15 @@ final class CalendarState {
     required this.selectedDay,
     required this.isTodaySelected,
     PeriodCalculator? calculator,
-  }) : visibleMonth = visibleMonth ??
+  }) : visibleMonth =
+           visibleMonth ??
            (visiblePeriod != null
                ? visiblePeriod.start
                : (calculator ?? PeriodCalculator(1))
-                   .containing(selectedDay)
-                   .start),
-       visiblePeriod = visiblePeriod ??
+                     .containing(selectedDay)
+                     .start),
+       visiblePeriod =
+           visiblePeriod ??
            (calculator ?? PeriodCalculator(1)).containing(
              visibleMonth ?? selectedDay,
            );

@@ -150,10 +150,7 @@ class _TransactionFilterSheetState
 
     final chosen = await Navigator.of(context).push<Category>(
       MaterialPageRoute<Category>(
-        builder: (_) => CategoryPickerPage(
-          kind: kind,
-          selectedId: _categoryId,
-        ),
+        builder: (_) => CategoryPickerPage(kind: kind, selectedId: _categoryId),
       ),
     );
 
@@ -239,9 +236,9 @@ class _TransactionFilterSheetState
                 Text(
                   strings('filterTitle'),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: colors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 TextButton(
                   onPressed: _clearAll,
@@ -254,9 +251,8 @@ class _TransactionFilterSheetState
             // Direction / Type
             Text(
               strings('categoriesKindLabel'),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: colors.textSecondary,
-                  ),
+              style: Theme.of(context).textTheme.labelMedium
+                  ?.copyWith(color: colors.textSecondary),
             ),
             const SizedBox(height: AppSpacing.xs),
             SegmentedButton<TransactionDirection?>(
@@ -284,9 +280,8 @@ class _TransactionFilterSheetState
             // Category Picker Row
             Text(
               strings('filterCategory'),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: colors.textSecondary,
-                  ),
+              style: Theme.of(context).textTheme.labelMedium
+                  ?.copyWith(color: colors.textSecondary),
             ),
             const SizedBox(height: AppSpacing.xs),
             InkWell(
@@ -322,8 +317,11 @@ class _TransactionFilterSheetState
                         onPressed: () => setState(() => _categoryId = null),
                       ),
                     ] else ...<Widget>[
-                      Icon(Icons.category_outlined,
-                          size: 20, color: colors.textSecondary),
+                      Icon(
+                        Icons.category_outlined,
+                        size: 20,
+                        color: colors.textSecondary,
+                      ),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: Text(
@@ -342,9 +340,8 @@ class _TransactionFilterSheetState
             // Date Range
             Text(
               strings('filterDateRange'),
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: colors.textSecondary,
-                  ),
+              style: Theme.of(context).textTheme.labelMedium
+                  ?.copyWith(color: colors.textSecondary),
             ),
             const SizedBox(height: AppSpacing.xs),
             Row(
@@ -410,16 +407,13 @@ class _TransactionFilterSheetState
                   child: Text(strings('filterClearAll')),
                 ),
               ),
-            ] else ...<Widget>[
-              const SizedBox(height: AppSpacing.lg),
-            ],
+            ] else ...<Widget>[const SizedBox(height: AppSpacing.lg)],
 
             // Amount Range
             Text(
               '${strings('filterAmount')} (${currency.code.toUpperCase()})',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: colors.textSecondary,
-                  ),
+              style: Theme.of(context).textTheme.labelMedium
+                  ?.copyWith(color: colors.textSecondary),
             ),
             const SizedBox(height: AppSpacing.xs),
             Row(
