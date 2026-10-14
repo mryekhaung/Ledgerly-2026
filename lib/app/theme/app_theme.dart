@@ -2,6 +2,7 @@ import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Builds the app's [ThemeData] for light and dark from the design tokens.
@@ -15,12 +16,28 @@ abstract final class AppTheme {
   const AppTheme._();
 
   /// Light theme.
-  static ThemeData light() => _build(const AppColorsLight(), Brightness.light);
+  ///
+  /// [platform] selects the platform-adaptive chrome (docs/Platform.md §2). It is
+  /// injectable so a golden test can render iOS chrome on a Linux runner; when it
+  /// is null the host is resolved once via [AppPlatform.resolve].
+  static ThemeData light({AppPlatform? platform}) => _build(
+    const AppColorsLight(),
+    Brightness.light,
+    platform ?? AppPlatform.resolve(),
+  );
 
-  /// Dark theme.
-  static ThemeData dark() => _build(const AppColorsDark(), Brightness.dark);
+  /// Dark theme. See [light] for [platform].
+  static ThemeData dark({AppPlatform? platform}) => _build(
+    const AppColorsDark(),
+    Brightness.dark,
+    platform ?? AppPlatform.resolve(),
+  );
 
-  static ThemeData _build(AppColors colors, Brightness brightness) {
+  static ThemeData _build(
+    AppColors colors,
+    Brightness brightness,
+    AppPlatform platform,
+  ) {
     final colorScheme = _colorScheme(colors, brightness);
     final textTheme = AppTypography.textTheme(colors);
 
@@ -33,7 +50,13 @@ abstract final class AppTheme {
       dividerColor: colors.border,
       fontFamily: AppTypography.fontFamily,
       textTheme: textTheme,
-      splashFactory: InkSparkle.splashFactory,
+      // A Material ink ripple is Android chrome. Applying it globally puts an
+      // Android ripple on iOS, which is exactly the "skinned, not native" trap
+      // docs/Design.md §1 forbids and §5.2 calls out ("never a ripple on iOS").
+      // iOS gets the Cupertino press treatment instead (docs/Platform.md §2).
+      splashFactory: platform.usesMaterial
+          ? InkSparkle.splashFactory
+          : NoSplash.splashFactory,
       visualDensity: VisualDensity.standard,
 
       // Cards: we prefer tint + hairline to elevation (docs/Design.md §4.3).
