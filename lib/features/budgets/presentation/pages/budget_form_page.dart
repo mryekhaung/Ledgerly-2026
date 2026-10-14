@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
@@ -326,14 +327,14 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD97706).withValues(alpha: 0.15),
+                  color: colors.warningSubtle,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${(formState.alertThreshold * 100).round()}%',
-                  style: const TextStyle(
+                  style: AppTypography.caption.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFFD97706),
+                    color: colors.warning,
                   ),
                 ),
               ),
@@ -345,7 +346,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
             min: 0.5,
             max: 1.0,
             divisions: 10,
-            activeColor: const Color(0xFFD97706),
+            activeColor: colors.warning,
             onChanged: (val) {
               ref
                   .read(budgetFormNotifierProvider.notifier)
@@ -353,7 +354,9 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
             },
           ),
           Text(
-            'Notify with a warning alert when spending reaches ${(formState.alertThreshold * 100).round()}% of your budget.',
+            AppStrings.fill(context, 'budgetThresholdHint', <String, Object>{
+              'percent': (formState.alertThreshold * 100).round(),
+            }),
             style: theme.textTheme.bodySmall?.copyWith(
               color: colors.textSecondary,
             ),
@@ -421,14 +424,18 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
                       value: formState.alertThreshold,
                       minHeight: 8,
                       backgroundColor: colors.border.withValues(alpha: 0.35),
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        Color(0xFFD97706),
-                      ),
+                      valueColor: AlwaysStoppedAnimation<Color>(colors.warning),
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Warning alert triggers at ${(formState.alertThreshold * 100).round()}%',
+                    AppStrings.fill(
+                      context,
+                      'budgetThresholdLive',
+                      <String, Object>{
+                        'percent': (formState.alertThreshold * 100).round(),
+                      },
+                    ),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colors.textSecondary,
                     ),

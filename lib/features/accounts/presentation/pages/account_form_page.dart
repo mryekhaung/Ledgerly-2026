@@ -485,6 +485,8 @@ class _ColorSwatch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(22),
@@ -494,7 +496,9 @@ class _ColorSwatch extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
-          border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
+          border: isSelected
+              ? Border.all(color: colors.textOnBrand, width: 3)
+              : null,
           boxShadow: isSelected
               ? <BoxShadow>[
                   BoxShadow(
@@ -506,8 +510,8 @@ class _ColorSwatch extends StatelessWidget {
               : null,
         ),
         child: isSelected
-            ? const Center(
-                child: Icon(Icons.check, size: 20, color: Colors.white),
+            ? Center(
+                child: Icon(Icons.check, size: 20, color: colors.textOnBrand),
               )
             : null,
       ),

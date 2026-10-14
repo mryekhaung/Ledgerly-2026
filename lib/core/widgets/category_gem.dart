@@ -61,9 +61,8 @@ class CategoryGem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasColor = CategoryPalette.isValid(colorValue);
-    final gemColor = hasColor
-        ? Color(colorValue)
-        : AppThemeColors.of(context).brandSubtle;
+    final colors = AppThemeColors.of(context);
+    final gemColor = hasColor ? Color(colorValue) : colors.brandSubtle;
 
     return Semantics(
       label: semanticsLabel,
@@ -77,17 +76,16 @@ class CategoryGem extends StatelessWidget {
           color: gemColor,
           shape: BoxShape.circle,
           // A hairline keeps a pale gem from dissolving into a pale surface.
-          border: hasColor
-              ? null
-              : Border.all(color: AppThemeColors.of(context).border),
+          border: hasColor ? null : Border.all(color: colors.border),
         ),
         alignment: Alignment.center,
         child: Icon(
           CategoryIcons.iconFor(iconKey),
           size: size.iconSize,
-          // Fixed white on a saturated fill; the palette values are all dark
-          // enough that this stays legible.
-          color: Colors.white,
+          // The gem sits on a saturated category swatch, so this is an
+          // on-colour: `textOnBrand` is the token for exactly that (white in
+          // light, deep jade in dark) rather than a hardcoded `Colors.white`.
+          color: colors.textOnBrand,
         ),
       ),
     );

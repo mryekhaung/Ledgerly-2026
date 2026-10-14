@@ -987,6 +987,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get budgetFieldThreshold => 'Alert Warning Threshold';
 
   @override
+  String budgetThresholdHint(int percent) {
+    return 'Notify with a warning alert when spending reaches $percent% of your budget.';
+  }
+
+  @override
+  String budgetThresholdLive(int percent) {
+    return 'Warning alert triggers at $percent%';
+  }
+
+  @override
   String get budgetTotalOption => 'Overall (Total Expenses)';
 
   @override

@@ -73,4 +73,13 @@ abstract final class AvatarPalette {
   /// light scheme and a near-white in the dark one.
   static Color inkFor(AppColors colors) =>
       resolve(colors, const PaletteSlot(8));
+
+  /// The specular glint in the upper-left of each pupil.
+  ///
+  /// Always white: it reads as a light source reflecting off the eye, not as a
+  /// themed surface, so it must not follow the scheme. Held here rather than in
+  /// the painter because this file is the avatar stack's single home for raw
+  /// `Color` values (see the class doc; `docs/Design.md` §2).
+  static Color eyeHighlightFor(AppColors colors) =>
+      const Color(0xFFFFFFFF).withValues(alpha: 0.85);
 }

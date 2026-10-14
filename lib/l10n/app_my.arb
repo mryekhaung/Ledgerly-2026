@@ -312,6 +312,8 @@
   "budgetFieldAmount": "ကန့်သတ်ငွေပမာဏ",
   "budgetFieldPeriod": "ကာလ",
   "budgetFieldThreshold": "သတိပေးချက် ထုတ်ပြန်မည့် ရာခိုင်နှုန်း",
+  "budgetThresholdHint": "သင့်ဘတ်ဂျက်၏ {percent}% အသုံးပြုပြီးပါက သတိပေးချက် ထုတ်ပြန်ပါမည်။",
+  "budgetThresholdLive": "သတိပေးချက်သည် {percent}% တွင် အလုပ်လုပ်ပါမည်",
   "budgetTotalOption": "စုစုပေါင်း သုံးစွဲငွေ (အားလုံးအတွက်)",
   "budgetSpent": "သုံးစွဲပြီးငွေ",
   "budgetRemaining": "ကျန်ရှိငွေ",

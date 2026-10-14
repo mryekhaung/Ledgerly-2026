@@ -65,6 +65,12 @@ abstract final class AppStrings {
       'monthStartsOnDayFormat' => l10n.monthStartsOnDayFormat(
         _require(values, 'day') as int,
       ),
+      'budgetThresholdHint' => l10n.budgetThresholdHint(
+        _require(values, 'percent') as int,
+      ),
+      'budgetThresholdLive' => l10n.budgetThresholdLive(
+        _require(values, 'percent') as int,
+      ),
       'goalRemaining' => l10n.goalRemaining(
         _require(values, 'amount') as String,
       ),

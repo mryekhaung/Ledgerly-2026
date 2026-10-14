@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
+import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -239,6 +241,7 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
     WidgetRef ref,
     String Function(String) strings,
   ) {
+    final colors = AppThemeColors.of(context);
     final importState = ref.watch(importNotifierProvider);
     final notifier = ref.read(importNotifierProvider.notifier);
 
@@ -326,8 +329,8 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
                     Text(strings('importValidRows')),
                     Text(
                       '${importState.preview!.validRows}',
-                      style: const TextStyle(
-                        color: Colors.green,
+                      style: AppTypography.caption.copyWith(
+                        color: colors.moneyIn,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -340,9 +343,9 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
                     Text(strings('importDuplicateRows')),
                     Text(
                       '${importState.preview!.duplicateRows}',
-                      style: TextStyle(
+                      style: AppTypography.caption.copyWith(
                         color: importState.preview!.duplicateRows > 0
-                            ? Colors.orange
+                            ? colors.warning
                             : null,
                         fontWeight: FontWeight.w600,
                       ),
@@ -357,8 +360,8 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
                       Text(strings('importNewCategories')),
                       Text(
                         '${importState.preview!.newCategoryNames.length}',
-                        style: const TextStyle(
-                          color: Colors.blue,
+                        style: AppTypography.caption.copyWith(
+                          color: colors.brandPrimary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

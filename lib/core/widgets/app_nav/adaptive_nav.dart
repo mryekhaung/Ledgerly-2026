@@ -118,7 +118,7 @@ class _MaterialNavBar extends StatelessWidget {
           // selected pill matches the rest of the app (docs/Design.md §2.2).
           indicatorColor: hasSelection
               ? colors.brandSubtle
-              : const Color(0x00000000),
+              : Colors.transparent,
           backgroundColor: colors.surfaceRaised,
           labelTextStyle: WidgetStateProperty.resolveWith(
             (states) => Theme.of(context).textTheme.labelSmall?.copyWith(

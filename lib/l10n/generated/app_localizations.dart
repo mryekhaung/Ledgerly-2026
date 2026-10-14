@@ -1966,6 +1966,18 @@ abstract class AppLocalizations {
   /// **'Alert Warning Threshold'**
   String get budgetFieldThreshold;
 
+  /// Explains what the alert threshold slider does.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify with a warning alert when spending reaches {percent}% of your budget.'**
+  String budgetThresholdHint(int percent);
+
+  /// Live readout under the threshold slider.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning alert triggers at {percent}%'**
+  String budgetThresholdLive(int percent);
+
   /// Option in category picker to set an overall total budget.
   ///
   /// In en, this message translates to:

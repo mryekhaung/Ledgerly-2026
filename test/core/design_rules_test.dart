@@ -202,28 +202,11 @@ void main() {
         'hardcoded colour',
         'docs/Design.md §2 — widgets read AppThemeColors, never raw hex',
         sites,
-        const <String, int>{
-          // `#D97706` reimplements the existing `warning`/`warningSubtle` token.
-          'lib/features/budgets/presentation/pages/budget_form_page.dart': 4,
-          'lib/features/budgets/presentation/widgets/budget_status_pill.dart':
-              2,
-          'lib/features/budgets/presentation/widgets/budget_summary_card.dart':
-              1,
-          'lib/features/budgets/presentation/widgets/budget_category_row.dart':
-              1,
-          // `Colors.white` as an on-colour check mark and selection ring; needs
-          // an `onBrand` token or an explicit two-colour set.
-          'lib/features/accounts/presentation/pages/account_form_page.dart': 2,
-          'lib/core/widgets/app_nav/adaptive_nav.dart': 1,
-          'lib/core/widgets/category_gem.dart': 1,
-          // `Colors.transparent` is allowed by the pattern; these are the real
-          // stragglers.
-          'lib/features/goals/presentation/pages/goal_form_page.dart': 1,
-          'lib/features/goals/presentation/pages/goals_list_page.dart': 1,
-          'lib/features/profile/presentation/widgets/avatar_painter.dart': 1,
-          'lib/features/data_transfer/presentation/pages/data_transfer_page.dart':
-              3,
-        },
+        // Burned to zero. The last of them were a reimplemented `warning`
+        // (#D97706, which also broke dark mode), Material's stock
+        // green/orange/blue, and several `Colors.white` on-colour uses that
+        // now read `textOnBrand`.
+        const <String, int>{},
       );
     });
 
@@ -453,18 +436,18 @@ void main() {
         const <String, int>{
           'lib/features/accounts/presentation/pages/transfer_page.dart': 9,
           'lib/features/goals/presentation/widgets/goal_card.dart': 8,
-          'lib/features/data_transfer/presentation/pages/data_transfer_page.dart':
-              6,
           'lib/features/auth/presentation/pages/welcome_page.dart': 4,
           'lib/features/goals/presentation/pages/goal_form_page.dart': 4,
           'lib/features/goals/presentation/widgets/goal_contribution_dialog.dart':
               4,
           'lib/features/recurring/presentation/widgets/recurring_item_card.dart':
               4,
-          'lib/features/accounts/presentation/widgets/account_card.dart': 2,
-          'lib/features/budgets/presentation/pages/budget_form_page.dart': 3,
+          'lib/features/data_transfer/presentation/pages/data_transfer_page.dart':
+              3,
           'lib/features/accounts/presentation/pages/account_form_page.dart': 2,
+          'lib/features/accounts/presentation/widgets/account_card.dart': 2,
           'lib/features/auth/presentation/pages/account_page.dart': 2,
+          'lib/features/budgets/presentation/pages/budget_form_page.dart': 2,
           'lib/features/goals/presentation/pages/goals_list_page.dart': 2,
           'lib/features/transactions/presentation/pages/transactions_list_page.dart':
               2,
@@ -474,8 +457,6 @@ void main() {
           'lib/features/auth/presentation/pages/sign_in_page.dart': 1,
           'lib/features/budgets/presentation/pages/budgets_page.dart': 1,
           'lib/features/budgets/presentation/widgets/budget_category_row.dart':
-              1,
-          'lib/features/budgets/presentation/widgets/budget_status_pill.dart':
               1,
         },
       );

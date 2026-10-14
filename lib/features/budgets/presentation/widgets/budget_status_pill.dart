@@ -1,5 +1,6 @@
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/features/budgets/domain/entities/budget_status.dart';
 import 'package:material_ui/material_ui.dart';
@@ -22,8 +23,8 @@ class BudgetStatusPill extends StatelessWidget {
         Icons.check_circle_outline,
       ),
       BudgetStatus.warning => (
-        const Color(0xFFD97706),
-        const Color(0xFFD97706).withValues(alpha: 0.12),
+        colors.warning,
+        colors.warningSubtle,
         strings('budgetStatusWarning'),
         Icons.warning_amber_rounded,
       ),
@@ -49,14 +50,7 @@ class BudgetStatusPill extends StatelessWidget {
         children: <Widget>[
           Icon(icon, size: 13, color: color),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
-          ),
+          Text(label, style: AppTypography.overline.copyWith(color: color)),
         ],
       ),
     );

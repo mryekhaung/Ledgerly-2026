@@ -1279,6 +1279,24 @@
   "@budgetFieldThreshold": {
     "description": "Form label for budget alert threshold slider."
   },
+  "budgetThresholdHint": "Notify with a warning alert when spending reaches {percent}% of your budget.",
+  "@budgetThresholdHint": {
+    "description": "Explains what the alert threshold slider does.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetThresholdLive": "Warning alert triggers at {percent}%",
+  "@budgetThresholdLive": {
+    "description": "Live readout under the threshold slider.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "budgetTotalOption": "Overall (Total Expenses)",
   "@budgetTotalOption": {
     "description": "Option in category picker to set an overall total budget."

@@ -88,7 +88,7 @@ class _GoalsListPageState extends ConsumerState<GoalsListPage>
             ? FloatingActionButton.extended(
                 onPressed: () => context.push(AppRoutes.goalsNew),
                 backgroundColor: colors.moneyIn,
-                foregroundColor: Colors.white,
+                foregroundColor: colors.textOnBrand,
                 icon: const Icon(Icons.add),
                 label: Text(strings('newGoal')),
               )

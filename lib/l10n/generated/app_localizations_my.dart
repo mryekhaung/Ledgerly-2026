@@ -1001,6 +1001,16 @@ class AppLocalizationsMy extends AppLocalizations {
   String get budgetFieldThreshold => 'သတိပေးချက် ထုတ်ပြန်မည့် ရာခိုင်နှုန်း';
 
   @override
+  String budgetThresholdHint(int percent) {
+    return 'သင့်ဘတ်ဂျက်၏ $percent% အသုံးပြုပြီးပါက သတိပေးချက် ထုတ်ပြန်ပါမည်။';
+  }
+
+  @override
+  String budgetThresholdLive(int percent) {
+    return 'သတိပေးချက်သည် $percent% တွင် အလုပ်လုပ်ပါမည်';
+  }
+
+  @override
   String get budgetTotalOption => 'စုစုပေါင်း သုံးစွဲငွေ (အားလုံးအတွက်)';
 
   @override

@@ -356,7 +356,7 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
                         color: Color(colorVal),
                         shape: BoxShape.circle,
                         border: formState.colorValue == colorVal
-                            ? Border.all(color: Colors.white, width: 3)
+                            ? Border.all(color: colors.textOnBrand, width: 3)
                             : null,
                         boxShadow: formState.colorValue == colorVal
                             ? [

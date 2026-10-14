@@ -38,7 +38,7 @@ class BudgetCategoryRow extends StatelessWidget {
 
     final statusColor = switch (p.status) {
       BudgetStatus.safe => colors.moneyIn,
-      BudgetStatus.warning => const Color(0xFFD97706),
+      BudgetStatus.warning => colors.warning,
       BudgetStatus.exceeded => colors.moneyOut,
     };
 

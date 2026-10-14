@@ -956,6 +956,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get budgetFieldThreshold => '警告アラートのしきい値';
 
   @override
+  String budgetThresholdHint(int percent) {
+    return '予算の $percent% に達したら警告アラートを通知します。';
+  }
+
+  @override
+  String budgetThresholdLive(int percent) {
+    return '警告アラートは $percent% で作動します';
+  }
+
+  @override
   String get budgetTotalOption => '全体（すべての支出）';
 
   @override

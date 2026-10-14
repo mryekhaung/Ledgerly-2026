@@ -314,11 +314,11 @@ class AvatarPainter extends CustomPainter {
         for (final x in <double>[leftX, rightX]) {
           canvas
             ..drawCircle(Offset(x, eyeY), radius, fill)
-            // A small white highlight in the upper-left of each pupil.
+            // A small glint in the upper-left of each pupil.
             ..drawCircle(
               Offset(x - radius * 0.35, eyeY - radius * 0.35),
               radius * 0.32,
-              Paint()..color = Colors.white.withValues(alpha: 0.85),
+              Paint()..color = AvatarPalette.eyeHighlightFor(colors),
             );
         }
     }
