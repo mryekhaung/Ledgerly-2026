@@ -219,12 +219,29 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
   - Two restore modes: Merge (safely adds missing categories and non-duplicate transactions) and Overwrite (atomically wipes and replaces all categories, transactions, and settings).
   - Hub UI page at `/settings/data-transfer` (`DataTransferPage`) with responsive layout, SegmentedTabs switching, 38 localized strings in en/my/ja, Riverpod 3 purity, and 19 passing tests.
 
-## Phase 3 — "Manage" (v0.3) — NOT STARTED
+## Phase 3 — "Manage" (v0.3) — COMPLETE (100% Shipped & CI Verified)
 
-- ☐ Accounts + transfers
-- ☐ Budgets (category + total) with progress and alerts — keyed by **period id** (`yyyy-MM` of the start date); decide start-month vs end-month naming **before** creating the table (`DataModel.md` §8)
-- ☐ Recurring transactions (scheduler on app open + local notifications)
-- ☐ Savings goals
+- ☑ **Accounts + transfers**:
+  - Drift schema v2 migration with `Accounts` table, `idx_accounts_active`, and soft delete.
+  - Multi-account support (Cash, Bank, Credit Card, Savings, E-Wallet) with custom icons, colors, opening balances, and net worth inclusion toggles.
+  - Net Worth calculation card (`NetWorthCard`) aggregating non-archived included accounts.
+  - Account-to-account atomic transfers with automatic double-entry transaction generation.
+  - Active and Archived tabs, drag-and-drop reordering, and transfer dialog.
+- ☑ **Budgets (category + total) with progress and alerts**:
+  - Drift schema v3 migration with `Budgets` table keyed by period id (`yyyy-MM`).
+  - Overall monthly budget and per-category budget support with alert threshold percentages (e.g., 80%).
+  - Real-time budget progress bar (`BudgetProgressBar`) tracking spent amount, remaining amount, and daily suggested spend.
+  - Active and Archived tabs, filter tabs, and responsive UI with full localization in en/my/ja.
+- ☑ **Recurring transactions (scheduler on app open + local notifications)**:
+  - Drift schema v4 migration with `RecurringTransactions` table and indexing.
+  - Daily, weekly, monthly, and yearly recurrences with optional end dates and auto-add toggle.
+  - `RecurringProcessor` engine automatically processing due transactions on app start with pending confirmation banner (`RecurringPendingBanner`).
+  - Active and Paused tabs, skip occurrence, pause/resume, and instant manual execution.
+- ☑ **Savings goals & target tracking**:
+  - Drift schema v5 migration with `SavingsGoals` table and `idx_savings_goals_list`.
+  - Visual progress bar, percentage, target date countdown, overdue badges, and CategoryGem icons.
+  - Quick contribution and withdrawal bottom sheet (`GoalContributionDialog`) with optional linked account selection.
+  - Active, Completed, and Archived tabs with empty states and full CRUD form (`GoalFormPage`).
 
 ## Phase 4 — "Sync & Polish" (v0.4) — NOT STARTED
 
