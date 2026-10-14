@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/nav_destinations.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/widgets/app_nav/adaptive_nav.dart';
+import 'package:ledgerly/features/recurring/presentation/providers/recurring_providers.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -19,7 +22,7 @@ import 'package:material_ui/material_ui.dart';
 /// Pages stay unaware of all of this: they render their own `Scaffold` and the
 /// shell positions it. That is what lets the same `CalendarPage` be a single
 /// column on a phone and the left pane of a two-pane layout on a tablet.
-class AppShell extends ConsumerWidget {
+class AppShell extends ConsumerStatefulWidget {
   /// Creates the shell.
   const AppShell({required this.location, required this.child, super.key});
 
@@ -30,14 +33,50 @@ class AppShell extends ConsumerWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends ConsumerState<AppShell> {
+  late final AppLifecycleListener _lifecycleListener;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        unawaited(
+          ref.read(recurringSchedulerNotifierProvider.notifier).runScheduler(),
+        );
+      }
+    });
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () {
+        if (mounted) {
+          unawaited(
+            ref
+                .read(recurringSchedulerNotifierProvider.notifier)
+                .runScheduler(),
+          );
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final sizeClass = WindowSizeClass.of(context);
 
     // Reading this here (rather than in the pages) keeps the nav's own label
     // language in step with the rest of the app the moment it changes.
     ref.watch(currentSettingsProvider);
 
-    final current = NavDestination.fromLocation(location);
+    final current = NavDestination.fromLocation(widget.location);
 
     void select(NavDestination destination) {
       // `go` rather than `push`: primary destinations replace each other, so
@@ -55,7 +94,7 @@ class AppShell extends ConsumerWidget {
         body: Row(
           children: <Widget>[
             nav,
-            Expanded(child: child),
+            Expanded(child: widget.child),
           ],
         ),
       );
@@ -81,7 +120,7 @@ class AppShell extends ConsumerWidget {
             bottom: MediaQuery.viewPaddingOf(context).bottom + _barInset,
           ),
         ),
-        child: child,
+        child: widget.child,
       ),
       bottomNavigationBar: nav,
     );

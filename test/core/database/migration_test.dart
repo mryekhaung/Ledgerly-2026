@@ -8,6 +8,7 @@ import 'package:ledgerly/core/database/app_database.dart';
 import 'package:ledgerly/core/database/daos/categories_dao.dart';
 import 'package:ledgerly/core/database/daos/clock.dart';
 import 'package:ledgerly/core/database/seed.dart';
+import 'package:ledgerly/core/utils/local_date.dart';
 
 import 'db_harness.dart';
 
@@ -36,6 +37,7 @@ void main() {
     'app_settings',
     'budgets',
     'categories',
+    'recurring_transactions',
     'transactions',
   ];
 
@@ -47,6 +49,8 @@ void main() {
     'idx_budgets_period',
     'idx_categories_list',
     'idx_categories_kind',
+    'idx_recurring_due',
+    'idx_recurring_list',
     'idx_settings_key',
     'idx_transactions_date',
     'idx_transactions_category',
@@ -277,13 +281,13 @@ void main() {
   });
 
   group('upgrade path', () {
-    test('should_be_at_v3', () {
+    test('should_be_at_v4', () {
       final h = useDbHarness();
       expect(
         h.db.schemaVersion,
-        3,
+        4,
         reason:
-            'v3 added budgets; bumping again requires a new onUpgrade step '
+            'v4 added recurring_transactions; bumping again requires a new onUpgrade step '
             'and a real upgrade test here (docs/DataModel.md §5)',
       );
     });
@@ -309,7 +313,25 @@ void main() {
       );
     });
 
-    test('should_upgrade_v1_to_v3_keeping_categories_and_transactions', () async {
+    test(
+      'should_declare_the_recurring_transactions_table_and_its_indexes',
+      () async {
+        final h = useDbHarness();
+        await h.db.customSelect('SELECT 1').get();
+
+        expect(
+          await namesByType(h.db, 'table'),
+          contains('recurring_transactions'),
+        );
+        expect(
+          await namesByType(h.db, 'index'),
+          contains('idx_recurring_list'),
+        );
+        expect(await namesByType(h.db, 'index'), contains('idx_recurring_due'));
+      },
+    );
+
+    test('should_upgrade_v1_to_v4_keeping_categories_and_transactions', () async {
       // The real upgrade proof from v1.
       final temp = useTempDbFile();
       addTearDown(temp.dispose);
@@ -318,6 +340,7 @@ void main() {
       // management is bypassed with raw DDL, but the file is then closed and
       // reopened by the real database below.
       final v1 = AppDatabase(NativeDatabase(temp.file));
+      await v1.customStatement('DROP TABLE IF EXISTS recurring_transactions');
       await v1.customStatement('DROP TABLE IF EXISTS budgets');
       await v1.customStatement('DROP TABLE IF EXISTS app_settings');
       await v1.customStatement('DROP TABLE IF EXISTS transactions');
@@ -413,6 +436,34 @@ void main() {
       expect(
         await namesByType(upgraded, 'index'),
         contains('idx_budgets_category'),
+      );
+
+      // ...and the v4 recurring_transactions table exists, is empty, and is writable.
+      expect(await upgraded.recurringDao.watchAll().first, isEmpty);
+      final recId = await upgraded.recurringDao.insertRow(
+        RecurringTransactionsCompanion.insert(
+          categoryId: 'c1',
+          amountMinor: 100000,
+          currency: 'mmk',
+          direction: 'expense',
+          frequency: 'monthly',
+          startDate: LocalDate(2026, 10, 1),
+          nextDueDate: LocalDate(2026, 11, 1),
+          createdAt: 1,
+          updatedAt: 1,
+        ),
+      );
+      final readRec = await upgraded.recurringDao.findById(recId);
+      expect(readRec, isNotNull);
+      expect(readRec!.amountMinor, 100000);
+
+      expect(
+        await namesByType(upgraded, 'index'),
+        contains('idx_recurring_list'),
+      );
+      expect(
+        await namesByType(upgraded, 'index'),
+        contains('idx_recurring_due'),
       );
 
       await upgraded.close();

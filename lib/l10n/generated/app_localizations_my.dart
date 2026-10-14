@@ -1051,8 +1051,127 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get budgetDuplicateTotal =>
-      'ဤကာလအတွက် စုစုပေါင်း ဘတ်ဂျက် သတ်မှတ်ပြီးသား ဖြစ်ပါသည်';
+      'ဤကာလအတွက် စုစုပေါင်းဘတ်ဂျက် ရှိပြီးဖြစ်ပါသည်';
 
   @override
   String get budgetOverallSummary => 'လစဥ် စုစုပေါင်း ဘတ်ဂျက်';
+
+  @override
+  String get recurringTitle => 'ပုံမှန် ထပ်တလဲလဲ ငွေစာရင်းများ';
+
+  @override
+  String get recurringSubtitle =>
+      'ပုံမှန် ပေးချေရသော စာရင်းများ၊ ဘေလ်များနှင့် ပုံမှန်ဝင်ငွေများ';
+
+  @override
+  String get recurringNew => 'ထပ်တလဲလဲ စာရင်းအသစ်';
+
+  @override
+  String get recurringEdit => 'ထပ်တလဲလဲ စာရင်း ပြင်ဆင်ရန်';
+
+  @override
+  String get recurringEmptyTitle => 'ပုံမှန် ထပ်တလဲလဲ စာရင်း မရှိသေးပါ';
+
+  @override
+  String get recurringEmptyBody =>
+      'လစာ၊ အိမ်လခ၊ အင်တာနက်ဖိုး စသည့် ပုံမှန်စာရင်းများကို ထည့်သွင်းထားပါက စာရင်းများကို အလိုအလျောက် မှတ်သားပေးမည် ဖြစ်ပါသည်။';
+
+  @override
+  String get recurringProcessNow => 'ကျသင့်ငွေစာရင်းများ ထည့်သွင်းမည်';
+
+  @override
+  String get recurringFrequencyDaily => 'နေ့စဥ်';
+
+  @override
+  String get recurringFrequencyWeekly => 'အပတ်စဥ်';
+
+  @override
+  String get recurringFrequencyMonthly => 'လစဥ်';
+
+  @override
+  String get recurringFrequencyYearly => 'နှစ်စဥ်';
+
+  @override
+  String get recurringFieldFrequency => 'ဖြစ်ပေါ်မည့် အကြိမ်ရေ';
+
+  @override
+  String get recurringFieldStartDate => 'စတင်မည့်ရက်';
+
+  @override
+  String get recurringFieldEndDate => 'ပြီးဆုံးမည့်ရက်';
+
+  @override
+  String get recurringFieldHasEndDate => 'ပြီးဆုံးမည့်ရက် သတ်မှတ်မည်';
+
+  @override
+  String get recurringFieldAutoAdd =>
+      'ကျသင့်သည့်ရက်တွင် စာရင်းကို အလိုအလျောက် ထည့်သွင်းမည်';
+
+  @override
+  String get recurringFieldAutoAddDesc =>
+      'ဖွင့်ထားပါက ကျသင့်ရက်ရောက်သည့်အခါ အက်ပ်ဖွင့်သည်နှင့် စာရင်းကို အလိုအလျောက် ထည့်သွင်းပေးမည် ဖြစ်ပါသည်။';
+
+  @override
+  String get recurringDueToday => 'ယနေ့ ကျသင့်ငွေ';
+
+  @override
+  String get recurringDueTomorrow => 'မနက်ဖြန် ကျသင့်ငွေ';
+
+  @override
+  String recurringNextDue(String date) {
+    return 'နောက်တစ်ကြိမ်: $date';
+  }
+
+  @override
+  String get recurringActionSkip => 'ဤတစ်ကြိမ် ကျော်မည်';
+
+  @override
+  String get recurringActionPause => 'ခေတ္တ ရပ်ဆိုင်းမည်';
+
+  @override
+  String get recurringActionResume => 'ပြန်လည် စတင်မည်';
+
+  @override
+  String get recurringActionDelete => 'ဖျက်မည်';
+
+  @override
+  String get recurringSkippedSuccess =>
+      'နောက်တစ်ကြိမ် ကျသင့်စာရင်းကို ကျော်လိုက်ပါပြီ';
+
+  @override
+  String get recurringSavedSuccess =>
+      'ပုံမှန် ထပ်တလဲလဲ စာရင်းကို သိမ်းဆည်းပြီးပါပြီ';
+
+  @override
+  String get recurringDeletedSuccess =>
+      'ပုံမှန် ထပ်တလဲလဲ စာရင်းကို ဖျက်ပြီးပါပြီ';
+
+  @override
+  String recurringProcessedSuccess(int count) {
+    return 'ထပ်တလဲလဲ စာရင်း $count ခုကို စာရင်းသွင်းပြီးပါပြီ';
+  }
+
+  @override
+  String get recurringConfirmDelete => 'ဤပုံမှန်စာရင်းကို ဖျက်မှာ သေချာပါသလား?';
+
+  @override
+  String get recurringConfirmDeleteMessage =>
+      'ယခင် ထည့်သွင်းပြီးသား စာရင်းများ ပျက်ပြယ်မည် မဟုတ်ပါ။';
+
+  @override
+  String get recurringErrorAmountPositive => 'ငွေပမာဏသည် သုညထက် ကြီးရပါမည်';
+
+  @override
+  String get recurringErrorCategoryRequired => 'အမျိုးအစား ရွေးချယ်ပေးပါ';
+
+  @override
+  String get recurringErrorEndDateBeforeStart =>
+      'ပြီးဆုံးမည့်ရက်သည် စတင်မည့်ရက်ထက် မစောရပါ';
+
+  @override
+  String get recurringPendingBannerTitle =>
+      'ထည့်သွင်းရန် စောင့်ဆိုင်းနေသော ထပ်တလဲလဲ စာရင်းများ';
+
+  @override
+  String get recurringPendingActionConfirm => 'ယခု ထည့်မည်';
 }

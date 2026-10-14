@@ -2067,6 +2067,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Overall Budget'**
   String get budgetOverallSummary;
+
+  /// Title of recurring transactions list page.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring Transactions'**
+  String get recurringTitle;
+
+  /// Subtitle of recurring transactions feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled subscriptions, bills, and recurring income'**
+  String get recurringSubtitle;
+
+  /// Action button to create a new recurring rule.
+  ///
+  /// In en, this message translates to:
+  /// **'New Recurring'**
+  String get recurringNew;
+
+  /// Title for editing recurring rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Recurring'**
+  String get recurringEdit;
+
+  /// Title for empty recurring list state.
+  ///
+  /// In en, this message translates to:
+  /// **'No recurring transactions'**
+  String get recurringEmptyTitle;
+
+  /// Body description for empty recurring list state.
+  ///
+  /// In en, this message translates to:
+  /// **'Add recurring subscriptions, salary, rent, or utilities to automate your tracking.'**
+  String get recurringEmptyBody;
+
+  /// Action button to manually trigger recurring scheduler.
+  ///
+  /// In en, this message translates to:
+  /// **'Process Due'**
+  String get recurringProcessNow;
+
+  /// Daily recurrence cadence label.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get recurringFrequencyDaily;
+
+  /// Weekly recurrence cadence label.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get recurringFrequencyWeekly;
+
+  /// Monthly recurrence cadence label.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get recurringFrequencyMonthly;
+
+  /// Yearly recurrence cadence label.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get recurringFrequencyYearly;
+
+  /// Label for frequency dropdown in recurring form.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency'**
+  String get recurringFieldFrequency;
+
+  /// Label for start date picker in recurring form.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get recurringFieldStartDate;
+
+  /// Label for end date picker in recurring form.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get recurringFieldEndDate;
+
+  /// Toggle to enable optional end date.
+  ///
+  /// In en, this message translates to:
+  /// **'Set an end date'**
+  String get recurringFieldHasEndDate;
+
+  /// Label for auto-add switch in recurring form.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically create transaction on due date'**
+  String get recurringFieldAutoAdd;
+
+  /// Description explaining the auto-add feature.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled, the transaction is added automatically when you open the app on or after the due date.'**
+  String get recurringFieldAutoAddDesc;
+
+  /// Badge when a recurring item is due today.
+  ///
+  /// In en, this message translates to:
+  /// **'Due today'**
+  String get recurringDueToday;
+
+  /// Badge when a recurring item is due tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Due tomorrow'**
+  String get recurringDueTomorrow;
+
+  /// Label showing next occurrence date.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {date}'**
+  String recurringNextDue(String date);
+
+  /// Menu action to skip the next due date.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip occurrence'**
+  String get recurringActionSkip;
+
+  /// Menu action to pause a recurring rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause rule'**
+  String get recurringActionPause;
+
+  /// Menu action to unpause a recurring rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume rule'**
+  String get recurringActionResume;
+
+  /// Menu action to delete a recurring rule.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete rule'**
+  String get recurringActionDelete;
+
+  /// Snackbar confirming occurrence skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped next occurrence'**
+  String get recurringSkippedSuccess;
+
+  /// Snackbar confirming recurring rule saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring transaction saved'**
+  String get recurringSavedSuccess;
+
+  /// Snackbar confirming recurring rule deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring transaction deleted'**
+  String get recurringDeletedSuccess;
+
+  /// Snackbar showing number of generated transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Processed {count} recurring transaction(s)'**
+  String recurringProcessedSuccess(int count);
+
+  /// Title of delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Recurring Rule?'**
+  String get recurringConfirmDelete;
+
+  /// Message of delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Past transactions generated by this rule will be kept.'**
+  String get recurringConfirmDeleteMessage;
+
+  /// Validation error for non-positive recurring amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount must be greater than zero'**
+  String get recurringErrorAmountPositive;
+
+  /// Validation error when category is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a category'**
+  String get recurringErrorCategoryRequired;
+
+  /// Validation error when end date is before start date.
+  ///
+  /// In en, this message translates to:
+  /// **'End date cannot be before start date'**
+  String get recurringErrorEndDateBeforeStart;
+
+  /// Title of banner showing recurring items awaiting user approval.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending recurring transactions'**
+  String get recurringPendingBannerTitle;
+
+  /// Action to confirm adding a pending recurring transaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Now'**
+  String get recurringPendingActionConfirm;
 }
 
 class _AppLocalizationsDelegate

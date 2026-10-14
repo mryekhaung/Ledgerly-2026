@@ -10,6 +10,7 @@ import 'package:ledgerly/features/categories/di/categories_module.dart';
 import 'package:ledgerly/features/data_transfer/di/data_transfer_module.dart';
 import 'package:ledgerly/features/insights/di/insights_module.dart';
 import 'package:ledgerly/features/profile/di/profile_module.dart';
+import 'package:ledgerly/features/recurring/di/recurring_module.dart';
 import 'package:ledgerly/features/settings/di/settings_module.dart';
 import 'package:ledgerly/features/transactions/di/transactions_module.dart';
 
@@ -64,6 +65,7 @@ Future<void> configureDependencies({
   registerDataTransferModule(getIt);
   registerAccountsModule(getIt);
   registerBudgetsModule(getIt);
+  registerRecurringModule(getIt);
 
   // Seed the starter categories on a genuinely fresh install.
   //

@@ -97,4 +97,16 @@ abstract final class AppRoutes {
   /// Edit budget (Phase 3).
   static const String budgetEdit = '/budgets/:id/edit';
   static const String budgetEditName = 'budgetEdit';
+
+  /// Recurring transactions management (Phase 3).
+  static const String recurring = '/recurring';
+  static const String recurringName = 'recurring';
+
+  /// Add new recurring transaction (Phase 3).
+  static const String recurringNew = '/recurring/new';
+  static const String recurringNewName = 'recurringNew';
+
+  /// Edit recurring transaction (Phase 3).
+  static const String recurringEdit = '/recurring/:id/edit';
+  static const String recurringEditName = 'recurringEdit';
 }

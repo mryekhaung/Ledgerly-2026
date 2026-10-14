@@ -124,8 +124,10 @@ void main() {
       await host(tester, AppSettings.defaults);
       await tester.pumpAndSettle();
 
-      await tester.drag(find.byType(ListView), const Offset(0, -500));
-      await tester.pumpAndSettle();
+      for (var step = 0; step < 6; step++) {
+        await tester.drag(find.byType(ListView), const Offset(0, -200));
+        await tester.pumpAndSettle();
+      }
 
       expect(find.text('Credits'), findsOneWidget);
       expect(find.textContaining('Open Peeps'), findsOneWidget);

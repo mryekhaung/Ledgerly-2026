@@ -62,6 +62,9 @@ abstract final class AppLocalization {
     'budgetThresholdInvalid' => 'budgetThresholdInvalid',
     'budgetDuplicateCategory' => 'budgetDuplicateCategory',
     'budgetDuplicateTotal' => 'budgetDuplicateTotal',
+    'recurringErrorAmountPositive' => 'recurringErrorAmountPositive',
+    'recurringErrorCategoryRequired' => 'recurringErrorCategoryRequired',
+    'recurringErrorEndDateBeforeStart' => 'recurringErrorEndDateBeforeStart',
     _ => 'failureValidation',
   };
 }

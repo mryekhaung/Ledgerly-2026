@@ -186,6 +186,13 @@ class SettingsPage extends ConsumerWidget {
                   leading: const Icon(Icons.pie_chart_outline),
                   onTap: () => context.pushNamed(AppRoutes.budgetsName),
                 ),
+                const _GroupDivider(),
+                _NavRow(
+                  label: strings('recurringTitle'),
+                  subtitle: strings('recurringSubtitle'),
+                  leading: const Icon(Icons.update_rounded),
+                  onTap: () => context.pushNamed(AppRoutes.recurringName),
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),

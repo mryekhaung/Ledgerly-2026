@@ -1,0 +1,328 @@
+import 'dart:async';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_spacing.dart';
+import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/category_gem.dart';
+import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
+import 'package:ledgerly/features/recurring/domain/entities/recurring_frequency.dart';
+import 'package:ledgerly/features/recurring/domain/entities/recurring_transaction.dart';
+import 'package:ledgerly/features/recurring/presentation/providers/recurring_providers.dart';
+import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
+import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
+import 'package:material_ui/material_ui.dart';
+
+/// Card item representing a scheduled recurring transaction rule.
+class RecurringItemCard extends ConsumerWidget {
+  const RecurringItemCard({required this.item, super.key});
+
+  final RecurringTransaction item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colors = AppThemeColors.of(context);
+    final strings = AppStrings.of(context);
+    final category = ref.watch(categoryByIdProvider(item.categoryId)).value;
+
+    final today = LocalDate.fromDateTime(DateTime.now());
+    final isDue = item.isDue(today);
+    final isTomorrow = item.nextDueDate == today.addDays(1);
+
+    final frequencyLabel = switch (item.frequency) {
+      RecurringFrequency.daily => strings('recurringFrequencyDaily'),
+      RecurringFrequency.weekly => strings('recurringFrequencyWeekly'),
+      RecurringFrequency.monthly => strings('recurringFrequencyMonthly'),
+      RecurringFrequency.yearly => strings('recurringFrequencyYearly'),
+    };
+
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      color: colors.surfaceRaised,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: isDue
+              ? colors.warning.withValues(alpha: 0.6)
+              : colors.border.withValues(alpha: 0.4),
+          width: isDue ? 1.5 : 1.0,
+        ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => context.pushNamed(
+          AppRoutes.recurringEditName,
+          pathParameters: {'id': item.id},
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  CategoryGem(
+                    colorValue: category?.colorValue ?? 0xFF888888,
+                    iconKey: category?.iconKey ?? 'receipt',
+                    size: CategoryGemSize.md,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          category?.name ?? strings('budgetsCategory'),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (item.note != null &&
+                            item.note!.trim().isNotEmpty) ...<Widget>[
+                          const SizedBox(height: 2),
+                          Text(
+                            item.note!,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.textSecondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  AmountText(
+                    item.amount,
+                    style: AmountStyle.row,
+                    signed: true,
+                    color: item.direction == TransactionDirection.income
+                        ? colors.moneyIn
+                        : colors.moneyOut,
+                  ),
+                  PopupMenuButton<String>(
+                    icon: Icon(
+                      Icons.more_vert,
+                      size: 20,
+                      color: colors.textSecondary,
+                    ),
+                    onSelected: (value) async {
+                      final scheduler = ref.read(
+                        recurringSchedulerNotifierProvider.notifier,
+                      );
+                      switch (value) {
+                        case 'skip':
+                          await scheduler.skipOccurrence(item.id);
+                          if (context.mounted) {
+                            AppFeedback.confirm(
+                              context,
+                              message: strings('recurringSkippedSuccess'),
+                            );
+                          }
+                          break;
+                        case 'pause':
+                          await scheduler.setArchived(
+                            item.id,
+                            !item.isArchived,
+                          );
+                          break;
+                        case 'edit':
+                          if (context.mounted) {
+                            unawaited(
+                              context.pushNamed(
+                                AppRoutes.recurringEditName,
+                                pathParameters: {'id': item.id},
+                              ),
+                            );
+                          }
+                          break;
+                        case 'delete':
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text(strings('recurringConfirmDelete')),
+                              content: Text(
+                                strings('recurringConfirmDeleteMessage'),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(false),
+                                  child: Text(strings('actionCancel')),
+                                ),
+                                FilledButton(
+                                  onPressed: () => Navigator.of(ctx).pop(true),
+                                  child: Text(strings('actionDelete')),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true) {
+                            await scheduler.delete(item.id);
+                            if (context.mounted) {
+                              AppFeedback.confirm(
+                                context,
+                                message: strings('recurringDeletedSuccess'),
+                              );
+                            }
+                          }
+                          break;
+                      }
+                    },
+                    itemBuilder: (ctx) => <PopupMenuEntry<String>>[
+                      PopupMenuItem<String>(
+                        value: 'skip',
+                        child: Row(
+                          children: <Widget>[
+                            const Icon(Icons.skip_next, size: 18),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text(strings('recurringActionSkip')),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'pause',
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              item.isArchived ? Icons.play_arrow : Icons.pause,
+                              size: 18,
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text(
+                              item.isArchived
+                                  ? strings('recurringActionResume')
+                                  : strings('recurringActionPause'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'edit',
+                        child: Row(
+                          children: <Widget>[
+                            const Icon(Icons.edit, size: 18),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text(strings('budgetsEdit')),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem<String>(
+                        value: 'delete',
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.delete,
+                              size: 18,
+                              color: colors.moneyOut,
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text(
+                              strings('recurringActionDelete'),
+                              style: TextStyle(color: colors.moneyOut),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Wrap(
+                spacing: AppSpacing.xs,
+                runSpacing: AppSpacing.xs,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  // Frequency badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs + 2,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.brandPrimary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      frequencyLabel,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: colors.brandPrimary,
+                      ),
+                    ),
+                  ),
+
+                  // Auto vs Manual chip
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs + 2,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          (item.autoAdd ? colors.moneyIn : colors.textSecondary)
+                              .withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      item.autoAdd ? 'Auto' : 'Manual',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: item.autoAdd
+                            ? colors.moneyIn
+                            : colors.textSecondary,
+                      ),
+                    ),
+                  ),
+
+                  // Due indicator
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs + 2,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDue
+                          ? colors.warning.withValues(alpha: 0.15)
+                          : colors.surface,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: isDue
+                            ? colors.warning
+                            : colors.border.withValues(alpha: 0.5),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Text(
+                      isDue
+                          ? strings('recurringDueToday')
+                          : (isTomorrow
+                                ? strings('recurringDueTomorrow')
+                                : '${item.nextDueDate}'),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: isDue ? FontWeight.bold : FontWeight.normal,
+                        color: isDue ? colors.warning : colors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

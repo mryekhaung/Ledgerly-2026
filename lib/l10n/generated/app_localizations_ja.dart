@@ -1001,8 +1001,117 @@ class AppLocalizationsJa extends AppLocalizations {
   String get budgetDuplicateCategory => 'このカテゴリーには既にこの期間の予算が存在します';
 
   @override
-  String get budgetDuplicateTotal => 'この期間の全体予算は既に設定されています';
+  String get budgetDuplicateTotal => 'この期間の全体予算は既に存在します';
 
   @override
   String get budgetOverallSummary => '今月の全体予算';
+
+  @override
+  String get recurringTitle => '定期取引';
+
+  @override
+  String get recurringSubtitle => 'サブスクリプション、定期請求、定期収入';
+
+  @override
+  String get recurringNew => '定期取引を追加';
+
+  @override
+  String get recurringEdit => '定期取引を編集';
+
+  @override
+  String get recurringEmptyTitle => '定期取引がありません';
+
+  @override
+  String get recurringEmptyBody => '給与、家賃、公共料金などの定期取引を追加して自動で記録しましょう。';
+
+  @override
+  String get recurringProcessNow => '期限到来分を処理';
+
+  @override
+  String get recurringFrequencyDaily => '毎日';
+
+  @override
+  String get recurringFrequencyWeekly => '毎週';
+
+  @override
+  String get recurringFrequencyMonthly => '毎月';
+
+  @override
+  String get recurringFrequencyYearly => '毎年';
+
+  @override
+  String get recurringFieldFrequency => '頻度';
+
+  @override
+  String get recurringFieldStartDate => '開始日';
+
+  @override
+  String get recurringFieldEndDate => '終了日';
+
+  @override
+  String get recurringFieldHasEndDate => '終了日を設定する';
+
+  @override
+  String get recurringFieldAutoAdd => '期日に自動で取引を作成する';
+
+  @override
+  String get recurringFieldAutoAddDesc => '有効にすると、期日以降にアプリを開いた際に自動で取引が記録されます。';
+
+  @override
+  String get recurringDueToday => '今日が期日';
+
+  @override
+  String get recurringDueTomorrow => '明日が期日';
+
+  @override
+  String recurringNextDue(String date) {
+    return '次回: $date';
+  }
+
+  @override
+  String get recurringActionSkip => '今回をスキップ';
+
+  @override
+  String get recurringActionPause => '一時停止';
+
+  @override
+  String get recurringActionResume => '再開';
+
+  @override
+  String get recurringActionDelete => '削除';
+
+  @override
+  String get recurringSkippedSuccess => '次回の取引をスキップしました';
+
+  @override
+  String get recurringSavedSuccess => '定期取引を保存しました';
+
+  @override
+  String get recurringDeletedSuccess => '定期取引を削除しました';
+
+  @override
+  String recurringProcessedSuccess(int count) {
+    return '$count件の定期取引を処理しました';
+  }
+
+  @override
+  String get recurringConfirmDelete => '定期取引ルールを削除しますか？';
+
+  @override
+  String get recurringConfirmDeleteMessage => '過去に作成された取引は削除されません。';
+
+  @override
+  String get recurringErrorAmountPositive => '金額は0より大きい必要があります';
+
+  @override
+  String get recurringErrorCategoryRequired => 'カテゴリーを選択してください';
+
+  @override
+  String get recurringErrorEndDateBeforeStart => '終了日は開始日より前の日付にできません';
+
+  @override
+  String get recurringPendingBannerTitle => '保留中の定期取引';
+
+  @override
+  String get recurringPendingActionConfirm => '今すぐ追加';
 }

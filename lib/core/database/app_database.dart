@@ -3,12 +3,14 @@ import 'package:ledgerly/core/database/daos/accounts_dao.dart';
 import 'package:ledgerly/core/database/daos/app_settings_dao.dart';
 import 'package:ledgerly/core/database/daos/budgets_dao.dart';
 import 'package:ledgerly/core/database/daos/categories_dao.dart';
+import 'package:ledgerly/core/database/daos/recurring_dao.dart';
 import 'package:ledgerly/core/database/daos/transactions_dao.dart';
 import 'package:ledgerly/core/database/tables/accounts.dart';
 import 'package:ledgerly/core/database/tables/app_settings.dart';
 import 'package:ledgerly/core/database/tables/budgets.dart';
 import 'package:ledgerly/core/database/tables/categories.dart';
 import 'package:ledgerly/core/database/tables/common_columns.dart';
+import 'package:ledgerly/core/database/tables/recurring_transactions.dart';
 import 'package:ledgerly/core/database/tables/transactions.dart';
 import 'package:ledgerly/core/database/uuid.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -23,13 +25,21 @@ part 'app_database.g.dart';
 /// Schema spec: `docs/DataModel.md`. Bump [schemaVersion] **only** together with an
 /// `onUpgrade` step and a matching `migration_test.dart` case.
 @DriftDatabase(
-  tables: [Categories, Transactions, Accounts, AppSettings, Budgets],
+  tables: [
+    Categories,
+    Transactions,
+    Accounts,
+    AppSettings,
+    Budgets,
+    RecurringTransactions,
+  ],
   daos: [
     CategoriesDao,
     TransactionsDao,
     AccountsDao,
     AppSettingsDao,
     BudgetsDao,
+    RecurringDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -42,8 +52,9 @@ class AppDatabase extends _$AppDatabase {
   /// v1 — initial: `categories`, `transactions`, `accounts`.
   /// v2 — `app_settings`: app-wide preferences.
   /// v3 — `budgets`: spending limits per category and total period budgets.
+  /// v4 — `recurring_transactions`: recurring transaction scheduler definitions.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -61,6 +72,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createIndex(idxBudgetsList);
         await m.createIndex(idxBudgetsPeriod);
         await m.createIndex(idxBudgetsCategory);
+      }
+      if (from < 4) {
+        await m.createTable(recurringTransactions);
+        await m.createIndex(idxRecurringList);
+        await m.createIndex(idxRecurringDue);
       }
     },
     beforeOpen: (OpeningDetails details) async {

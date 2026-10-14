@@ -18,6 +18,8 @@ import 'package:ledgerly/features/data_transfer/presentation/pages/data_transfer
 import 'package:ledgerly/features/insights/presentation/pages/insights_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/profile_page.dart';
+import 'package:ledgerly/features/recurring/presentation/pages/recurring_form_page.dart';
+import 'package:ledgerly/features/recurring/presentation/pages/recurring_list_page.dart';
 import 'package:ledgerly/features/settings/presentation/pages/month_starts_on_page.dart';
 import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
@@ -103,6 +105,11 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             name: AppRoutes.budgetsName,
             builder: (context, state) => const BudgetsPage(),
           ),
+          GoRoute(
+            path: AppRoutes.recurring,
+            name: AppRoutes.recurringName,
+            builder: (context, state) => const RecurringListPage(),
+          ),
         ],
       ),
 
@@ -184,6 +191,19 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
         name: AppRoutes.budgetEditName,
         builder: (context, state) =>
             BudgetFormPage(budgetId: state.pathParameters['id']),
+      ),
+
+      // Recurring forms (Phase 3).
+      GoRoute(
+        path: AppRoutes.recurringNew,
+        name: AppRoutes.recurringNewName,
+        builder: (context, state) => const RecurringFormPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.recurringEdit,
+        name: AppRoutes.recurringEditName,
+        builder: (context, state) =>
+            RecurringFormPage(recurringId: state.pathParameters['id']),
       ),
     ],
   );
