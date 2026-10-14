@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
@@ -227,7 +228,9 @@ class RecurringItemCard extends ConsumerWidget {
                             const SizedBox(width: AppSpacing.sm),
                             Text(
                               strings('recurringActionDelete'),
-                              style: TextStyle(color: colors.moneyOut),
+                              style: AppTypography.body.copyWith(
+                                color: colors.moneyOut,
+                              ),
                             ),
                           ],
                         ),
@@ -254,10 +257,9 @@ class RecurringItemCard extends ConsumerWidget {
                     ),
                     child: Text(
                       frequencyLabel,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                      style: AppTypography.caption.copyWith(
                         color: colors.brandPrimary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -276,12 +278,11 @@ class RecurringItemCard extends ConsumerWidget {
                     ),
                     child: Text(
                       item.autoAdd ? 'Auto' : 'Manual',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                      style: AppTypography.caption.copyWith(
                         color: item.autoAdd
                             ? colors.moneyIn
                             : colors.textSecondary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -310,10 +311,9 @@ class RecurringItemCard extends ConsumerWidget {
                           : (isTomorrow
                                 ? strings('recurringDueTomorrow')
                                 : '${item.nextDueDate}'),
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: isDue ? FontWeight.bold : FontWeight.normal,
+                      style: AppTypography.caption.copyWith(
                         color: isDue ? colors.warning : colors.textSecondary,
+                        fontWeight: isDue ? FontWeight.w600 : FontWeight.w500,
                       ),
                     ),
                   ),

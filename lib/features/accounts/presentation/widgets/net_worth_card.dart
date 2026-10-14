@@ -68,9 +68,7 @@ class NetWorthCard extends ConsumerWidget {
                 ),
                 child: Text(
                   currency.name.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                  style: AppTypography.overline.copyWith(
                     color: colors.brandPrimary,
                   ),
                 ),

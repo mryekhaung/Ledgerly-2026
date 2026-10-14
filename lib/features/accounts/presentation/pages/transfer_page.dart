@@ -152,7 +152,9 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                 child: Text(
                   strings('accountsEmptyBody'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: colors.textSecondary),
+                  style: AppTypography.body.copyWith(
+                    color: colors.textSecondary,
+                  ),
                 ),
               ),
             );
@@ -194,7 +196,9 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                       Expanded(
                         child: Text(
                           errorBanner,
-                          style: TextStyle(color: colors.warning),
+                          style: AppTypography.body.copyWith(
+                            color: colors.warning,
+                          ),
                         ),
                       ),
                     ],
@@ -224,9 +228,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                         const SizedBox(width: AppSpacing.sm),
                         Text(
                           strings('accountsTransferFrom'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                          style: AppTypography.label.copyWith(
                             color: colors.textSecondary,
                           ),
                         ),
@@ -253,8 +255,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                               const SizedBox(width: AppSpacing.sm),
                               Text(
                                 '(${a.currency.symbol}${a.currentBalanceMinor})',
-                                style: TextStyle(
-                                  fontSize: 12,
+                                style: AppTypography.label.copyWith(
                                   color: colors.textTertiary,
                                 ),
                               ),
@@ -291,9 +292,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                         const SizedBox(width: AppSpacing.sm),
                         Text(
                           strings('accountsTransferTo'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                          style: AppTypography.label.copyWith(
                             color: colors.textSecondary,
                           ),
                         ),
@@ -320,8 +319,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                               const SizedBox(width: AppSpacing.sm),
                               Text(
                                 '(${a.currency.symbol}${a.currentBalanceMinor})',
-                                style: TextStyle(
-                                  fontSize: 12,
+                                style: AppTypography.label.copyWith(
                                   color: colors.textTertiary,
                                 ),
                               ),
@@ -342,10 +340,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
               // Amount
               Text(
                 strings('accountsTransferAmount').toUpperCase(),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
+                style: AppTypography.overline.copyWith(
                   color: colors.textTertiary,
                 ),
               ),
@@ -372,10 +367,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
               // Date Picker Field
               Text(
                 strings('accountsTransferDate').toUpperCase(),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
+                style: AppTypography.overline.copyWith(
                   color: colors.textTertiary,
                 ),
               ),
@@ -398,10 +390,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
               // Note Field
               Text(
                 strings('accountsTransferNote').toUpperCase(),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
+                style: AppTypography.overline.copyWith(
                   color: colors.textTertiary,
                 ),
               ),

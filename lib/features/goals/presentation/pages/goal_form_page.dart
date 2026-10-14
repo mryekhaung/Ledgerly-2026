@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
@@ -169,7 +170,7 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
                 ),
                 child: Text(
                   formState.errorMessage!,
-                  style: TextStyle(color: colors.moneyOut),
+                  style: AppTypography.body.copyWith(color: colors.moneyOut),
                 ),
               ),
 
@@ -283,11 +284,7 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
             // Icon Picker
             Text(
               strings('goalIconLabel'),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: colors.textPrimary,
-              ),
+              style: AppTypography.body.copyWith(color: colors.textPrimary),
             ),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
@@ -327,11 +324,7 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
             // Color Picker
             Text(
               strings('goalColorLabel'),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: colors.textPrimary,
-              ),
+              style: AppTypography.body.copyWith(color: colors.textPrimary),
             ),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
@@ -383,7 +376,9 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
                     )
                   : Text(
                       strings('saveGoal'),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: AppTypography.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
             ),
           ],

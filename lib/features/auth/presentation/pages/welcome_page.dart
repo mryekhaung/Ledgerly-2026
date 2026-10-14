@@ -5,6 +5,7 @@ import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -133,7 +134,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
           onPressed: authState.isLoading ? null : _skip,
           child: Text(
             strings('welcomeSkip'),
-            style: TextStyle(color: colors.textSecondary),
+            style: AppTypography.body.copyWith(color: colors.textSecondary),
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
@@ -301,7 +302,9 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                     icon: const Icon(Icons.person_outline_rounded),
                     label: Text(
                       strings('continueAsGuest'),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: AppTypography.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -318,7 +321,9 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                     icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
                     label: Text(
                       strings('signInWithGoogle'),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: AppTypography.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -335,7 +340,9 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                     icon: const Icon(Icons.apple_rounded, size: 24),
                     label: Text(
                       strings('signInWithApple'),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: AppTypography.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),

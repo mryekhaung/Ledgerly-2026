@@ -177,7 +177,9 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
                       )
                     : Text(
                         MaterialLocalizations.of(context).saveButtonLabel,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: AppTypography.body.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
               ),
               if (!isNew) ...<Widget>[
@@ -191,7 +193,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
                   ),
                   label: Text(
                     strings('budgetsDelete'),
-                    style: TextStyle(color: colors.moneyOut),
+                    style: AppTypography.body.copyWith(color: colors.moneyOut),
                   ),
                 ),
               ],

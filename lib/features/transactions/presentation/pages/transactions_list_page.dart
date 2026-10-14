@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
@@ -502,7 +503,7 @@ class _TransactionRow extends ConsumerWidget {
           category?.name ?? transaction.categoryId,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
+          style: AppTypography.body.copyWith(
             color: colors.textPrimary,
             fontWeight: FontWeight.w600,
           ),
@@ -516,7 +517,7 @@ class _TransactionRow extends ConsumerWidget {
                 note,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: colors.textSecondary),
+                style: AppTypography.body.copyWith(color: colors.textSecondary),
               ),
             ],
             Text(

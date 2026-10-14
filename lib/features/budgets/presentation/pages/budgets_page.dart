@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/budgets/presentation/providers/budget_providers.dart';
@@ -141,10 +142,9 @@ class BudgetsPage extends ConsumerWidget {
                     ),
                     child: Text(
                       '${categoryProgresses.length}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                      style: AppTypography.label.copyWith(
                         color: colors.brandPrimary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

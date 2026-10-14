@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
@@ -196,17 +197,14 @@ class _GoalContributionDialogState
                       _mode == GoalContributionMode.deposit
                           ? strings('depositTitle')
                           : strings('withdrawTitle'),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      style: AppTypography.title.copyWith(
                         color: colors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       widget.goal.name,
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: AppTypography.label.copyWith(
                         color: colors.textSecondary,
                       ),
                     ),
@@ -219,7 +217,9 @@ class _GoalContributionDialogState
                 children: [
                   Text(
                     strings('goalCurrentAmountLabel'),
-                    style: TextStyle(fontSize: 12, color: colors.textSecondary),
+                    style: AppTypography.label.copyWith(
+                      color: colors.textSecondary,
+                    ),
                   ),
                   AmountText(
                     widget.goal.currentAmount,
@@ -332,7 +332,9 @@ class _GoalContributionDialogState
                     _mode == GoalContributionMode.deposit
                         ? strings('depositAction')
                         : strings('withdrawAction'),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: AppTypography.body.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
           ),
         ],

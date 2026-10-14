@@ -234,8 +234,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
                       const SizedBox(height: 2),
                       Text(
                         typeLabel,
-                        style: TextStyle(
-                          fontSize: 12,
+                        style: AppTypography.label.copyWith(
                           color: colors.textSecondary,
                         ),
                       ),
@@ -426,10 +425,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label.toUpperCase(),
-      style: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.bold,
-        letterSpacing: 0.8,
+      style: AppTypography.overline.copyWith(
         color: AppThemeColors.of(context).textTertiary,
       ),
     );

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
@@ -236,7 +237,9 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                             _isSignUp
                                 ? strings('signUpTitle')
                                 : strings('signInTitle'),
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            style: AppTypography.body.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                         const SizedBox(height: AppSpacing.md),

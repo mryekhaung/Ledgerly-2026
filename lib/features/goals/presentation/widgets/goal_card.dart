@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
@@ -135,9 +136,7 @@ class GoalCard extends ConsumerWidget {
                             Flexible(
                               child: Text(
                                 goal.name,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                style: AppTypography.title.copyWith(
                                   color: colors.textPrimary,
                                 ),
                                 maxLines: 1,
@@ -157,10 +156,8 @@ class GoalCard extends ConsumerWidget {
                                 ),
                                 child: Text(
                                   '100%',
-                                  style: TextStyle(
-                                    fontSize: 12,
+                                  style: AppTypography.caption.copyWith(
                                     color: colors.moneyIn,
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
@@ -180,14 +177,13 @@ class GoalCard extends ConsumerWidget {
                                     'days': daysRemaining,
                                   })
                                 : '',
-                            style: TextStyle(
-                              fontSize: 12,
+                            style: AppTypography.label.copyWith(
                               color: isOverdue
                                   ? colors.moneyOut
                                   : colors.textSecondary,
                               fontWeight: isOverdue
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
                             ),
                           ),
                       ],
@@ -309,7 +305,9 @@ class GoalCard extends ConsumerWidget {
                             const SizedBox(width: 8),
                             Text(
                               strings('deleteGoal'),
-                              style: TextStyle(color: colors.moneyOut),
+                              style: AppTypography.body.copyWith(
+                                color: colors.moneyOut,
+                              ),
                             ),
                           ],
                         ),
@@ -352,8 +350,7 @@ class GoalCard extends ConsumerWidget {
                       ),
                       Text(
                         ' / ',
-                        style: TextStyle(
-                          fontSize: 12,
+                        style: AppTypography.label.copyWith(
                           color: colors.textSecondary,
                         ),
                       ),
@@ -367,12 +364,11 @@ class GoalCard extends ConsumerWidget {
                   ),
                   Text(
                     '$percent%',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                    style: AppTypography.label.copyWith(
                       color: isCompleted
                           ? colors.moneyIn
                           : colors.textSecondary,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -383,11 +379,7 @@ class GoalCard extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   strings('goalCompleted'),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colors.moneyIn,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTypography.label.copyWith(color: colors.moneyIn),
                 ),
               ] else ...[
                 const SizedBox(height: 4),
@@ -395,7 +387,9 @@ class GoalCard extends ConsumerWidget {
                   AppStrings.fill(context, 'goalRemaining', {
                     'amount': '${goal.remainingAmount.amountMinor}',
                   }),
-                  style: TextStyle(fontSize: 12, color: colors.textSecondary),
+                  style: AppTypography.label.copyWith(
+                    color: colors.textSecondary,
+                  ),
                 ),
               ],
             ],

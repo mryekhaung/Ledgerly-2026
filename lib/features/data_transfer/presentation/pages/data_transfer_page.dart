@@ -169,7 +169,9 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
                     Text(strings('exportTotalRecords')),
                     Text(
                       '${exportState.exportedData!.recordCount}',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: AppTypography.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -508,7 +510,9 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
                 const Divider(),
                 Text(
                   'Backup Metadata: ${state.loadedMetadata!.categoryCount} categories, ${state.loadedMetadata!.transactionCount} transactions',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style: AppTypography.body.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 SegmentedTabs<RestoreMode>(
@@ -529,9 +533,8 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     strings('restoreOverwriteWarning'),
-                    style: TextStyle(
+                    style: AppTypography.label.copyWith(
                       color: Theme.of(context).colorScheme.error,
-                      fontSize: 12,
                     ),
                   ),
                 ],

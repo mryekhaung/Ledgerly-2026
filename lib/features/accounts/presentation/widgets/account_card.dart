@@ -117,8 +117,7 @@ class AccountCard extends ConsumerWidget {
                       children: <Widget>[
                         Text(
                           typeLabel,
-                          style: TextStyle(
-                            fontSize: 12,
+                          style: AppTypography.label.copyWith(
                             color: colors.textSecondary,
                           ),
                         ),
@@ -224,7 +223,9 @@ class AccountCard extends ConsumerWidget {
                         const SizedBox(width: AppSpacing.sm),
                         Text(
                           strings('accountsDelete'),
-                          style: TextStyle(color: colors.warning),
+                          style: AppTypography.body.copyWith(
+                            color: colors.warning,
+                          ),
                         ),
                       ],
                     ),

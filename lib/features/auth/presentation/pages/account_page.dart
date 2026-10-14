@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/auth/domain/entities/auth_provider_type.dart';
@@ -309,7 +310,9 @@ class AccountPage extends ConsumerWidget {
                     ),
                     title: Text(
                       strings('accountSignOut'),
-                      style: TextStyle(color: colors.textPrimary),
+                      style: AppTypography.body.copyWith(
+                        color: colors.textPrimary,
+                      ),
                     ),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: authState.isLoading
@@ -324,7 +327,7 @@ class AccountPage extends ConsumerWidget {
                     ),
                     title: Text(
                       strings('accountDeleteTitle'),
-                      style: TextStyle(
+                      style: AppTypography.body.copyWith(
                         color: colors.moneyOut,
                         fontWeight: FontWeight.w600,
                       ),

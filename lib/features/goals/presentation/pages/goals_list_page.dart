@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
@@ -130,9 +131,7 @@ class _GoalsTab extends StatelessWidget {
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     emptyTitle,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                    style: AppTypography.title.copyWith(
                       color: colors.textPrimary,
                     ),
                     textAlign: TextAlign.center,
@@ -140,7 +139,9 @@ class _GoalsTab extends StatelessWidget {
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     emptyMessage,
-                    style: TextStyle(fontSize: 14, color: colors.textSecondary),
+                    style: AppTypography.body.copyWith(
+                      color: colors.textSecondary,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   if (showCreateAction) ...[

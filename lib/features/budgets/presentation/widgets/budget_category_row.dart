@@ -1,5 +1,6 @@
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
@@ -141,7 +142,9 @@ class BudgetCategoryRow extends StatelessWidget {
                             const SizedBox(width: AppSpacing.sm),
                             Text(
                               strings('budgetsDelete'),
-                              style: TextStyle(color: colors.moneyOut),
+                              style: AppTypography.body.copyWith(
+                                color: colors.moneyOut,
+                              ),
                             ),
                           ],
                         ),

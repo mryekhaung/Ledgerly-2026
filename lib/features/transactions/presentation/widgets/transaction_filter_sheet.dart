@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
@@ -309,7 +310,9 @@ class _TransactionFilterSheetState
                       Expanded(
                         child: Text(
                           cat.name,
-                          style: TextStyle(color: colors.textPrimary),
+                          style: AppTypography.body.copyWith(
+                            color: colors.textPrimary,
+                          ),
                         ),
                       ),
                       IconButton(
@@ -326,7 +329,9 @@ class _TransactionFilterSheetState
                       Expanded(
                         child: Text(
                           strings('transactionCategoryChoose'),
-                          style: TextStyle(color: colors.textSecondary),
+                          style: AppTypography.body.copyWith(
+                            color: colors.textSecondary,
+                          ),
                         ),
                       ),
                       const Icon(Icons.chevron_right, size: 20),

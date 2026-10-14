@@ -419,32 +419,10 @@ void main() {
         'docs/Design.md §3 / §8 — "Only tokens, zero literal sizes"; build '
             'styles from theme.textTheme.* or AppTypography.*',
         sites,
-        const <String, int>{
-          'lib/features/accounts/presentation/pages/transfer_page.dart': 9,
-          'lib/features/goals/presentation/widgets/goal_card.dart': 8,
-          'lib/features/auth/presentation/pages/welcome_page.dart': 4,
-          'lib/features/goals/presentation/pages/goal_form_page.dart': 4,
-          'lib/features/goals/presentation/widgets/goal_contribution_dialog.dart':
-              4,
-          'lib/features/recurring/presentation/widgets/recurring_item_card.dart':
-              4,
-          'lib/features/data_transfer/presentation/pages/data_transfer_page.dart':
-              3,
-          'lib/features/accounts/presentation/pages/account_form_page.dart': 2,
-          'lib/features/accounts/presentation/widgets/account_card.dart': 2,
-          'lib/features/auth/presentation/pages/account_page.dart': 2,
-          'lib/features/budgets/presentation/pages/budget_form_page.dart': 2,
-          'lib/features/goals/presentation/pages/goals_list_page.dart': 2,
-          'lib/features/transactions/presentation/pages/transactions_list_page.dart':
-              2,
-          'lib/features/transactions/presentation/widgets/transaction_filter_sheet.dart':
-              2,
-          'lib/features/accounts/presentation/widgets/net_worth_card.dart': 1,
-          'lib/features/auth/presentation/pages/sign_in_page.dart': 1,
-          'lib/features/budgets/presentation/pages/budgets_page.dart': 1,
-          'lib/features/budgets/presentation/widgets/budget_category_row.dart':
-              1,
-        },
+        // Burned to zero. Every site now derives from `AppTypography.*`
+        // (`title`/`body`/`label`/`caption`/`overline`) with only colour and,
+        // where the design calls for it, a weight override.
+        const <String, int>{},
       );
     });
   });
