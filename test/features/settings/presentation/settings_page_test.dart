@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ledgerly/app/di/app_environment.dart';
+import 'package:ledgerly/app/di/injection.dart';
+import 'package:ledgerly/core/database/connection/database_connection.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
@@ -196,5 +199,30 @@ void main() {
       // Sunday is index 1 in the options list.
       expect(button.selected, <int>{1});
     });
+
+    testWidgets(
+      'renders without error when configured with real DI container',
+      (tester) async {
+        await resetDependencies();
+        await configureDependencies(
+          environment: AppEnvironment.dev,
+          connectionFactory: openInMemoryDatabase,
+        );
+
+        try {
+          await pumpAppHost(
+            tester,
+            locale: const Locale('en'),
+            home: const SettingsPage(),
+          );
+          await tester.pumpAndSettle();
+
+          expect(tester.takeException(), isNull);
+          expect(find.byType(SettingsPage), findsOneWidget);
+        } finally {
+          await resetDependencies();
+        }
+      },
+    );
   });
 }

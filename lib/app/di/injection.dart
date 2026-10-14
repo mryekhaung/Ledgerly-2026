@@ -39,6 +39,7 @@ final GetIt getIt = GetIt.instance;
 /// datasource where `prod` uses a real one (docs/Architecture.md §10, §4).
 Future<void> configureDependencies({
   required AppEnvironment environment,
+  QueryExecutorFactory? connectionFactory,
 }) async {
   // Guard against double-initialisation in tests that call this twice.
   if (getIt.isRegistered<AppEnvironment>()) {
@@ -51,7 +52,7 @@ Future<void> configureDependencies({
   // Order matters: `core` owns the database and every feature module resolves
   // it from the locator, so it must be registered first
   // (docs/Architecture.md §10).
-  registerCoreModule(getIt);
+  registerCoreModule(getIt, connectionFactory: connectionFactory);
   registerCategoriesModule(getIt);
   registerTransactionsModule(getIt);
   registerInsightsModule(getIt);

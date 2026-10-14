@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:ledgerly/core/database/app_database.dart';
 import 'package:ledgerly/core/database/daos/app_settings_dao.dart';
 import 'package:ledgerly/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:ledgerly/features/auth/data/datasources/auth_remote_datasource.dart';
@@ -25,7 +26,11 @@ import 'package:ledgerly/features/auth/domain/usecases/watch_auth_state.dart';
 void registerAuthModule(GetIt getIt) {
   // Datasources
   getIt.registerLazySingleton<AuthLocalDataSource>(
-    () => AuthLocalDataSource(getIt<AppSettingsDao>()),
+    () => AuthLocalDataSource(
+      getIt.isRegistered<AppSettingsDao>()
+          ? getIt<AppSettingsDao>()
+          : getIt<AppDatabase>().appSettingsDao,
+    ),
   );
   getIt.registerLazySingleton<AuthRemoteDataSource>(
     NoopAuthRemoteDataSource.new,

@@ -21,8 +21,12 @@ void registerBudgetsModule(GetIt getIt) {
     ..registerLazySingleton<BudgetLocalDataSource>(
       () => BudgetLocalDataSourceImpl(
         budgetsDao: getIt<BudgetsDao>(),
-        transactionsDao: getIt<TransactionsDao>(),
-        categoriesDao: getIt<CategoriesDao>(),
+        transactionsDao: getIt.isRegistered<TransactionsDao>()
+            ? getIt<TransactionsDao>()
+            : getIt<AppDatabase>().transactionsDao,
+        categoriesDao: getIt.isRegistered<CategoriesDao>()
+            ? getIt<CategoriesDao>()
+            : getIt<AppDatabase>().categoriesDao,
       ),
     )
     ..registerLazySingleton<BudgetRepository>(
