@@ -243,7 +243,7 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
   - Quick contribution and withdrawal bottom sheet (`GoalContributionDialog`) with optional linked account selection.
   - Active, Completed, and Archived tabs with empty states and full CRUD form (`GoalFormPage`).
 
-## Phase 3.5 — "Design debt burn-down" (v0.3.1) — IN PROGRESS
+## Phase 3.5 — "Design debt burn-down" (v0.3.1) — IN PROGRESS (A + B complete)
 
 Design compliance was drifting because nothing enforced `docs/Design.md`:
 `design_tokens_test.dart` only asserts token *values*, and the `banned-imports`
@@ -273,43 +273,78 @@ CI job carries no design rules. This phase fixes that in two halves.
   `AppPlatform? platform` so the factory is chosen per platform and a golden
   test can render iOS chrome on a Linux runner.
 
-**Measured baseline: 170 tolerated violations across 7 rules.**
+**Measured baseline when the gate first went live: 170 tolerated violations
+across 7 rules.**
 
-| Rule | Doc | Count | Files |
-| --- | --- | ---: | ---: |
-| Inline `TextStyle(` in a view | §3 | 61 | 20 |
-| Raw `Scaffold(` in a feature page | §5.1 | 32 | 25 |
-| Off-scale radius (`BorderRadius`/`circular`) | §4.2 | 30 | 15 |
-| First-paint spinner instead of skeleton | §5.11 | 21 | 16 |
-| Hardcoded colour (`Color(0x…)` / `Colors.x`) | §2 | 18 | 11 |
-| Sub-caption size (`fontSize` < 11) | §3 | 4 | 4 |
-| Hardcoded English UI string | §7 | 4 | 3 |
+| Rule | Doc | Baseline | Files | Now |
+| --- | --- | ---: | ---: | ---: |
+| Inline `TextStyle(` in a view | §3 | 61 | 20 | **0** |
+| Raw `Scaffold(` in a feature page | §5.1 | 32 | 25 | **0** |
+| Off-scale radius (`BorderRadius`/`circular`) | §4.2 | 30 | 15 | **0** |
+| First-paint spinner instead of skeleton | §5.11 | 21 | 16 | **0** |
+| Hardcoded colour (`Color(0x…)` / `Colors.x`) | §2 | 18 | 11 | **0** |
+| Sub-caption size (`fontSize` < 11) | §3 | 4 | 4 | **0** |
+| Hardcoded English UI string | §7 | 4 | 3 | **0** |
 
 These are counts of matching *lines*, which is what the scanner and its budgets
 measure. They were re-derived by replaying the scanner's own scope and regexes
 after an earlier hand-tallied table under-counted the multi-line budget maps.
 
-### B. Burn the debt down — NOT STARTED
+### B. Burn the debt down — COMPLETE
 
-Fix the tolerated violations file by file, lowering each budget in the same
-commit that fixes its file. Highest leverage first:
+All seven budgets are now `const <String, int>{}` — **zero tolerated
+violations, no per-file exemptions**. The two-directional check made this a
+ratchet: each commit that fixed a file also had to delete that file's stale
+budget, so the baseline could only tighten.
 
-- ☐ **`inline TextStyle` → `AppTypography`** (61, 20 files). The biggest single
-  rule, and the root of most typography drift.
-- ☐ **Raw `Scaffold` → `AppScaffold`** (32, 25 files). Mechanical, mostly in
-  `presentation/pages/`. Note `app_router.dart`, `app_shell.dart` and
-  `responsive_layout.dart` legitimately build one — confirm each rather than
-  blanket-replacing.
-- ☐ **Off-scale radius → `AppRadius`** (30, 15 files). Mechanical; watch for
-  radii that are legitimate one-offs and should join the scale instead.
-- ☐ **First-paint spinner → skeleton** (21, 16 files). Spinners inside a
-  *submitting button* are legitimate and should stay until the button variants
-  grow a busy state. **`state_placeholder.dart` is the highest-leverage single
-  file** — replacing its body fixes every `loading:` call site at once.
-- ☐ **Hardcoded colour → token** (18, 11 files). `budget_form_page.dart`'s
-  `#D97706` is just `warning` reimplemented; `Colors.white` on-colour uses want
-  an explicit `onBrand` token.
-- ☐ **Sub-caption size** (4) and **hardcoded string** (4). Trivial cleanups.
+| Commit | Item | Fixed |
+| --- | --- | ---: |
+| `81a2e2b` | Sub-caption sizes + hardcoded English strings | 8 |
+| `55a1104` | Hardcoded colour → token | 18 |
+| `09c8221` | Off-scale radius → `AppRadius` | 30 |
+| `6d2273d` | Raw page `Scaffold` → `AppScaffold` | 32 |
+| `aff5821` | Inline `TextStyle` → `AppTypography` | 54 |
+| `ebb2948` | First-paint spinner → skeleton | 19 |
+
+- ☑ **`inline TextStyle` → `AppTypography`** (61, 20 files). Mapping used:
+  16–18 px bold → `title`, 14–15 px → `body`, 12 px → `label`, 11 px +
+  `tracking: 0.8` → `overline`. Any bare `FontWeight.bold` (w700) on small text
+  was demoted to at most `w600`, per §3's "nothing lighter than w500 at small
+  sizes, nothing heavier than w600 below 22 px".
+- ☑ **Raw `Scaffold` → `AppScaffold`** (32, 25 files). `AppScaffold` gained a
+  `bottom` slot (`PreferredSizeWidget?`) so `TabBar`s stay part of the app bar
+  as M3 requires; a `bottom`-only caller now still gets an app bar. The three
+  files whose `Scaffold` genuinely *is* the frame (`app_shell.dart`,
+  `app_router.dart`, `responsive_layout.dart`) became a named `framePaths`
+  exemption list, guarded by
+  `should_keep_the_exempted_page_frames` — an exemption that stops matching
+  fails the suite, so the list cannot silently rot.
+- ☑ **Off-scale radius → `AppRadius`** (30, 15 files). Added `AppRadius.radiusSm`
+  as the single-[`Radius`] sibling of the existing `radiusXl`. Making
+  `borderMd` const-propagation-visible then surfaced two
+  `prefer_const_constructors` hits in `account_page.dart` (CI `Analyze`), fixed
+  by marking the `RoundedRectangleBorder`s `const`.
+- ☑ **First-paint spinner → skeleton** (21, 16 files). New `AppSkeleton`,
+  `AppSkeletonList`, `AppSkeletonCard` in `lib/core/widgets/app_skeleton.dart`
+  — a 1200 ms `reverse: true` fade over `surfaceSubtle`, collapsing to a static
+  block under `MediaQuery.disableAnimationsOf`. `state_placeholder.dart` was the
+  leverage point as predicted: `LoadingPlaceholder` *was* a centred spinner, and
+  making it a skeleton fixed eight `loading:` call sites in one file. Rule 4 was
+  rewritten to **dismiss** the legitimate busy-indicator form
+  (`dismiss: (line) => line.contains('strokeWidth')`, with a one-line lookahead
+  because `dart format` wraps the argument onto the next line) rather than
+  budget it — pinned by `should_dismiss_only_the_busy_indicator_form`.
+- ☑ **Hardcoded colour → token** (18, 11 files). Two real bugs fell out:
+  `budget_form_page.dart`'s `#D97706` was a second off-system amber that also
+  broke in dark mode (it is the `warning` role reimplemented), and
+  `data_transfer_page.dart` was using stock Material `Colors.green/orange/blue`.
+- ☑ **Sub-caption size** (4) and **hardcoded string** (4). Trivial cleanups.
+
+**Known gap left by this phase (follow-up):** Rule 2 checks radius *values*, not
+token *usage*, so ~35 sites still hand-write `BorderRadius.circular(12)`,
+`(20)` or `(8)` where `AppRadius.borderMd`, `borderLg` and `borderSm` already
+exist. The rule permits that value-level bypass. Tightening it to require the
+token at those exact values is the natural next increment.
 
 ### C. Judgment items — not auto-detectable (NOT STARTED)
 
