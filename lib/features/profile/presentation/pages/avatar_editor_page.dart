@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_catalog.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_config.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_palette.dart';
@@ -146,15 +147,14 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
         if (didPop) return;
         unawaited(_onCancel());
       },
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.close_rounded),
-            onPressed: _saving ? null : () => unawaited(_onCancel()),
-            tooltip: strings('actionCancel'),
-          ),
-          title: Text(strings('avatarEditorTitle')),
+      child: AppScaffold(
+        title: strings('avatarEditorTitle'),
+        leading: IconButton(
+          icon: const Icon(Icons.close_rounded),
+          onPressed: _saving ? null : () => unawaited(_onCancel()),
+          tooltip: strings('actionCancel'),
         ),
+        useSafeArea: false,
         body: SafeArea(
           child: Column(
             children: <Widget>[

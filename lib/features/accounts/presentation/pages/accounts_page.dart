@@ -6,6 +6,7 @@ import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/accounts/presentation/widgets/account_card.dart';
@@ -125,27 +126,25 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
     final activeAccountsAsync = ref.watch(accountsStreamProvider);
     final archivedAccountsAsync = ref.watch(archivedAccountsStreamProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(strings('accountsTitle')),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: colors.brandPrimary,
-          unselectedLabelColor: colors.textSecondary,
-          indicatorColor: colors.brandPrimary,
-          tabs: <Widget>[
-            Tab(text: strings('accountsActiveTab')),
-            Tab(text: strings('accountsArchivedTab')),
-          ],
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.swap_horiz),
-            tooltip: strings('accountsTransferButton'),
-            onPressed: _navigateToTransfer,
-          ),
+    return AppScaffold(
+      title: strings('accountsTitle'),
+      bottom: TabBar(
+        controller: _tabController,
+        labelColor: colors.brandPrimary,
+        unselectedLabelColor: colors.textSecondary,
+        indicatorColor: colors.brandPrimary,
+        tabs: <Widget>[
+          Tab(text: strings('accountsActiveTab')),
+          Tab(text: strings('accountsArchivedTab')),
         ],
       ),
+      actions: <Widget>[
+        IconButton(
+          icon: const Icon(Icons.swap_horiz),
+          tooltip: strings('accountsTransferButton'),
+          onPressed: _navigateToTransfer,
+        ),
+      ],
       body: TabBarView(
         controller: _tabController,
         children: <Widget>[

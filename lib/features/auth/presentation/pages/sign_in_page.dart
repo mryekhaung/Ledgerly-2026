@@ -4,6 +4,7 @@ import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
@@ -114,12 +115,9 @@ class _SignInPageState extends ConsumerState<SignInPage> {
     final strings = AppStrings.of(context);
     final authState = ref.watch(authNotifierProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _isSignUp ? strings('signUpTitle') : strings('signInTitle'),
-        ),
-      ),
+    return AppScaffold(
+      title: _isSignUp ? strings('signUpTitle') : strings('signInTitle'),
+      useSafeArea: false,
       body: SafeArea(
         child: Center(
           child: ConstrainedPane(

@@ -4,6 +4,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
@@ -98,12 +99,8 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
 
     final isEditing = formState.isEditing;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          isEditing ? strings('recurringEdit') : strings('recurringNew'),
-        ),
-      ),
+    return AppScaffold(
+      title: isEditing ? strings('recurringEdit') : strings('recurringNew'),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: <Widget>[

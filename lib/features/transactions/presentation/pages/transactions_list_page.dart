@@ -8,6 +8,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
@@ -113,35 +114,34 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
     final state = ref.watch(transactionsListProvider);
     final notifier = ref.read(transactionsListProvider.notifier);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(strings('transactionsTitle')),
-        actions: <Widget>[
-          IconButton(
-            icon: Stack(
-              clipBehavior: Clip.none,
-              children: <Widget>[
-                const Icon(Icons.tune),
-                if (state.filter.isActive)
-                  Positioned(
-                    top: -2,
-                    right: -2,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: colors.brandPrimary,
-                        shape: BoxShape.circle,
-                      ),
+    return AppScaffold(
+      title: strings('transactionsTitle'),
+      actions: <Widget>[
+        IconButton(
+          icon: Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              const Icon(Icons.tune),
+              if (state.filter.isActive)
+                Positioned(
+                  top: -2,
+                  right: -2,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: colors.brandPrimary,
+                      shape: BoxShape.circle,
                     ),
                   ),
-              ],
-            ),
-            tooltip: strings('filterTitle'),
-            onPressed: () => _openFilterSheet(state.filter),
+                ),
+            ],
           ),
-        ],
-      ),
+          tooltip: strings('filterTitle'),
+          onPressed: () => _openFilterSheet(state.filter),
+        ),
+      ],
+      useSafeArea: false,
       body: SafeArea(
         child: ConstrainedPane(
           maxWidth: AppSpacing.proseMaxWidth,

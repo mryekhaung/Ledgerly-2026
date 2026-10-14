@@ -4,6 +4,7 @@ import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/recurring/presentation/providers/recurring_providers.dart';
 import 'package:ledgerly/features/recurring/presentation/widgets/recurring_item_card.dart';
 import 'package:ledgerly/features/recurring/presentation/widgets/recurring_pending_banner.dart';
@@ -34,41 +35,39 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
 
     final displayedItems = _selectedTabIndex == 0 ? activeItems : pausedItems;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(strings('recurringTitle')),
-        actions: <Widget>[
-          if (schedulerState.isProcessing)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.sync),
-              tooltip: strings('recurringProcessNow'),
-              onPressed: () async {
-                final result = await ref
-                    .read(recurringSchedulerNotifierProvider.notifier)
-                    .runScheduler();
-                if (context.mounted) {
-                  AppFeedback.confirm(
-                    context,
-                    message: AppStrings.fill(
-                      context,
-                      'recurringProcessedSuccess',
-                      {'count': result.generatedCount},
-                    ),
-                  );
-                }
-              },
+    return AppScaffold(
+      title: strings('recurringTitle'),
+      actions: <Widget>[
+        if (schedulerState.isProcessing)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
-        ],
-      ),
+          )
+        else
+          IconButton(
+            icon: const Icon(Icons.sync),
+            tooltip: strings('recurringProcessNow'),
+            onPressed: () async {
+              final result = await ref
+                  .read(recurringSchedulerNotifierProvider.notifier)
+                  .runScheduler();
+              if (context.mounted) {
+                AppFeedback.confirm(
+                  context,
+                  message: AppStrings.fill(
+                    context,
+                    'recurringProcessedSuccess',
+                    {'count': result.generatedCount},
+                  ),
+                );
+              }
+            },
+          ),
+      ],
       floatingActionButton: displayedItems.isNotEmpty
           ? FloatingActionButton.extended(
               onPressed: () => context.push(AppRoutes.recurringNew),

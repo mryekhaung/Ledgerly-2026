@@ -19,6 +19,7 @@ class AppScaffold extends StatelessWidget {
     this.titleWidget,
     this.leading,
     this.actions,
+    this.bottom,
     this.bottomNavigationBar,
     this.floatingActionButton,
     this.isScrollable = false,
@@ -42,6 +43,14 @@ class AppScaffold extends StatelessWidget {
 
   /// Trailing action widgets in the top app bar.
   final List<Widget>? actions;
+
+  /// A widget below the top app bar — typically a `TabBar`.
+  ///
+  /// Tabs are part of the app bar in M3, not part of the body: putting a
+  /// `TabBar` in the body would scroll away with the content and lose the
+  /// platform's own tab-bar treatment. Pages that do not pass [title],
+  /// [leading] or [actions] still get a bar when [bottom] is set.
+  final PreferredSizeWidget? bottom;
 
   /// Optional bottom navigation or dock.
   final Widget? bottomNavigationBar;
@@ -80,11 +89,16 @@ class AppScaffold extends StatelessWidget {
               )
             : null);
 
-    final appBar = (resolvedTitle != null || leading != null || actions != null)
+    final appBar =
+        (resolvedTitle != null ||
+            leading != null ||
+            actions != null ||
+            bottom != null)
         ? AppBar(
             title: resolvedTitle,
             leading: leading,
             actions: actions,
+            bottom: bottom,
             centerTitle: platform.usesLiquidGlass,
             backgroundColor: Colors.transparent,
             elevation: 0,

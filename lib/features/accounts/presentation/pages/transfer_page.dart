@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/account_catalog.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
@@ -124,8 +125,8 @@ class _TransferPageState extends ConsumerState<TransferPage> {
     final formState = ref.watch(transferNotifierProvider);
     final notifier = ref.read(transferNotifierProvider.notifier);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(strings('accountsTransferTitle'))),
+    return AppScaffold(
+      title: strings('accountsTransferTitle'),
       body: accountsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, _) => Center(child: Text(strings('stateErrorBody'))),

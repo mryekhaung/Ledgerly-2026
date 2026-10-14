@@ -3,6 +3,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/result.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
@@ -39,8 +40,8 @@ class CategoryPickerPage extends ConsumerWidget {
       kind: kind,
     ));
 
-    return Scaffold(
-      appBar: AppBar(title: Text(strings('transactionCategoryChoose'))),
+    return AppScaffold(
+      title: strings('transactionCategoryChoose'),
       // A `Result` stream: the failure is a value, so the error branch renders
       // without an exception ever escaping `data/`
       // (`docs/Architecture.md` §8).

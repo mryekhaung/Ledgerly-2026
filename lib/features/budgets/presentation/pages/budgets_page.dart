@@ -4,6 +4,7 @@ import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/budgets/presentation/providers/budget_providers.dart';
 import 'package:ledgerly/features/budgets/presentation/widgets/budget_category_row.dart';
 import 'package:ledgerly/features/budgets/presentation/widgets/budget_period_selector.dart';
@@ -70,8 +71,8 @@ class BudgetsPage extends ConsumerWidget {
     final currency = ref.watch(currencyProvider);
     final hasAnyBudget = totalProgress != null || categoryProgresses.isNotEmpty;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(strings('budgetsTitle'))),
+    return AppScaffold(
+      title: strings('budgetsTitle'),
       floatingActionButton: hasAnyBudget
           ? FloatingActionButton.extended(
               onPressed: () => context.push(AppRoutes.budgetNew),

@@ -9,6 +9,7 @@ import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
@@ -126,22 +127,18 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
     final locale = Localizations.localeOf(context);
     final periodStr = _formatPeriod(currentPeriod, locale);
 
-    return Scaffold(
-      backgroundColor: colors.surface,
-      appBar: AppBar(
-        backgroundColor: colors.surface,
-        elevation: 0,
-        actions: <Widget>[
-          TextButton(
-            onPressed: authState.isLoading ? null : _skip,
-            child: Text(
-              strings('welcomeSkip'),
-              style: TextStyle(color: colors.textSecondary),
-            ),
+    return AppScaffold(
+      actions: <Widget>[
+        TextButton(
+          onPressed: authState.isLoading ? null : _skip,
+          child: Text(
+            strings('welcomeSkip'),
+            style: TextStyle(color: colors.textSecondary),
           ),
-          const SizedBox(width: AppSpacing.sm),
-        ],
-      ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+      ],
+      useSafeArea: false,
       body: SafeArea(
         child: Center(
           child: ConstrainedPane(

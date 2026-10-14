@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/budgets/domain/entities/budget.dart';
 import 'package:ledgerly/features/budgets/presentation/providers/budget_providers.dart';
@@ -157,10 +158,8 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
           .firstOrNull;
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isNew ? strings('budgetsNew') : strings('budgetsEdit')),
-      ),
+    return AppScaffold(
+      title: isNew ? strings('budgetsNew') : strings('budgetsEdit'),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),

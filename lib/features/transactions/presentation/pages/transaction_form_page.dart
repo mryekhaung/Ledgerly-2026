@@ -5,6 +5,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_keypad.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/form_field_surface.dart';
 import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
@@ -103,25 +104,22 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
     // a transaction it does not belong to.
     final category = _selectedCategory(state);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          state.isEditing
-              ? strings('transactionEdit')
-              : strings('transactionNew'),
+    return AppScaffold(
+      title: state.isEditing
+          ? strings('transactionEdit')
+          : strings('transactionNew'),
+      actions: <Widget>[
+        TextButton(
+          onPressed: state.isSaving ? null : notifier.save,
+          child: state.isSaving
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator.adaptive(strokeWidth: 2),
+                )
+              : Text(strings('transactionSave')),
         ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: state.isSaving ? null : notifier.save,
-            child: state.isSaving
-                ? const SizedBox.square(
-                    dimension: 18,
-                    child: CircularProgressIndicator.adaptive(strokeWidth: 2),
-                  )
-                : Text(strings('transactionSave')),
-          ),
-        ],
-      ),
+      ],
+      useSafeArea: false,
       body: SafeArea(
         bottom: false,
         // On medium and up the form becomes a centred column rather than a

@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/failure.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
 import 'package:ledgerly/features/profile/domain/usecases/save_display_name.dart';
@@ -32,8 +33,8 @@ class ProfilePage extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final profile = ref.watch(currentUserProfileProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(strings('profileTitle'))),
+    return AppScaffold(
+      title: strings('profileTitle'),
       body: ListView(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pageHorizontal(

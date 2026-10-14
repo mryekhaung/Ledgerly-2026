@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
 import 'package:ledgerly/features/profile/presentation/widgets/avatar.dart';
@@ -36,8 +37,8 @@ class SettingsPage extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final settings = ref.watch(currentSettingsProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(strings('settingsTitle'))),
+    return AppScaffold(
+      title: strings('settingsTitle'),
       // Width-capped rather than stretched: a preference row reads as a row at
       // 560 px and as a stranded label at 1200 (`docs/Design.md` §8).
       body: ConstrainedPane(

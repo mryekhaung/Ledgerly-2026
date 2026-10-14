@@ -3,6 +3,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/insights/domain/entities/period_insights.dart';
 import 'package:ledgerly/features/insights/presentation/providers/insights_providers.dart';
 import 'package:ledgerly/features/insights/presentation/widgets/cash_flow_line_chart_card.dart';
@@ -33,8 +34,9 @@ class InsightsPage extends ConsumerWidget {
     final insightsAsync = ref.watch(insightsDataProvider);
     final currency = ref.watch(currencyProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(strings('insightsTitle')), elevation: 0),
+    return AppScaffold(
+      title: strings('insightsTitle'),
+      useSafeArea: false,
       body: SafeArea(
         child: Column(
           children: <Widget>[

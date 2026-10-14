@@ -7,6 +7,7 @@ import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
@@ -42,8 +43,8 @@ class MonthStartsOnPage extends ConsumerWidget {
     final currentStr = _formatPeriod(currentPeriod, locale);
     final previousStr = _formatPeriod(previousPeriod, locale);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(strings('monthStartsOnTitle'))),
+    return AppScaffold(
+      title: strings('monthStartsOnTitle'),
       body: ConstrainedPane(
         maxWidth: AppSpacing.proseMaxWidth,
         child: ListView(

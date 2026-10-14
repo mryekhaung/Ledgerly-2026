@@ -4,6 +4,7 @@ import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/auth/domain/entities/auth_provider_type.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
@@ -123,8 +124,8 @@ class AccountPage extends ConsumerWidget {
     final isGuest = authState.isGuest;
     final avatarConfig = ref.watch(currentAvatarProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(strings('accountTitle'))),
+    return AppScaffold(
+      title: strings('accountTitle'),
       body: ConstrainedPane(
         maxWidth: AppSpacing.proseMaxWidth,
         child: ListView(
@@ -260,7 +261,7 @@ class AccountPage extends ConsumerWidget {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: colors.textPrimary,
                         minimumSize: const Size.fromHeight(44),
-                        shape: RoundedRectangleBorder(
+                        shape: const RoundedRectangleBorder(
                           borderRadius: AppRadius.borderMd,
                         ),
                       ),
@@ -279,7 +280,7 @@ class AccountPage extends ConsumerWidget {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: colors.textPrimary,
                         minimumSize: const Size.fromHeight(44),
-                        shape: RoundedRectangleBorder(
+                        shape: const RoundedRectangleBorder(
                           borderRadius: AppRadius.borderMd,
                         ),
                       ),

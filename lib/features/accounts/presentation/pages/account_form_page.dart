@@ -7,6 +7,7 @@ import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account_type.dart';
 import 'package:ledgerly/features/accounts/presentation/account_catalog.dart';
@@ -132,11 +133,13 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
     if (accountId != null && !_initialized) {
       final accountAsync = ref.watch(accountByIdProvider(accountId));
       return accountAsync.when(
-        loading: () =>
-            const Scaffold(body: Center(child: CircularProgressIndicator())),
-        error: (err, _) => Scaffold(
-          appBar: AppBar(),
-          body: Center(child: Text(strings('stateErrorBody'))),
+        loading: () => const AppScaffold(body: LoadingPlaceholder()),
+        error: (err, _) => AppScaffold(
+          body: StatePlaceholder(
+            icon: Icons.error_outline,
+            title: strings('stateErrorTitle'),
+            body: strings('stateErrorBody'),
+          ),
         ),
         data: (account) {
           if (account != null && !_initialized) {
@@ -146,9 +149,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
                 setState(() {});
               }
             });
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
+            return const AppScaffold(body: LoadingPlaceholder());
           }
           return _buildScaffold(context, formState);
         },
@@ -176,22 +177,18 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
       _ => formState.type.name,
     };
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          formState.isEditing
-              ? strings('accountsEditTitle')
-              : strings('accountsNewTitle'),
-        ),
-        actions: <Widget>[
-          if (formState.isEditing)
-            IconButton(
-              icon: Icon(Icons.delete_outline, color: colors.warning),
-              tooltip: strings('accountsDelete'),
-              onPressed: _handleDelete,
-            ),
-        ],
-      ),
+    return AppScaffold(
+      title: formState.isEditing
+          ? strings('accountsEditTitle')
+          : strings('accountsNewTitle'),
+      actions: <Widget>[
+        if (formState.isEditing)
+          IconButton(
+            icon: Icon(Icons.delete_outline, color: colors.warning),
+            tooltip: strings('accountsDelete'),
+            onPressed: _handleDelete,
+          ),
+      ],
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: <Widget>[

@@ -3,6 +3,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/category_list_state.dart';
@@ -91,8 +92,8 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
     // The split is a presentation change only: the same list and the same form,
     // arranged differently.
     if (sizeClass.usesSidebar) {
-      return Scaffold(
-        appBar: AppBar(title: Text(strings('categoriesTitle'))),
+      return AppScaffold(
+        title: strings('categoriesTitle'),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: _openForm,
           icon: const Icon(Icons.add),
@@ -119,8 +120,8 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: Text(strings('categoriesTitle'))),
+    return AppScaffold(
+      title: strings('categoriesTitle'),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openForm,
         icon: const Icon(Icons.add),

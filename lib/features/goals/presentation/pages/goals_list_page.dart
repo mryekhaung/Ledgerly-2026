@@ -4,6 +4,7 @@ import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/presentation/providers/goals_providers.dart';
 import 'package:ledgerly/features/goals/presentation/widgets/goal_card.dart';
@@ -42,23 +43,18 @@ class _GoalsListPageState extends ConsumerState<GoalsListPage>
     final completedGoalsAsync = ref.watch(completedGoalsProvider);
     final archivedGoalsAsync = ref.watch(archivedGoalsProvider);
 
-    return Scaffold(
-      backgroundColor: colors.surface,
-      appBar: AppBar(
-        title: Text(strings('savingsGoalsTitle')),
-        backgroundColor: colors.surfaceRaised,
-        elevation: 0,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: colors.textPrimary,
-          unselectedLabelColor: colors.textSecondary,
-          indicatorColor: colors.moneyIn,
-          tabs: [
-            Tab(text: strings('savingsGoalsActiveTab')),
-            Tab(text: strings('savingsGoalsCompletedTab')),
-            Tab(text: strings('savingsGoalsArchivedTab')),
-          ],
-        ),
+    return AppScaffold(
+      title: strings('savingsGoalsTitle'),
+      bottom: TabBar(
+        controller: _tabController,
+        labelColor: colors.textPrimary,
+        unselectedLabelColor: colors.textSecondary,
+        indicatorColor: colors.moneyIn,
+        tabs: [
+          Tab(text: strings('savingsGoalsActiveTab')),
+          Tab(text: strings('savingsGoalsCompletedTab')),
+          Tab(text: strings('savingsGoalsArchivedTab')),
+        ],
       ),
       body: TabBarView(
         controller: _tabController,

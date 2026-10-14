@@ -264,6 +264,29 @@ void main() {
   // ---------------------------------------------------------------------------
 
   group('design rule: pages use AppScaffold (docs/Design.md §5.1)', () {
+    /// Files whose `Scaffold` **is** the frame rather than a page inside one.
+    ///
+    /// `AppScaffold` is a *page* frame: it supplies the content cap, safe areas
+    /// and an adaptive bar to whatever body a page hands it. These three supply
+    /// a frame themselves, so routing them through `AppScaffold` would either
+    /// recurse or fight the thing that calls them:
+    ///
+    /// * `app_shell.dart` — hosts `AppScaffold` pages as its child; it must own
+    ///   the nav chrome the pages sit in.
+    /// * `responsive_layout.dart` (`ModalFormScaffold`) — a deliberately
+    ///   different presentation for modal *forms*: a card on a sunk background
+    ///   with its own `AppBar`, not the standard page frame.
+    /// * `app_router.dart` — the error/loading frames for a route that cannot
+    ///   build its page yet.
+    ///
+    /// The rule therefore targets pages, and these are asserted below to still
+    /// exist so a later reader does not "fix" them.
+    const framePaths = <String>[
+      'lib/app/router/app_shell.dart',
+      'lib/app/router/app_router.dart',
+      'lib/features/shared/presentation/widgets/responsive_layout.dart',
+    ];
+
     test('should_not_build_a_raw_scaffold_in_a_feature_page', () {
       final sites = scan(
         const <String>['lib/features', 'lib/app'],
@@ -271,6 +294,7 @@ void main() {
         // in Dart's RegExp, so it is dismissed below by content instead.
         RegExp(r'\bScaffold\('),
         dismiss: (line) => line.contains('ScaffoldMessenger'),
+        include: (path) => !framePaths.contains(path),
       );
 
       expectWithinBudget(
@@ -279,43 +303,28 @@ void main() {
             'features": it owns the 1200 px content cap and the safe areas, so a '
             'raw Scaffold stretches to 1440 px on web',
         sites,
-        const <String, int>{
-          'lib/features/accounts/presentation/pages/account_form_page.dart': 4,
-          'lib/app/router/app_router.dart': 2,
-          'lib/app/router/app_shell.dart': 2,
-          'lib/features/categories/presentation/pages/category_list_page.dart':
-              2,
-          // The shared modal-form frame *is* the wide-layout replacement for a
-          // page Scaffold, so it legitimately builds one.
-          'lib/features/shared/presentation/widgets/responsive_layout.dart': 2,
-          'lib/features/accounts/presentation/pages/accounts_page.dart': 1,
-          'lib/features/accounts/presentation/pages/transfer_page.dart': 1,
-          'lib/features/auth/presentation/pages/account_page.dart': 1,
-          'lib/features/auth/presentation/pages/sign_in_page.dart': 1,
-          'lib/features/auth/presentation/pages/welcome_page.dart': 1,
-          'lib/features/budgets/presentation/pages/budget_form_page.dart': 1,
-          'lib/features/budgets/presentation/pages/budgets_page.dart': 1,
-          'lib/features/goals/presentation/pages/goal_form_page.dart': 1,
-          'lib/features/goals/presentation/pages/goals_list_page.dart': 1,
-          'lib/features/insights/presentation/pages/insights_page.dart': 1,
-          'lib/features/profile/presentation/pages/avatar_editor_page.dart': 1,
-          'lib/features/profile/presentation/pages/profile_page.dart': 1,
-          'lib/features/recurring/presentation/pages/recurring_form_page.dart':
-              1,
-          'lib/features/recurring/presentation/pages/recurring_list_page.dart':
-              1,
-          'lib/features/settings/presentation/pages/month_starts_on_page.dart':
-              1,
-          'lib/features/settings/presentation/pages/settings_page.dart': 1,
-          'lib/features/transactions/presentation/pages/calendar_page.dart': 1,
-          'lib/features/transactions/presentation/pages/category_picker_page.dart':
-              1,
-          'lib/features/transactions/presentation/pages/transaction_form_page.dart':
-              1,
-          'lib/features/transactions/presentation/pages/transactions_list_page.dart':
-              1,
-        },
+        // Burned to zero for pages. The only remaining `Scaffold`s live in the
+        // three frame files excluded above, which supply the frame rather than
+        // sit inside one.
+        const <String, int>{},
       );
+    });
+
+    test('should_keep_the_exempted_page_frames', () {
+      // Re-asserts the path exemption: these three files are excluded from the
+      // rule above because they supply a frame rather than live inside one, so
+      // they must still actually contain the scaffolds being exempted.
+      for (final path in framePaths) {
+        final source = File(path).readAsStringSync();
+        expect(
+          RegExp(r'\bScaffold\(').hasMatch(source),
+          isTrue,
+          reason:
+              '$path is exempted from the AppScaffold rule because it '
+              'builds the frame itself; if that is no longer true, remove it '
+              'from framePaths.',
+        );
+      }
     });
   });
 
@@ -339,7 +348,7 @@ void main() {
           // A spinner inside a *submitting button* is legitimate: the affordance
           // is the button, not a blanked page. These stay until the button
           // variants grow a busy state.
-          'lib/features/accounts/presentation/pages/account_form_page.dart': 3,
+          'lib/features/accounts/presentation/pages/account_form_page.dart': 1,
           'lib/features/accounts/presentation/pages/transfer_page.dart': 3,
           'lib/features/accounts/presentation/pages/accounts_page.dart': 2,
           'lib/features/auth/presentation/pages/sign_in_page.dart': 1,

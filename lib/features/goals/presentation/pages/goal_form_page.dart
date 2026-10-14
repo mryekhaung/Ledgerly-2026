@@ -4,6 +4,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/goals/presentation/providers/goals_providers.dart';
@@ -139,15 +140,8 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
     final formState = ref.watch(goalFormProvider);
     final accountsAsync = ref.watch(accountsStreamProvider);
 
-    return Scaffold(
-      backgroundColor: colors.surface,
-      appBar: AppBar(
-        title: Text(
-          formState.isEditMode ? strings('editGoal') : strings('newGoal'),
-        ),
-        backgroundColor: colors.surfaceRaised,
-        elevation: 0,
-      ),
+    return AppScaffold(
+      title: formState.isEditMode ? strings('editGoal') : strings('newGoal'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(

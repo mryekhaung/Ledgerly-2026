@@ -14,6 +14,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/utils/month_grid_layout.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/month_year_picker_page.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -100,22 +101,20 @@ class CalendarPage extends ConsumerWidget {
       _SummaryCard(day: state.selectedDay),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(strings('navigationCalendar')),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.search),
-            tooltip: strings('transactionsTitle'),
-            onPressed: () => context.push(AppRoutes.transactions),
+    return AppScaffold(
+      title: strings('navigationCalendar'),
+      actions: <Widget>[
+        IconButton(
+          icon: const Icon(Icons.search),
+          tooltip: strings('transactionsTitle'),
+          onPressed: () => context.push(AppRoutes.transactions),
+        ),
+        if (state.canGoToToday)
+          TextButton(
+            onPressed: notifier.goToToday,
+            child: Text(strings('calendarToday')),
           ),
-          if (state.canGoToToday)
-            TextButton(
-              onPressed: notifier.goToToday,
-              child: Text(strings('calendarToday')),
-            ),
-        ],
-      ),
+      ],
       body: sizeClass.isTwoPaneCapable
           ? _WideBody(
               monthPane: monthPane,
