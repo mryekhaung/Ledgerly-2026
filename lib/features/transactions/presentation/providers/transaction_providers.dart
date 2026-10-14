@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/di/injection.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/delete_transaction.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/save_transaction.dart';
+import 'package:ledgerly/features/transactions/domain/usecases/search_transactions.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/watch_transactions.dart';
 
 /// Thin bridge between get_it and Riverpod for the transaction use cases.
@@ -68,3 +69,9 @@ final deleteTransactionProvider = Provider<DeleteTransaction>(
 final restoreTransactionProvider = Provider<RestoreTransaction>(
   (_) => getIt<RestoreTransaction>(),
 );
+
+/// Bridge for [SearchTransactions].
+final searchTransactionsProvider = Provider<SearchTransactions>(
+  (_) => getIt<SearchTransactions>(),
+);
+

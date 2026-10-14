@@ -5,6 +5,7 @@ import 'package:ledgerly/features/transactions/data/repositories/transaction_rep
 import 'package:ledgerly/features/transactions/domain/repositories/transaction_repository.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/delete_transaction.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/save_transaction.dart';
+import 'package:ledgerly/features/transactions/domain/usecases/search_transactions.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/watch_transactions.dart';
 
 /// Registers the transactions feature: datasource, repository and use cases.
@@ -51,5 +52,8 @@ void registerTransactionsModule(GetIt getIt) {
     )
     ..registerFactory<RestoreTransaction>(
       () => RestoreTransaction(getIt<TransactionRepository>()),
+    )
+    ..registerFactory<SearchTransactions>(
+      () => SearchTransactions(getIt<TransactionRepository>()),
     );
 }

@@ -533,4 +533,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get insightsNextPeriod => 'Next period';
+
+  @override
+  String get transactionsTitle => 'Transactions';
+
+  @override
+  String get transactionsSearchHint => 'Search note or category...';
+
+  @override
+  String get filterTitle => 'Filters';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterIncome => 'Income';
+
+  @override
+  String get filterExpense => 'Expense';
+
+  @override
+  String get filterCategory => 'Category';
+
+  @override
+  String get filterDateRange => 'Date Range';
+
+  @override
+  String get filterStartDate => 'Start date';
+
+  @override
+  String get filterEndDate => 'End date';
+
+  @override
+  String get filterAmount => 'Amount';
+
+  @override
+  String get filterMinAmount => 'Min amount';
+
+  @override
+  String get filterMaxAmount => 'Max amount';
+
+  @override
+  String get filterClearAll => 'Clear all';
+
+  @override
+  String get filterApply => 'Apply';
+
+  @override
+  String get transactionsNoResultsTitle => 'No transactions found';
+
+  @override
+  String get transactionsNoResultsBody =>
+      'Try adjusting your search or filters to find what you\'re looking for.';
 }

@@ -22,6 +22,10 @@ abstract final class AppRoutes {
   static const String settings = '/settings';
   static const String settingsName = 'settings';
 
+  /// Transactions list and search (Phase 2).
+  static const String transactions = '/transactions';
+  static const String transactionsName = 'transactions';
+
   /// Add / edit transaction (Phase 1). Dedicated page, never a dialog.
   static const String transactionNew = '/transactions/new';
   static const String transactionNewName = 'transactionNew';

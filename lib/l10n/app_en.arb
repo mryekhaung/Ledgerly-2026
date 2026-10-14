@@ -690,5 +690,73 @@
   "insightsNextPeriod": "Next period",
   "@insightsNextPeriod": {
     "description": "Tooltip for next period button."
+  },
+  "transactionsTitle": "Transactions",
+  "@transactionsTitle": {
+    "description": "App bar title for the transactions list and search screen."
+  },
+  "transactionsSearchHint": "Search note or category...",
+  "@transactionsSearchHint": {
+    "description": "Placeholder text inside the transaction search bar."
+  },
+  "filterTitle": "Filters",
+  "@filterTitle": {
+    "description": "Title of the transaction filter bottom sheet."
+  },
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "Filter chip label for showing all transactions."
+  },
+  "filterIncome": "Income",
+  "@filterIncome": {
+    "description": "Filter chip label for filtering income transactions."
+  },
+  "filterExpense": "Expense",
+  "@filterExpense": {
+    "description": "Filter chip label for filtering expense transactions."
+  },
+  "filterCategory": "Category",
+  "@filterCategory": {
+    "description": "Label for category filter."
+  },
+  "filterDateRange": "Date Range",
+  "@filterDateRange": {
+    "description": "Label for date range filter."
+  },
+  "filterStartDate": "Start date",
+  "@filterStartDate": {
+    "description": "Label for date filter start date."
+  },
+  "filterEndDate": "End date",
+  "@filterEndDate": {
+    "description": "Label for date filter end date."
+  },
+  "filterAmount": "Amount",
+  "@filterAmount": {
+    "description": "Label for amount range filter."
+  },
+  "filterMinAmount": "Min amount",
+  "@filterMinAmount": {
+    "description": "Label for minimum amount filter input."
+  },
+  "filterMaxAmount": "Max amount",
+  "@filterMaxAmount": {
+    "description": "Label for maximum amount filter input."
+  },
+  "filterClearAll": "Clear all",
+  "@filterClearAll": {
+    "description": "Button label to clear all active search and filter criteria."
+  },
+  "filterApply": "Apply",
+  "@filterApply": {
+    "description": "Button label to apply active filters."
+  },
+  "transactionsNoResultsTitle": "No transactions found",
+  "@transactionsNoResultsTitle": {
+    "description": "Title when search query or filters match no transactions."
+  },
+  "transactionsNoResultsBody": "Try adjusting your search or filters to find what you're looking for.",
+  "@transactionsNoResultsBody": {
+    "description": "Body message when search query or filters match no transactions."
   }
 }

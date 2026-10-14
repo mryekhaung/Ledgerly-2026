@@ -103,6 +103,11 @@ class CalendarPage extends ConsumerWidget {
       appBar: AppBar(
         title: Text(strings('navigationCalendar')),
         actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: strings('transactionsTitle'),
+            onPressed: () => context.push(AppRoutes.transactions),
+          ),
           if (state.canGoToToday)
             TextButton(
               onPressed: notifier.goToToday,

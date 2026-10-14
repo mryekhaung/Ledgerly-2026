@@ -535,4 +535,57 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get insightsNextPeriod => 'နောက် ကာလ';
+
+  @override
+  String get transactionsTitle => 'ငွေစာရင်းများ';
+
+  @override
+  String get transactionsSearchHint =>
+      'မှတ်စု သို့မဟုတ် အမျိုးအစားဖြင့် ရှာရန်...';
+
+  @override
+  String get filterTitle => 'စစ်ထုတ်မှုများ';
+
+  @override
+  String get filterAll => 'အားလုံး';
+
+  @override
+  String get filterIncome => 'ဝင်ငွေ';
+
+  @override
+  String get filterExpense => 'ထွက်ငွေ';
+
+  @override
+  String get filterCategory => 'အမျိုးအစား';
+
+  @override
+  String get filterDateRange => 'ရက်စွဲအပိုင်းအခြား';
+
+  @override
+  String get filterStartDate => 'စတင်ရက်';
+
+  @override
+  String get filterEndDate => 'ပြီးဆုံးရက်';
+
+  @override
+  String get filterAmount => 'ပမာဏ';
+
+  @override
+  String get filterMinAmount => 'အနည်းဆုံးပမာဏ';
+
+  @override
+  String get filterMaxAmount => 'အများဆုံးပမာဏ';
+
+  @override
+  String get filterClearAll => 'အားလုံးရှင်းမည်';
+
+  @override
+  String get filterApply => 'အသုံးပြုမည်';
+
+  @override
+  String get transactionsNoResultsTitle => 'စာရင်းမတွေ့ရှိပါ';
+
+  @override
+  String get transactionsNoResultsBody =>
+      'ရှာဖွေမှု သို့မဟုတ် filter များကို ပြောင်းလဲစမ်းသပ်ကြည့်ပါ။';
 }

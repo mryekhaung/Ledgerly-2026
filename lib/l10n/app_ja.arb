@@ -164,5 +164,22 @@
   "insightsNoDataTitle": "取引データがありません",
   "insightsNoDataBody": "この期間の取引を登録すると、支出分析が表示されます。",
   "insightsPreviousPeriod": "前の期間",
-  "insightsNextPeriod": "次の期間"
+  "insightsNextPeriod": "次の期間",
+  "transactionsTitle": "取引一覧",
+  "transactionsSearchHint": "メモやカテゴリーで検索...",
+  "filterTitle": "フィルター",
+  "filterAll": "すべて",
+  "filterIncome": "収入",
+  "filterExpense": "支出",
+  "filterCategory": "カテゴリー",
+  "filterDateRange": "期間",
+  "filterStartDate": "開始日",
+  "filterEndDate": "終了日",
+  "filterAmount": "金額",
+  "filterMinAmount": "最小金額",
+  "filterMaxAmount": "最大金額",
+  "filterClearAll": "すべてクリア",
+  "filterApply": "適用",
+  "transactionsNoResultsTitle": "取引が見つかりません",
+  "transactionsNoResultsBody": "検索キーワードやフィルターを変更してみてください。"
 }

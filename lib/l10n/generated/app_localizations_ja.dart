@@ -515,4 +515,55 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get insightsNextPeriod => '次の期間';
+
+  @override
+  String get transactionsTitle => '取引一覧';
+
+  @override
+  String get transactionsSearchHint => 'メモやカテゴリーで検索...';
+
+  @override
+  String get filterTitle => 'フィルター';
+
+  @override
+  String get filterAll => 'すべて';
+
+  @override
+  String get filterIncome => '収入';
+
+  @override
+  String get filterExpense => '支出';
+
+  @override
+  String get filterCategory => 'カテゴリー';
+
+  @override
+  String get filterDateRange => '期間';
+
+  @override
+  String get filterStartDate => '開始日';
+
+  @override
+  String get filterEndDate => '終了日';
+
+  @override
+  String get filterAmount => '金額';
+
+  @override
+  String get filterMinAmount => '最小金額';
+
+  @override
+  String get filterMaxAmount => '最大金額';
+
+  @override
+  String get filterClearAll => 'すべてクリア';
+
+  @override
+  String get filterApply => '適用';
+
+  @override
+  String get transactionsNoResultsTitle => '取引が見つかりません';
+
+  @override
+  String get transactionsNoResultsBody => '検索キーワードやフィルターを変更してみてください。';
 }

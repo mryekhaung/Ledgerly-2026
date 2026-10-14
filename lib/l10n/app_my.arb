@@ -164,5 +164,22 @@
   "insightsNoDataTitle": "စာရင်းမှတ်တမ်း မရှိသေးပါ",
   "insightsNoDataBody": "ဤကာလအတွင်း ငွေစာရင်းများ ထည့်သွင်းပြီး သုံးသပ်ချက်များကို ကြည့်ရှုပါ။",
   "insightsPreviousPeriod": "ယခင် ကာလ",
-  "insightsNextPeriod": "နောက် ကာလ"
+  "insightsNextPeriod": "နောက် ကာလ",
+  "transactionsTitle": "ငွေစာရင်းများ",
+  "transactionsSearchHint": "မှတ်စု သို့မဟုတ် အမျိုးအစားဖြင့် ရှာရန်...",
+  "filterTitle": "စစ်ထုတ်မှုများ",
+  "filterAll": "အားလုံး",
+  "filterIncome": "ဝင်ငွေ",
+  "filterExpense": "ထွက်ငွေ",
+  "filterCategory": "အမျိုးအစား",
+  "filterDateRange": "ရက်စွဲအပိုင်းအခြား",
+  "filterStartDate": "စတင်ရက်",
+  "filterEndDate": "ပြီးဆုံးရက်",
+  "filterAmount": "ပမာဏ",
+  "filterMinAmount": "အနည်းဆုံးပမာဏ",
+  "filterMaxAmount": "အများဆုံးပမာဏ",
+  "filterClearAll": "အားလုံးရှင်းမည်",
+  "filterApply": "အသုံးပြုမည်",
+  "transactionsNoResultsTitle": "စာရင်းမတွေ့ရှိပါ",
+  "transactionsNoResultsBody": "ရှာဖွေမှု သို့မဟုတ် filter များကို ပြောင်းလဲစမ်းသပ်ကြည့်ပါ။"
 }

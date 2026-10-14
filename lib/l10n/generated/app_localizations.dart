@@ -1089,6 +1089,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next period'**
   String get insightsNextPeriod;
+
+  /// App bar title for the transactions list and search screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get transactionsTitle;
+
+  /// Placeholder text inside the transaction search bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Search note or category...'**
+  String get transactionsSearchHint;
+
+  /// Title of the transaction filter bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get filterTitle;
+
+  /// Filter chip label for showing all transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// Filter chip label for filtering income transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get filterIncome;
+
+  /// Filter chip label for filtering expense transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get filterExpense;
+
+  /// Label for category filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get filterCategory;
+
+  /// Label for date range filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Range'**
+  String get filterDateRange;
+
+  /// Label for date filter start date.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get filterStartDate;
+
+  /// Label for date filter end date.
+  ///
+  /// In en, this message translates to:
+  /// **'End date'**
+  String get filterEndDate;
+
+  /// Label for amount range filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get filterAmount;
+
+  /// Label for minimum amount filter input.
+  ///
+  /// In en, this message translates to:
+  /// **'Min amount'**
+  String get filterMinAmount;
+
+  /// Label for maximum amount filter input.
+  ///
+  /// In en, this message translates to:
+  /// **'Max amount'**
+  String get filterMaxAmount;
+
+  /// Button label to clear all active search and filter criteria.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all'**
+  String get filterClearAll;
+
+  /// Button label to apply active filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get filterApply;
+
+  /// Title when search query or filters match no transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions found'**
+  String get transactionsNoResultsTitle;
+
+  /// Body message when search query or filters match no transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting your search or filters to find what you\'re looking for.'**
+  String get transactionsNoResultsBody;
 }
 
 class _AppLocalizationsDelegate

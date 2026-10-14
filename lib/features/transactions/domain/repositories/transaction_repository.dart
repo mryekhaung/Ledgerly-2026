@@ -4,6 +4,7 @@ import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
+import 'package:ledgerly/features/transactions/domain/entities/transaction_filter.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_totals.dart';
 
 /// The domain's contract for reading and writing transactions.
@@ -112,4 +113,12 @@ abstract interface class TransactionRepository {
   /// Restores a soft-deleted [id] — the undo affordance
   /// (`docs/Roadmap.md` Phase 1, "haptics, undo").
   Future<Result<void>> restore(String id);
+
+  /// Searches live transactions matching [filter], with [limit] and [offset]
+  /// pagination.
+  Future<Result<List<Transaction>>> searchTransactions({
+    required TransactionFilter filter,
+    int limit = 20,
+    int offset = 0,
+  });
 }

@@ -15,6 +15,7 @@ import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/transaction_form_page.dart';
+import 'package:ledgerly/features/transactions/presentation/pages/transactions_list_page.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:material_ui/material_ui.dart';
@@ -47,6 +48,11 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             path: AppRoutes.insights,
             name: AppRoutes.insightsName,
             builder: (context, state) => const InsightsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.transactions,
+            name: AppRoutes.transactionsName,
+            builder: (context, state) => const TransactionsListPage(),
           ),
           GoRoute(
             path: AppRoutes.categories,

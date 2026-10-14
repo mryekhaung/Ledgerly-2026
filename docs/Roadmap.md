@@ -191,8 +191,7 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
 - ☐ Firebase project + flavors; `AuthRepository` + Firebase adapter
 - ☐ Welcome / Sign in with Apple / Google (/ Email) / Account pages — and the first-run **"When does your month start?"** question (default 1, skippable; `Design.md` §6.6)
 - ☐ Guest → account linking + merge prompt
-- ☐ Sign out + **Delete account** (re-auth, Apple token revoke) — store requirement
-- ☐ Transactions list page: search, filters, paging
+- ☑ **Transactions list page: search, filters, paging** — Debounced search (notes & categories), filter chips (direction, category picker, date range picker, min/max amount range), modal filter bottom sheet (`TransactionFilterSheet`), infinite scrolling paging (`TransactionsListNotifier`), swipe-to-delete with undo bar, tap-to-edit, responsive layout, accessible semantics. Covered by unit and widget test suites.
 - ☐ Export CSV/JSON (+ share) — range presets ("this period", "last period") come from `PeriodCalculator`
 - ☐ Import CSV/JSON with mapping, preview, dedupe (isolate)
 - ☐ Full backup/restore

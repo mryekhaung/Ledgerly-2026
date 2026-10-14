@@ -342,4 +342,70 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
       TransactionsCompanion(deletedAt: Value(now), updatedAt: Value(now)),
     );
   }
+
+  /// Searches live transactions matching the given filter criteria with pagination.
+  Future<List<Transaction>> searchTransactions({
+    String? searchQuery,
+    LocalDate? startDate,
+    LocalDate? endDate,
+    String? categoryId,
+    String? direction,
+    int? minAmountMinor,
+    int? maxAmountMinor,
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    List<String>? matchingCategoryIds;
+    final queryText = searchQuery?.trim();
+    if (queryText != null && queryText.isNotEmpty) {
+      final matchingCategories = await (db.select(db.categories)
+            ..where((c) => c.deletedAt.isNull() & c.name.like('%$queryText%')))
+          .get();
+      matchingCategoryIds = matchingCategories.map((c) => c.id).toList();
+    }
+
+    final query = select(transactions)
+      ..where((t) {
+        Expression<bool> predicate = t.deletedAt.isNull();
+
+        if (queryText != null && queryText.isNotEmpty) {
+          Expression<bool> searchPred = t.note.like('%$queryText%');
+          if (matchingCategoryIds != null && matchingCategoryIds.isNotEmpty) {
+            searchPred = searchPred | t.categoryId.isIn(matchingCategoryIds);
+          }
+          predicate = predicate & searchPred;
+        }
+
+        if (startDate != null) {
+          predicate = predicate & t.date.isBiggerOrEqualValue(startDate.value);
+        }
+        if (endDate != null) {
+          predicate = predicate & t.date.isSmallerOrEqualValue(endDate.value);
+        }
+        if (categoryId != null) {
+          predicate = predicate & t.categoryId.equals(categoryId);
+        }
+        if (direction != null) {
+          predicate = predicate & t.direction.equals(direction);
+        }
+        if (minAmountMinor != null) {
+          predicate =
+              predicate & t.amountMinor.isBiggerOrEqualValue(minAmountMinor);
+        }
+        if (maxAmountMinor != null) {
+          predicate =
+              predicate & t.amountMinor.isSmallerOrEqualValue(maxAmountMinor);
+        }
+
+        return predicate;
+      })
+      ..orderBy([
+        (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc),
+        (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
+      ])
+      ..limit(limit, offset: offset);
+
+    return query.get();
+  }
 }
+

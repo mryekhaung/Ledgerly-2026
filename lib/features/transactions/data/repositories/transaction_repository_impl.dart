@@ -7,6 +7,7 @@ import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/transactions/data/datasources/transaction_local_datasource.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
+import 'package:ledgerly/features/transactions/domain/entities/transaction_filter.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_totals.dart';
 import 'package:ledgerly/features/transactions/domain/repositories/transaction_repository.dart';
 
@@ -124,6 +125,19 @@ class TransactionRepositoryImpl implements TransactionRepository {
   @override
   Future<Result<void>> restore(String id) =>
       guardResult(() => _local.restore(id));
+
+  @override
+  Future<Result<List<Transaction>>> searchTransactions({
+    required TransactionFilter filter,
+    int limit = 20,
+    int offset = 0,
+  }) => guardResult(
+    () => _local.searchTransactions(
+      filter: filter,
+      limit: limit,
+      offset: offset,
+    ),
+  );
 
   /// Maps "row is gone" to a domain `NotFoundFailure` and everything else to the
   /// generic storage failure.

@@ -16,6 +16,7 @@ import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
+import 'package:ledgerly/features/transactions/domain/entities/transaction_filter.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_totals.dart';
 import 'package:ledgerly/features/transactions/domain/repositories/transaction_repository.dart';
 
@@ -309,6 +310,58 @@ class FakeTransactionRepository implements TransactionRepository {
     );
     emit();
     return const Success<void>(null);
+  }
+
+  @override
+  Future<Result<List<Transaction>>> searchTransactions({
+    required TransactionFilter filter,
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    if (forcedFailure case final failure?) {
+      return Err<List<Transaction>>(failure);
+    }
+    final result = _live.where((t) {
+      if (filter.searchQuery case final query?) {
+        final q = query.trim().toLowerCase();
+        if (q.isNotEmpty) {
+          final note = t.note?.toLowerCase() ?? '';
+          final cat = t.categoryId.toLowerCase();
+          if (!note.contains(q) && !cat.contains(q)) return false;
+        }
+      }
+      if (filter.startDate case final start?) {
+        if (t.date < start) return false;
+      }
+      if (filter.endDate case final end?) {
+        if (t.date > end) return false;
+      }
+      if (filter.categoryId case final catId?) {
+        if (t.categoryId != catId) return false;
+      }
+      if (filter.direction case final dir?) {
+        if (t.direction != dir) return false;
+      }
+      if (filter.minAmountMinor case final min?) {
+        if (t.amountMinor < min) return false;
+      }
+      if (filter.maxAmountMinor case final max?) {
+        if (t.amountMinor > max) return false;
+      }
+      return true;
+    }).toList();
+
+    result.sort((a, b) {
+      final dateCmp = b.date.compareTo(a.date);
+      if (dateCmp != 0) return dateCmp;
+      return b.createdAt.compareTo(a.createdAt);
+    });
+
+    if (offset >= result.length) {
+      return const Success<List<Transaction>>(<Transaction>[]);
+    }
+    final end = (offset + limit).clamp(0, result.length);
+    return Success<List<Transaction>>(result.sublist(offset, end));
   }
 }
 

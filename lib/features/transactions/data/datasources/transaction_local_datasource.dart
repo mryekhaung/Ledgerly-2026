@@ -9,6 +9,7 @@ import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/transactions/data/mappers/transaction_mapper.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
+import 'package:ledgerly/features/transactions/domain/entities/transaction_filter.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_totals.dart';
 
 /// Reads and writes transactions in the local SQLite database.
@@ -268,6 +269,26 @@ class TransactionLocalDataSource {
       expenseMinor: expense,
       currency: currency,
     );
+  }
+
+  /// Searches live transactions matching [filter] with [limit] and [offset] pagination.
+  Future<List<Transaction>> searchTransactions({
+    required TransactionFilter filter,
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    final rows = await _database.transactionsDao.searchTransactions(
+      searchQuery: filter.searchQuery,
+      startDate: filter.startDate,
+      endDate: filter.endDate,
+      categoryId: filter.categoryId,
+      direction: filter.direction?.storageValue,
+      minAmountMinor: filter.minAmountMinor,
+      maxAmountMinor: filter.maxAmountMinor,
+      limit: limit,
+      offset: offset,
+    );
+    return TransactionMapper.toEntities(rows);
   }
 
   String _generatedId() {
