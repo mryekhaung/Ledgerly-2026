@@ -33,48 +33,55 @@ class BudgetSummaryCard extends StatelessWidget {
       return Card(
         color: colors.surfaceRaised,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: colors.border.withValues(alpha: 0.6)),
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: colors.border.withValues(alpha: 0.4)),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Row(
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.pie_chart_outline,
-                    color: colors.brandPrimary,
-                    size: 28,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    strings('budgetOverallSummary'),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                strings('budgetsEmptyBody'),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colors.textSecondary,
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: colors.brandPrimary.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.pie_chart_outline,
+                  color: colors.brandPrimary,
+                  size: 20,
                 ),
               ),
-              const SizedBox(height: AppSpacing.md),
-              OutlinedButton.icon(
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      strings('budgetOverallSummary'),
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      strings('budgetTotalOption'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton.icon(
                 onPressed: onTapSetTotal,
-                icon: const Icon(Icons.add, size: 18),
+                icon: const Icon(Icons.add, size: 16),
                 label: Text(strings('budgetsNew')),
-                style: OutlinedButton.styleFrom(
+                style: TextButton.styleFrom(
                   foregroundColor: colors.brandPrimary,
-                  side: BorderSide(color: colors.brandPrimary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                 ),
               ),
             ],

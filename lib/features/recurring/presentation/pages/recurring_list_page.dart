@@ -8,6 +8,7 @@ import 'package:ledgerly/features/recurring/presentation/providers/recurring_pro
 import 'package:ledgerly/features/recurring/presentation/widgets/recurring_item_card.dart';
 import 'package:ledgerly/features/recurring/presentation/widgets/recurring_pending_banner.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
+import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Main page displaying scheduled recurring transactions.
@@ -23,7 +24,6 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
 
@@ -116,44 +116,15 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
 
           // Empty state
           if (displayedItems.isEmpty) ...<Widget>[
-            Card(
-              color: colors.surfaceRaised,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: colors.border.withValues(alpha: 0.4)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.xl),
-                child: Column(
-                  children: <Widget>[
-                    Icon(
-                      Icons.event_repeat,
-                      size: 48,
-                      color: colors.textSecondary.withValues(alpha: 0.6),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Text(
-                      strings('recurringEmptyTitle'),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      strings('recurringEmptyBody'),
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    FilledButton.tonalIcon(
-                      onPressed: () => context.push(AppRoutes.recurringNew),
-                      icon: const Icon(Icons.add),
-                      label: Text(strings('recurringNew')),
-                    ),
-                  ],
-                ),
+            const SizedBox(height: AppSpacing.lg),
+            StatePlaceholder(
+              icon: Icons.event_repeat,
+              title: strings('recurringEmptyTitle'),
+              body: strings('recurringEmptyBody'),
+              action: FilledButton.tonalIcon(
+                onPressed: () => context.push(AppRoutes.recurringNew),
+                icon: const Icon(Icons.add),
+                label: Text(strings('recurringNew')),
               ),
             ),
           ] else ...<Widget>[

@@ -15,6 +15,7 @@ import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
+import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
@@ -97,7 +98,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(BudgetPeriodSelector), findsOneWidget);
-      expect(find.byType(BudgetSummaryCard), findsOneWidget);
+      expect(find.byType(StatePlaceholder), findsOneWidget);
       expect(find.text('No budgets yet'), findsOneWidget);
     });
 

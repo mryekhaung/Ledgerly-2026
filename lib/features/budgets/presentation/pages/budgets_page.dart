@@ -10,6 +10,7 @@ import 'package:ledgerly/features/budgets/presentation/widgets/budget_period_sel
 import 'package:ledgerly/features/budgets/presentation/widgets/budget_summary_card.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
+import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Main Budgets screen displaying overall period budget and category caps.
@@ -67,10 +68,11 @@ class BudgetsPage extends ConsumerWidget {
     final categoryProgresses = ref.watch(categoryBudgetProgressListProvider);
     final isPayCycle = ref.watch(monthStartDayProvider) != 1;
     final currency = ref.watch(currencyProvider);
+    final hasAnyBudget = totalProgress != null || categoryProgresses.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(title: Text(strings('budgetsTitle'))),
-      floatingActionButton: categoryProgresses.isNotEmpty
+      floatingActionButton: hasAnyBudget
           ? FloatingActionButton.extended(
               onPressed: () => context.push(AppRoutes.budgetNew),
               icon: const Icon(Icons.add),
@@ -93,100 +95,89 @@ class BudgetsPage extends ConsumerWidget {
             onNext: () => ref.read(budgetPeriodProvider.notifier).next(),
           ),
           const SizedBox(height: AppSpacing.md),
-          BudgetSummaryCard(
-            progress: totalProgress,
-            currency: currency,
-            onTapSetTotal: () =>
-                context.push('${AppRoutes.budgetNew}?type=total'),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                strings('budgetsCategory'),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (categoryProgresses.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colors.brandPrimary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '${categoryProgresses.length}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: colors.brandPrimary,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          if (categoryProgresses.isEmpty) ...<Widget>[
-            Card(
-              color: colors.surfaceRaised,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: colors.border.withValues(alpha: 0.4)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  children: <Widget>[
-                    Icon(
-                      Icons.tune,
-                      size: 36,
-                      color: colors.textSecondary.withValues(alpha: 0.6),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      strings('budgetsEmptyTitle'),
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      strings('budgetsEmptyBody'),
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    OutlinedButton.icon(
-                      onPressed: () => context.push(AppRoutes.budgetNew),
-                      icon: const Icon(Icons.add, size: 16),
-                      label: Text(strings('budgetsNew')),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: colors.brandPrimary,
-                        side: BorderSide(color: colors.brandPrimary),
-                      ),
-                    ),
-                  ],
+          if (!hasAnyBudget) ...<Widget>[
+            const SizedBox(height: AppSpacing.xl),
+            StatePlaceholder(
+              icon: Icons.pie_chart_outline,
+              title: strings('budgetsEmptyTitle'),
+              body: strings('budgetsEmptyBody'),
+              action: FilledButton.icon(
+                onPressed: () => context.push(AppRoutes.budgetNew),
+                icon: const Icon(Icons.add),
+                label: Text(strings('budgetsNew')),
+                style: FilledButton.styleFrom(
+                  backgroundColor: colors.brandPrimary,
+                  foregroundColor: colors.textOnBrand,
                 ),
               ),
             ),
           ] else ...<Widget>[
-            for (final p in categoryProgresses) ...<Widget>[
-              BudgetCategoryRow(
-                progress: p,
-                onTap: () => context.push('/budgets/${p.budget.id}/edit'),
-                onDelete: () => _confirmDelete(context, ref, p.budget.id),
+            BudgetSummaryCard(
+              progress: totalProgress,
+              currency: currency,
+              onTapSetTotal: () =>
+                  context.push('${AppRoutes.budgetNew}?type=total'),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  strings('budgetsCategory'),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (categoryProgresses.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.brandPrimary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '${categoryProgresses.length}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: colors.brandPrimary,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            if (categoryProgresses.isEmpty) ...<Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.md,
+                  horizontal: AppSpacing.sm,
+                ),
+                child: Center(
+                  child: Text(
+                    strings('budgetsEmptyBody'),
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(height: AppSpacing.sm),
+            ] else ...<Widget>[
+              for (final p in categoryProgresses) ...<Widget>[
+                BudgetCategoryRow(
+                  progress: p,
+                  onTap: () => context.push('/budgets/${p.budget.id}/edit'),
+                  onDelete: () => _confirmDelete(context, ref, p.budget.id),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+              ],
             ],
+            const SizedBox(height: 80), // Padding for FAB
           ],
-          const SizedBox(height: 80), // Padding for FAB
         ],
       ),
     );

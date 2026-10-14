@@ -63,11 +63,6 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             builder: (context, state) => const InsightsPage(),
           ),
           GoRoute(
-            path: AppRoutes.transactions,
-            name: AppRoutes.transactionsName,
-            builder: (context, state) => const TransactionsListPage(),
-          ),
-          GoRoute(
             path: AppRoutes.categories,
             name: AppRoutes.categoriesName,
             builder: (context, state) => const CategoryListPage(),
@@ -77,42 +72,51 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             name: AppRoutes.settingsName,
             builder: (context, state) => const SettingsPage(),
           ),
-          GoRoute(
-            path: AppRoutes.settingsMonthStartsOn,
-            name: AppRoutes.settingsMonthStartsOnName,
-            builder: (context, state) => const MonthStartsOnPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.profile,
-            name: AppRoutes.profileName,
-            builder: (context, state) => const ProfilePage(),
-          ),
-          GoRoute(
-            path: AppRoutes.account,
-            name: AppRoutes.accountName,
-            builder: (context, state) => const AccountPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.dataTransfer,
-            name: AppRoutes.dataTransferName,
-            builder: (context, state) => const DataTransferPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.accounts,
-            name: AppRoutes.accountsName,
-            builder: (context, state) => const AccountsPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.budgets,
-            name: AppRoutes.budgetsName,
-            builder: (context, state) => const BudgetsPage(),
-          ),
-          GoRoute(
-            path: AppRoutes.recurring,
-            name: AppRoutes.recurringName,
-            builder: (context, state) => const RecurringListPage(),
-          ),
         ],
+      ),
+
+      // Pushed sub-screens (outside the shell) so they hide the bottom
+      // navigation bar, have full vertical canvas, and support seamless
+      // predictive back gestures.
+      GoRoute(
+        path: AppRoutes.transactions,
+        name: AppRoutes.transactionsName,
+        builder: (context, state) => const TransactionsListPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsMonthStartsOn,
+        name: AppRoutes.settingsMonthStartsOnName,
+        builder: (context, state) => const MonthStartsOnPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.profile,
+        name: AppRoutes.profileName,
+        builder: (context, state) => const ProfilePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.account,
+        name: AppRoutes.accountName,
+        builder: (context, state) => const AccountPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.dataTransfer,
+        name: AppRoutes.dataTransferName,
+        builder: (context, state) => const DataTransferPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.accounts,
+        name: AppRoutes.accountsName,
+        builder: (context, state) => const AccountsPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.budgets,
+        name: AppRoutes.budgetsName,
+        builder: (context, state) => const BudgetsPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.recurring,
+        name: AppRoutes.recurringName,
+        builder: (context, state) => const RecurringListPage(),
       ),
 
       // Onboarding / Welcome and Sign-In are top-level routes OUTSIDE the shell
