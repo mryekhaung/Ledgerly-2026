@@ -3,6 +3,7 @@ import 'package:ledgerly/app/di/app_environment.dart';
 import 'package:ledgerly/core/database/app_database.dart';
 import 'package:ledgerly/core/database/seed.dart';
 import 'package:ledgerly/core/di/core_module.dart';
+import 'package:ledgerly/features/accounts/di/accounts_module.dart';
 import 'package:ledgerly/features/auth/di/auth_module.dart';
 import 'package:ledgerly/features/categories/di/categories_module.dart';
 import 'package:ledgerly/features/data_transfer/di/data_transfer_module.dart';
@@ -60,6 +61,7 @@ Future<void> configureDependencies({
   registerProfileModule(getIt);
   registerAuthModule(getIt);
   registerDataTransferModule(getIt);
+  registerAccountsModule(getIt);
 
   // Seed the starter categories on a genuinely fresh install.
   //

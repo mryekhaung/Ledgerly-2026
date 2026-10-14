@@ -69,4 +69,20 @@ abstract final class AppRoutes {
   /// Data transfer, export, import, and backup page (Phase 2).
   static const String dataTransfer = '/settings/data-transfer';
   static const String dataTransferName = 'dataTransfer';
+
+  /// Accounts and Wallets management (Phase 3).
+  static const String accounts = '/accounts';
+  static const String accountsName = 'accounts';
+
+  /// Add new account (Phase 3).
+  static const String accountNew = '/accounts/new';
+  static const String accountNewName = 'accountNew';
+
+  /// Edit account (Phase 3).
+  static const String accountEdit = '/accounts/:id/edit';
+  static const String accountEditName = 'accountEdit';
+
+  /// Transfer funds between accounts (Phase 3).
+  static const String accountTransfer = '/accounts/transfer';
+  static const String accountTransferName = 'accountTransfer';
 }

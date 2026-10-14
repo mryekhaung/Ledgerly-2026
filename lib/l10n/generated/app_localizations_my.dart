@@ -686,7 +686,7 @@ class AppLocalizationsMy extends AppLocalizations {
   String get accountDeleteConfirm => 'အပြီးဖျက်မည်';
 
   @override
-  String get accountDeletedSuccess => 'အကောင့်ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ';
+  String get accountDeletedSuccess => 'အကောင့်ကို ဖျက်ပြီးပါပြီ';
 
   @override
   String get authErrorInvalidCredentials =>
@@ -827,4 +827,136 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get restoreSuccess => 'ဒေတာများ အောင်မြင်စွာ ပြန်လည်ရယူပြီးပါပြီ';
+
+  @override
+  String get accountsTitle => 'အကောင့်များနှင့် ပိုက်ဆံအိတ်များ';
+
+  @override
+  String get accountsSubtitle =>
+      'ဘဏ်အကောင့်များ၊ ပိုက်ဆံအိတ်များနှင့် အသားတင်ပိုင်ဆိုင်မှုကို စီမံမည်';
+
+  @override
+  String get accountsNetWorth => 'စုစုပေါင်း အသားတင်ပိုင်ဆိုင်မှု';
+
+  @override
+  String get accountsActiveTab => 'လက်ရှိသုံးစွဲနေသော';
+
+  @override
+  String get accountsArchivedTab => 'သိမ်းဆည်းထားသော';
+
+  @override
+  String get accountsEmptyTitle => 'အကောင့်များ မရှိသေးပါ';
+
+  @override
+  String get accountsEmptyBody =>
+      'လက်ကျန်ငွေနှင့် ငွေလွှဲပြောင်းမှုများကို မှတ်တမ်းတင်ရန် သင့်ငွေသား၊ ဘဏ်အကောင့် သို့မဟုတ် ပိုက်ဆံအိတ်များကို ထည့်သွင်းပါ။';
+
+  @override
+  String get accountsAddButton => 'အကောင့်အသစ်ထည့်မည်';
+
+  @override
+  String get accountsEditTitle => 'အကောင့်ပြင်ဆင်မည်';
+
+  @override
+  String get accountsNewTitle => 'အကောင့်အသစ်';
+
+  @override
+  String get accountsTransferButton => 'ငွေလွှဲမည်';
+
+  @override
+  String get accountsTransferTitle => 'အကောင့်အချင်းချင်း ငွေလွှဲရန်';
+
+  @override
+  String get accountsTransferFrom => 'လွှဲပြောင်းမည့် အကောင့်';
+
+  @override
+  String get accountsTransferTo => 'လက်ခံမည့် အကောင့်';
+
+  @override
+  String get accountsTransferAmount => 'လွှဲပြောင်းငွေပမာဏ';
+
+  @override
+  String get accountsTransferDate => 'ရက်စွဲ';
+
+  @override
+  String get accountsTransferNote => 'မှတ်ချက် (ရွေးချယ်နိုင်သည်)';
+
+  @override
+  String get accountsTransferSubmit => 'ငွေလွှဲပြောင်းမှု ပြုလုပ်မည်';
+
+  @override
+  String get accountsTransferSuccess => 'ငွေလွှဲပြောင်းမှု အောင်မြင်ပါသည်';
+
+  @override
+  String get accountFieldName => 'အကောင့်အမည်';
+
+  @override
+  String get accountFieldType => 'အကောင့်အမျိုးအစား';
+
+  @override
+  String get accountFieldCurrency => 'ငွေကြေး';
+
+  @override
+  String get accountFieldOpeningBalance => 'စတင်လက်ကျန်ငွေ';
+
+  @override
+  String get accountFieldIcon => 'အိုင်ကွန်';
+
+  @override
+  String get accountFieldColor => 'အရောင်';
+
+  @override
+  String get accountFieldIncludeInTotal =>
+      'အသားတင်ပိုင်ဆိုင်မှုတွင် ထည့်သွင်းမည်';
+
+  @override
+  String get accountTypeCash => 'လက်ငင်းငွေသား';
+
+  @override
+  String get accountTypeBank => 'ဘဏ်အကောင့်';
+
+  @override
+  String get accountTypeCredit => 'Credit ကတ်';
+
+  @override
+  String get accountTypeSavings => 'စုဆောင်းငွေ';
+
+  @override
+  String get accountTypeEwallet => 'ဒီဂျစ်တယ် ပိုက်ဆံအိတ်';
+
+  @override
+  String get accountSavedSuccess =>
+      'အကောင့်ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ';
+
+  @override
+  String get accountArchiveSuccess =>
+      'အကောင့်ကို သိမ်းဆည်းခန်းထဲ ထည့်ပြီးပါပြီ';
+
+  @override
+  String get accountUnarchiveSuccess =>
+      'အကောင့်ကို ပြန်လည်အသုံးပြုနိုင်ရန် ပြင်ဆင်ပြီးပါပြီ';
+
+  @override
+  String get accountConfirmDelete => 'အကောင့်ကို ဖျက်မှာ သေချာပါသလား?';
+
+  @override
+  String get accountConfirmDeleteMessage =>
+      'ဤအကောင့်ကို ဖျက်ရန် သေချာပါသလား? ယခင်ပြုလုပ်ထားသော ငွေစာရင်းမှတ်တမ်းများ ဆက်လက်တည်ရှိနေမည် ဖြစ်ပါသည်။';
+
+  @override
+  String get accountsNameRequired => 'အကောင့်အမည် ထည့်သွင်းရန် လိုအပ်ပါသည်';
+
+  @override
+  String get accountsNameTooLong => 'အကောင့်အမည်သည် စာလုံး ၆၀ ထက် မကျော်ရပါ';
+
+  @override
+  String get accountsNameTaken => 'ဤအမည်ဖြင့် အကောင့်ရှိပြီးသား ဖြစ်ပါသည်';
+
+  @override
+  String get accountsTransferSameAccount =>
+      'လွှဲပြောင်းမည့် အကောင့်နှင့် လက်ခံမည့် အကောင့် မတူညီရပါ';
+
+  @override
+  String get accountsTransferAmountInvalid =>
+      'လွှဲပြောင်းငွေပမာဏသည် သုညထက် ကြီးရပါမည်';
 }

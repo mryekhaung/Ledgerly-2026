@@ -130,6 +130,22 @@ class AccountsDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  /// Rewrites `sortOrder` to match [orderedIds] — the reorder gesture's write.
+  ///
+  /// Runs in one transaction so the list can never be observed half-reordered.
+  Future<void> reorder(List<String> orderedIds) {
+    return transaction(() async {
+      final now = clock.nowUtcMillis();
+      for (var i = 0; i < orderedIds.length; i++) {
+        await (update(
+          accounts,
+        )..where((t) => t.id.equals(orderedIds[i]))).write(
+          AccountsCompanion(sortOrder: Value(i), updatedAt: Value(now)),
+        );
+      }
+    });
+  }
+
   Future<int> _nextSortOrder() async {
     final row =
         await (selectOnly(accounts)

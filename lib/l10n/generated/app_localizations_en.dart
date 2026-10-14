@@ -680,7 +680,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountDeleteConfirm => 'Delete permanently';
 
   @override
-  String get accountDeletedSuccess => 'Account successfully deleted';
+  String get accountDeletedSuccess => 'Account deleted';
 
   @override
   String get authErrorInvalidCredentials => 'Invalid email or password';
@@ -817,4 +817,132 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restoreSuccess => 'Backup successfully restored';
+
+  @override
+  String get accountsTitle => 'Accounts & Wallets';
+
+  @override
+  String get accountsSubtitle =>
+      'Manage bank accounts, wallets, and track net worth';
+
+  @override
+  String get accountsNetWorth => 'Total Net Worth';
+
+  @override
+  String get accountsActiveTab => 'Active';
+
+  @override
+  String get accountsArchivedTab => 'Archived';
+
+  @override
+  String get accountsEmptyTitle => 'No accounts yet';
+
+  @override
+  String get accountsEmptyBody =>
+      'Add your cash, bank accounts, or e-wallets to track your balances and transfers.';
+
+  @override
+  String get accountsAddButton => 'Add Account';
+
+  @override
+  String get accountsEditTitle => 'Edit Account';
+
+  @override
+  String get accountsNewTitle => 'New Account';
+
+  @override
+  String get accountsTransferButton => 'Transfer';
+
+  @override
+  String get accountsTransferTitle => 'Transfer Funds';
+
+  @override
+  String get accountsTransferFrom => 'From Account';
+
+  @override
+  String get accountsTransferTo => 'To Account';
+
+  @override
+  String get accountsTransferAmount => 'Transfer Amount';
+
+  @override
+  String get accountsTransferDate => 'Date';
+
+  @override
+  String get accountsTransferNote => 'Note (optional)';
+
+  @override
+  String get accountsTransferSubmit => 'Execute Transfer';
+
+  @override
+  String get accountsTransferSuccess => 'Transfer completed successfully';
+
+  @override
+  String get accountFieldName => 'Account Name';
+
+  @override
+  String get accountFieldType => 'Account Type';
+
+  @override
+  String get accountFieldCurrency => 'Currency';
+
+  @override
+  String get accountFieldOpeningBalance => 'Opening Balance';
+
+  @override
+  String get accountFieldIcon => 'Icon';
+
+  @override
+  String get accountFieldColor => 'Color';
+
+  @override
+  String get accountFieldIncludeInTotal => 'Include in Net Worth';
+
+  @override
+  String get accountTypeCash => 'Cash';
+
+  @override
+  String get accountTypeBank => 'Bank Account';
+
+  @override
+  String get accountTypeCredit => 'Credit Card';
+
+  @override
+  String get accountTypeSavings => 'Savings';
+
+  @override
+  String get accountTypeEwallet => 'E-Wallet';
+
+  @override
+  String get accountSavedSuccess => 'Account saved successfully';
+
+  @override
+  String get accountArchiveSuccess => 'Account archived';
+
+  @override
+  String get accountUnarchiveSuccess => 'Account restored from archive';
+
+  @override
+  String get accountConfirmDelete => 'Delete Account?';
+
+  @override
+  String get accountConfirmDeleteMessage =>
+      'Are you sure you want to delete this account? Existing transactions will remain intact.';
+
+  @override
+  String get accountsNameRequired => 'Account name is required';
+
+  @override
+  String get accountsNameTooLong => 'Account name cannot exceed 60 characters';
+
+  @override
+  String get accountsNameTaken => 'An account with this name already exists';
+
+  @override
+  String get accountsTransferSameAccount =>
+      'Source and destination accounts must be different';
+
+  @override
+  String get accountsTransferAmountInvalid =>
+      'Transfer amount must be greater than zero';
 }

@@ -1372,10 +1372,10 @@ abstract class AppLocalizations {
   /// **'Delete permanently'**
   String get accountDeleteConfirm;
 
-  /// Feedback message after account is deleted.
+  /// Snackbar shown when account is deleted.
   ///
   /// In en, this message translates to:
-  /// **'Account successfully deleted'**
+  /// **'Account deleted'**
   String get accountDeletedSuccess;
 
   /// Error when email or password is incorrect.
@@ -1641,6 +1641,252 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Backup successfully restored'**
   String get restoreSuccess;
+
+  /// Title for accounts and wallets management.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts & Wallets'**
+  String get accountsTitle;
+
+  /// Subtitle for accounts section in settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage bank accounts, wallets, and track net worth'**
+  String get accountsSubtitle;
+
+  /// Label for net worth card.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Net Worth'**
+  String get accountsNetWorth;
+
+  /// Tab or section label for active accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get accountsActiveTab;
+
+  /// Tab or section label for archived accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get accountsArchivedTab;
+
+  /// Empty state title for accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'No accounts yet'**
+  String get accountsEmptyTitle;
+
+  /// Empty state description for accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your cash, bank accounts, or e-wallets to track your balances and transfers.'**
+  String get accountsEmptyBody;
+
+  /// Button to create a new account.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Account'**
+  String get accountsAddButton;
+
+  /// Page title when editing an account.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Account'**
+  String get accountsEditTitle;
+
+  /// Page title when creating an account.
+  ///
+  /// In en, this message translates to:
+  /// **'New Account'**
+  String get accountsNewTitle;
+
+  /// Button to start fund transfer between accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get accountsTransferButton;
+
+  /// Page title for transferring funds between accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Funds'**
+  String get accountsTransferTitle;
+
+  /// Source account selector label.
+  ///
+  /// In en, this message translates to:
+  /// **'From Account'**
+  String get accountsTransferFrom;
+
+  /// Destination account selector label.
+  ///
+  /// In en, this message translates to:
+  /// **'To Account'**
+  String get accountsTransferTo;
+
+  /// Amount field label for transfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Amount'**
+  String get accountsTransferAmount;
+
+  /// Date field label for transfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get accountsTransferDate;
+
+  /// Optional note for transfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get accountsTransferNote;
+
+  /// Submit button for transfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Execute Transfer'**
+  String get accountsTransferSubmit;
+
+  /// Snackbar shown when transfer succeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer completed successfully'**
+  String get accountsTransferSuccess;
+
+  /// Label for account name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Name'**
+  String get accountFieldName;
+
+  /// Label for account type field.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Type'**
+  String get accountFieldType;
+
+  /// Label for account currency field.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get accountFieldCurrency;
+
+  /// Label for opening balance field.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening Balance'**
+  String get accountFieldOpeningBalance;
+
+  /// Label for account icon picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get accountFieldIcon;
+
+  /// Label for account color picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get accountFieldColor;
+
+  /// Toggle to include account balance in total net worth.
+  ///
+  /// In en, this message translates to:
+  /// **'Include in Net Worth'**
+  String get accountFieldIncludeInTotal;
+
+  /// Account type cash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get accountTypeCash;
+
+  /// Account type bank.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Account'**
+  String get accountTypeBank;
+
+  /// Account type credit card.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit Card'**
+  String get accountTypeCredit;
+
+  /// Account type savings.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings'**
+  String get accountTypeSavings;
+
+  /// Account type e-wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'E-Wallet'**
+  String get accountTypeEwallet;
+
+  /// Snackbar shown when account is saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Account saved successfully'**
+  String get accountSavedSuccess;
+
+  /// Snackbar shown when account is archived.
+  ///
+  /// In en, this message translates to:
+  /// **'Account archived'**
+  String get accountArchiveSuccess;
+
+  /// Snackbar shown when account is unarchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Account restored from archive'**
+  String get accountUnarchiveSuccess;
+
+  /// Title for account delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account?'**
+  String get accountConfirmDelete;
+
+  /// Message for account delete confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this account? Existing transactions will remain intact.'**
+  String get accountConfirmDeleteMessage;
+
+  /// Validation error when account name is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Account name is required'**
+  String get accountsNameRequired;
+
+  /// Validation error when account name is too long.
+  ///
+  /// In en, this message translates to:
+  /// **'Account name cannot exceed 60 characters'**
+  String get accountsNameTooLong;
+
+  /// Validation error when account name is already in use.
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this name already exists'**
+  String get accountsNameTaken;
+
+  /// Validation error when from and to accounts are identical.
+  ///
+  /// In en, this message translates to:
+  /// **'Source and destination accounts must be different'**
+  String get accountsTransferSameAccount;
+
+  /// Validation error when transfer amount is non-positive.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer amount must be greater than zero'**
+  String get accountsTransferAmountInvalid;
 }
 
 class _AppLocalizationsDelegate

@@ -52,6 +52,12 @@ abstract final class AppLocalization {
     'transactionNoteTooLong' => 'transactionNoteTooLong',
     'transactionCategoryRequired' => 'transactionCategoryRequired',
     'transactionDirectionUnsupported' => 'transactionDirectionUnsupported',
+    'accountNameRequired' => 'accountsNameRequired',
+    'accountNameTooLong' => 'accountsNameTooLong',
+    'accountNameTaken' => 'accountsNameTaken',
+    'transferSameAccount' => 'accountsTransferSameAccount',
+    'transferAmountNonPositive' => 'accountsTransferAmountInvalid',
+    'transferAmountZero' => 'accountsTransferAmountInvalid',
     _ => 'failureValidation',
   };
 }

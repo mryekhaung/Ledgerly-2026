@@ -5,6 +5,9 @@ import 'package:ledgerly/app/router/app_shell.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/features/accounts/presentation/pages/account_form_page.dart';
+import 'package:ledgerly/features/accounts/presentation/pages/accounts_page.dart';
+import 'package:ledgerly/features/accounts/presentation/pages/transfer_page.dart';
 import 'package:ledgerly/features/auth/presentation/pages/account_page.dart';
 import 'package:ledgerly/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:ledgerly/features/auth/presentation/pages/welcome_page.dart';
@@ -88,6 +91,11 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             name: AppRoutes.dataTransferName,
             builder: (context, state) => const DataTransferPage(),
           ),
+          GoRoute(
+            path: AppRoutes.accounts,
+            name: AppRoutes.accountsName,
+            builder: (context, state) => const AccountsPage(),
+          ),
         ],
       ),
 
@@ -134,6 +142,27 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
         path: '/profile/avatar',
         name: AppRoutes.avatarEditorName,
         builder: (context, state) => const AvatarEditorPage(),
+      ),
+
+      // Account forms and transfers (Phase 3).
+      GoRoute(
+        path: AppRoutes.accountNew,
+        name: AppRoutes.accountNewName,
+        builder: (context, state) => const AccountFormPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.accountEdit,
+        name: AppRoutes.accountEditName,
+        builder: (context, state) =>
+            AccountFormPage(accountId: state.pathParameters['id']),
+      ),
+      GoRoute(
+        path: AppRoutes.accountTransfer,
+        name: AppRoutes.accountTransferName,
+        builder: (context, state) => TransferPage(
+          initialFromId: state.uri.queryParameters['from'],
+          initialToId: state.uri.queryParameters['to'],
+        ),
       ),
     ],
   );

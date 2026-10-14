@@ -658,7 +658,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accountDeleteConfirm => '完全に削除';
 
   @override
-  String get accountDeletedSuccess => 'アカウントが削除されました';
+  String get accountDeletedSuccess => '口座を削除しました';
 
   @override
   String get authErrorInvalidCredentials => 'メールアドレスまたはパスワードが正しくありません';
@@ -791,4 +791,128 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get restoreSuccess => 'バックアップが正常に復元されました';
+
+  @override
+  String get accountsTitle => '口座・ウォレット';
+
+  @override
+  String get accountsSubtitle => '銀行口座やウォレットの管理・純資産確認';
+
+  @override
+  String get accountsNetWorth => '純資産合計';
+
+  @override
+  String get accountsActiveTab => '有効';
+
+  @override
+  String get accountsArchivedTab => 'アーカイブ済み';
+
+  @override
+  String get accountsEmptyTitle => '口座がありません';
+
+  @override
+  String get accountsEmptyBody => '現金、銀行口座、電子マネーを追加して、残高や振替を管理しましょう。';
+
+  @override
+  String get accountsAddButton => '口座を追加';
+
+  @override
+  String get accountsEditTitle => '口座を編集';
+
+  @override
+  String get accountsNewTitle => '新規口座';
+
+  @override
+  String get accountsTransferButton => '振替';
+
+  @override
+  String get accountsTransferTitle => '口座間振替';
+
+  @override
+  String get accountsTransferFrom => '振替元口座';
+
+  @override
+  String get accountsTransferTo => '振替先口座';
+
+  @override
+  String get accountsTransferAmount => '振替金額';
+
+  @override
+  String get accountsTransferDate => '日付';
+
+  @override
+  String get accountsTransferNote => 'メモ（任意）';
+
+  @override
+  String get accountsTransferSubmit => '振替を実行';
+
+  @override
+  String get accountsTransferSuccess => '振替が完了しました';
+
+  @override
+  String get accountFieldName => '口座名';
+
+  @override
+  String get accountFieldType => '口座タイプ';
+
+  @override
+  String get accountFieldCurrency => '通貨';
+
+  @override
+  String get accountFieldOpeningBalance => '開始残高';
+
+  @override
+  String get accountFieldIcon => 'アイコン';
+
+  @override
+  String get accountFieldColor => 'カラー';
+
+  @override
+  String get accountFieldIncludeInTotal => '純資産に含める';
+
+  @override
+  String get accountTypeCash => '現金';
+
+  @override
+  String get accountTypeBank => '銀行口座';
+
+  @override
+  String get accountTypeCredit => 'クレジットカード';
+
+  @override
+  String get accountTypeSavings => '貯蓄';
+
+  @override
+  String get accountTypeEwallet => '電子マネー';
+
+  @override
+  String get accountSavedSuccess => '口座を保存しました';
+
+  @override
+  String get accountArchiveSuccess => '口座をアーカイブしました';
+
+  @override
+  String get accountUnarchiveSuccess => '口座のアーカイブを解除しました';
+
+  @override
+  String get accountConfirmDelete => '口座を削除しますか？';
+
+  @override
+  String get accountConfirmDeleteMessage =>
+      'この口座を削除してもよろしいですか？関連する取引履歴は保持されます。';
+
+  @override
+  String get accountsNameRequired => '口座名は必須です';
+
+  @override
+  String get accountsNameTooLong => '口座名は60文字以内で入力してください';
+
+  @override
+  String get accountsNameTaken => 'この名前の口座は既に存在します';
+
+  @override
+  String get accountsTransferSameAccount => '振替元と振替先は異なる口座を指定してください';
+
+  @override
+  String get accountsTransferAmountInvalid => '振替金額は0より大きい必要があります';
 }
