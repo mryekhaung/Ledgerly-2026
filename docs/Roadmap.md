@@ -243,6 +243,78 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
   - Quick contribution and withdrawal bottom sheet (`GoalContributionDialog`) with optional linked account selection.
   - Active, Completed, and Archived tabs with empty states and full CRUD form (`GoalFormPage`).
 
+## Phase 3.5 — "Design debt burn-down" (v0.3.1) — IN PROGRESS
+
+Design compliance was drifting because nothing enforced `docs/Design.md`:
+`design_tokens_test.dart` only asserts token *values*, and the `banned-imports`
+CI job carries no design rules. This phase fixes that in two halves.
+
+### A. Mechanically enforceable — COMPLETE
+
+- ☑ **`test/core/design_rules_test.dart`** — a source-level scanner in the style
+  of `test/core/layer_rule_test.dart`, enforcing seven rules with per-file
+  violation budgets. Budgets are checked in **both directions**: a file over
+  budget fails (new debt), and a file under budget *also* fails (stale budget).
+  Debt can therefore only shrink; the baseline can never quietly turn into an
+  allowlist. A nine-test `scanner self-check` group guards the regexes
+  themselves.
+- ☑ **`design-rules` CI job** — design drift gets its own fast, isolated signal
+  instead of hiding inside the full test wall. `analyze` and `test` now depend
+  on it.
+- ☑ **`tool/run_test.sh`** — local `flutter test` dies on the dev machine with
+  `CreateFile failed 231 (All pipe instances are busy)`, a machine-wide pipe
+  limit. This compiles one test to a debug kernel and runs it under
+  `flutter_tester.exe` instead. Golden and widget tests cannot be driven this
+  way; every other test can. CI remains the authoritative oracle.
+- ☑ **Fixed a live bug the gate caught on its first run** — `AppTheme` set
+  `splashFactory: InkSparkle.splashFactory` globally, so iOS rendered an Android
+  ink ripple. That is the "skinned, not native" trap `docs/Design.md` §1 forbids
+  and §5.2 names explicitly. `AppTheme.light`/`dark` now take an injectable
+  `AppPlatform? platform` so the factory is chosen per platform and a golden
+  test can render iOS chrome on a Linux runner.
+
+**Measured baseline: 108 tolerated violations across 7 rules.**
+
+| Rule | Doc | Count | Files |
+| --- | --- | ---: | ---: |
+| Inline `TextStyle(` in a view | §3 | 40 | 12 |
+| Raw `Scaffold(` in a feature page | §5.1 | 24 | 18 |
+| First-paint spinner instead of skeleton | §5.11 | 15 | 10 |
+| Off-scale radius (`BorderRadius`/`circular`) | §4.2 | 14 | 7 |
+| Hardcoded colour (`Color(0x…)` / `Colors.x`) | §2 | 11 | 7 |
+| Sub-caption size (`fontSize` < 11) | §3 | 3 | 3 |
+| Hardcoded English UI string | §7 | 1 | 1 |
+
+### B. Burn the debt down — NOT STARTED
+
+Fix the tolerated violations file by file, lowering each budget in the same
+commit that fixes its file. Highest leverage first:
+
+- ☐ **`inline TextStyle` → `AppTypography`** (40). The biggest single rule, and
+  the root of most typography drift.
+- ☐ **First-paint spinner → skeleton** (15). `state_placeholder.dart` alone
+  unlocks every screen that loads — the single highest-leverage file.
+- ☐ **Raw `Scaffold` → `AppScaffold`** (24). Mechanical, mostly in
+  `presentation/pages/`.
+- ☐ **Off-scale radius → `AppRadius`** (14). Mechanical; watch for radii that
+  are legitimate one-offs and should join the scale instead.
+- ☐ **Hardcoded colour → token** (11). `budget_form_page.dart`'s `#D97706` is
+  just `warning` reimplemented; `Colors.white` on-colour uses want an explicit
+  `onBrand` token.
+- ☐ **Sub-caption size** (3) and **hardcoded string** (1). Trivial cleanups.
+
+### C. Judgment items — not auto-detectable (NOT STARTED)
+
+- ☐ **Icon system** — no enforced icon set; icons are picked ad hoc.
+- ☐ **`ListRow` adoption** — 0 used against 14 `ListTile` (`docs/Design.md` §5.6).
+- ☐ **`AppCard` adoption** — cards mostly hand-rolled from `Container` +
+  `BoxDecoration` (§5.2).
+- ☐ **`SegmentedTabs`** — segmented controls are rebuilt per screen.
+- ☐ **Golden tests** — few screens are pinned; regression is invisible.
+- ☐ **Calendar spec deviations** (§6) — `_Capsule` hardcodes `width: 24` where
+  the spec says "60% of cell"; the height step is `step * 64` against the spec's
+  five-step quantization; `BoxShape.circle` where the spec says `radius.md`.
+
 ## Phase 4 — "Sync & Polish" (v0.4) — NOT STARTED
 
 - ☐ (Auth already shipped in v0.2) Sync status UI
