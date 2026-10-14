@@ -76,6 +76,43 @@ void main() {
       expect(find.byType(BackdropFilter), findsNothing);
     });
 
+    testWidgets('should_respect_bottom_safe_area_on_android', (tester) async {
+      const bottomPadding = 34.0;
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: const <LocalizationsDelegate<Object?>>[
+              ...GlobalMaterialLocalizations.delegates,
+              AppLocalizations.delegate,
+            ],
+            supportedLocales: const <Locale>[Locale('en')],
+            home: Builder(
+              builder: (context) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  size: const Size(390, 844),
+                  padding: const EdgeInsets.only(bottom: bottomPadding),
+                  viewPadding: const EdgeInsets.only(bottom: bottomPadding),
+                ),
+                child: AppTestScopes(
+                  platform: AppPlatform.android,
+                  child: Scaffold(
+                    bottomNavigationBar: AdaptiveNav(
+                      current: NavDestination.calendar,
+                      onSelect: (_) {},
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final navRect = tester.getRect(find.byType(NavigationBar));
+      expect(navRect.bottom, lessThanOrEqualTo(844.0 - bottomPadding));
+    });
+
     testWidgets('should_use_the_floating_glass_bar_on_ios', (tester) async {
       await tester.pumpWidget(
         host(width: TestWidths.phone, platform: AppPlatform.ios),

@@ -152,12 +152,16 @@ class DockedBottomBar extends StatelessWidget {
         color: colors.surfaceRaised,
         border: Border(top: BorderSide(color: colors.border)),
       ),
-      child: MediaQuery.removePadding(
-        context: context,
-        // The bar handles the bottom inset itself via the SafeArea below, so the
-        // child must not also be inset or the icons sit too high.
-        removeBottom: true,
-        child: SafeArea(top: false, child: child),
+      child: SafeArea(
+        top: false,
+        child: MediaQuery.removePadding(
+          context: context,
+          // The bar handles the bottom inset itself via the SafeArea above, so
+          // the child (e.g. NavigationBar) must not also be inset or the icons
+          // sit too high.
+          removeBottom: true,
+          child: child,
+        ),
       ),
     );
   }
