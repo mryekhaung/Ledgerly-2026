@@ -10,6 +10,7 @@ import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/account_catalog.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
+import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -128,8 +129,12 @@ class _TransferPageState extends ConsumerState<TransferPage> {
     return AppScaffold(
       title: strings('accountsTransferTitle'),
       body: accountsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) => Center(child: Text(strings('stateErrorBody'))),
+        loading: () => const LoadingPlaceholder(),
+        error: (_, _) => StatePlaceholder(
+          icon: Icons.error_outline,
+          title: strings('stateErrorTitle'),
+          body: strings('stateErrorBody'),
+        ),
         data: (accounts) {
           if (!_initialized) {
             if (accounts.length < 2) {
@@ -141,7 +146,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                   setState(() {});
                 }
               });
-              return const Center(child: CircularProgressIndicator());
+              return const LoadingPlaceholder();
             }
           }
 

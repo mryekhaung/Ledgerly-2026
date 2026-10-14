@@ -10,6 +10,7 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
+import 'package:ledgerly/core/widgets/app_skeleton.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
@@ -260,9 +261,11 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
         separatorBuilder: (_, _) => const Divider(height: 1),
         itemBuilder: (context, index) {
           if (index >= state.items.length) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-              child: Center(child: CircularProgressIndicator.adaptive()),
+            // The next page is loading: keep the list's own rhythm rather than
+            // dropping a spinner into the flow (docs/Design.md §5.11).
+            return const AppSkeletonList(
+              rows: 3,
+              rowHeight: AppRowHeight.twoLine,
             );
           }
 

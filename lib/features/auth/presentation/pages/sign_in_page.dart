@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
+import 'package:ledgerly/core/widgets/app_skeleton.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
@@ -216,12 +217,10 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                       const SizedBox(height: AppSpacing.xl),
 
                       if (authState.isLoading)
-                        const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(AppSpacing.md),
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
+                        // A skeleton the size of the button it replaces, so the
+                        // page does not jump when auth resolves
+                        // (docs/Design.md §5.11).
+                        const AppSkeleton(height: 50, radius: AppRadius.md)
                       else ...<Widget>[
                         FilledButton(
                           onPressed: _submit,

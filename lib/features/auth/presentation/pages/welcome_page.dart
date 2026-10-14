@@ -11,6 +11,7 @@ import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
+import 'package:ledgerly/core/widgets/app_skeleton.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
@@ -282,11 +283,15 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
 
                 // Auth Action Buttons
                 if (authState.isLoading)
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(AppSpacing.lg),
-                      child: CircularProgressIndicator(),
-                    ),
+                  // Skeletons the size of the two buttons they replace, so the
+                  // layout does not jump when auth resolves
+                  // (docs/Design.md §5.11).
+                  const Column(
+                    children: <Widget>[
+                      AppSkeleton(height: 50, radius: AppRadius.md),
+                      SizedBox(height: AppSpacing.md),
+                      AppSkeleton(height: 50, radius: AppRadius.md),
+                    ],
                   )
                 else ...<Widget>[
                   FilledButton.icon(

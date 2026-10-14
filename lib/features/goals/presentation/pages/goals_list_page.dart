@@ -9,6 +9,7 @@ import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/presentation/providers/goals_providers.dart';
 import 'package:ledgerly/features/goals/presentation/widgets/goal_card.dart';
+import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Hub page displaying savings goals organized into Active, Completed, and Archived tabs.
@@ -173,7 +174,7 @@ class _GoalsTab extends StatelessWidget {
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const LoadingPlaceholder(),
       error: (e, _) => Center(child: Text('Error: $e')),
     );
   }

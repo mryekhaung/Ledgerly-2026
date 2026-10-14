@@ -150,7 +150,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
         children: <Widget>[
           // Active Accounts Tab
           activeAccountsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const LoadingPlaceholder(),
             error: (_, _) => StatePlaceholder(
               icon: Icons.error_outline,
               title: strings('stateErrorTitle'),
@@ -200,7 +200,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
 
           // Archived Accounts Tab
           archivedAccountsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const LoadingPlaceholder(),
             error: (_, _) => StatePlaceholder(
               icon: Icons.error_outline,
               title: strings('stateErrorTitle'),

@@ -334,46 +334,76 @@ void main() {
 
   group('design rule: loading is a skeleton (docs/Design.md §5.11)', () {
     test('should_not_show_a_centered_spinner_on_first_paint', () {
-      final sites = scan(const <String>[
-        'lib/features',
-        'lib/app',
-      ], RegExp(r'CircularProgressIndicator'));
+      // §5.11 bans the *first-paint* spinner, not every spinner. Two kinds are
+      // legitimate and are dismissed here rather than budgeted, so the rule can
+      // sit at zero and every future spinner has to justify itself:
+      //
+      //   1. A **busy indicator inside a control** — a `Submit` button that
+      //      swaps its label for a thin spinner. §5.11 does not cover this: the
+      //      affordance is the button and the page is not blanked. These always
+      //      set a thin `strokeWidth` (they are 18-20 px, where the default
+      //      4 px ring swamps the label).
+      //   2. **`AppSkeleton`** — the sanctioned first-paint treatment, which
+      //      happens to animate and so mentions no spinner at all.
+      //
+      // `AppSkeleton` therefore never matches, and a bare
+      // `CircularProgressIndicator()` in a page body still does.
+      //
+      // The `strokeWidth` tell can land on the *next* line (a formatted
+      // `CircularProgressIndicator(\n strokeWidth: 2,\n)`), so the dismissal
+      // looks one line ahead. `scan` is line-scoped, so the join happens here.
+      final allLines = <String, List<String>>{};
+      final sites = scan(
+        const <String>['lib/features', 'lib/app'],
+        RegExp(r'CircularProgressIndicator'),
+        dismiss: (line) => line.contains('strokeWidth'),
+      );
+
+      // Re-scan, dismissing on the joined (line, next-line) text so a spinner
+      // whose `strokeWidth` wrapped onto the following line is still treated as
+      // a busy indicator.
+      final refined = <Site>[];
+      for (final site in sites) {
+        final lines = allLines.putIfAbsent(site.file, () {
+          final file = File(site.file);
+          return file.existsSync() ? file.readAsLinesSync() : const <String>[];
+        });
+        final next = site.lineNumber < lines.length
+            ? withoutComment(lines[site.lineNumber])
+            : '';
+        if (next.contains('strokeWidth')) continue;
+        refined.add(site);
+      }
 
       expectWithinBudget(
         'first-paint spinner',
         'docs/Design.md §5.11 — "never a centered spinner"; first paint is a '
             'skeleton matching the final layout',
-        sites,
-        const <String, int>{
-          // A spinner inside a *submitting button* is legitimate: the affordance
-          // is the button, not a blanked page. These stay until the button
-          // variants grow a busy state.
-          'lib/features/accounts/presentation/pages/account_form_page.dart': 1,
-          'lib/features/accounts/presentation/pages/transfer_page.dart': 3,
-          'lib/features/accounts/presentation/pages/accounts_page.dart': 2,
-          'lib/features/auth/presentation/pages/sign_in_page.dart': 1,
-          'lib/features/auth/presentation/pages/welcome_page.dart': 1,
-          'lib/features/budgets/presentation/pages/budget_form_page.dart': 1,
-          'lib/features/categories/presentation/pages/category_form_page.dart':
-              1,
-          'lib/features/goals/presentation/pages/goal_form_page.dart': 1,
-          'lib/features/goals/presentation/pages/goals_list_page.dart': 1,
-          'lib/features/goals/presentation/widgets/goal_contribution_dialog.dart':
-              1,
-          'lib/features/profile/presentation/pages/avatar_editor_page.dart': 1,
-          'lib/features/recurring/presentation/pages/recurring_form_page.dart':
-              1,
-          'lib/features/recurring/presentation/pages/recurring_list_page.dart':
-              1,
-          // The shared placeholder. Replacing its body with a skeleton builder
-          // fixes every `loading:` call site at once, so this is the highest
-          // leverage single fix in the burn-down.
-          'lib/features/shared/presentation/widgets/state_placeholder.dart': 1,
-          'lib/features/transactions/presentation/pages/transaction_form_page.dart':
-              1,
-          'lib/features/transactions/presentation/pages/transactions_list_page.dart':
-              1,
-        },
+        refined,
+        const <String, int>{},
+      );
+    });
+
+    test('should_dismiss_only_the_busy_indicator_form', () {
+      // Pins the dismissal above: a thin spinner is allowed, a bare one is not.
+      final pattern = RegExp(r'CircularProgressIndicator');
+      bool dismiss(String line) => line.contains('strokeWidth');
+
+      expect(
+        dismiss('child: CircularProgressIndicator(strokeWidth: 2),'),
+        isTrue,
+        reason: 'A busy indicator inside a button carries a strokeWidth.',
+      );
+      expect(
+        dismiss(
+          'loading: () => const Center(child: CircularProgressIndicator()),',
+        ),
+        isFalse,
+        reason: 'A first-paint spinner is bare, so it must not be dismissed.',
+      );
+      expect(
+        pattern.hasMatch('child: CircularProgressIndicator.adaptive(),'),
+        isTrue,
       );
     });
   });

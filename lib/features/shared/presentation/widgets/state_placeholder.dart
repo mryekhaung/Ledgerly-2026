@@ -1,5 +1,6 @@
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/widgets/app_skeleton.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// A centred empty/loading/error placeholder.
@@ -84,21 +85,26 @@ class StatePlaceholder extends StatelessWidget {
   }
 }
 
-/// A centred spinner for a first-load state.
+/// A skeleton list for a first-load state (docs/Design.md §5.11).
 ///
-/// A distinct widget from [StatePlaceholder] because a loading screen has no
-/// message worth reading — showing "Loading…" text for 200 ms is noise.
+/// §5.11: *"Loading (first paint): skeleton matching final layout
+/// (`surfaceSubtle` shimmer), **never a centered spinner**."* So this is not a
+/// spinner with a friendlier name — it draws the shape of the rows that are
+/// about to arrive, which removes the layout jump the spinner caused.
+///
+/// It lives here, next to [StatePlaceholder], because the loading/empty/error
+/// trio is one family in §5.11 and splitting them across files is how they
+/// drift apart.
 class LoadingPlaceholder extends StatelessWidget {
   /// Creates a loading placeholder.
-  const LoadingPlaceholder({super.key});
+  const LoadingPlaceholder({this.rows = 5, super.key});
+
+  /// How many skeleton rows to draw. Pick the count that fills the viewport
+  /// for the screen in question so the skeleton does not itself scroll.
+  final int rows;
 
   @override
-  Widget build(BuildContext context) => const Center(
-    child: Padding(
-      padding: EdgeInsets.all(AppSpacing.xl),
-      child: CircularProgressIndicator.adaptive(),
-    ),
-  );
+  Widget build(BuildContext context) => AppSkeletonList(rows: rows);
 }
 
 /// An inline error banner with a retry affordance.
