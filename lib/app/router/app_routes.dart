@@ -65,4 +65,8 @@ abstract final class AppRoutes {
   /// Account management page (Phase 2).
   static const String account = '/settings/account';
   static const String accountName = 'account';
+
+  /// Data transfer, export, import, and backup page (Phase 2).
+  static const String dataTransfer = '/settings/data-transfer';
+  static const String dataTransferName = 'dataTransfer';
 }

@@ -694,4 +694,137 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get authErrorEmailAlreadyInUse => 'ဤအီးမေးလ်ကို အသုံးပြုပြီးဖြစ်ပါသည်';
+
+  @override
+  String get settingsDataTransfer => 'ဒေတာနှင့် အရန်သိမ်းဆည်းမှု';
+
+  @override
+  String get settingsDataTransferSubtitle =>
+      'စာရင်းများထုတ်ယူခြင်း၊ ထည့်သွင်းခြင်းနှင့် အရန်သိမ်းခြင်း';
+
+  @override
+  String get dataTransferTitle => 'ဒေတာ စီမံခန့်ခွဲမှု';
+
+  @override
+  String get dataTransferTabExport => 'ထုတ်ယူရန်';
+
+  @override
+  String get dataTransferTabImport => 'ထည့်သွင်းရန်';
+
+  @override
+  String get dataTransferTabBackup => 'အရန်သိမ်း/ပြန်ယူ';
+
+  @override
+  String get exportFormatLabel => 'ဖော်မတ်';
+
+  @override
+  String get exportRangeLabel => 'ကာလအပိုင်းအခြား';
+
+  @override
+  String get exportPresetThisPeriod => 'ယခုကာလ';
+
+  @override
+  String get exportPresetLastPeriod => 'ပြီးခဲ့သည့်ကာလ';
+
+  @override
+  String get exportPresetAllTime => 'အားလုံး';
+
+  @override
+  String get exportPresetCustom => 'စိတ်ကြိုက်';
+
+  @override
+  String get exportSummaryTitle => 'ထုတ်ယူမည့် အကျဉ်းချုပ်';
+
+  @override
+  String get exportActionExport => 'ထုတ်ယူပြီး ကူးယူမည်';
+
+  @override
+  String get exportSuccessCopied => 'ဒေတာများကို clipboard သို့ ကူးယူပြီးပါပြီ';
+
+  @override
+  String get exportTotalRecords => 'စာရင်း အရေအတွက်';
+
+  @override
+  String get exportTotalIncome => 'ဝင်ငွေ စုစုပေါင်း';
+
+  @override
+  String get exportTotalExpense => 'အသုံးစရိတ် စုစုပေါင်း';
+
+  @override
+  String get importSourceLabel => 'CSV / JSON စာရင်း အရင်းအမြစ်';
+
+  @override
+  String get importPasteHint =>
+      'CSV သို့မဟုတ် JSON စာရင်းများကို ဤနေရာတွင် paste ချပါ...';
+
+  @override
+  String get importActionParse => 'ဒေတာ စစ်ဆေးမည်';
+
+  @override
+  String get importPreviewTitle => 'ထည့်သွင်းမည့် အကြိုကြည့်ရှုမှု';
+
+  @override
+  String get importTotalRows => 'စာရင်း စုစုပေါင်း';
+
+  @override
+  String get importValidRows => 'မှန်ကန်သော စာရင်းများ';
+
+  @override
+  String get importDuplicateRows => 'စာရင်းထပ်နေမှုများ';
+
+  @override
+  String get importNewCategories => 'ကဏ္ဍ အသစ်များ';
+
+  @override
+  String get importSkipDuplicates => 'ထပ်နေသော စာရင်းများကို ချန်လှပ်မည်';
+
+  @override
+  String get importAutoCreateCategories =>
+      'ကဏ္ဍအသစ်များကို အလိုအလျောက် ဖန်တီးမည်';
+
+  @override
+  String get importActionExecute => 'စာရင်းများ ထည့်သွင်းမည်';
+
+  @override
+  String get importSuccess => 'စာရင်းများကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ';
+
+  @override
+  String get backupTitle => 'အရန်သိမ်းဆည်းမှု အပြည့်အစုံ';
+
+  @override
+  String get backupDescription =>
+      'သင့်ဆက်တင်များ၊ ကဏ္ဍများနှင့် ငွေစာရင်းမှတ်တမ်းအားလုံးပါဝင်သော အော့ဖ်လိုင်း JSON archive အပြည့်အစုံကို ထုတ်ယူသိမ်းဆည်းပါ။';
+
+  @override
+  String get backupActionCreate => 'အရန်သိမ်း ဖိုင်ထုတ်မည်';
+
+  @override
+  String get backupCreatedSuccess =>
+      'အရန်သိမ်းဒေတာ ထုတ်ယူပြီး clipboard သို့ ကူးယူပြီးပါပြီ';
+
+  @override
+  String get restoreTitle => 'အရန်သိမ်းဒေတာ ပြန်လည်ရယူရန်';
+
+  @override
+  String get restorePasteHint =>
+      'Ledgerly အရန်သိမ်း JSON archive ကို ဤနေရာတွင် ထည့်ပါ...';
+
+  @override
+  String get restoreActionParse => 'အရန်သိမ်းဒေတာ ဖွင့်မည်';
+
+  @override
+  String get restoreActionExecute => 'ဒေတာများ ပြန်လည်ရယူမည်';
+
+  @override
+  String get restoreModeMerge => 'ရှိပြီးသား စာရင်းများနှင့် ပေါင်းစပ်မည်';
+
+  @override
+  String get restoreModeOverwrite => 'ရှိပြီးသား စာရင်းအားလုံးကို အစားထိုးမည်';
+
+  @override
+  String get restoreOverwriteWarning =>
+      'သတိပေးချက် - အစားထိုးပါက လက်ရှိကဏ္ဍများနှင့် ငွေစာရင်းမှတ်တမ်းအားလုံး ပျက်စီးသွားပါမည်။';
+
+  @override
+  String get restoreSuccess => 'ဒေတာများ အောင်မြင်စွာ ပြန်လည်ရယူပြီးပါပြီ';
 }

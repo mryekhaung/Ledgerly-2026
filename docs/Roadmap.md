@@ -202,9 +202,22 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
 - ☑ **Guest → account linking + merge prompt**:
   - ✅ Account linking implemented via `LinkAccount` use case and UI banner in `AccountPage` to link anonymous guest accounts to permanent Google, Apple, or Email credentials without losing local budget history.
 - ☑ **Transactions list page: search, filters, paging** — Debounced search (notes & categories), filter chips (direction, category picker, date range picker, min/max amount range), modal filter bottom sheet (`TransactionFilterSheet`), infinite scrolling paging (`TransactionsListNotifier`), swipe-to-delete with undo bar, tap-to-edit, responsive layout, accessible semantics. Covered by unit and widget test suites.
-- ☐ Export CSV/JSON (+ share) — range presets ("this period", "last period") come from `PeriodCalculator`
-- ☐ Import CSV/JSON with mapping, preview, dedupe (isolate)
-- ☐ Full backup/restore
+- ☑ **Export CSV/JSON (+ clipboard/share)**:
+  - Range presets ("this period", "last period", "all time", "custom") computed via `PeriodCalculator` and `BudgetPeriod`.
+  - Pure Dart RFC 4180 CSV codec and JSON exporter formatting transactions with date, category, amount, currency, direction, and notes.
+  - Export preview summary showing transaction count, total income, and total expense.
+  - Clipboard copy and export feedback via `AppFeedback.confirm`.
+- ☑ **Import CSV/JSON with column mapping, preview, deduplication**:
+  - RFC 4180 compliant CSV parser and JSON parser handling commas, quotes, and multiline text.
+  - Interactive column mapping preview with column type selectors (Date, Category, Amount, Currency, Direction, Note).
+  - In-memory signature-based deduplication engine (`DeduplicationEngine`) detecting existing transactions.
+  - Import options: skip duplicates, auto-create missing categories.
+  - Detailed import result reporting rows imported, duplicates skipped, and categories created.
+- ☑ **Full Backup & Restore**:
+  - Schema-versioned full JSON archive encoding categories, transactions, and user app settings.
+  - Backup metadata extraction (version, timestamp, record counts) for safe preview before restoring.
+  - Two restore modes: Merge (safely adds missing categories and non-duplicate transactions) and Overwrite (atomically wipes and replaces all categories, transactions, and settings).
+  - Hub UI page at `/settings/data-transfer` (`DataTransferPage`) with responsive layout, SegmentedTabs switching, 38 localized strings in en/my/ja, Riverpod 3 purity, and 19 passing tests.
 
 ## Phase 3 — "Manage" (v0.3) — NOT STARTED
 

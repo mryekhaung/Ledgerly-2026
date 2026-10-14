@@ -1389,6 +1389,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This email is already in use'**
   String get authErrorEmailAlreadyInUse;
+
+  /// Label for data transfer and backup row in settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Data & Backup'**
+  String get settingsDataTransfer;
+
+  /// Subtitle for data transfer and backup row in settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Export, import, and backup database'**
+  String get settingsDataTransferSubtitle;
+
+  /// App bar title for Data Transfer page.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Transfer'**
+  String get dataTransferTitle;
+
+  /// Tab label for Export.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get dataTransferTabExport;
+
+  /// Tab label for Import.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get dataTransferTabImport;
+
+  /// Tab label for Backup & Restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get dataTransferTabBackup;
+
+  /// Label for export format choice.
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get exportFormatLabel;
+
+  /// Label for export date range.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Range'**
+  String get exportRangeLabel;
+
+  /// Export range preset for this pay period.
+  ///
+  /// In en, this message translates to:
+  /// **'This Period'**
+  String get exportPresetThisPeriod;
+
+  /// Export range preset for last pay period.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Period'**
+  String get exportPresetLastPeriod;
+
+  /// Export range preset for all transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'All Time'**
+  String get exportPresetAllTime;
+
+  /// Export range preset for custom dates.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get exportPresetCustom;
+
+  /// Title above export count and totals.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Summary'**
+  String get exportSummaryTitle;
+
+  /// Button to trigger export and copy content to clipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Export & Copy'**
+  String get exportActionExport;
+
+  /// Snackbar feedback when export is copied.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported data copied to clipboard'**
+  String get exportSuccessCopied;
+
+  /// Count of transactions in export.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get exportTotalRecords;
+
+  /// Total income in export summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get exportTotalIncome;
+
+  /// Total expense in export summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get exportTotalExpense;
+
+  /// Label above import input field.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV / JSON Source'**
+  String get importSourceLabel;
+
+  /// Placeholder for import text input.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste CSV or JSON transaction records here...'**
+  String get importPasteHint;
+
+  /// Button to parse import source.
+  ///
+  /// In en, this message translates to:
+  /// **'Parse Data'**
+  String get importActionParse;
+
+  /// Title above import preview results.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Preview'**
+  String get importPreviewTitle;
+
+  /// Total rows found in imported content.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Rows'**
+  String get importTotalRows;
+
+  /// Valid rows ready to be imported.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid Rows'**
+  String get importValidRows;
+
+  /// Duplicate rows detected.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate Rows'**
+  String get importDuplicateRows;
+
+  /// New categories detected from import.
+  ///
+  /// In en, this message translates to:
+  /// **'New Categories'**
+  String get importNewCategories;
+
+  /// Checkbox to skip duplicate records.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip duplicate records'**
+  String get importSkipDuplicates;
+
+  /// Checkbox to auto-create categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically create new categories'**
+  String get importAutoCreateCategories;
+
+  /// Button to commit import to database.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Transactions'**
+  String get importActionExecute;
+
+  /// Success message after import completes.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions successfully imported'**
+  String get importSuccess;
+
+  /// Title for full app backup section.
+  ///
+  /// In en, this message translates to:
+  /// **'Full App Backup'**
+  String get backupTitle;
+
+  /// Description of full backup archive.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a complete, offline JSON archive containing all your settings, categories, and transaction history.'**
+  String get backupDescription;
+
+  /// Button to create full backup archive.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Full Backup'**
+  String get backupActionCreate;
+
+  /// Success message when backup is created.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup created & copied to clipboard'**
+  String get backupCreatedSuccess;
+
+  /// Title for restore section.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from Backup'**
+  String get restoreTitle;
+
+  /// Placeholder for restore JSON input.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste Ledgerly backup JSON archive here...'**
+  String get restorePasteHint;
+
+  /// Button to inspect backup JSON.
+  ///
+  /// In en, this message translates to:
+  /// **'Load Backup'**
+  String get restoreActionParse;
+
+  /// Button to execute restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Backup'**
+  String get restoreActionExecute;
+
+  /// Radio option to merge backup data.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge with existing data'**
+  String get restoreModeMerge;
+
+  /// Radio option to overwrite all database data.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace all existing data'**
+  String get restoreModeOverwrite;
+
+  /// Destructive warning for overwrite restore mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning: Replacing will erase all existing categories and transactions.'**
+  String get restoreOverwriteWarning;
+
+  /// Success message after backup restoration.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup successfully restored'**
+  String get restoreSuccess;
 }
 
 class _AppLocalizationsDelegate

@@ -198,6 +198,13 @@ class SettingsPage extends ConsumerWidget {
                   onTap: () => context.pushNamed(AppRoutes.profileName),
                 ),
                 const _GroupDivider(),
+                _NavRow(
+                  label: strings('settingsDataTransfer'),
+                  subtitle: strings('settingsDataTransferSubtitle'),
+                  leading: const Icon(Icons.sync_alt_rounded),
+                  onTap: () => context.pushNamed(AppRoutes.dataTransferName),
+                ),
+                const _GroupDivider(),
                 _InfoRow(
                   label: strings('settingsVersionLabel'),
                   value: _AppVersion.display,

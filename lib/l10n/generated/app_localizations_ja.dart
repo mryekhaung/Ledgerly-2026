@@ -665,4 +665,130 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get authErrorEmailAlreadyInUse => 'このメールアドレスは既に使用されています';
+
+  @override
+  String get settingsDataTransfer => 'データとバックアップ';
+
+  @override
+  String get settingsDataTransferSubtitle => 'データのエクスポート・インポート・バックアップ';
+
+  @override
+  String get dataTransferTitle => 'データ管理';
+
+  @override
+  String get dataTransferTabExport => 'エクスポート';
+
+  @override
+  String get dataTransferTabImport => 'インポート';
+
+  @override
+  String get dataTransferTabBackup => 'バックアップ';
+
+  @override
+  String get exportFormatLabel => '形式';
+
+  @override
+  String get exportRangeLabel => '期間';
+
+  @override
+  String get exportPresetThisPeriod => '今期';
+
+  @override
+  String get exportPresetLastPeriod => '前期';
+
+  @override
+  String get exportPresetAllTime => 'すべて';
+
+  @override
+  String get exportPresetCustom => 'カスタム';
+
+  @override
+  String get exportSummaryTitle => 'エクスポート概要';
+
+  @override
+  String get exportActionExport => 'エクスポートしてコピー';
+
+  @override
+  String get exportSuccessCopied => 'データをクリップボードにコピーしました';
+
+  @override
+  String get exportTotalRecords => '取引件数';
+
+  @override
+  String get exportTotalIncome => '収入合計';
+
+  @override
+  String get exportTotalExpense => '支出合計';
+
+  @override
+  String get importSourceLabel => 'CSV / JSON データ元';
+
+  @override
+  String get importPasteHint => 'CSVまたはJSON取引データをここに貼り付けてください...';
+
+  @override
+  String get importActionParse => 'データを解析';
+
+  @override
+  String get importPreviewTitle => 'インポートプレビュー';
+
+  @override
+  String get importTotalRows => '全行数';
+
+  @override
+  String get importValidRows => '有効な取引';
+
+  @override
+  String get importDuplicateRows => '重複件数';
+
+  @override
+  String get importNewCategories => '新規カテゴリー';
+
+  @override
+  String get importSkipDuplicates => '重複レコードをスキップ';
+
+  @override
+  String get importAutoCreateCategories => '新規カテゴリーを自動作成';
+
+  @override
+  String get importActionExecute => '取引をインポート';
+
+  @override
+  String get importSuccess => '取引が正常にインポートされました';
+
+  @override
+  String get backupTitle => 'アプリの完全バックアップ';
+
+  @override
+  String get backupDescription => '設定、カテゴリー、取引履歴を含むオフラインJSONアーカイブを作成します。';
+
+  @override
+  String get backupActionCreate => '完全バックアップを作成';
+
+  @override
+  String get backupCreatedSuccess => 'バックアップを作成しコピーしました';
+
+  @override
+  String get restoreTitle => 'バックアップから復元';
+
+  @override
+  String get restorePasteHint => 'LedgerlyバックアップJSONをここに貼り付けてください...';
+
+  @override
+  String get restoreActionParse => 'バックアップを読み込み';
+
+  @override
+  String get restoreActionExecute => 'データを復元';
+
+  @override
+  String get restoreModeMerge => '既存のデータに統合';
+
+  @override
+  String get restoreModeOverwrite => 'すべてのデータを置き換え';
+
+  @override
+  String get restoreOverwriteWarning => '注意：置き換えると、既存のカテゴリーと取引データはすべて削除されます。';
+
+  @override
+  String get restoreSuccess => 'バックアップが正常に復元されました';
 }

@@ -687,4 +687,134 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authErrorEmailAlreadyInUse => 'This email is already in use';
+
+  @override
+  String get settingsDataTransfer => 'Data & Backup';
+
+  @override
+  String get settingsDataTransferSubtitle =>
+      'Export, import, and backup database';
+
+  @override
+  String get dataTransferTitle => 'Data Transfer';
+
+  @override
+  String get dataTransferTabExport => 'Export';
+
+  @override
+  String get dataTransferTabImport => 'Import';
+
+  @override
+  String get dataTransferTabBackup => 'Backup';
+
+  @override
+  String get exportFormatLabel => 'Format';
+
+  @override
+  String get exportRangeLabel => 'Date Range';
+
+  @override
+  String get exportPresetThisPeriod => 'This Period';
+
+  @override
+  String get exportPresetLastPeriod => 'Last Period';
+
+  @override
+  String get exportPresetAllTime => 'All Time';
+
+  @override
+  String get exportPresetCustom => 'Custom';
+
+  @override
+  String get exportSummaryTitle => 'Export Summary';
+
+  @override
+  String get exportActionExport => 'Export & Copy';
+
+  @override
+  String get exportSuccessCopied => 'Exported data copied to clipboard';
+
+  @override
+  String get exportTotalRecords => 'Transactions';
+
+  @override
+  String get exportTotalIncome => 'Income';
+
+  @override
+  String get exportTotalExpense => 'Expense';
+
+  @override
+  String get importSourceLabel => 'CSV / JSON Source';
+
+  @override
+  String get importPasteHint => 'Paste CSV or JSON transaction records here...';
+
+  @override
+  String get importActionParse => 'Parse Data';
+
+  @override
+  String get importPreviewTitle => 'Import Preview';
+
+  @override
+  String get importTotalRows => 'Total Rows';
+
+  @override
+  String get importValidRows => 'Valid Rows';
+
+  @override
+  String get importDuplicateRows => 'Duplicate Rows';
+
+  @override
+  String get importNewCategories => 'New Categories';
+
+  @override
+  String get importSkipDuplicates => 'Skip duplicate records';
+
+  @override
+  String get importAutoCreateCategories =>
+      'Automatically create new categories';
+
+  @override
+  String get importActionExecute => 'Import Transactions';
+
+  @override
+  String get importSuccess => 'Transactions successfully imported';
+
+  @override
+  String get backupTitle => 'Full App Backup';
+
+  @override
+  String get backupDescription =>
+      'Create a complete, offline JSON archive containing all your settings, categories, and transaction history.';
+
+  @override
+  String get backupActionCreate => 'Create Full Backup';
+
+  @override
+  String get backupCreatedSuccess => 'Backup created & copied to clipboard';
+
+  @override
+  String get restoreTitle => 'Restore from Backup';
+
+  @override
+  String get restorePasteHint => 'Paste Ledgerly backup JSON archive here...';
+
+  @override
+  String get restoreActionParse => 'Load Backup';
+
+  @override
+  String get restoreActionExecute => 'Restore Backup';
+
+  @override
+  String get restoreModeMerge => 'Merge with existing data';
+
+  @override
+  String get restoreModeOverwrite => 'Replace all existing data';
+
+  @override
+  String get restoreOverwriteWarning =>
+      'Warning: Replacing will erase all existing categories and transactions.';
+
+  @override
+  String get restoreSuccess => 'Backup successfully restored';
 }

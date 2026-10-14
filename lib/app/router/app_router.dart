@@ -9,6 +9,7 @@ import 'package:ledgerly/features/auth/presentation/pages/account_page.dart';
 import 'package:ledgerly/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:ledgerly/features/auth/presentation/pages/welcome_page.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
+import 'package:ledgerly/features/data_transfer/presentation/pages/data_transfer_page.dart';
 import 'package:ledgerly/features/insights/presentation/pages/insights_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/profile_page.dart';
@@ -81,6 +82,11 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             path: AppRoutes.account,
             name: AppRoutes.accountName,
             builder: (context, state) => const AccountPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.dataTransfer,
+            name: AppRoutes.dataTransferName,
+            builder: (context, state) => const DataTransferPage(),
           ),
         ],
       ),

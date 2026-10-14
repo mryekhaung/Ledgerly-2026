@@ -890,6 +890,174 @@
   "authErrorEmailAlreadyInUse": "This email is already in use",
   "@authErrorEmailAlreadyInUse": {
     "description": "Error when registering with an existing email."
+  },
+  "settingsDataTransfer": "Data & Backup",
+  "@settingsDataTransfer": {
+    "description": "Label for data transfer and backup row in settings."
+  },
+  "settingsDataTransferSubtitle": "Export, import, and backup database",
+  "@settingsDataTransferSubtitle": {
+    "description": "Subtitle for data transfer and backup row in settings."
+  },
+  "dataTransferTitle": "Data Transfer",
+  "@dataTransferTitle": {
+    "description": "App bar title for Data Transfer page."
+  },
+  "dataTransferTabExport": "Export",
+  "@dataTransferTabExport": {
+    "description": "Tab label for Export."
+  },
+  "dataTransferTabImport": "Import",
+  "@dataTransferTabImport": {
+    "description": "Tab label for Import."
+  },
+  "dataTransferTabBackup": "Backup",
+  "@dataTransferTabBackup": {
+    "description": "Tab label for Backup & Restore."
+  },
+  "exportFormatLabel": "Format",
+  "@exportFormatLabel": {
+    "description": "Label for export format choice."
+  },
+  "exportRangeLabel": "Date Range",
+  "@exportRangeLabel": {
+    "description": "Label for export date range."
+  },
+  "exportPresetThisPeriod": "This Period",
+  "@exportPresetThisPeriod": {
+    "description": "Export range preset for this pay period."
+  },
+  "exportPresetLastPeriod": "Last Period",
+  "@exportPresetLastPeriod": {
+    "description": "Export range preset for last pay period."
+  },
+  "exportPresetAllTime": "All Time",
+  "@exportPresetAllTime": {
+    "description": "Export range preset for all transactions."
+  },
+  "exportPresetCustom": "Custom",
+  "@exportPresetCustom": {
+    "description": "Export range preset for custom dates."
+  },
+  "exportSummaryTitle": "Export Summary",
+  "@exportSummaryTitle": {
+    "description": "Title above export count and totals."
+  },
+  "exportActionExport": "Export & Copy",
+  "@exportActionExport": {
+    "description": "Button to trigger export and copy content to clipboard."
+  },
+  "exportSuccessCopied": "Exported data copied to clipboard",
+  "@exportSuccessCopied": {
+    "description": "Snackbar feedback when export is copied."
+  },
+  "exportTotalRecords": "Transactions",
+  "@exportTotalRecords": {
+    "description": "Count of transactions in export."
+  },
+  "exportTotalIncome": "Income",
+  "@exportTotalIncome": {
+    "description": "Total income in export summary."
+  },
+  "exportTotalExpense": "Expense",
+  "@exportTotalExpense": {
+    "description": "Total expense in export summary."
+  },
+  "importSourceLabel": "CSV / JSON Source",
+  "@importSourceLabel": {
+    "description": "Label above import input field."
+  },
+  "importPasteHint": "Paste CSV or JSON transaction records here...",
+  "@importPasteHint": {
+    "description": "Placeholder for import text input."
+  },
+  "importActionParse": "Parse Data",
+  "@importActionParse": {
+    "description": "Button to parse import source."
+  },
+  "importPreviewTitle": "Import Preview",
+  "@importPreviewTitle": {
+    "description": "Title above import preview results."
+  },
+  "importTotalRows": "Total Rows",
+  "@importTotalRows": {
+    "description": "Total rows found in imported content."
+  },
+  "importValidRows": "Valid Rows",
+  "@importValidRows": {
+    "description": "Valid rows ready to be imported."
+  },
+  "importDuplicateRows": "Duplicate Rows",
+  "@importDuplicateRows": {
+    "description": "Duplicate rows detected."
+  },
+  "importNewCategories": "New Categories",
+  "@importNewCategories": {
+    "description": "New categories detected from import."
+  },
+  "importSkipDuplicates": "Skip duplicate records",
+  "@importSkipDuplicates": {
+    "description": "Checkbox to skip duplicate records."
+  },
+  "importAutoCreateCategories": "Automatically create new categories",
+  "@importAutoCreateCategories": {
+    "description": "Checkbox to auto-create categories."
+  },
+  "importActionExecute": "Import Transactions",
+  "@importActionExecute": {
+    "description": "Button to commit import to database."
+  },
+  "importSuccess": "Transactions successfully imported",
+  "@importSuccess": {
+    "description": "Success message after import completes."
+  },
+  "backupTitle": "Full App Backup",
+  "@backupTitle": {
+    "description": "Title for full app backup section."
+  },
+  "backupDescription": "Create a complete, offline JSON archive containing all your settings, categories, and transaction history.",
+  "@backupDescription": {
+    "description": "Description of full backup archive."
+  },
+  "backupActionCreate": "Create Full Backup",
+  "@backupActionCreate": {
+    "description": "Button to create full backup archive."
+  },
+  "backupCreatedSuccess": "Backup created & copied to clipboard",
+  "@backupCreatedSuccess": {
+    "description": "Success message when backup is created."
+  },
+  "restoreTitle": "Restore from Backup",
+  "@restoreTitle": {
+    "description": "Title for restore section."
+  },
+  "restorePasteHint": "Paste Ledgerly backup JSON archive here...",
+  "@restorePasteHint": {
+    "description": "Placeholder for restore JSON input."
+  },
+  "restoreActionParse": "Load Backup",
+  "@restoreActionParse": {
+    "description": "Button to inspect backup JSON."
+  },
+  "restoreActionExecute": "Restore Backup",
+  "@restoreActionExecute": {
+    "description": "Button to execute restore."
+  },
+  "restoreModeMerge": "Merge with existing data",
+  "@restoreModeMerge": {
+    "description": "Radio option to merge backup data."
+  },
+  "restoreModeOverwrite": "Replace all existing data",
+  "@restoreModeOverwrite": {
+    "description": "Radio option to overwrite all database data."
+  },
+  "restoreOverwriteWarning": "Warning: Replacing will erase all existing categories and transactions.",
+  "@restoreOverwriteWarning": {
+    "description": "Destructive warning for overwrite restore mode."
+  },
+  "restoreSuccess": "Backup successfully restored",
+  "@restoreSuccess": {
+    "description": "Success message after backup restoration."
   }
 }
 
