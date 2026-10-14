@@ -144,11 +144,6 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
             tooltip: strings('accountsTransferButton'),
             onPressed: _navigateToTransfer,
           ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: strings('accountsAddButton'),
-            onPressed: _navigateToAdd,
-          ),
         ],
       ),
       body: TabBarView(
@@ -243,11 +238,16 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToAdd,
-        backgroundColor: colors.brandPrimary,
-        foregroundColor: colors.textOnBrand,
-        child: const Icon(Icons.add),
+      floatingActionButton: activeAccountsAsync.maybeWhen(
+        data: (accounts) => accounts.isNotEmpty
+            ? FloatingActionButton(
+                onPressed: _navigateToAdd,
+                backgroundColor: colors.brandPrimary,
+                foregroundColor: colors.textOnBrand,
+                child: const Icon(Icons.add),
+              )
+            : null,
+        orElse: () => null,
       ),
     );
   }

@@ -127,7 +127,12 @@ class _SingleColumnLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.md,
+        AppSpacing.md,
+        AppSpacing.md + MediaQuery.paddingOf(context).bottom + 24,
+      ),
       children: <Widget>[
         InsightSummaryCard(
           summary: insights.summary,

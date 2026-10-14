@@ -67,20 +67,17 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
                 }
               },
             ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: strings('recurringNew'),
-            onPressed: () => context.push(AppRoutes.recurringNew),
-          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(AppRoutes.recurringNew),
-        icon: const Icon(Icons.add),
-        label: Text(strings('recurringNew')),
-        backgroundColor: colors.brandPrimary,
-        foregroundColor: colors.textOnBrand,
-      ),
+      floatingActionButton: displayedItems.isNotEmpty
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push(AppRoutes.recurringNew),
+              icon: const Icon(Icons.add),
+              label: Text(strings('recurringNew')),
+              backgroundColor: colors.brandPrimary,
+              foregroundColor: colors.textOnBrand,
+            )
+          : null,
       body: ListView(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,

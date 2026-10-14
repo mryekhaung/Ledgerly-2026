@@ -69,23 +69,16 @@ class BudgetsPage extends ConsumerWidget {
     final currency = ref.watch(currencyProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(strings('budgetsTitle')),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: strings('budgetsNew'),
-            onPressed: () => context.push(AppRoutes.budgetNew),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(AppRoutes.budgetNew),
-        icon: const Icon(Icons.add),
-        label: Text(strings('budgetsNew')),
-        backgroundColor: colors.brandPrimary,
-        foregroundColor: colors.textOnBrand,
-      ),
+      appBar: AppBar(title: Text(strings('budgetsTitle'))),
+      floatingActionButton: categoryProgresses.isNotEmpty
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push(AppRoutes.budgetNew),
+              icon: const Icon(Icons.add),
+              label: Text(strings('budgetsNew')),
+              backgroundColor: colors.brandPrimary,
+              foregroundColor: colors.textOnBrand,
+            )
+          : null,
       body: ListView(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,

@@ -43,11 +43,11 @@ class SettingsPage extends ConsumerWidget {
       body: ConstrainedPane(
         maxWidth: AppSpacing.proseMaxWidth,
         child: ListView(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppSpacing.pageHorizontal(
-              MediaQuery.sizeOf(context).width,
-            ),
-            vertical: AppSpacing.lg,
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.pageHorizontal(MediaQuery.sizeOf(context).width),
+            AppSpacing.lg,
+            AppSpacing.pageHorizontal(MediaQuery.sizeOf(context).width),
+            AppSpacing.lg + MediaQuery.paddingOf(context).bottom + 24,
           ),
           children: <Widget>[
             _SectionHeader(label: strings('settingsPreferencesSection')),

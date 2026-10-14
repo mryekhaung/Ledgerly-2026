@@ -83,12 +83,17 @@ class _GoalsListPageState extends ConsumerState<GoalsListPage>
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(AppRoutes.goalsNew),
-        backgroundColor: colors.moneyIn,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add),
-        label: Text(strings('newGoal')),
+      floatingActionButton: activeGoalsAsync.maybeWhen(
+        data: (goals) => goals.isNotEmpty
+            ? FloatingActionButton.extended(
+                onPressed: () => context.push(AppRoutes.goalsNew),
+                backgroundColor: colors.moneyIn,
+                foregroundColor: Colors.white,
+                icon: const Icon(Icons.add),
+                label: Text(strings('newGoal')),
+              )
+            : null,
+        orElse: () => null,
       ),
     );
   }

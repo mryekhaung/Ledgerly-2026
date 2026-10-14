@@ -82,7 +82,7 @@ void main() {
 
       expect(find.text('Recurring Transactions'), findsOneWidget);
       expect(find.text('No recurring transactions'), findsOneWidget);
-      expect(find.byType(FloatingActionButton), findsOneWidget);
+      expect(find.byType(FloatingActionButton), findsNothing);
     });
 
     testWidgets('renders active recurring items and pending banner', (
@@ -111,6 +111,7 @@ void main() {
       expect(find.byType(RecurringItemCard), findsNWidgets(2));
       expect(find.text('Netflix 4K'), findsOneWidget);
       expect(find.text('Gym Membership'), findsOneWidget);
+      expect(find.byType(FloatingActionButton), findsOneWidget);
     });
   });
 

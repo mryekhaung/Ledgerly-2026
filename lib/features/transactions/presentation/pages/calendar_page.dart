@@ -126,7 +126,7 @@ class CalendarPage extends ConsumerWidget {
                 ...monthPane,
                 const SizedBox(height: AppSpacing.lg),
                 _DayList(day: state.selectedDay),
-                const SizedBox(height: AppSpacing.lg),
+                SizedBox(height: 80 + MediaQuery.paddingOf(context).bottom),
               ],
             ),
       floatingActionButton: FloatingActionButton(
