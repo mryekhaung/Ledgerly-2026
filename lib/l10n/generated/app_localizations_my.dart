@@ -588,4 +588,110 @@ class AppLocalizationsMy extends AppLocalizations {
   @override
   String get transactionsNoResultsBody =>
       'ရှာဖွေမှု သို့မဟုတ် filter များကို ပြောင်းလဲစမ်းသပ်ကြည့်ပါ။';
+
+  @override
+  String get welcomeTitle => 'Ledgerly မှ ကြိုဆိုပါသည်';
+
+  @override
+  String get welcomeSubtitle =>
+      'သင့်ငွေကြေးစီမံခန့်ခွဲမှုကို လွယ်ကူထိရောက်စွာ ပြုလုပ်ပါ';
+
+  @override
+  String get welcomeMonthStartQuestion =>
+      'သင့်လစာစက်ဝန်း မည်သည့်ရက်တွင် စတင်သနည်း။';
+
+  @override
+  String get welcomeMonthStartHelp =>
+      'သင့်လစာ သို့မဟုတ် ဝင်ငွေရရှိသည့်ရက်ကို ရွေးချယ်ပါ။ နောက်မှလည်း အချိန်မရွေး ပြောင်းလဲနိုင်ပါသည်။';
+
+  @override
+  String get welcomeGetStarted => 'စတင်မည်';
+
+  @override
+  String get welcomeSkip => 'လောလောဆယ် ကျော်မည်';
+
+  @override
+  String get continueAsGuest => 'အကောင့်မသုံးဘဲ ဆက်သွားမည်';
+
+  @override
+  String get signInWithGoogle => 'Google ဖြင့် ဝင်မည်';
+
+  @override
+  String get signInWithApple => 'Apple ဖြင့် ဝင်မည်';
+
+  @override
+  String get signInWithEmail => 'အီးမေးလ်ဖြင့် ဝင်မည်';
+
+  @override
+  String get signInTitle => 'အကောင့်ဝင်ရန်';
+
+  @override
+  String get signUpTitle => 'အကောင့်အသစ်ဖွင့်ရန်';
+
+  @override
+  String get emailLabel => 'အီးမေးလ်လိပ်စာ';
+
+  @override
+  String get passwordLabel => 'စကားဝှက်';
+
+  @override
+  String get displayNameLabel => 'အမည်';
+
+  @override
+  String get forgotPassword => 'စကားဝှက် မေ့နေပါသလား';
+
+  @override
+  String get noAccountPrompt => 'အကောင့်မရှိသေးဘူးလား။ အသစ်ဖွင့်ပါ';
+
+  @override
+  String get haveAccountPrompt => 'အကောင့်ရှိပြီးသားလား။ ဝင်ပါ';
+
+  @override
+  String get accountTitle => 'အကောင့်';
+
+  @override
+  String get accountGuestBadge => 'ဧည့်သည် အကောင့်';
+
+  @override
+  String get accountLinkedBadge => 'ချိတ်ဆက်ပြီး အကောင့်';
+
+  @override
+  String get accountLinkBannerTitle =>
+      'သင့်စာရင်းများကို လုံခြုံစွာ သိမ်းဆည်းပါ';
+
+  @override
+  String get accountLinkBannerBody =>
+      'ဖုန်းလဲသည့်အခါ စာရင်းများမပျောက်စေရန် အကောင့်ဖြင့် ချိတ်ဆက်ထားပါ။';
+
+  @override
+  String get accountLinkGoogle => 'Google အကောင့် ချိတ်ဆက်မည်';
+
+  @override
+  String get accountLinkApple => 'Apple ID ချိတ်ဆက်မည်';
+
+  @override
+  String get accountSignOut => 'အကောင့်မှ ထွက်မည်';
+
+  @override
+  String get accountSignOutConfirm => 'အကောင့်မှ ထွက်ရန် သေချာပါသလား။';
+
+  @override
+  String get accountDeleteTitle => 'အကောင့်ဖျက်သိမ်းရန်';
+
+  @override
+  String get accountDeleteBody =>
+      'ဤလုပ်ဆောင်ချက်သည် သင့်အကောင့်နှင့် ငွေစာရင်းမှတ်တမ်းအားလုံးကို ထာဝရ ဖျက်ဆီးပါမည်။ ပြန်လည်ရယူနိုင်မည် မဟုတ်ပါ။';
+
+  @override
+  String get accountDeleteConfirm => 'အပြီးဖျက်မည်';
+
+  @override
+  String get accountDeletedSuccess => 'အကောင့်ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ';
+
+  @override
+  String get authErrorInvalidCredentials =>
+      'အီးမေးလ် သို့မဟုတ် စကားဝှက် မှားယွင်းနေပါသည်';
+
+  @override
+  String get authErrorEmailAlreadyInUse => 'ဤအီးမေးလ်ကို အသုံးပြုပြီးဖြစ်ပါသည်';
 }

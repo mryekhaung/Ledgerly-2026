@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
 import 'package:ledgerly/features/profile/presentation/widgets/avatar.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
@@ -178,6 +179,16 @@ class SettingsPage extends ConsumerWidget {
             const SizedBox(height: AppSpacing.sm),
             _SettingsGroup(
               children: <Widget>[
+                _NavRow(
+                  label: strings('accountTitle'),
+                  subtitle: ref.watch(isGuestProvider)
+                      ? strings('accountGuestBadge')
+                      : (ref.watch(currentUserProvider)?.email ??
+                            strings('accountLinkedBadge')),
+                  leading: const Icon(Icons.manage_accounts_outlined),
+                  onTap: () => context.pushNamed(AppRoutes.accountName),
+                ),
+                const _GroupDivider(),
                 _NavRow(
                   label: strings('profileTitle'),
                   leading: Avatar(

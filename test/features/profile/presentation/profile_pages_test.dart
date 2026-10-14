@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_catalog.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_config.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
@@ -35,6 +36,8 @@ void main() {
     return ProviderScope(
       overrides: [
         userProfileProvider.overrideWith((ref) => Stream.value(profile)),
+        isGuestProvider.overrideWithValue(true),
+        currentUserProvider.overrideWithValue(null),
         if (random case final random?)
           avatarRandomProvider.overrideWithValue(random),
       ],

@@ -5,6 +5,9 @@ import 'package:ledgerly/app/router/app_shell.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/features/auth/presentation/pages/account_page.dart';
+import 'package:ledgerly/features/auth/presentation/pages/sign_in_page.dart';
+import 'package:ledgerly/features/auth/presentation/pages/welcome_page.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
 import 'package:ledgerly/features/insights/presentation/pages/insights_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
@@ -74,7 +77,25 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             name: AppRoutes.profileName,
             builder: (context, state) => const ProfilePage(),
           ),
+          GoRoute(
+            path: AppRoutes.account,
+            name: AppRoutes.accountName,
+            builder: (context, state) => const AccountPage(),
+          ),
         ],
+      ),
+
+      // Onboarding / Welcome and Sign-In are top-level routes OUTSIDE the shell
+      // (no bottom navigation bar).
+      GoRoute(
+        path: AppRoutes.welcome,
+        name: AppRoutes.welcomeName,
+        builder: (context, state) => const WelcomePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.signIn,
+        name: AppRoutes.signInName,
+        builder: (context, state) => const SignInPage(),
       ),
 
       // Add / edit transaction are top-level (outside the shell) so they can be

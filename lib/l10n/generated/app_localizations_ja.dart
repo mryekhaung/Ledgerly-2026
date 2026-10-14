@@ -566,4 +566,103 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get transactionsNoResultsBody => '検索キーワードやフィルターを変更してみてください。';
+
+  @override
+  String get welcomeTitle => 'Ledgerlyへようこそ';
+
+  @override
+  String get welcomeSubtitle => '簡単でスマートなお金の管理';
+
+  @override
+  String get welcomeMonthStartQuestion => '月の開始日はいつですか？';
+
+  @override
+  String get welcomeMonthStartHelp => '給与日や収入のサイクルに合わせて設定できます。後からいつでも変更可能です。';
+
+  @override
+  String get welcomeGetStarted => '使ってみる';
+
+  @override
+  String get welcomeSkip => '今はスキップ';
+
+  @override
+  String get continueAsGuest => 'ゲストとして続ける';
+
+  @override
+  String get signInWithGoogle => 'Googleでログイン';
+
+  @override
+  String get signInWithApple => 'Appleでサインイン';
+
+  @override
+  String get signInWithEmail => 'メールアドレスでログイン';
+
+  @override
+  String get signInTitle => 'ログイン';
+
+  @override
+  String get signUpTitle => 'アカウント作成';
+
+  @override
+  String get emailLabel => 'メールアドレス';
+
+  @override
+  String get passwordLabel => 'パスワード';
+
+  @override
+  String get displayNameLabel => 'お名前';
+
+  @override
+  String get forgotPassword => 'パスワードをお忘れですか？';
+
+  @override
+  String get noAccountPrompt => 'アカウントをお持ちでないですか？ 登録';
+
+  @override
+  String get haveAccountPrompt => 'すでにアカウントをお持ちですか？ ログイン';
+
+  @override
+  String get accountTitle => 'アカウント';
+
+  @override
+  String get accountGuestBadge => 'ゲストアカウント';
+
+  @override
+  String get accountLinkedBadge => '連携済みアカウント';
+
+  @override
+  String get accountLinkBannerTitle => 'データを安全に保護';
+
+  @override
+  String get accountLinkBannerBody => 'アカウントを連携すると、機種変更時でもデータを引き継げます。';
+
+  @override
+  String get accountLinkGoogle => 'Googleアカウントを連携';
+
+  @override
+  String get accountLinkApple => 'Appleで連携';
+
+  @override
+  String get accountSignOut => 'ログアウト';
+
+  @override
+  String get accountSignOutConfirm => 'ログアウトしてもよろしいですか？';
+
+  @override
+  String get accountDeleteTitle => 'アカウント削除';
+
+  @override
+  String get accountDeleteBody => 'アカウントとすべての関連データが完全に削除されます。この操作は取り消せません。';
+
+  @override
+  String get accountDeleteConfirm => '完全に削除';
+
+  @override
+  String get accountDeletedSuccess => 'アカウントが削除されました';
+
+  @override
+  String get authErrorInvalidCredentials => 'メールアドレスまたはパスワードが正しくありません';
+
+  @override
+  String get authErrorEmailAlreadyInUse => 'このメールアドレスは既に使用されています';
 }

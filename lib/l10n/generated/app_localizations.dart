@@ -1191,6 +1191,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try adjusting your search or filters to find what you\'re looking for.'**
   String get transactionsNoResultsBody;
+
+  /// Main title on welcome/onboarding screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Ledgerly'**
+  String get welcomeTitle;
+
+  /// Subtitle on welcome screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Master your money, effortlessly.'**
+  String get welcomeSubtitle;
+
+  /// First-run onboarding question for pay-cycle start day.
+  ///
+  /// In en, this message translates to:
+  /// **'When does your month start?'**
+  String get welcomeMonthStartQuestion;
+
+  /// Supporting explanation for pay cycle start day.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the day your income or pay cycle begins. You can change this anytime.'**
+  String get welcomeMonthStartHelp;
+
+  /// Button to start using the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get welcomeGetStarted;
+
+  /// Button to skip onboarding and continue directly.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get welcomeSkip;
+
+  /// Button to use the app anonymously without an account.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as Guest'**
+  String get continueAsGuest;
+
+  /// Button label for Google sign-in.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get signInWithGoogle;
+
+  /// Button label for Apple sign-in.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Apple'**
+  String get signInWithApple;
+
+  /// Button label for Email sign-in.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Email'**
+  String get signInWithEmail;
+
+  /// Title for sign-in page.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signInTitle;
+
+  /// Title for create account page.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get signUpTitle;
+
+  /// Label for email input field.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get emailLabel;
+
+  /// Label for password input field.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordLabel;
+
+  /// Label for name input field.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get displayNameLabel;
+
+  /// Link button for password recovery.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// Prompt on sign-in page to switch to sign-up.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? Sign up'**
+  String get noAccountPrompt;
+
+  /// Prompt on sign-up page to switch to sign-in.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Sign in'**
+  String get haveAccountPrompt;
+
+  /// Title of the account management page.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountTitle;
+
+  /// Badge showing account is running in guest mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Account'**
+  String get accountGuestBadge;
+
+  /// Badge showing account is linked to an identity provider.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced Account'**
+  String get accountLinkedBadge;
+
+  /// Title of the prompt inviting guests to link their account.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your data securely'**
+  String get accountLinkBannerTitle;
+
+  /// Explanation of guest account linking benefits.
+  ///
+  /// In en, this message translates to:
+  /// **'Link your guest account to keep your finances backed up across devices.'**
+  String get accountLinkBannerBody;
+
+  /// Button to link current guest session to Google.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Google Account'**
+  String get accountLinkGoogle;
+
+  /// Button to link current guest session to Apple.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Apple ID'**
+  String get accountLinkApple;
+
+  /// Button to sign out of the current account.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get accountSignOut;
+
+  /// Confirmation prompt before signing out.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign out?'**
+  String get accountSignOutConfirm;
+
+  /// Button and title for deleting account.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get accountDeleteTitle;
+
+  /// Warning body for account deletion dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete your account and all associated local and cloud data. This action cannot be undone.'**
+  String get accountDeleteBody;
+
+  /// Destructive confirm button for account deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete permanently'**
+  String get accountDeleteConfirm;
+
+  /// Feedback message after account is deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Account successfully deleted'**
+  String get accountDeletedSuccess;
+
+  /// Error when email or password is incorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email or password'**
+  String get authErrorInvalidCredentials;
+
+  /// Error when registering with an existing email.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already in use'**
+  String get authErrorEmailAlreadyInUse;
 }
 
 class _AppLocalizationsDelegate

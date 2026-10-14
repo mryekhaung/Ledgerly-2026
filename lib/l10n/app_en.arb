@@ -758,5 +758,138 @@
   "transactionsNoResultsBody": "Try adjusting your search or filters to find what you're looking for.",
   "@transactionsNoResultsBody": {
     "description": "Body message when search query or filters match no transactions."
+  },
+  "welcomeTitle": "Welcome to Ledgerly",
+  "@welcomeTitle": {
+    "description": "Main title on welcome/onboarding screen."
+  },
+  "welcomeSubtitle": "Master your money, effortlessly.",
+  "@welcomeSubtitle": {
+    "description": "Subtitle on welcome screen."
+  },
+  "welcomeMonthStartQuestion": "When does your month start?",
+  "@welcomeMonthStartQuestion": {
+    "description": "First-run onboarding question for pay-cycle start day."
+  },
+  "welcomeMonthStartHelp": "Choose the day your income or pay cycle begins. You can change this anytime.",
+  "@welcomeMonthStartHelp": {
+    "description": "Supporting explanation for pay cycle start day."
+  },
+  "welcomeGetStarted": "Get Started",
+  "@welcomeGetStarted": {
+    "description": "Button to start using the app."
+  },
+  "welcomeSkip": "Skip for now",
+  "@welcomeSkip": {
+    "description": "Button to skip onboarding and continue directly."
+  },
+  "continueAsGuest": "Continue as Guest",
+  "@continueAsGuest": {
+    "description": "Button to use the app anonymously without an account."
+  },
+  "signInWithGoogle": "Sign in with Google",
+  "@signInWithGoogle": {
+    "description": "Button label for Google sign-in."
+  },
+  "signInWithApple": "Sign in with Apple",
+  "@signInWithApple": {
+    "description": "Button label for Apple sign-in."
+  },
+  "signInWithEmail": "Sign in with Email",
+  "@signInWithEmail": {
+    "description": "Button label for Email sign-in."
+  },
+  "signInTitle": "Sign In",
+  "@signInTitle": {
+    "description": "Title for sign-in page."
+  },
+  "signUpTitle": "Create Account",
+  "@signUpTitle": {
+    "description": "Title for create account page."
+  },
+  "emailLabel": "Email address",
+  "@emailLabel": {
+    "description": "Label for email input field."
+  },
+  "passwordLabel": "Password",
+  "@passwordLabel": {
+    "description": "Label for password input field."
+  },
+  "displayNameLabel": "Name",
+  "@displayNameLabel": {
+    "description": "Label for name input field."
+  },
+  "forgotPassword": "Forgot password?",
+  "@forgotPassword": {
+    "description": "Link button for password recovery."
+  },
+  "noAccountPrompt": "Don't have an account? Sign up",
+  "@noAccountPrompt": {
+    "description": "Prompt on sign-in page to switch to sign-up."
+  },
+  "haveAccountPrompt": "Already have an account? Sign in",
+  "@haveAccountPrompt": {
+    "description": "Prompt on sign-up page to switch to sign-in."
+  },
+  "accountTitle": "Account",
+  "@accountTitle": {
+    "description": "Title of the account management page."
+  },
+  "accountGuestBadge": "Guest Account",
+  "@accountGuestBadge": {
+    "description": "Badge showing account is running in guest mode."
+  },
+  "accountLinkedBadge": "Synced Account",
+  "@accountLinkedBadge": {
+    "description": "Badge showing account is linked to an identity provider."
+  },
+  "accountLinkBannerTitle": "Save your data securely",
+  "@accountLinkBannerTitle": {
+    "description": "Title of the prompt inviting guests to link their account."
+  },
+  "accountLinkBannerBody": "Link your guest account to keep your finances backed up across devices.",
+  "@accountLinkBannerBody": {
+    "description": "Explanation of guest account linking benefits."
+  },
+  "accountLinkGoogle": "Link Google Account",
+  "@accountLinkGoogle": {
+    "description": "Button to link current guest session to Google."
+  },
+  "accountLinkApple": "Link Apple ID",
+  "@accountLinkApple": {
+    "description": "Button to link current guest session to Apple."
+  },
+  "accountSignOut": "Sign Out",
+  "@accountSignOut": {
+    "description": "Button to sign out of the current account."
+  },
+  "accountSignOutConfirm": "Are you sure you want to sign out?",
+  "@accountSignOutConfirm": {
+    "description": "Confirmation prompt before signing out."
+  },
+  "accountDeleteTitle": "Delete Account",
+  "@accountDeleteTitle": {
+    "description": "Button and title for deleting account."
+  },
+  "accountDeleteBody": "This will permanently delete your account and all associated local and cloud data. This action cannot be undone.",
+  "@accountDeleteBody": {
+    "description": "Warning body for account deletion dialog."
+  },
+  "accountDeleteConfirm": "Delete permanently",
+  "@accountDeleteConfirm": {
+    "description": "Destructive confirm button for account deletion."
+  },
+  "accountDeletedSuccess": "Account successfully deleted",
+  "@accountDeletedSuccess": {
+    "description": "Feedback message after account is deleted."
+  },
+  "authErrorInvalidCredentials": "Invalid email or password",
+  "@authErrorInvalidCredentials": {
+    "description": "Error when email or password is incorrect."
+  },
+  "authErrorEmailAlreadyInUse": "This email is already in use",
+  "@authErrorEmailAlreadyInUse": {
+    "description": "Error when registering with an existing email."
   }
 }
+

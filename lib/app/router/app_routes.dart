@@ -53,4 +53,16 @@ abstract final class AppRoutes {
   /// bottom edge. Reached by deep link `/profile/avatar` or by `pushNamed` from
   /// the Profile page; popping returns to the profile (which stays in the shell).
   static const String avatarEditorName = 'avatarEditor';
+
+  /// Welcome and onboarding page (Phase 2).
+  static const String welcome = '/welcome';
+  static const String welcomeName = 'welcome';
+
+  /// Sign-in / registration page (Phase 2).
+  static const String signIn = '/sign-in';
+  static const String signInName = 'signIn';
+
+  /// Account management page (Phase 2).
+  static const String account = '/settings/account';
+  static const String accountName = 'account';
 }

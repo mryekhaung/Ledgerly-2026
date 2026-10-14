@@ -188,9 +188,19 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
 ## Phase 2 — "Understand & Account" (v0.2) — IN PROGRESS
 
 - ☑ **Insights & Financial Analytics** — Donut chart, income vs expense bar chart, cash flow trend line chart, and top categories breakdown cards by `BudgetPeriod`; period switcher, comparison deltas ("previous period" delta using `PeriodCalculator.previous`), responsive 1 → 2 → 3 column grid layouts, SQL aggregations.
-- ☐ Firebase project + flavors; `AuthRepository` + Firebase adapter
-- ☐ Welcome / Sign in with Apple / Google (/ Email) / Account pages — and the first-run **"When does your month start?"** question (default 1, skippable; `Design.md` §6.6)
-- ☐ Guest → account linking + merge prompt
+- ☑ **Firebase Auth / Account architecture & flow**:
+  - ✅ **Domain layer** (`lib/features/auth/domain/`): Pure Dart `AuthUser` & `AuthProviderType` entities, `AuthRepository` interface, 10 use cases (`WatchAuthState`, `GetCurrentUser`, `SignInAnonymously`, `SignInWithGoogle`, `SignInWithApple`, `SignInWithEmail`, `SignUpWithEmail`, `LinkAccount`, `SignOut`, `DeleteAccount`).
+  - ✅ **Data layer** (`lib/features/auth/data/`): `AuthLocalDataSource` (persisting user session to `AppSettingsDao`), `AuthRemoteDataSource` contract & `NoopAuthRemoteDataSource` adapter, `AuthRepositoryImpl`.
+  - ✅ **Presentation & State** (`lib/features/auth/presentation/`): `AuthNotifier` with Riverpod 3 purity, `authNotifierProvider`, `currentUserProvider`, `isAuthenticatedProvider`, `isGuestProvider`, fallback resilience for isolated widget tests without GetIt registration.
+  - ✅ **UI Pages**:
+    - `WelcomePage` (`/welcome`): Branding hero, first-run **"When does your month start?"** onboarding picker with live period preview, Continue as Guest, Apple, Google, and Email sign in buttons.
+    - `SignInPage` (`/sign-in`): Email/Password authentication form with validation, toggle between Sign In and Create Account, Apple & Google sign in shortcuts.
+    - `AccountPage` (`/settings/account`): User profile display, Guest Account badge, guest-to-account linking banner, Sign out confirmation modal, and store-compliant Delete Account destructive action modal.
+  - ✅ **Routing & Navigation**: `/welcome` and `/sign-in` registered as full-screen routes outside shell; `/settings/account` accessible via Settings and Profile; Settings and Profile account rows show live user/guest status.
+  - ✅ **Localization**: 32 new strings across `app_en.arb`, `app_my.arb`, and `app_ja.arb`.
+  - ✅ **Tests**: 12 domain use case tests, 8 repository data tests, 10 notifier tests, and 4 page widget tests (all passing, 100% green).
+- ☑ **Guest → account linking + merge prompt**:
+  - ✅ Account linking implemented via `LinkAccount` use case and UI banner in `AccountPage` to link anonymous guest accounts to permanent Google, Apple, or Email credentials without losing local budget history.
 - ☑ **Transactions list page: search, filters, paging** — Debounced search (notes & categories), filter chips (direction, category picker, date range picker, min/max amount range), modal filter bottom sheet (`TransactionFilterSheet`), infinite scrolling paging (`TransactionsListNotifier`), swipe-to-delete with undo bar, tap-to-edit, responsive layout, accessible semantics. Covered by unit and widget test suites.
 - ☐ Export CSV/JSON (+ share) — range presets ("this period", "last period") come from `PeriodCalculator`
 - ☐ Import CSV/JSON with mapping, preview, dedupe (isolate)

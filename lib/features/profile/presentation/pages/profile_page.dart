@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/failure.dart';
+import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
 import 'package:ledgerly/features/profile/domain/usecases/save_display_name.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
@@ -48,6 +49,21 @@ class ProfilePage extends ConsumerWidget {
               _AvatarRow(profile: profile),
               const _GroupDivider(),
               _NameRow(profile: profile),
+              const _GroupDivider(),
+              _TappableRow(
+                onTap: () => context.pushNamed(AppRoutes.accountName),
+                leading: Icon(
+                  Icons.manage_accounts_outlined,
+                  size: 24,
+                  color: AppThemeColors.of(context).textTertiary,
+                ),
+                label: strings('accountTitle'),
+                value: ref.watch(isGuestProvider)
+                    ? strings('accountGuestBadge')
+                    : (ref.watch(currentUserProvider)?.email ??
+                          strings('accountLinkedBadge')),
+                valueColor: AppThemeColors.of(context).brandPrimary,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.xxl),

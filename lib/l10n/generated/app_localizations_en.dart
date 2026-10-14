@@ -585,4 +585,106 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get transactionsNoResultsBody =>
       'Try adjusting your search or filters to find what you\'re looking for.';
+
+  @override
+  String get welcomeTitle => 'Welcome to Ledgerly';
+
+  @override
+  String get welcomeSubtitle => 'Master your money, effortlessly.';
+
+  @override
+  String get welcomeMonthStartQuestion => 'When does your month start?';
+
+  @override
+  String get welcomeMonthStartHelp =>
+      'Choose the day your income or pay cycle begins. You can change this anytime.';
+
+  @override
+  String get welcomeGetStarted => 'Get Started';
+
+  @override
+  String get welcomeSkip => 'Skip for now';
+
+  @override
+  String get continueAsGuest => 'Continue as Guest';
+
+  @override
+  String get signInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get signInWithApple => 'Sign in with Apple';
+
+  @override
+  String get signInWithEmail => 'Sign in with Email';
+
+  @override
+  String get signInTitle => 'Sign In';
+
+  @override
+  String get signUpTitle => 'Create Account';
+
+  @override
+  String get emailLabel => 'Email address';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get displayNameLabel => 'Name';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get noAccountPrompt => 'Don\'t have an account? Sign up';
+
+  @override
+  String get haveAccountPrompt => 'Already have an account? Sign in';
+
+  @override
+  String get accountTitle => 'Account';
+
+  @override
+  String get accountGuestBadge => 'Guest Account';
+
+  @override
+  String get accountLinkedBadge => 'Synced Account';
+
+  @override
+  String get accountLinkBannerTitle => 'Save your data securely';
+
+  @override
+  String get accountLinkBannerBody =>
+      'Link your guest account to keep your finances backed up across devices.';
+
+  @override
+  String get accountLinkGoogle => 'Link Google Account';
+
+  @override
+  String get accountLinkApple => 'Link Apple ID';
+
+  @override
+  String get accountSignOut => 'Sign Out';
+
+  @override
+  String get accountSignOutConfirm => 'Are you sure you want to sign out?';
+
+  @override
+  String get accountDeleteTitle => 'Delete Account';
+
+  @override
+  String get accountDeleteBody =>
+      'This will permanently delete your account and all associated local and cloud data. This action cannot be undone.';
+
+  @override
+  String get accountDeleteConfirm => 'Delete permanently';
+
+  @override
+  String get accountDeletedSuccess => 'Account successfully deleted';
+
+  @override
+  String get authErrorInvalidCredentials => 'Invalid email or password';
+
+  @override
+  String get authErrorEmailAlreadyInUse => 'This email is already in use';
 }
