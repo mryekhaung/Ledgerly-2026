@@ -915,6 +915,10 @@
   "@dataTransferTabBackup": {
     "description": "Tab label for Backup & Restore."
   },
+  "dataTransferPaste": "Paste",
+  "@dataTransferPaste": {
+    "description": "Button that pastes clipboard text into the import or restore field."
+  },
   "exportFormatLabel": "Format",
   "@exportFormatLabel": {
     "description": "Label for export format choice."
@@ -1394,6 +1398,14 @@
   "recurringFieldFrequency": "Frequency",
   "@recurringFieldFrequency": {
     "description": "Label for frequency dropdown in recurring form."
+  },
+  "recurringFieldAccountOptional": "Account (Optional)",
+  "@recurringFieldAccountOptional": {
+    "description": "Label for the optional account dropdown in recurring form."
+  },
+  "recurringAccountNone": "No Account specified",
+  "@recurringAccountNone": {
+    "description": "Dropdown entry meaning the recurring transaction is not tied to an account."
   },
   "recurringFieldStartDate": "Start Date",
   "@recurringFieldStartDate": {

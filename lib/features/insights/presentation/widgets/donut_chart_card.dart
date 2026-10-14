@@ -69,9 +69,11 @@ class DonutChartCard extends StatelessWidget {
                         children: <Widget>[
                           Text(
                             strings('insightsTotalExpense'),
+                            // Dropping the `fontSize: 10` override keeps the
+                            // `caption` (11) the theme already applies — the §3
+                            // floor.
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: colors.textSecondary,
-                              fontSize: 10,
                             ),
                           ),
                           const SizedBox(height: 2),

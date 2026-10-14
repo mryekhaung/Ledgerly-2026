@@ -34,6 +34,11 @@ analyzer:
     - "lib/l10n/generated/**"
     - "**/*.gr.dart"
     - ".fvm/**"
+    # A developer harness, not app code: it imports `package:flutter_tools/...`,
+    # which only resolves inside the Flutter SDK's own package, so analyzing it
+    # from this repo would always fail. The rest of tool/ (the pure-Dart avatar
+    # extractor, which has tests) stays under analysis.
+    - "tool/gen_l10n.dart"
     - build/**
     - android/**
     - ios/**

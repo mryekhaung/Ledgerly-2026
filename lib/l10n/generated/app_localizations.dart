@@ -1426,6 +1426,12 @@ abstract class AppLocalizations {
   /// **'Backup'**
   String get dataTransferTabBackup;
 
+  /// Button that pastes clipboard text into the import or restore field.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get dataTransferPaste;
+
   /// Label for export format choice.
   ///
   /// In en, this message translates to:
@@ -2139,6 +2145,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Frequency'**
   String get recurringFieldFrequency;
+
+  /// Label for the optional account dropdown in recurring form.
+  ///
+  /// In en, this message translates to:
+  /// **'Account (Optional)'**
+  String get recurringFieldAccountOptional;
+
+  /// Dropdown entry meaning the recurring transaction is not tied to an account.
+  ///
+  /// In en, this message translates to:
+  /// **'No Account specified'**
+  String get recurringAccountNone;
 
   /// Label for start date picker in recurring form.
   ///

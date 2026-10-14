@@ -273,35 +273,43 @@ CI job carries no design rules. This phase fixes that in two halves.
   `AppPlatform? platform` so the factory is chosen per platform and a golden
   test can render iOS chrome on a Linux runner.
 
-**Measured baseline: 108 tolerated violations across 7 rules.**
+**Measured baseline: 170 tolerated violations across 7 rules.**
 
 | Rule | Doc | Count | Files |
 | --- | --- | ---: | ---: |
-| Inline `TextStyle(` in a view | §3 | 40 | 12 |
-| Raw `Scaffold(` in a feature page | §5.1 | 24 | 18 |
-| First-paint spinner instead of skeleton | §5.11 | 15 | 10 |
-| Off-scale radius (`BorderRadius`/`circular`) | §4.2 | 14 | 7 |
-| Hardcoded colour (`Color(0x…)` / `Colors.x`) | §2 | 11 | 7 |
-| Sub-caption size (`fontSize` < 11) | §3 | 3 | 3 |
-| Hardcoded English UI string | §7 | 1 | 1 |
+| Inline `TextStyle(` in a view | §3 | 61 | 20 |
+| Raw `Scaffold(` in a feature page | §5.1 | 32 | 25 |
+| Off-scale radius (`BorderRadius`/`circular`) | §4.2 | 30 | 15 |
+| First-paint spinner instead of skeleton | §5.11 | 21 | 16 |
+| Hardcoded colour (`Color(0x…)` / `Colors.x`) | §2 | 18 | 11 |
+| Sub-caption size (`fontSize` < 11) | §3 | 4 | 4 |
+| Hardcoded English UI string | §7 | 4 | 3 |
+
+These are counts of matching *lines*, which is what the scanner and its budgets
+measure. They were re-derived by replaying the scanner's own scope and regexes
+after an earlier hand-tallied table under-counted the multi-line budget maps.
 
 ### B. Burn the debt down — NOT STARTED
 
 Fix the tolerated violations file by file, lowering each budget in the same
 commit that fixes its file. Highest leverage first:
 
-- ☐ **`inline TextStyle` → `AppTypography`** (40). The biggest single rule, and
-  the root of most typography drift.
-- ☐ **First-paint spinner → skeleton** (15). `state_placeholder.dart` alone
-  unlocks every screen that loads — the single highest-leverage file.
-- ☐ **Raw `Scaffold` → `AppScaffold`** (24). Mechanical, mostly in
-  `presentation/pages/`.
-- ☐ **Off-scale radius → `AppRadius`** (14). Mechanical; watch for radii that
-  are legitimate one-offs and should join the scale instead.
-- ☐ **Hardcoded colour → token** (11). `budget_form_page.dart`'s `#D97706` is
-  just `warning` reimplemented; `Colors.white` on-colour uses want an explicit
-  `onBrand` token.
-- ☐ **Sub-caption size** (3) and **hardcoded string** (1). Trivial cleanups.
+- ☐ **`inline TextStyle` → `AppTypography`** (61, 20 files). The biggest single
+  rule, and the root of most typography drift.
+- ☐ **Raw `Scaffold` → `AppScaffold`** (32, 25 files). Mechanical, mostly in
+  `presentation/pages/`. Note `app_router.dart`, `app_shell.dart` and
+  `responsive_layout.dart` legitimately build one — confirm each rather than
+  blanket-replacing.
+- ☐ **Off-scale radius → `AppRadius`** (30, 15 files). Mechanical; watch for
+  radii that are legitimate one-offs and should join the scale instead.
+- ☐ **First-paint spinner → skeleton** (21, 16 files). Spinners inside a
+  *submitting button* are legitimate and should stay until the button variants
+  grow a busy state. **`state_placeholder.dart` is the highest-leverage single
+  file** — replacing its body fixes every `loading:` call site at once.
+- ☐ **Hardcoded colour → token** (18, 11 files). `budget_form_page.dart`'s
+  `#D97706` is just `warning` reimplemented; `Colors.white` on-colour uses want
+  an explicit `onBrand` token.
+- ☐ **Sub-caption size** (4) and **hardcoded string** (4). Trivial cleanups.
 
 ### C. Judgment items — not auto-detectable (NOT STARTED)
 

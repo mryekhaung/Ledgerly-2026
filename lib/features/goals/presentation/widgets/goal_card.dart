@@ -33,7 +33,7 @@ class GoalCard extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(strings('actionCancel')),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),

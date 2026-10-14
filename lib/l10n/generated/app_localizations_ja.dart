@@ -685,6 +685,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dataTransferTabBackup => 'バックアップ';
 
   @override
+  String get dataTransferPaste => '貼り付け';
+
+  @override
   String get exportFormatLabel => '形式';
 
   @override
@@ -1041,6 +1044,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get recurringFieldFrequency => '頻度';
+
+  @override
+  String get recurringFieldAccountOptional => '口座（任意）';
+
+  @override
+  String get recurringAccountNone => '口座を指定しない';
 
   @override
   String get recurringFieldStartDate => '開始日';

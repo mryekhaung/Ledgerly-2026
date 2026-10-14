@@ -708,6 +708,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataTransferTabBackup => 'Backup';
 
   @override
+  String get dataTransferPaste => 'Paste';
+
+  @override
   String get exportFormatLabel => 'Format';
 
   @override
@@ -1078,6 +1081,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recurringFieldFrequency => 'Frequency';
+
+  @override
+  String get recurringFieldAccountOptional => 'Account (Optional)';
+
+  @override
+  String get recurringAccountNone => 'No Account specified';
 
   @override
   String get recurringFieldStartDate => 'Start Date';

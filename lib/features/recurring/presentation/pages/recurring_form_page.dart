@@ -211,15 +211,15 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
             DropdownButtonFormField<String?>(
               initialValue: formState.accountId,
               decoration: InputDecoration(
-                labelText: 'Account (Optional)',
+                labelText: strings('recurringFieldAccountOptional'),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
               items: <DropdownMenuItem<String?>>[
-                const DropdownMenuItem<String?>(
+                DropdownMenuItem<String?>(
                   value: null,
-                  child: Text('No Account specified'),
+                  child: Text(strings('recurringAccountNone')),
                 ),
                 ...accounts.map(
                   (acc) => DropdownMenuItem<String?>(

@@ -433,16 +433,10 @@ void main() {
         'docs/Design.md §3 — "Never go below caption (11)"; Burmese and '
             'Japanese lose legibility below it',
         sites,
-        const <String, int>{
-          // A micro month label inside a 48 px calendar cell; it also drives the
-          // `showMonthLabel` cell layout, so it is pinned rather than tokenised.
-          'lib/features/transactions/presentation/pages/calendar_page.dart': 1,
-          // A credit/overdraft micro-badge. Should become a `Badge` component.
-          'lib/features/accounts/presentation/widgets/account_card.dart': 1,
-          'lib/features/insights/presentation/widgets/donut_chart_card.dart': 1,
-          'lib/features/insights/presentation/widgets/income_expense_bar_chart_card.dart':
-              1,
-        },
+        // Burned to zero. The four sites here were the calendar month label
+        // (now `overline` per §6.6), the archived badge on `account_card`, and
+        // the two chart captions (now derived from `caption`).
+        const <String, int>{},
       );
     });
 
@@ -467,7 +461,7 @@ void main() {
               4,
           'lib/features/recurring/presentation/widgets/recurring_item_card.dart':
               4,
-          'lib/features/accounts/presentation/widgets/account_card.dart': 3,
+          'lib/features/accounts/presentation/widgets/account_card.dart': 2,
           'lib/features/budgets/presentation/pages/budget_form_page.dart': 3,
           'lib/features/accounts/presentation/pages/account_form_page.dart': 2,
           'lib/features/auth/presentation/pages/account_page.dart': 2,
@@ -482,8 +476,6 @@ void main() {
           'lib/features/budgets/presentation/widgets/budget_category_row.dart':
               1,
           'lib/features/budgets/presentation/widgets/budget_status_pill.dart':
-              1,
-          'lib/features/insights/presentation/widgets/income_expense_bar_chart_card.dart':
               1,
         },
       );
@@ -505,14 +497,10 @@ void main() {
         'docs/Design.md §7 — every visible string is an ARB key (en/my/ja); '
             'no literals in widgets',
         sites,
-        const <String, int>{
-          // Four sites predate this gate and need ARB keys.
-          'lib/features/data_transfer/presentation/pages/data_transfer_page.dart':
-              2,
-          'lib/features/goals/presentation/widgets/goal_card.dart': 1,
-          'lib/features/recurring/presentation/pages/recurring_form_page.dart':
-              1,
-        },
+        // Burned to zero: the two "Paste" buttons became `dataTransferPaste`,
+        // the goal dialog's "Cancel" reuses `actionCancel`, and the recurring
+        // form's "No Account specified" became `recurringAccountNone`.
+        const <String, int>{},
       );
     });
   });

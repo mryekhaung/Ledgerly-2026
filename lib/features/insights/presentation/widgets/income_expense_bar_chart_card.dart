@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/features/insights/domain/entities/daily_trend_point.dart';
@@ -208,14 +209,12 @@ class _BarChartPainter extends CustomPainter {
         canvas.drawRRect(expenseRRect, expensePaint);
       }
 
-      // Label below bar
+      // Label below bar. This is a CustomPainter, so there is no BuildContext
+      // to read the TextTheme from — derive the metrics from `caption` (11),
+      // the §3 floor, rather than a literal that can drift under it.
       final textSpan = TextSpan(
         text: chunk.label,
-        style: TextStyle(
-          color: gridColor,
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-        ),
+        style: AppTypography.caption.copyWith(color: gridColor),
       );
       final textPainter = TextPainter(
         text: textSpan,

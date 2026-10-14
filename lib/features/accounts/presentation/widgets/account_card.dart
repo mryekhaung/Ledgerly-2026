@@ -101,10 +101,11 @@ class AccountCard extends ConsumerWidget {
                             ),
                             child: Text(
                               strings('accountsArchivedTab'),
-                              style: TextStyle(
-                                fontSize: 10,
+                              // `caption` (11) is the §3 floor; this badge used
+                              // to sit at 10. A dedicated `Badge` component
+                              // (docs/Roadmap.md Phase 3.5 C) would own this.
+                              style: AppTypography.caption.copyWith(
                                 color: colors.textSecondary,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),

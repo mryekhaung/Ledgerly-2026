@@ -715,6 +715,9 @@ class AppLocalizationsMy extends AppLocalizations {
   String get dataTransferTabBackup => 'အရန်သိမ်း/ပြန်ယူ';
 
   @override
+  String get dataTransferPaste => 'ကူးထည့်';
+
+  @override
   String get exportFormatLabel => 'ဖော်မတ်';
 
   @override
@@ -1093,6 +1096,12 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get recurringFieldFrequency => 'ဖြစ်ပေါ်မည့် အကြိမ်ရေ';
+
+  @override
+  String get recurringFieldAccountOptional => 'အကောင့် (မလိုအပ်)';
+
+  @override
+  String get recurringAccountNone => 'အကောင့် မသတ်မှတ်ထား';
 
   @override
   String get recurringFieldStartDate => 'စတင်မည့်ရက်';

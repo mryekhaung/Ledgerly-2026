@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
@@ -681,13 +682,15 @@ class _DayCell extends StatelessWidget {
                         DateFormat.MMM(
                           Localizations.localeOf(context).toLanguageTag(),
                         ).format(day.toDateTime()),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          fontSize: 8,
-                          height: 1.0,
+                        // docs/Design.md §6.6: the tiny month label on the 1st
+                        // of each calendar month is `overline`. It used to be an
+                        // 8 px literal, which is below the `caption` floor §3
+                        // sets ("never go below caption (11)") — Burmese and
+                        // Japanese lose legibility under it.
+                        style: AppTypography.overline.copyWith(
                           color: isSelected
                               ? colors.brandPrimary
                               : colors.textSecondary,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     SizedBox(

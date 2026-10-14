@@ -276,7 +276,7 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
           children: [
             TextButton.icon(
               icon: const Icon(Icons.paste_rounded, size: 18),
-              label: const Text('Paste'),
+              label: Text(strings('dataTransferPaste')),
               onPressed: () async {
                 final data = await Clipboard.getData(Clipboard.kTextPlain);
                 if (data?.text != null) {
@@ -478,7 +478,7 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
                 children: [
                   TextButton.icon(
                     icon: const Icon(Icons.paste_rounded, size: 18),
-                    label: const Text('Paste'),
+                    label: Text(strings('dataTransferPaste')),
                     onPressed: () async {
                       final data = await Clipboard.getData(
                         Clipboard.kTextPlain,
