@@ -624,7 +624,7 @@ void main() {
       bool dismiss(String line) => line.contains('ScaffoldMessenger');
 
       expect(pattern.hasMatch('return Scaffold('), isTrue);
-      final messenger = 'ScaffoldMessenger.of(context).showSnackBar';
+      const messenger = 'ScaffoldMessenger.of(context).showSnackBar';
       expect(pattern.hasMatch(messenger) && !dismiss(messenger), isFalse);
     });
 
