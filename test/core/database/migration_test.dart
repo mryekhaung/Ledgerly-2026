@@ -38,6 +38,7 @@ void main() {
     'budgets',
     'categories',
     'recurring_transactions',
+    'savings_goals',
     'transactions',
   ];
 
@@ -51,6 +52,7 @@ void main() {
     'idx_categories_kind',
     'idx_recurring_due',
     'idx_recurring_list',
+    'idx_savings_goals_list',
     'idx_settings_key',
     'idx_transactions_date',
     'idx_transactions_category',
@@ -281,13 +283,13 @@ void main() {
   });
 
   group('upgrade path', () {
-    test('should_be_at_v4', () {
+    test('should_be_at_v5', () {
       final h = useDbHarness();
       expect(
         h.db.schemaVersion,
-        4,
+        5,
         reason:
-            'v4 added recurring_transactions; bumping again requires a new onUpgrade step '
+            'v5 added savings_goals; bumping again requires a new onUpgrade step '
             'and a real upgrade test here (docs/DataModel.md §5)',
       );
     });
@@ -331,7 +333,18 @@ void main() {
       },
     );
 
-    test('should_upgrade_v1_to_v4_keeping_categories_and_transactions', () async {
+    test('should_declare_the_savings_goals_table_and_its_indexes', () async {
+      final h = useDbHarness();
+      await h.db.customSelect('SELECT 1').get();
+
+      expect(await namesByType(h.db, 'table'), contains('savings_goals'));
+      expect(
+        await namesByType(h.db, 'index'),
+        contains('idx_savings_goals_list'),
+      );
+    });
+
+    test('should_upgrade_v1_to_v5_keeping_categories_and_transactions', () async {
       // The real upgrade proof from v1.
       final temp = useTempDbFile();
       addTearDown(temp.dispose);
@@ -340,6 +353,8 @@ void main() {
       // management is bypassed with raw DDL, but the file is then closed and
       // reopened by the real database below.
       final v1 = AppDatabase(NativeDatabase(temp.file));
+      await v1.customStatement('DROP TABLE IF EXISTS savings_goals');
+      await v1.customStatement('DROP INDEX IF EXISTS idx_savings_goals_list');
       await v1.customStatement('DROP TABLE IF EXISTS recurring_transactions');
       await v1.customStatement('DROP TABLE IF EXISTS budgets');
       await v1.customStatement('DROP TABLE IF EXISTS app_settings');
@@ -464,6 +479,27 @@ void main() {
       expect(
         await namesByType(upgraded, 'index'),
         contains('idx_recurring_due'),
+      );
+
+      // ...and the v5 savings_goals table exists, is empty, and is writable.
+      expect(await upgraded.savingsGoalsDao.watchAll().first, isEmpty);
+      final goalId = await upgraded.savingsGoalsDao.insertRow(
+        SavingsGoalsCompanion.insert(
+          name: 'Trip to Tokyo',
+          targetAmountMinor: 2000000,
+          currency: 'mmk',
+          createdAt: 1,
+          updatedAt: 1,
+        ),
+      );
+      final readGoal = await upgraded.savingsGoalsDao.findById(goalId);
+      expect(readGoal, isNotNull);
+      expect(readGoal!.name, 'Trip to Tokyo');
+      expect(readGoal.targetAmountMinor, 2000000);
+
+      expect(
+        await namesByType(upgraded, 'index'),
+        contains('idx_savings_goals_list'),
       );
 
       await upgraded.close();

@@ -1114,4 +1114,151 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get recurringPendingActionConfirm => '今すぐ追加';
+
+  @override
+  String get savingsGoalsTitle => '貯金目標';
+
+  @override
+  String get savingsGoalsActiveTab => '進行中';
+
+  @override
+  String get savingsGoalsCompletedTab => '達成済み';
+
+  @override
+  String get savingsGoalsArchivedTab => 'アーカイブ';
+
+  @override
+  String get newGoal => '目標を追加';
+
+  @override
+  String get editGoal => '目標を編集';
+
+  @override
+  String get goalNameLabel => '目標名';
+
+  @override
+  String get goalTargetAmountLabel => '目標金額';
+
+  @override
+  String get goalCurrentAmountLabel => '現在の貯蓄額';
+
+  @override
+  String get goalTargetDateLabel => '目標日（任意）';
+
+  @override
+  String get goalAccountLabel => '連携口座（任意）';
+
+  @override
+  String get goalNotesLabel => 'メモ（任意）';
+
+  @override
+  String get goalIconLabel => 'アイコン';
+
+  @override
+  String get goalColorLabel => 'カラー';
+
+  @override
+  String get saveGoal => '目標を保存';
+
+  @override
+  String get deleteGoal => '目標を削除';
+
+  @override
+  String get deleteGoalConfirm => 'この貯金目標を削除してもよろしいですか？この操作は取り消せません。';
+
+  @override
+  String get archiveGoal => 'アーカイブ';
+
+  @override
+  String get unarchiveGoal => 'アーカイブ解除';
+
+  @override
+  String get depositTitle => '貯金を入金';
+
+  @override
+  String get withdrawTitle => '貯金を引き出し';
+
+  @override
+  String get depositAction => '入金';
+
+  @override
+  String get withdrawAction => '引き出し';
+
+  @override
+  String get goalAmountLabel => '金額';
+
+  @override
+  String goalRemaining(String amount) {
+    return 'あと $amount';
+  }
+
+  @override
+  String goalDaysLeft(int days) {
+    return '残り $days 日';
+  }
+
+  @override
+  String goalDaysOverdue(int days) {
+    return '$days 日経過';
+  }
+
+  @override
+  String get goalCompleted => '目標達成！ 🎉';
+
+  @override
+  String get goalCompletedSub => 'おめでとうございます！貯金目標を達成しました。';
+
+  @override
+  String get emptyGoalsTitle => '貯金目標がありません';
+
+  @override
+  String get emptyGoalsMessage => '旅行や緊急資金、大きな買い物のための目標を設定しましょう。';
+
+  @override
+  String get emptyCompletedGoals => '達成済みの目標はまだありません。貯金を続けましょう！';
+
+  @override
+  String get emptyArchivedGoals => 'アーカイブされた目標はありません。';
+
+  @override
+  String get goalNameRequired => '目標名を入力してください';
+
+  @override
+  String get goalNameTooLong => '目標名は100文字以内で入力してください';
+
+  @override
+  String get goalTargetAmountInvalid => '目標金額は0より大きい必要があります';
+
+  @override
+  String get goalCurrentAmountInvalid => '貯蓄額は負の値にできません';
+
+  @override
+  String get goalContributionAmountInvalid => '入金額は0より大きい必要があります';
+
+  @override
+  String get goalWithdrawAmountInvalid => '引き出し額は0より大きい必要があります';
+
+  @override
+  String get goalWithdrawExceedsBalance => '引き出し額が現在の貯蓄残高を超えています';
+
+  @override
+  String get goalNotesTooLong => 'メモは500文字以内で入力してください';
+
+  @override
+  String get goalSavedSuccess => '貯金目標を保存しました';
+
+  @override
+  String get goalDeletedSuccess => '貯金目標を削除しました';
+
+  @override
+  String get goalContributedSuccess => '貯金を入金しました';
+
+  @override
+  String get goalWithdrawnSuccess => '貯金を引き出しました';
+
+  @override
+  String get settingsSavingsGoals => '貯金目標';
+
+  @override
+  String get settingsSavingsGoalsSubtitle => '目標金額、緊急資金、進捗状況を管理';
 }

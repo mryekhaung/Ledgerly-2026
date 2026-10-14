@@ -1155,4 +1155,159 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recurringPendingActionConfirm => 'Add Now';
+
+  @override
+  String get savingsGoalsTitle => 'Savings Goals';
+
+  @override
+  String get savingsGoalsActiveTab => 'Active';
+
+  @override
+  String get savingsGoalsCompletedTab => 'Completed';
+
+  @override
+  String get savingsGoalsArchivedTab => 'Archived';
+
+  @override
+  String get newGoal => 'New Goal';
+
+  @override
+  String get editGoal => 'Edit Goal';
+
+  @override
+  String get goalNameLabel => 'Goal Name';
+
+  @override
+  String get goalTargetAmountLabel => 'Target Amount';
+
+  @override
+  String get goalCurrentAmountLabel => 'Current Saved Amount';
+
+  @override
+  String get goalTargetDateLabel => 'Target Date (Optional)';
+
+  @override
+  String get goalAccountLabel => 'Linked Account (Optional)';
+
+  @override
+  String get goalNotesLabel => 'Notes (Optional)';
+
+  @override
+  String get goalIconLabel => 'Icon';
+
+  @override
+  String get goalColorLabel => 'Color';
+
+  @override
+  String get saveGoal => 'Save Goal';
+
+  @override
+  String get deleteGoal => 'Delete Goal';
+
+  @override
+  String get deleteGoalConfirm =>
+      'Are you sure you want to delete this savings goal? This cannot be undone.';
+
+  @override
+  String get archiveGoal => 'Archive';
+
+  @override
+  String get unarchiveGoal => 'Unarchive';
+
+  @override
+  String get depositTitle => 'Add Contribution';
+
+  @override
+  String get withdrawTitle => 'Withdraw Funds';
+
+  @override
+  String get depositAction => 'Deposit';
+
+  @override
+  String get withdrawAction => 'Withdraw';
+
+  @override
+  String get goalAmountLabel => 'Amount';
+
+  @override
+  String goalRemaining(String amount) {
+    return '$amount remaining';
+  }
+
+  @override
+  String goalDaysLeft(int days) {
+    return '$days days left';
+  }
+
+  @override
+  String goalDaysOverdue(int days) {
+    return '$days days overdue';
+  }
+
+  @override
+  String get goalCompleted => 'Goal Achieved! 🎉';
+
+  @override
+  String get goalCompletedSub =>
+      'Congratulations! You reached your savings target.';
+
+  @override
+  String get emptyGoalsTitle => 'No Savings Goals Yet';
+
+  @override
+  String get emptyGoalsMessage =>
+      'Set a goal to save for a vacation, emergency fund, or large purchase.';
+
+  @override
+  String get emptyCompletedGoals => 'No completed goals yet. Keep saving!';
+
+  @override
+  String get emptyArchivedGoals => 'No archived goals.';
+
+  @override
+  String get goalNameRequired => 'Please enter a goal name';
+
+  @override
+  String get goalNameTooLong => 'Goal name cannot exceed 100 characters';
+
+  @override
+  String get goalTargetAmountInvalid =>
+      'Target amount must be greater than zero';
+
+  @override
+  String get goalCurrentAmountInvalid => 'Saved amount cannot be negative';
+
+  @override
+  String get goalContributionAmountInvalid =>
+      'Contribution amount must be greater than zero';
+
+  @override
+  String get goalWithdrawAmountInvalid =>
+      'Withdrawal amount must be greater than zero';
+
+  @override
+  String get goalWithdrawExceedsBalance =>
+      'Withdrawal amount cannot exceed the saved balance';
+
+  @override
+  String get goalNotesTooLong => 'Notes cannot exceed 500 characters';
+
+  @override
+  String get goalSavedSuccess => 'Savings goal saved';
+
+  @override
+  String get goalDeletedSuccess => 'Savings goal deleted';
+
+  @override
+  String get goalContributedSuccess => 'Contribution added successfully';
+
+  @override
+  String get goalWithdrawnSuccess => 'Funds withdrawn successfully';
+
+  @override
+  String get settingsSavingsGoals => 'Savings Goals';
+
+  @override
+  String get settingsSavingsGoalsSubtitle =>
+      'Track targets, emergency funds, and progress';
 }

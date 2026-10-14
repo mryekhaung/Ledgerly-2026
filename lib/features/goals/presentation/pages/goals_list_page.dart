@@ -1,0 +1,178 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_spacing.dart';
+import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
+import 'package:ledgerly/features/goals/presentation/providers/goals_providers.dart';
+import 'package:ledgerly/features/goals/presentation/widgets/goal_card.dart';
+import 'package:material_ui/material_ui.dart';
+
+/// Hub page displaying savings goals organized into Active, Completed, and Archived tabs.
+class GoalsListPage extends ConsumerStatefulWidget {
+  const GoalsListPage({super.key});
+
+  @override
+  ConsumerState<GoalsListPage> createState() => _GoalsListPageState();
+}
+
+class _GoalsListPageState extends ConsumerState<GoalsListPage>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final strings = AppStrings.of(context);
+
+    final activeGoalsAsync = ref.watch(activeGoalsProvider);
+    final completedGoalsAsync = ref.watch(completedGoalsProvider);
+    final archivedGoalsAsync = ref.watch(archivedGoalsProvider);
+
+    return Scaffold(
+      backgroundColor: colors.surface,
+      appBar: AppBar(
+        title: Text(strings('savingsGoalsTitle')),
+        backgroundColor: colors.surfaceRaised,
+        elevation: 0,
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: colors.textPrimary,
+          unselectedLabelColor: colors.textSecondary,
+          indicatorColor: colors.moneyIn,
+          tabs: [
+            Tab(text: strings('savingsGoalsActiveTab')),
+            Tab(text: strings('savingsGoalsCompletedTab')),
+            Tab(text: strings('savingsGoalsArchivedTab')),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _GoalsTab(
+            goalsAsync: activeGoalsAsync,
+            emptyTitle: strings('emptyGoalsTitle'),
+            emptyMessage: strings('emptyGoalsMessage'),
+            showCreateAction: true,
+          ),
+          _GoalsTab(
+            goalsAsync: completedGoalsAsync,
+            emptyTitle: strings('emptyCompletedGoals'),
+            emptyMessage: strings('emptyCompletedGoals'),
+            showCreateAction: false,
+          ),
+          _GoalsTab(
+            goalsAsync: archivedGoalsAsync,
+            emptyTitle: strings('emptyArchivedGoals'),
+            emptyMessage: strings('emptyArchivedGoals'),
+            showCreateAction: false,
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push(AppRoutes.goalsNew),
+        backgroundColor: colors.moneyIn,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: Text(strings('newGoal')),
+      ),
+    );
+  }
+}
+
+class _GoalsTab extends StatelessWidget {
+  const _GoalsTab({
+    required this.goalsAsync,
+    required this.emptyTitle,
+    required this.emptyMessage,
+    required this.showCreateAction,
+  });
+
+  final AsyncValue<List<SavingsGoal>> goalsAsync;
+  final String emptyTitle;
+  final String emptyMessage;
+  final bool showCreateAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final strings = AppStrings.of(context);
+
+    return goalsAsync.when(
+      data: (goals) {
+        if (goals.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.savings_outlined,
+                    size: 64,
+                    color: colors.textSecondary.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    emptyTitle,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textPrimary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    emptyMessage,
+                    style: TextStyle(fontSize: 14, color: colors.textSecondary),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (showCreateAction) ...[
+                    const SizedBox(height: AppSpacing.lg),
+                    FilledButton.icon(
+                      onPressed: () => context.push(AppRoutes.goalsNew),
+                      icon: const Icon(Icons.add),
+                      label: Text(strings('newGoal')),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colors.moneyIn,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          itemCount: goals.length,
+          itemBuilder: (context, index) {
+            final goal = goals[index];
+            return GoalCard(
+              goal: goal,
+              onEdit: () => context.push('/goals/edit/${goal.id}'),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+    );
+  }
+}

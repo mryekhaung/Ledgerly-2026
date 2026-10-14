@@ -4,6 +4,7 @@ import 'package:ledgerly/core/database/daos/app_settings_dao.dart';
 import 'package:ledgerly/core/database/daos/budgets_dao.dart';
 import 'package:ledgerly/core/database/daos/categories_dao.dart';
 import 'package:ledgerly/core/database/daos/recurring_dao.dart';
+import 'package:ledgerly/core/database/daos/savings_goals_dao.dart';
 import 'package:ledgerly/core/database/daos/transactions_dao.dart';
 import 'package:ledgerly/core/database/tables/accounts.dart';
 import 'package:ledgerly/core/database/tables/app_settings.dart';
@@ -11,6 +12,7 @@ import 'package:ledgerly/core/database/tables/budgets.dart';
 import 'package:ledgerly/core/database/tables/categories.dart';
 import 'package:ledgerly/core/database/tables/common_columns.dart';
 import 'package:ledgerly/core/database/tables/recurring_transactions.dart';
+import 'package:ledgerly/core/database/tables/savings_goals.dart';
 import 'package:ledgerly/core/database/tables/transactions.dart';
 import 'package:ledgerly/core/database/uuid.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -32,6 +34,7 @@ part 'app_database.g.dart';
     AppSettings,
     Budgets,
     RecurringTransactions,
+    SavingsGoals,
   ],
   daos: [
     CategoriesDao,
@@ -40,6 +43,7 @@ part 'app_database.g.dart';
     AppSettingsDao,
     BudgetsDao,
     RecurringDao,
+    SavingsGoalsDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -53,8 +57,9 @@ class AppDatabase extends _$AppDatabase {
   /// v2 — `app_settings`: app-wide preferences.
   /// v3 — `budgets`: spending limits per category and total period budgets.
   /// v4 — `recurring_transactions`: recurring transaction scheduler definitions.
+  /// v5 — `savings_goals`: savings goals tracking target amounts and deadlines.
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -77,6 +82,10 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(recurringTransactions);
         await m.createIndex(idxRecurringList);
         await m.createIndex(idxRecurringDue);
+      }
+      if (from < 5) {
+        await m.createTable(savingsGoals);
+        await m.createIndex(idxSavingsGoalsList);
       }
     },
     beforeOpen: (OpeningDetails details) async {

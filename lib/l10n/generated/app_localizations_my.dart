@@ -1174,4 +1174,159 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get recurringPendingActionConfirm => 'ယခု ထည့်မည်';
+
+  @override
+  String get savingsGoalsTitle => 'စုငွေ ရည်မှန်းချက်များ';
+
+  @override
+  String get savingsGoalsActiveTab => 'လုပ်ဆောင်ဆဲ';
+
+  @override
+  String get savingsGoalsCompletedTab => 'အောင်မြင်ပြီး';
+
+  @override
+  String get savingsGoalsArchivedTab => 'သိမ်းဆည်းထားသော';
+
+  @override
+  String get newGoal => 'ရည်မှန်းချက်အသစ်';
+
+  @override
+  String get editGoal => 'ရည်မှန်းချက် ပြင်ဆင်ရန်';
+
+  @override
+  String get goalNameLabel => 'ရည်မှန်းချက် အမည်';
+
+  @override
+  String get goalTargetAmountLabel => 'သတ်မှတ် ရည်မှန်းငွေ';
+
+  @override
+  String get goalCurrentAmountLabel => 'လက်ရှိ စုဆောင်းငွေ';
+
+  @override
+  String get goalTargetDateLabel => 'ပြီးမြောက်ရမည့်ရက် (ရွေးချယ်ရန်)';
+
+  @override
+  String get goalAccountLabel => 'ချိတ်ဆက်မည့် အကောင့် (ရွေးချယ်ရန်)';
+
+  @override
+  String get goalNotesLabel => 'မှတ်ချက် (ရွေးချယ်ရန်)';
+
+  @override
+  String get goalIconLabel => 'အိုင်ကွန်';
+
+  @override
+  String get goalColorLabel => 'အရောင်';
+
+  @override
+  String get saveGoal => 'ရည်မှန်းချက် သိမ်းဆည်းမည်';
+
+  @override
+  String get deleteGoal => 'ရည်မှန်းချက် ဖျက်မည်';
+
+  @override
+  String get deleteGoalConfirm =>
+      'ဤစုငွေရည်မှန်းချက်ကို ဖျက်ရန် သေချာပါသလား? ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်၍ မရပါ။';
+
+  @override
+  String get archiveGoal => 'သိမ်းဆည်းထားမည်';
+
+  @override
+  String get unarchiveGoal => 'ပြန်လည်ဖော်ပြမည်';
+
+  @override
+  String get depositTitle => 'စုငွေ ထည့်ဝင်မည်';
+
+  @override
+  String get withdrawTitle => 'စုငွေ ထုတ်ယူမည်';
+
+  @override
+  String get depositAction => 'ငွေထည့်မည်';
+
+  @override
+  String get withdrawAction => 'ငွေထုတ်မည်';
+
+  @override
+  String get goalAmountLabel => 'ငွေပမာဏ';
+
+  @override
+  String goalRemaining(String amount) {
+    return '$amount လိုအပ်သေးသည်';
+  }
+
+  @override
+  String goalDaysLeft(int days) {
+    return '$days ရက် လိုသေးသည်';
+  }
+
+  @override
+  String goalDaysOverdue(int days) {
+    return '$days ရက် ကျော်လွန်နေပါပြီ';
+  }
+
+  @override
+  String get goalCompleted => 'ရည်မှန်းချက် အောင်မြင်ပါပြီ! 🎉';
+
+  @override
+  String get goalCompletedSub =>
+      'ဂုဏ်ယူပါသည်! သင်၏ စုငွေရည်မှန်းချက် ပြည့်မီသွားပါပြီ။';
+
+  @override
+  String get emptyGoalsTitle => 'စုငွေ ရည်မှန်းချက် မရှိသေးပါ';
+
+  @override
+  String get emptyGoalsMessage =>
+      'ခရီးသွားရန်၊ အရေးပေါ်ရန်ပုံငွေ သို့မဟုတ် လိုချင်သောအရာများအတွက် စုငွေပန်းတိုင် သတ်မှတ်လိုက်ပါ။';
+
+  @override
+  String get emptyCompletedGoals =>
+      'ပြီးမြောက်သော ရည်မှန်းချက် မရှိသေးပါ။ ဆက်လက်စုဆောင်းပါ!';
+
+  @override
+  String get emptyArchivedGoals => 'သိမ်းဆည်းထားသော ရည်မှန်းချက် မရှိပါ။';
+
+  @override
+  String get goalNameRequired => 'ရည်မှန်းချက် အမည် ထည့်သွင်းပေးပါ';
+
+  @override
+  String get goalNameTooLong =>
+      'ရည်မှန်းချက် အမည်သည် စာလုံးရေ ၁၀၀ ထက် မကျော်ရပါ';
+
+  @override
+  String get goalTargetAmountInvalid => 'ရည်မှန်းငွေပမာဏသည် သုညထက် ကြီးရပါမည်';
+
+  @override
+  String get goalCurrentAmountInvalid => 'စုဆောင်းငွေသည် အနှုတ် မဖြစ်ရပါ';
+
+  @override
+  String get goalContributionAmountInvalid =>
+      'ထည့်ဝင်ငွေပမာဏသည် သုညထက် ကြီးရပါမည်';
+
+  @override
+  String get goalWithdrawAmountInvalid => 'ထုတ်ယူငွေပမာဏသည် သုညထက် ကြီးရပါမည်';
+
+  @override
+  String get goalWithdrawExceedsBalance =>
+      'ထုတ်ယူငွေသည် လက်ရှိစုငွေထက် မကျော်လွန်ရပါ';
+
+  @override
+  String get goalNotesTooLong => 'မှတ်ချက်သည် စာလုံးရေ ၅၀၀ ထက် မကျော်ရပါ';
+
+  @override
+  String get goalSavedSuccess => 'စုငွေရည်မှန်းချက်ကို သိမ်းဆည်းပြီးပါပြီ';
+
+  @override
+  String get goalDeletedSuccess => 'စုငွေရည်မှန်းချက်ကို ဖျက်ပြီးပါပြီ';
+
+  @override
+  String get goalContributedSuccess => 'စုငွေ ထည့်ဝင်မှု အောင်မြင်ပါသည်';
+
+  @override
+  String get goalWithdrawnSuccess => 'စုငွေ ထုတ်ယူမှု အောင်မြင်ပါသည်';
+
+  @override
+  String get settingsSavingsGoals => 'စုငွေ ရည်မှန်းချက်များ';
+
+  @override
+  String get settingsSavingsGoalsSubtitle =>
+      'ပန်းတိုင်များ၊ အရေးပေါ်ရန်ပုံငွေနှင့် တိုးတက်မှုများကို စောင့်ကြည့်ပါ';
 }

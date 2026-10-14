@@ -2277,6 +2277,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Now'**
   String get recurringPendingActionConfirm;
+
+  /// App bar title for the savings goals page.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings Goals'**
+  String get savingsGoalsTitle;
+
+  /// Label for active savings goals tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get savingsGoalsActiveTab;
+
+  /// Label for completed savings goals tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get savingsGoalsCompletedTab;
+
+  /// Label for archived savings goals tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get savingsGoalsArchivedTab;
+
+  /// Title and button label for creating a new savings goal.
+  ///
+  /// In en, this message translates to:
+  /// **'New Goal'**
+  String get newGoal;
+
+  /// Title for editing an existing savings goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Goal'**
+  String get editGoal;
+
+  /// Form label for the savings goal name.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Name'**
+  String get goalNameLabel;
+
+  /// Form label for target amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Amount'**
+  String get goalTargetAmountLabel;
+
+  /// Form label for initial or current saved amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Saved Amount'**
+  String get goalCurrentAmountLabel;
+
+  /// Form label for optional goal deadline date.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Date (Optional)'**
+  String get goalTargetDateLabel;
+
+  /// Form label for linked account.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked Account (Optional)'**
+  String get goalAccountLabel;
+
+  /// Form label for notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (Optional)'**
+  String get goalNotesLabel;
+
+  /// Label for icon picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get goalIconLabel;
+
+  /// Label for color picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get goalColorLabel;
+
+  /// Button to save a goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Goal'**
+  String get saveGoal;
+
+  /// Button to delete a goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Goal'**
+  String get deleteGoal;
+
+  /// Confirmation message when deleting a goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this savings goal? This cannot be undone.'**
+  String get deleteGoalConfirm;
+
+  /// Action to archive a goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get archiveGoal;
+
+  /// Action to unarchive a goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Unarchive'**
+  String get unarchiveGoal;
+
+  /// Title for the deposit dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Contribution'**
+  String get depositTitle;
+
+  /// Title for the withdraw dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdraw Funds'**
+  String get withdrawTitle;
+
+  /// Action button to deposit money into a goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit'**
+  String get depositAction;
+
+  /// Action button to withdraw money from a goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdraw'**
+  String get withdrawAction;
+
+  /// Label for amount input field.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get goalAmountLabel;
+
+  /// Label showing remaining amount to reach target.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} remaining'**
+  String goalRemaining(String amount);
+
+  /// Days remaining until goal target date.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left'**
+  String goalDaysLeft(int days);
+
+  /// Days overdue past goal target date.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days overdue'**
+  String goalDaysOverdue(int days);
+
+  /// Celebration title when goal is achieved.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Achieved! 🎉'**
+  String get goalCompleted;
+
+  /// Celebration subtitle when goal is achieved.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations! You reached your savings target.'**
+  String get goalCompletedSub;
+
+  /// Title shown when there are no savings goals.
+  ///
+  /// In en, this message translates to:
+  /// **'No Savings Goals Yet'**
+  String get emptyGoalsTitle;
+
+  /// Message shown when there are no savings goals.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a goal to save for a vacation, emergency fund, or large purchase.'**
+  String get emptyGoalsMessage;
+
+  /// Message when no goals are completed.
+  ///
+  /// In en, this message translates to:
+  /// **'No completed goals yet. Keep saving!'**
+  String get emptyCompletedGoals;
+
+  /// Message when no goals are archived.
+  ///
+  /// In en, this message translates to:
+  /// **'No archived goals.'**
+  String get emptyArchivedGoals;
+
+  /// Validation error when goal name is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a goal name'**
+  String get goalNameRequired;
+
+  /// Validation error when goal name is too long.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal name cannot exceed 100 characters'**
+  String get goalNameTooLong;
+
+  /// Validation error when target amount is not positive.
+  ///
+  /// In en, this message translates to:
+  /// **'Target amount must be greater than zero'**
+  String get goalTargetAmountInvalid;
+
+  /// Validation error when saved amount is negative.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved amount cannot be negative'**
+  String get goalCurrentAmountInvalid;
+
+  /// Validation error when contribution amount is not positive.
+  ///
+  /// In en, this message translates to:
+  /// **'Contribution amount must be greater than zero'**
+  String get goalContributionAmountInvalid;
+
+  /// Validation error when withdrawal amount is not positive.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdrawal amount must be greater than zero'**
+  String get goalWithdrawAmountInvalid;
+
+  /// Validation error when withdrawal exceeds current amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdrawal amount cannot exceed the saved balance'**
+  String get goalWithdrawExceedsBalance;
+
+  /// Validation error when notes are too long.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes cannot exceed 500 characters'**
+  String get goalNotesTooLong;
+
+  /// Snackbar confirming savings goal saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings goal saved'**
+  String get goalSavedSuccess;
+
+  /// Snackbar confirming savings goal deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings goal deleted'**
+  String get goalDeletedSuccess;
+
+  /// Snackbar confirming contribution added.
+  ///
+  /// In en, this message translates to:
+  /// **'Contribution added successfully'**
+  String get goalContributedSuccess;
+
+  /// Snackbar confirming funds withdrawn.
+  ///
+  /// In en, this message translates to:
+  /// **'Funds withdrawn successfully'**
+  String get goalWithdrawnSuccess;
+
+  /// Title for savings goals in settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings Goals'**
+  String get settingsSavingsGoals;
+
+  /// Subtitle for savings goals in settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Track targets, emergency funds, and progress'**
+  String get settingsSavingsGoalsSubtitle;
 }
 
 class _AppLocalizationsDelegate

@@ -15,6 +15,8 @@ import 'package:ledgerly/features/budgets/presentation/pages/budget_form_page.da
 import 'package:ledgerly/features/budgets/presentation/pages/budgets_page.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
 import 'package:ledgerly/features/data_transfer/presentation/pages/data_transfer_page.dart';
+import 'package:ledgerly/features/goals/presentation/pages/goal_form_page.dart';
+import 'package:ledgerly/features/goals/presentation/pages/goals_list_page.dart';
 import 'package:ledgerly/features/insights/presentation/pages/insights_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
 import 'package:ledgerly/features/profile/presentation/pages/profile_page.dart';
@@ -204,6 +206,22 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
         name: AppRoutes.recurringEditName,
         builder: (context, state) =>
             RecurringFormPage(recurringId: state.pathParameters['id']),
+      ),
+      GoRoute(
+        path: AppRoutes.goals,
+        name: AppRoutes.goalsName,
+        builder: (context, state) => const GoalsListPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.goalsNew,
+        name: AppRoutes.goalsNewName,
+        builder: (context, state) => const GoalFormPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.goalsEdit,
+        name: AppRoutes.goalsEditName,
+        builder: (context, state) =>
+            GoalFormPage(goalId: state.pathParameters['id']),
       ),
     ],
   );

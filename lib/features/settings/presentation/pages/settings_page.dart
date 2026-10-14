@@ -193,6 +193,13 @@ class SettingsPage extends ConsumerWidget {
                   leading: const Icon(Icons.update_rounded),
                   onTap: () => context.pushNamed(AppRoutes.recurringName),
                 ),
+                const _GroupDivider(),
+                _NavRow(
+                  label: strings('settingsSavingsGoals'),
+                  subtitle: strings('settingsSavingsGoalsSubtitle'),
+                  leading: const Icon(Icons.savings_outlined),
+                  onTap: () => context.pushNamed(AppRoutes.goalsName),
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),

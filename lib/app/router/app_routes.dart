@@ -109,4 +109,16 @@ abstract final class AppRoutes {
   /// Edit recurring transaction (Phase 3).
   static const String recurringEdit = '/recurring/:id/edit';
   static const String recurringEditName = 'recurringEdit';
+
+  /// Savings goals management (Phase 3).
+  static const String goals = '/goals';
+  static const String goalsName = 'goals';
+
+  /// Add new savings goal (Phase 3).
+  static const String goalsNew = '/goals/new';
+  static const String goalsNewName = 'goalsNew';
+
+  /// Edit savings goal (Phase 3).
+  static const String goalsEdit = '/goals/edit/:id';
+  static const String goalsEditName = 'goalsEdit';
 }
