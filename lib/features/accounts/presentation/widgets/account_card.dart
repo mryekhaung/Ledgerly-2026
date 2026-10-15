@@ -109,10 +109,14 @@ class AccountCard extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.xxs),
                 Row(
                   children: <Widget>[
-                    Text(
-                      typeLabel,
-                      style: AppTypography.label.copyWith(
-                        color: colors.textSecondary,
+                    Flexible(
+                      child: Text(
+                        typeLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.label.copyWith(
+                          color: colors.textSecondary,
+                        ),
                       ),
                     ),
                     if (!account.includeInTotal) ...[
