@@ -1222,6 +1222,12 @@ abstract class AppLocalizations {
   /// **'Get Started'**
   String get welcomeGetStarted;
 
+  /// Screen-reader label for a pay-cycle start day chip.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String welcomeDayChipLabel(int day);
+
   /// Button to skip onboarding and continue directly.
   ///
   /// In en, this message translates to:
@@ -1395,6 +1401,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This email is already in use'**
   String get authErrorEmailAlreadyInUse;
+
+  /// Generic fallback when sign-in fails without details.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in failed. Please try again.'**
+  String get authErrorSignInFailed;
 
   /// Label for data transfer and backup row in settings.
   ///

@@ -583,6 +583,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get welcomeGetStarted => '使ってみる';
 
   @override
+  String welcomeDayChipLabel(int day) {
+    return '$day日';
+  }
+
+  @override
   String get welcomeSkip => '今はスキップ';
 
   @override
@@ -668,6 +673,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get authErrorEmailAlreadyInUse => 'このメールアドレスは既に使用されています';
+
+  @override
+  String get authErrorSignInFailed => 'ログインに失敗しました。もう一度お試しください。';
 
   @override
   String get settingsDataTransfer => 'データとバックアップ';

@@ -88,6 +88,9 @@ abstract final class AppStrings {
         _require(values, 'categories') as int,
         _require(values, 'transactions') as int,
       ),
+      'welcomeDayChipLabel' => l10n.welcomeDayChipLabel(
+        _require(values, 'day') as int,
+      ),
       _ => throw FlutterError(
         'AppStrings.fill() has no case for "$key". Add one in '
         'lib/core/presentation/app_strings.dart.',

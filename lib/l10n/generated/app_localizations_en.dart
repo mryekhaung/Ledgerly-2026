@@ -603,6 +603,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeGetStarted => 'Get Started';
 
   @override
+  String welcomeDayChipLabel(int day) {
+    return 'Day $day';
+  }
+
+  @override
   String get welcomeSkip => 'Skip for now';
 
   @override
@@ -690,6 +695,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authErrorEmailAlreadyInUse => 'This email is already in use';
+
+  @override
+  String get authErrorSignInFailed => 'Sign in failed. Please try again.';
 
   @override
   String get settingsDataTransfer => 'Data & Backup';

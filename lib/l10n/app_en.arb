@@ -779,6 +779,15 @@
   "@welcomeGetStarted": {
     "description": "Button to start using the app."
   },
+  "welcomeDayChipLabel": "Day {day}",
+  "@welcomeDayChipLabel": {
+    "description": "Screen-reader label for a pay-cycle start day chip.",
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
   "welcomeSkip": "Skip for now",
   "@welcomeSkip": {
     "description": "Button to skip onboarding and continue directly."
@@ -894,6 +903,10 @@
   "authErrorEmailAlreadyInUse": "This email is already in use",
   "@authErrorEmailAlreadyInUse": {
     "description": "Error when registering with an existing email."
+  },
+  "authErrorSignInFailed": "Sign in failed. Please try again.",
+  "@authErrorSignInFailed": {
+    "description": "Generic fallback when sign-in fails without details."
   },
   "settingsDataTransfer": "Data & Backup",
   "@settingsDataTransfer": {

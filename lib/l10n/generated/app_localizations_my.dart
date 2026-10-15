@@ -608,6 +608,11 @@ class AppLocalizationsMy extends AppLocalizations {
   String get welcomeGetStarted => 'စတင်မည်';
 
   @override
+  String welcomeDayChipLabel(int day) {
+    return 'ရက် $day';
+  }
+
+  @override
   String get welcomeSkip => 'လောလောဆယ် ကျော်မည်';
 
   @override
@@ -697,6 +702,10 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get authErrorEmailAlreadyInUse => 'ဤအီးမေးလ်ကို အသုံးပြုပြီးဖြစ်ပါသည်';
+
+  @override
+  String get authErrorSignInFailed =>
+      'အကောင့်ဝင်ရောက်မှု မအောင်မြင်ပါ။ ထပ်ကြိုးစားကြည့်ပါ။';
 
   @override
   String get settingsDataTransfer => 'ဒေတာနှင့် အရန်သိမ်းဆည်းမှု';
