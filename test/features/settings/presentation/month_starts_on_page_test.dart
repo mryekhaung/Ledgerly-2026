@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/domain/usecases/save_settings.dart';
@@ -9,6 +8,7 @@ import 'package:ledgerly/features/settings/presentation/providers/settings_provi
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
+import '../../../support/width_walk.dart';
 
 void main() {
   AppSettings savedSettings = AppSettings.defaults;
@@ -86,31 +86,6 @@ void main() {
     });
   });
 
-  group('MonthStartsOnPage responsive layouts', () {
-    for (final width in <double>[
-      TestWidths.phone,
-      TestWidths.tablet,
-      TestWidths.desktop,
-    ]) {
-      testWidgets('lays out at width $width without overflow', (tester) async {
-        await host(tester, width: width);
-        await tester.pumpAndSettle();
-
-        expect(tester.takeException(), isNull);
-      });
-
-      testWidgets(
-        'lays out at width $width at text scale 2.0 without overflow',
-        (tester) async {
-          await host(tester, width: width, textScale: 2.0);
-          await tester.pumpAndSettle();
-
-          expect(tester.takeException(), isNull);
-        },
-      );
-    }
-  });
-
   group('MonthStartsOnPage localization', () {
     testWidgets('renders in Burmese', (tester) async {
       await host(tester, locale: const Locale('my'));
@@ -136,4 +111,11 @@ void main() {
       expect(find.textContaining('前の期間'), findsOneWidget);
     });
   });
+
+  // Replaces a hand-rolled loop that covered three widths
+  // (phone/tablet/desktop) and missed 360, 430 and 1440, and that re-pumped on
+  // top of the previous tree rather than unmounting. The page was migrated onto
+  // `AppScaffold.contentMaxWidth` (`docs/Roadmap.md` §J), so the widths it did
+  // not cover were exactly the ones the migration was not checked at.
+  widthWalkGroup(pageName: 'MonthStartsOnPage', host: host);
 }

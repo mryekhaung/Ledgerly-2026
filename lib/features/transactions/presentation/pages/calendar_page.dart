@@ -111,20 +111,66 @@ class CalendarPage extends ConsumerWidget {
             child: Text(strings('calendarToday')),
           ),
       ],
-      body: sizeClass.isTwoPaneCapable
-          ? _WideBody(
-              monthPane: monthPane,
-              dayPane: DayList(day: state.selectedDay),
-            )
-          : ListView(
-              padding: ResponsiveInsets.pageHorizontal(context),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final horizontal = AppSpacing.pageHorizontal(
+            MediaQuery.sizeOf(context).width,
+          );
+
+          // A size class alone is not enough to justify a split: at a 600 px
+          // window the shell's rail leaves 520 px, and a 300 px grid beside a
+          // 196 px day list is worse than the single column it replaced. The
+          // arithmetic lives on `TwoPaneLayout` so this page cannot disagree
+          // with the layout about when the split happens.
+          final split =
+              sizeClass.isTwoPaneCapable &&
+              TwoPaneLayout.fits(
+                constraints.maxWidth,
+                masterMinWidth: _monthPaneMinWidth,
+                detailMinWidth: _dayPaneMinWidth,
+              );
+
+          if (!split) {
+            return ListView(
+              padding: EdgeInsets.symmetric(horizontal: horizontal),
               children: <Widget>[
                 ...monthPane,
                 const SizedBox(height: AppSpacing.lg),
                 DayList(day: state.selectedDay),
                 SizedBox(height: 80 + MediaQuery.paddingOf(context).bottom),
               ],
+            );
+          }
+
+          // Each pane gets **its own scrollable** rather than sharing one. A
+          // single `CustomScrollView` across both would make the day list's
+          // length determine the grid's scroll extent, so a busy day would push
+          // the month header off screen — which is exactly what the wide layout
+          // is supposed to avoid.
+          return TwoPaneLayout(
+            master: ListView(
+              padding: EdgeInsets.fromLTRB(
+                horizontal,
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+              ),
+              children: monthPane,
             ),
+            detail: ListView(
+              padding: EdgeInsets.fromLTRB(
+                0,
+                AppSpacing.lg,
+                horizontal,
+                AppSpacing.lg,
+              ),
+              children: <Widget>[DayList(day: state.selectedDay)],
+            ),
+            masterMinWidth: _monthPaneMinWidth,
+            detailMinWidth: _dayPaneMinWidth,
+          );
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () =>
             unawaited(_openTransactionForm(context, state.selectedDay)),
@@ -166,58 +212,18 @@ class CalendarPage extends ConsumerWidget {
   }
 }
 
-/// The two-pane body: grid + summary on the left, the day's transactions right.
+/// Floor for the month pane, in logical pixels.
 ///
-/// Each pane gets **its own scrollable** rather than sharing one. A single
-/// `CustomScrollView` across both would make the day list's length determine the
-/// grid's scroll extent, so a busy day would push the month header off screen —
-/// which is exactly what the wide layout is supposed to avoid.
-class _WideBody extends StatelessWidget {
-  const _WideBody({required this.monthPane, required this.dayPane});
+/// `MonthSwitcher` spends **120 px** of whatever it is given on chrome — two
+/// 48 px chevrons, a 4 px gap and a 20 px caret — and the pay-cycle label
+/// ("Oct 10 – Nov 9") needs up to ~130 px in the shipped font. A 300 px pane
+/// leaves 300 − 24 (page padding) − 120 = **156 px** for the label, which is the
+/// first width at which the header stops ellipsizing.
+///
+/// Before this floor existed the pane was a bare 4-of-10 flex share, which at an
+/// 894 px window came to 252 px and left the label 108 px — so it ellipsized, and
+/// nothing caught it, because `TextOverflow.ellipsis` does not throw.
+const double _monthPaneMinWidth = 300;
 
-  final List<Widget> monthPane;
-  final Widget dayPane;
-
-  @override
-  Widget build(BuildContext context) {
-    final horizontal = AppSpacing.pageHorizontal(
-      MediaQuery.sizeOf(context).width,
-    );
-
-    return Row(
-      // `stretch`, not `start`: both panes are `ListView`s, so `start` hands
-      // each one an unbounded box and the first frame throws "Vertical viewport
-      // was given unbounded height". `stretch` gives them the row's height,
-      // which is what makes the two panes scroll independently — the whole
-      // point of the wide layout.
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Expanded(
-          flex: 4,
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(
-              horizontal,
-              AppSpacing.lg,
-              0,
-              AppSpacing.lg,
-            ),
-            children: monthPane,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.xl),
-        Expanded(
-          flex: 6,
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(
-              0,
-              AppSpacing.lg,
-              horizontal,
-              AppSpacing.lg,
-            ),
-            children: <Widget>[dayPane],
-          ),
-        ),
-      ],
-    );
-  }
-}
+/// Floor for the day pane: room for a category name and an amount side by side.
+const double _dayPaneMinWidth = 260;

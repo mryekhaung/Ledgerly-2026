@@ -8,7 +8,6 @@ import 'package:ledgerly/features/settings/presentation/widgets/about_section.da
 import 'package:ledgerly/features/settings/presentation/widgets/features_section.dart';
 import 'package:ledgerly/features/settings/presentation/widgets/preferences_section.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
-import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// App settings: currency, language, appearance and week start.
@@ -41,28 +40,28 @@ class SettingsPage extends ConsumerWidget {
     return AppScaffold(
       title: strings('settingsTitle'),
       // Width-capped rather than stretched: a preference row reads as a row at
-      // 560 px and as a stranded label at 1200 (`docs/Design.md` §8).
-      body: ConstrainedPane(
-        maxWidth: AppSpacing.proseMaxWidth,
-        child: ListView(
-          padding: EdgeInsets.fromLTRB(
-            AppSpacing.pageHorizontal(MediaQuery.sizeOf(context).width),
-            AppSpacing.lg,
-            AppSpacing.pageHorizontal(MediaQuery.sizeOf(context).width),
-            AppSpacing.lg + MediaQuery.paddingOf(context).bottom + 24,
-          ),
-          children: <Widget>[
-            PreferencesSection(settings: settings, onSave: save),
-            const SizedBox(height: AppSpacing.lg),
-            FeaturesSection(settings: settings, onSave: save),
-            const SizedBox(height: AppSpacing.lg),
-            AboutSection(
-              version: _AppVersion.display,
-              onCreditsTap: () => _showCreditsDialog(context, strings),
-            ),
-            const SizedBox(height: AppSpacing.xxl),
-          ],
+      // 560 px and as a stranded label at 1200 (`docs/Design.md` §8). Declared
+      // on the scaffold rather than on the body so it can line the title up with
+      // the column it is centring.
+      contentMaxWidth: AppSpacing.proseMaxWidth,
+      body: ListView(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.pageHorizontal(MediaQuery.sizeOf(context).width),
+          AppSpacing.lg,
+          AppSpacing.pageHorizontal(MediaQuery.sizeOf(context).width),
+          AppSpacing.lg + MediaQuery.paddingOf(context).bottom + 24,
         ),
+        children: <Widget>[
+          PreferencesSection(settings: settings, onSave: save),
+          const SizedBox(height: AppSpacing.lg),
+          FeaturesSection(settings: settings, onSave: save),
+          const SizedBox(height: AppSpacing.lg),
+          AboutSection(
+            version: _AppVersion.display,
+            onCreditsTap: () => _showCreditsDialog(context, strings),
+          ),
+          const SizedBox(height: AppSpacing.xxl),
+        ],
       ),
     );
   }

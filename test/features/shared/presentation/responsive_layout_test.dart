@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
@@ -26,6 +27,32 @@ void main() {
       );
 
   group('TwoPaneLayout', () {
+    /// The rendered width of the leading pane.
+    ///
+    /// Measured off the `SizedBox` the layout wraps the master in, not off the
+    /// master's own widget: a `Flexible`/`Expanded` pane reports its *share*,
+    /// and it is the box the pane's content actually lives in that decides
+    /// whether that content clips.
+    ///
+    /// `.first` because `find.ancestor` walks outward from the target, so the
+    /// nearest enclosing `SizedBox` is the pane's.
+    double masterPaneWidth(WidgetTester tester) => tester
+        .getSize(
+          find
+              .ancestor(
+                of: find.text('master'),
+                matching: find.byType(SizedBox),
+              )
+              .first,
+        )
+        .width;
+
+    /// Whether the layout is currently split side by side.
+    bool isSplit() => find
+        .descendant(of: find.byType(TwoPaneLayout), matching: find.byType(Row))
+        .evaluate()
+        .isNotEmpty;
+
     testWidgets('should_stack_the_panes_below_medium', (tester) async {
       await host(
         tester,
@@ -79,15 +106,9 @@ void main() {
         TestWidths.wide,
       );
 
-      final size = tester.getSize(
-        find
-            .ancestor(
-              of: find.text('master'),
-              matching: find.byType(ConstrainedBox),
-            )
-            .first,
-      );
-      expect(size.width, lessThanOrEqualTo(300));
+      // The ceiling is now an explicit width on the master rather than a
+      // `ConstrainedBox` around it, so it is measured the same way the floor is.
+      expect(masterPaneWidth(tester), lessThanOrEqualTo(300));
     });
 
     testWidgets('should_apply_the_configured_spacing_when_stacked', (
@@ -107,63 +128,153 @@ void main() {
       final detailTop = tester.getTopLeft(find.text('detail')).dy;
       expect(detailTop - masterBottom, greaterThanOrEqualTo(24));
     });
-  });
 
-  group('ConstrainedPane', () {
-    testWidgets('should_cap_the_child_at_the_prose_width', (tester) async {
-      await host(
-        tester,
-        const ConstrainedPane(child: Text('body')),
-        TestWidths.wide,
-      );
+    // --- the floor (docs/Roadmap.md §G.8 R1) ---------------------------------
 
-      final size = tester.getSize(
-        find
-            .ancestor(
-              of: find.text('body'),
-              matching: find.byType(ConstrainedBox),
-            )
-            .first,
-      );
-      expect(size.width, lessThanOrEqualTo(560));
+    testWidgets('should_never_give_the_master_less_than_its_floor', (
+      tester,
+    ) async {
+      // The regression this guards: a bare flex share has **no floor**, so the
+      // master shrank with the window while the content inside it did not. On
+      // the calendar that left the month label 108 px at an 894 px window, and
+      // it ellipsized — silently, because `TextOverflow.ellipsis` does not
+      // throw, so no overflow-based walk could ever have seen it.
+      //
+      // 320 sits above the 4-of-10 share at these widths (700 px → 270), so it
+      // is the floor that decides the width rather than the share.
+      const floor = 320.0;
+      for (final width in <double>[700, 800, TestWidths.tablet]) {
+        await host(
+          tester,
+          const TwoPaneLayout(
+            master: Text('master'),
+            detail: Text('detail'),
+            masterMinWidth: floor,
+          ),
+          width,
+        );
+
+        expect(isSplit(), isTrue, reason: 'expected a split at width $width');
+        expect(
+          masterPaneWidth(tester),
+          greaterThanOrEqualTo(floor),
+          reason: 'the master fell below its floor at width $width',
+        );
+      }
     });
 
-    testWidgets('should_not_stretch_a_narrow_child', (tester) async {
+    testWidgets('should_fill_the_row_exactly_with_both_panes_and_the_gap', (
+      tester,
+    ) async {
+      // The explicit-width split must not leave a gap or overflow: master + gap
+      // + detail has to come to the body width exactly, or the detail pane is
+      // being silently squeezed.
+      const width = 900.0;
       await host(
         tester,
-        const ConstrainedPane(child: Text('body')),
-        TestWidths.smallPhone,
+        const TwoPaneLayout(master: Text('master'), detail: Text('detail')),
+        width,
       );
 
-      // The cap is a ceiling, not a target: on a narrow window the child gets
-      // whatever width there is rather than being padded out to 560.
-      final size = tester.getSize(
-        find
-            .ancestor(
-              of: find.text('body'),
-              matching: find.byType(ConstrainedBox),
-            )
-            .first,
-      );
-      expect(size.width, lessThanOrEqualTo(TestWidths.smallPhone));
+      final master = masterPaneWidth(tester);
+      final detail = tester.getSize(find.text('detail')).width;
+
+      expect(master + AppSpacing.xl + detail, closeTo(width, 0.01));
+      expect(tester.takeException(), isNull);
     });
 
-    testWidgets('should_honour_a_custom_cap', (tester) async {
+    testWidgets('should_stack_when_the_body_cannot_hold_both_floors', (
+      tester,
+    ) async {
+      // A size class alone is not enough to justify a split. 768 px is
+      // two-pane-capable, but two 400 px floors plus the gap need 824 — and a
+      // squeezed pair is worse than the single column it replaced.
       await host(
         tester,
-        const ConstrainedPane(maxWidth: 200, child: Text('body')),
-        TestWidths.wide,
+        const TwoPaneLayout(
+          master: Text('master'),
+          detail: Text('detail'),
+          masterMinWidth: 400,
+          detailMinWidth: 400,
+        ),
+        TestWidths.tablet,
       );
 
-      final size = tester.getSize(
-        find
-            .ancestor(
-              of: find.text('body'),
-              matching: find.byType(ConstrainedBox),
-            )
-            .first,
+      expect(isSplit(), isFalse);
+      // Stacking rearranges; it never drops a pane.
+      expect(find.text('master'), findsOneWidget);
+      expect(find.text('detail'), findsOneWidget);
+    });
+
+    testWidgets(
+      'should_keep_both_panes_at_or_above_their_floors_at_every_width',
+      (tester) async {
+        // The calendar's floors, walked across every mandated width. Whichever
+        // arrangement results, neither pane may be handed less than its floor —
+        // that is the invariant the whole layout exists to hold.
+        const masterFloor = 300.0;
+        const detailFloor = 260.0;
+        for (final width in TestWidths.all) {
+          await host(
+            tester,
+            const TwoPaneLayout(
+              master: Text('master'),
+              detail: Text('detail'),
+              masterMinWidth: masterFloor,
+              detailMinWidth: detailFloor,
+            ),
+            width,
+          );
+
+          expect(
+            tester.takeException(),
+            isNull,
+            reason: 'TwoPaneLayout threw at width $width',
+          );
+          if (!isSplit()) continue;
+
+          expect(
+            masterPaneWidth(tester),
+            greaterThanOrEqualTo(masterFloor),
+            reason: 'master below its floor at width $width',
+          );
+          expect(
+            tester.getSize(find.text('detail')).width,
+            greaterThanOrEqualTo(detailFloor),
+            reason: 'detail below its floor at width $width',
+          );
+        }
+      },
+    );
+
+    test('should_report_a_minimum_body_width_of_both_floors_plus_the_gap', () {
+      const layout = TwoPaneLayout(master: SizedBox(), detail: SizedBox());
+      expect(layout.minBodyWidth, 280 + AppSpacing.xl + 280);
+    });
+
+    test('should_split_exactly_at_the_sum_of_the_floors', () {
+      // `fits` is the calendar's branch condition, so it has to agree with what
+      // `build` does: a hair under the floors must mean "stack".
+      const master = 300.0;
+      const detail = 260.0;
+      const minBody = master + AppSpacing.xl + detail;
+
+      expect(
+        TwoPaneLayout.fits(
+          minBody,
+          masterMinWidth: master,
+          detailMinWidth: detail,
+        ),
+        isTrue,
       );
-      expect(size.width, lessThanOrEqualTo(200));
+      expect(
+        TwoPaneLayout.fits(
+          minBody - 0.1,
+          masterMinWidth: master,
+          detailMinWidth: detail,
+        ),
+        isFalse,
+      );
     });
   });
 
@@ -304,21 +415,6 @@ void main() {
           tester.takeException(),
           isNull,
           reason: 'TwoPaneLayout threw at width $width',
-        );
-      }
-    });
-
-    testWidgets('should_lay_out_a_capped_pane_without_overflowing', (
-      tester,
-    ) async {
-      for (final width in TestWidths.all) {
-        await host(tester, const ConstrainedPane(child: Text('body')), width);
-        await tester.pump();
-
-        expect(
-          tester.takeException(),
-          isNull,
-          reason: 'ConstrainedPane threw at width $width',
         );
       }
     });

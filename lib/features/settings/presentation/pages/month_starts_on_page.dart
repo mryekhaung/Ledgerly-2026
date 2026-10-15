@@ -12,7 +12,6 @@ import 'package:ledgerly/features/settings/presentation/providers/settings_provi
 import 'package:ledgerly/features/settings/presentation/widgets/month_starts_on/day_grid.dart';
 import 'package:ledgerly/features/settings/presentation/widgets/month_starts_on/preview_card.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
-import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The dedicated picker page for the budget-month start day (docs/Design.md §6.6).
@@ -48,39 +47,39 @@ class MonthStartsOnPage extends ConsumerWidget {
 
     return AppScaffold(
       title: strings('monthStartsOnTitle'),
-      body: ConstrainedPane(
-        maxWidth: AppSpacing.proseMaxWidth,
-        child: ListView(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppSpacing.pageHorizontal(
-              MediaQuery.sizeOf(context).width,
-            ),
-            vertical: AppSpacing.lg,
+      // Declared on the scaffold so the title lines up with the column it caps
+      // (`AppScaffold.contentMaxWidth`).
+      contentMaxWidth: AppSpacing.proseMaxWidth,
+      body: ListView(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.pageHorizontal(
+            MediaQuery.sizeOf(context).width,
           ),
-          children: <Widget>[
-            Text(
-              strings('monthStartsOnDescription'),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppThemeColors.of(context).textSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            DayGrid(
-              selectedDay: selectedDay,
-              onSelect: (day) => _save(
-                context,
-                ref,
-                settings.copyWith(monthStartDay: day),
-                strings,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            PeriodPreviewCard(
-              currentRange: currentStr,
-              previousRange: previousStr,
-            ),
-          ],
+          vertical: AppSpacing.lg,
         ),
+        children: <Widget>[
+          Text(
+            strings('monthStartsOnDescription'),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppThemeColors.of(context).textSecondary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          DayGrid(
+            selectedDay: selectedDay,
+            onSelect: (day) => _save(
+              context,
+              ref,
+              settings.copyWith(monthStartDay: day),
+              strings,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          PeriodPreviewCard(
+            currentRange: currentStr,
+            previousRange: previousStr,
+          ),
+        ],
       ),
     );
   }

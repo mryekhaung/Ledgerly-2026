@@ -19,6 +19,7 @@ import 'package:ledgerly/features/transactions/domain/usecases/watch_transaction
 import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/calendar_notifier.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/calendar/month_switcher.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
@@ -345,33 +346,23 @@ void main() {
       await host(tester, TestWidths.desktop);
       await tester.pumpAndSettle();
 
-      final panes = tester
-          .widgetList<ListView>(find.byType(ListView))
-          .toList(growable: false);
-      expect(panes, hasLength(2));
+      // Two panes, each with its own scrollable.
+      final panes = find.byType(ListView);
+      expect(panes, findsNWidgets(2));
 
-      // flex 4 / 6 — the day list is the wider pane, matching the
-      // single-column emphasis where it is the primary content.
-      //
-      // `Expanded`, not `Flexible`: the panes are built as `Expanded(flex: …)`,
-      // and `find.byType` matches an exact runtime type, so `find.byType(
-      // Flexible)` never sees an `Expanded` (they are parent and child in the
-      // class hierarchy, not the same runtime type) and the list came back
-      // empty. Scoped to the `Expanded`s that wrap the two pane `ListView`s
-      // rather than `find.byType(Row)` at large, so an unrelated flex deeper in
-      // the tree cannot be collected.
-      final flexes =
-          tester
-              .widgetList<Expanded>(
-                find.ancestor(
-                  of: find.byType(ListView),
-                  matching: find.byType(Expanded),
-                ),
-              )
-              .map((f) => f.flex)
-              .toList()
-            ..sort();
-      expect(flexes, <int>[4, 6]);
+      // Measured, not read off the flex weights. The master is now given an
+      // explicit width (`TwoPaneLayout`) rather than a flex share, because a
+      // share has no *floor* and the month header needs one — so the weights no
+      // longer describe the split. What still has to hold is the shape: the day
+      // list, the primary content, gets the wider pane.
+      final master = tester.getSize(panes.first).width;
+      final detail = tester.getSize(panes.last).width;
+
+      expect(
+        detail,
+        greaterThan(master),
+        reason: 'the day list should be the wider pane',
+      );
     });
 
     testWidgets('should_not_split_at_compact_even_when_tall', (tester) async {
@@ -380,6 +371,109 @@ void main() {
 
       // 430 px is still a phone: one column.
       expect(find.byType(ListView), findsOneWidget);
+    });
+  });
+
+  group('month header fits (docs/Roadmap.md §G.8 R1)', () {
+    /// What the widest label the switcher can show needs, in the **shipped**
+    /// font: the pay-cycle range ("Oct 10 – Nov 9") runs to about 130 px at
+    /// `titleMedium`. `calendar_page.dart` derives the month pane's 300 px floor
+    /// from this number, so it is the number the regression has to hold.
+    const requiredLabelWidth = 130.0;
+
+    /// The width the month label is actually allowed to occupy.
+    ///
+    /// The label sits in a `Flexible` inside the switcher's inner `Row`, beside
+    /// a 4 px gap and a 20 px caret, so its available box is that row's width
+    /// minus those two — and both are read off the live widgets rather than
+    /// hardcoded, so changing the switcher's furniture fails here instead of
+    /// silently eating into the label.
+    ///
+    /// Measuring the **available box** is deliberate, and is what
+    /// `docs/Roadmap.md` §G.8 R5 calls for. The widget-test font advances each
+    /// glyph by about twice Inter, so an assertion on the rendered text width —
+    /// or on `TextOverflow`, which never throws — would pass or fail for a
+    /// reason that does not exist in the shipped app. The available box is
+    /// font-independent, and it is exactly what the original probe measured.
+    ///
+    /// The inner row is found by its `Flexible` child, matched on the *exact*
+    /// runtime type: the outer row's children are `Expanded`s, and `Expanded` is
+    /// a subclass of `Flexible`, so `is Flexible` would match both rows.
+    double labelAvailableWidth(WidgetTester tester) {
+      final rowFinder = find.descendant(
+        of: find.byType(MonthSwitcher),
+        matching: find.byWidgetPredicate(
+          (w) => w is Row && w.children.any((c) => c.runtimeType == Flexible),
+        ),
+      );
+      expect(rowFinder, findsOneWidget);
+
+      final row = tester.widget<Row>(rowFinder);
+      final rowWidth = tester.getSize(rowFinder).width;
+
+      var reserved = 0.0;
+      for (final child in row.children) {
+        if (child.runtimeType == Flexible) continue;
+        if (child is SizedBox) reserved += child.width ?? 0;
+        if (child is Icon) reserved += child.size ?? 24;
+      }
+      return rowWidth - reserved;
+    }
+
+    /// Body widths to sweep, in 32 px steps.
+    ///
+    /// **Swept, not sampled.** The label's room is a function of the *body*
+    /// width, and the floor that protects it binds only in a band: a body wide
+    /// enough that the page still splits (≥ 584 px, the two floors plus the
+    /// gap) but narrow enough that the 4-of-10 share falls under the 300 px
+    /// floor (≤ ~774 px). Visiting only the six mandated widths steps straight
+    /// over that band — which is exactly how the defect survived a green suite,
+    /// and why the sweep is the shape this test has to have.
+    ///
+    /// In the real app the shell takes its nav chrome off first, so the window
+    /// the defect was reported at (894 px) hands the page a **654 px** body.
+    /// Hosting the page standalone makes the surface and the body the same
+    /// thing, so that case is covered by the sweep rather than by asking for
+    /// 894.
+    List<double> bodies() => <double>[
+      for (var w = 360.0; w <= 1440; w += 32) w,
+    ];
+
+    testWidgets('should_leave_the_month_label_room_to_live', (tester) async {
+      for (final width in bodies()) {
+        await host(tester, width);
+        await tester.pump();
+
+        expect(
+          labelAvailableWidth(tester),
+          greaterThanOrEqualTo(requiredLabelWidth),
+          reason: 'the month label had no room at a ${width}px body',
+        );
+
+        // Unmount so the next width starts from a clean tree — a lazy
+        // scrollable carrying `MergeSemantics` rows trips a framework
+        // assertion when re-pumped on top of the previous one.
+        await tester.pumpWidget(const SizedBox.shrink());
+      }
+    });
+
+    testWidgets('should_leave_the_pay_cycle_label_room_to_live', (
+      tester,
+    ) async {
+      // Pay-cycle mode adds a "Pay cycle" caption under the range, and the
+      // range is the longest label the switcher ever shows. Checked at the
+      // narrowest body the page still splits at, which is the worst case.
+      await host(
+        tester,
+        584,
+        extraOverrides: <Override>[monthStartDayProvider.overrideWithValue(10)],
+      );
+      await tester.pump();
+
+      expect(
+        labelAvailableWidth(tester),
+        greaterThanOrEqualTo(requiredLabelWidth),
+      );
     });
   });
 

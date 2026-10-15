@@ -96,9 +96,9 @@ class AppTestScopes extends StatelessWidget {
 ///    "Vertical viewport was given unbounded height" — a stack that points into
 ///    `material_ui` and reads like a page bug.
 /// 2. `pumpAppHost` also resizes `tester.view`, because `MediaQuery` only
-///    overrides *data*. A widget that measures itself (a `ConstrainedPane`,
-///    which is an `Align` and so as wide as its parent) still lays out against
-///    the real window and would report 800 regardless of the requested width.
+///    overrides *data*. A widget that measures itself (an `Align`-based
+///    column, which is as wide as its parent) still lays out against the real
+///    window and would report 800 regardless of the requested width.
 ///
 /// Why the `StretchingOverscrollIndicator` shows up at all: the widget-test
 /// binding reports `TargetPlatform.android` on desktop hosts, and with Material 3
@@ -216,10 +216,10 @@ class _TestSurround extends StatelessWidget {
 ///
 /// `appTestHost` alone only overrides `MediaQuery.size`; the layout still runs
 /// against `tester.view`'s 800×600. A widget that branches on the size class
-/// does not care, but one that is measured — a `ConstrainedPane` inside an
-/// `Align` is as wide as its parent, so `tester.getSize` reports the window, not
-/// the width the test asked for — does. This resizes the view so `MediaQuery`
-/// and the constraints agree, which is what a real device does.
+/// does not care, but one that is measured — an `Align`-based column is as wide
+/// as its parent, so `tester.getSize` reports the window, not the width the test
+/// asked for — does. This resizes the view so `MediaQuery` and the constraints
+/// agree, which is what a real device does.
 ///
 /// The view is restored by `addTearDown`, so a test can call this repeatedly
 /// (e.g. walking `TestWidths.all`) without leaking a size into the next case.

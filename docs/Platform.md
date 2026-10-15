@@ -78,7 +78,7 @@ Usage rules:
 | large | ≥ 1200 | Sidebar + content capped at ~1200px, extra gutters, 3-column insights |
 
 Screen behaviors:
-- **Calendar:** compact → calendar above day list. medium+ → **left: month calendar + summary, right: selected-day transactions** (two panes).
+- **Calendar:** compact → calendar above day list. medium+ → **left: month calendar + summary, right: selected-day transactions** (two panes) — but only while the body can hold both at their floors (a 300 px month pane, a 24 px gap and a 260 px day pane). Below that it stays one column, because a squeezed pair is worse than the single column it replaced (`docs/Roadmap.md` §J). Each pane scrolls independently.
 - **Add/Edit Transaction & other forms:** same *route*, different presentation — compact: full-screen page; medium+: centered modal page/side panel (max 560px). Still dedicated pages, never inline edit mazes.
 - **Categories:** compact list → form push; expanded → list (left) + form (right) master–detail.
 - **Insights:** 1 → 2 → 3 column card grid; charts resize with `LayoutBuilder`.

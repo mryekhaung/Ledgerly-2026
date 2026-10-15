@@ -12,7 +12,6 @@ import 'package:ledgerly/features/auth/presentation/widgets/account/identity_car
 import 'package:ledgerly/features/auth/presentation/widgets/account/linking_banner.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
-import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Account management page (Phase 2, docs/Roadmap.md).
@@ -134,41 +133,43 @@ class AccountPage extends ConsumerWidget {
 
     return AppScaffold(
       title: strings('accountTitle'),
-      body: ConstrainedPane(
-        maxWidth: AppSpacing.proseMaxWidth,
-        child: ListView(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppSpacing.pageHorizontal(
-              MediaQuery.sizeOf(context).width,
-            ),
-            vertical: AppSpacing.lg,
+      // The column is declared on the scaffold so the title lines up with it
+      // (`AppScaffold.contentMaxWidth`); capping the body here instead would
+      // make the cap a second owner of the column and let it drift from the
+      // title's inset.
+      contentMaxWidth: AppSpacing.proseMaxWidth,
+      body: ListView(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.pageHorizontal(
+            MediaQuery.sizeOf(context).width,
           ),
-          children: <Widget>[
-            // Identity Card
-            AccountIdentityCard(
-              user: user,
-              isGuest: isGuest,
-              avatarConfig: avatarConfig,
+          vertical: AppSpacing.lg,
+        ),
+        children: <Widget>[
+          // Identity Card
+          AccountIdentityCard(
+            user: user,
+            isGuest: isGuest,
+            avatarConfig: avatarConfig,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+
+          // Guest-to-Account Linking Banner (Design.md §6.6 / Roadmap §Phase 2)
+          if (isGuest) ...<Widget>[
+            AccountLinkingBanner(
+              isLoading: authState.isLoading,
+              onLink: (provider) => _linkAccount(context, ref, provider),
             ),
             const SizedBox(height: AppSpacing.xl),
-
-            // Guest-to-Account Linking Banner (Design.md §6.6 / Roadmap §Phase 2)
-            if (isGuest) ...<Widget>[
-              AccountLinkingBanner(
-                isLoading: authState.isLoading,
-                onLink: (provider) => _linkAccount(context, ref, provider),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-            ],
-
-            // Account Actions
-            AccountActionsCard(
-              isLoading: authState.isLoading,
-              onSignOut: () => _signOut(context, ref),
-              onDeleteAccount: () => _deleteAccount(context, ref),
-            ),
           ],
-        ),
+
+          // Account Actions
+          AccountActionsCard(
+            isLoading: authState.isLoading,
+            onSignOut: () => _signOut(context, ref),
+            onDeleteAccount: () => _deleteAccount(context, ref),
+          ),
+        ],
       ),
     );
   }

@@ -16,7 +16,6 @@ import 'package:ledgerly/features/auth/presentation/widgets/welcome/hero_header.
 import 'package:ledgerly/features/auth/presentation/widgets/welcome/month_start_question.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
-import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The onboarding and welcome page (Phase 2, docs/Design.md §6.6).
@@ -158,51 +157,50 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
         const SizedBox(width: AppSpacing.sm),
       ],
       useSafeArea: false,
+      // Declared on the scaffold so the title lines up with the column it caps
+      // (`AppScaffold.contentMaxWidth`). The extra `Center` this used to carry
+      // was redundant: the scaffold's own column already centres the body.
+      contentMaxWidth: AppSpacing.proseMaxWidth,
       body: SafeArea(
-        child: Center(
-          child: ConstrainedPane(
-            maxWidth: AppSpacing.proseMaxWidth,
-            child: ListView(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppSpacing.pageHorizontal(
-                  MediaQuery.sizeOf(context).width,
-                ),
-                vertical: AppSpacing.md,
-              ),
-              children: <Widget>[
-                // App Hero Icon & Title
-                const HeroHeader(),
-
-                // First-Run Question: Month start day (Design.md §6.6)
-                MonthStartQuestion(
-                  selectedDay: _selectedDay,
-                  onSelect: (day) {
-                    setState(() {
-                      _selectedDay = day;
-                    });
-                    AppFeedback.selection();
-                  },
-                  periodPreview: periodStr,
-                ),
-                const SizedBox(height: AppSpacing.xl),
-
-                // Auth Action Buttons
-                AuthButtons(
-                  isLoading: authState.isLoading,
-                  onGuest: _continueAsGuest,
-                  onGoogle: _signInWithGoogle,
-                  onApple: _signInWithApple,
-                  onEmail: () async {
-                    await _persistMonthStartDay();
-                    if (context.mounted) {
-                      await context.pushNamed(AppRoutes.signInName);
-                    }
-                  },
-                ),
-                const SizedBox(height: AppSpacing.xl),
-              ],
+        child: ListView(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.pageHorizontal(
+              MediaQuery.sizeOf(context).width,
             ),
+            vertical: AppSpacing.md,
           ),
+          children: <Widget>[
+            // App Hero Icon & Title
+            const HeroHeader(),
+
+            // First-Run Question: Month start day (Design.md §6.6)
+            MonthStartQuestion(
+              selectedDay: _selectedDay,
+              onSelect: (day) {
+                setState(() {
+                  _selectedDay = day;
+                });
+                AppFeedback.selection();
+              },
+              periodPreview: periodStr,
+            ),
+            const SizedBox(height: AppSpacing.xl),
+
+            // Auth Action Buttons
+            AuthButtons(
+              isLoading: authState.isLoading,
+              onGuest: _continueAsGuest,
+              onGoogle: _signInWithGoogle,
+              onApple: _signInWithApple,
+              onEmail: () async {
+                await _persistMonthStartDay();
+                if (context.mounted) {
+                  await context.pushNamed(AppRoutes.signInName);
+                }
+              },
+            ),
+            const SizedBox(height: AppSpacing.xl),
+          ],
         ),
       ),
     );

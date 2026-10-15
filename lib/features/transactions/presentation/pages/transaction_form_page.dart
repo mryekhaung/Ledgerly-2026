@@ -11,7 +11,6 @@ import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
-import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/category_picker_page.dart';
@@ -126,67 +125,68 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
         ),
       ],
       useSafeArea: false,
+      // On medium and up the form becomes a centred column rather than a
+      // full-bleed page (docs/Platform.md §5): the keypad is a fixed-width
+      // tray, and letting it stretch across a desktop window would put the
+      // digits a hand-width apart from the amount being typed. Declared on the
+      // scaffold so the title lines up with the column it caps.
+      contentMaxWidth: AppSpacing.proseMaxWidth,
+      // The form body insets by `lg` rather than the shared page padding.
+      contentInset: AppSpacing.lg,
       body: SafeArea(
         bottom: false,
-        // On medium and up the form becomes a centred column rather than a
-        // full-bleed page (docs/Platform.md §5): the keypad is a fixed-width
-        // tray, and letting it stretch across a desktop window would put the
-        // digits a hand-width apart from the amount being typed.
-        child: ConstrainedPane(
-          maxWidth: AppSpacing.proseMaxWidth,
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  children: <Widget>[
-                    DirectionToggle(
-                      direction: state.direction,
-                      onChanged: notifier.setDirection,
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                children: <Widget>[
+                  DirectionToggle(
+                    direction: state.direction,
+                    onChanged: notifier.setDirection,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  FieldGroup(
+                    error: _errorFor(state, 'categoryId', strings),
+                    field: CategoryField(
+                      category: category,
+                      isError: state.fieldErrors.containsKey('categoryId'),
+                      onTap: () => _pickCategory(state.direction),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-                    FieldGroup(
-                      error: _errorFor(state, 'categoryId', strings),
-                      field: CategoryField(
-                        category: category,
-                        isError: state.fieldErrors.containsKey('categoryId'),
-                        onTap: () => _pickCategory(state.direction),
-                      ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  FieldGroup(
+                    field: DateField(
+                      dateLabel: _formatDate(context, state.date),
+                      onTap: () => _pickDate(state.date),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-                    FieldGroup(
-                      field: DateField(
-                        dateLabel: _formatDate(context, state.date),
-                        onTap: () => _pickDate(state.date),
-                      ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  FieldGroup(
+                    error: _errorFor(state, 'note', strings),
+                    field: NoteField(
+                      controller: _noteController,
+                      hint: strings('transactionNoteHint'),
+                      onChanged: notifier.setNote,
                     ),
-                    const SizedBox(height: AppSpacing.lg),
-                    FieldGroup(
-                      error: _errorFor(state, 'note', strings),
-                      field: NoteField(
-                        controller: _noteController,
-                        hint: strings('transactionNoteHint'),
-                        onChanged: notifier.setNote,
-                      ),
+                  ),
+                  if (_generalError(state, strings) case final message?)
+                    Padding(
+                      padding: const EdgeInsets.only(top: AppSpacing.lg),
+                      child: FormFieldError(message: message),
                     ),
-                    if (_generalError(state, strings) case final message?)
-                      Padding(
-                        padding: const EdgeInsets.only(top: AppSpacing.lg),
-                        child: FormFieldError(message: message),
-                      ),
-                  ],
-                ),
+                ],
               ),
-              AmountKeypad(
-                entryBuffer: state.entryBuffer,
-                currency: state.currency,
-                semanticsLabel: strings('transactionAmountLabel'),
-                onDigit: notifier.enterDigit,
-                onDecimalPoint: notifier.enterDecimalPoint,
-                onBackspace: notifier.backspace,
-              ),
-            ],
-          ),
+            ),
+            AmountKeypad(
+              entryBuffer: state.entryBuffer,
+              currency: state.currency,
+              semanticsLabel: strings('transactionAmountLabel'),
+              onDigit: notifier.enterDigit,
+              onDecimalPoint: notifier.enterDecimalPoint,
+              onBackspace: notifier.backspace,
+            ),
+          ],
         ),
       ),
     );

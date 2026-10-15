@@ -5,7 +5,7 @@ Legend: ☐ todo · ◐ in progress · ☑ done. Each task = one small PR follow
 **Where we are (16 Oct 2026):** Phases 0–3.5 are **done** — the app is a working
 local-first budget manager with calendar, transactions, categories, settings,
 accounts, budgets, recurring, goals, insights, import/export, full backup and
-a local-only auth simulator. `flutter test` is **1437 green** and `flutter analyze` is clean,
+a local-only auth simulator. `flutter test` is **1429 green** and `flutter analyze` is clean,
 **locally as well as on CI** (`docs/Versions.md` — the proxy fix). **Phase 4
 (Sync & Polish) is the only unstarted phase**, and its blocker is now cleared:
 **`docs/Backend.md` has been written** (options, criteria and a recommendation
@@ -159,10 +159,10 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
   - ☑ 5. Tests + goldens (circle/squircle, light/dark); **Settings → Credits** entry: "Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear"; memory check (open/close editor ×10 in `--profile`, no growth). — done: Settings → Credits entry and dialog ("Avatar art: Open Peeps by Pablo Stanley (CC0 1.0), via DiceBear") with en/my/ja l10n; avatar golden tests in circle and squircle across light and dark themes with cross-platform tolerant comparator (`avatar_golden_test.dart`); 10x editor open/close lifecycle and bounded cache memory test (`avatar_editor_memory_test.dart`); 1066/1066 tests passing with zero analyzer warnings.
   - ☐ Later (v2.1): original item art (cat, sprout, headband…) for the *Item* tab, same color-token scheme.
 - ☑ **Responsive layouts (compact/medium/expanded) for Calendar, Forms, Categories, Settings** — built; on-device verification pending (see below).
-  - ✅ **Shared primitives** (`lib/features/shared/presentation/widgets/responsive_layout.dart`): `TwoPaneLayout` (stacks below medium, `Row` with a width-capped master at medium+), `ConstrainedPane` (a prose-width ceiling so a short page does not stretch to 1440 px), `ModalFormScaffold` (a real route on compact, a centred raised card over `surfaceSunken` at medium+), and `ResponsiveInsets` (`pageHorizontal` — 16 compact / 24 medium+ — plus a bottom safe-area helper).
-  - ✅ **Calendar**: below medium it is one scrolling column; at medium+ `_WideBody` gives **each pane its own `ListView`** (flex 4 / 6) rather than sharing one scrollable. That distinction is the whole point — a shared scroll view would let a busy day push the month header off screen, defeating the wide layout.
+  - ✅ **Shared primitives** (`lib/features/shared/presentation/widgets/responsive_layout.dart`): `TwoPaneLayout` (stacks below medium *or* when the body cannot hold both panes at their floors, then a `Row` with an explicit master width clamped to `[masterMinWidth, masterMaxWidth]`), `ModalFormScaffold` (a real route on compact, a centred raised card over `surfaceSunken` at medium+), and `ResponsiveInsets` (`pageHorizontal` — 16 compact / 24 medium+ — plus a bottom safe-area helper). The prose-width ceiling that used to live here as `ConstrainedPane` is **gone** — it moved to `AppScaffold.contentMaxWidth`, because a page-capped column and the app-bar title could not agree (§J).
+  - ✅ **Calendar**: below medium it is one scrolling column; at medium+ **each pane gets its own `ListView`** rather than sharing one scrollable. That distinction is the whole point — a shared scroll view would let a busy day push the month header off screen, defeating the wide layout. The split goes through `TwoPaneLayout` with the month pane floored at 300 px and the day pane at 260 px (§J).
   - ✅ **Categories**: a master–detail split at `usesSidebar` (`list flex 4` + `VerticalDivider` + `_DetailPane flex 6`). Tapping a row opens `CategoryFormBody` **inline in the pane** instead of pushing a route, the open row is tinted `brandSubtle` (the tint is the only cue linking row to pane, so it is a real surface change), and deleting/archiving the shown category closes the pane. The form body was extracted to a public widget so the same code renders as a route on compact and as a pane on wide — no forked form.
-  - ✅ **Settings** and the **transaction form** are both wrapped in `ConstrainedPane`, so a desktop window shows a readable column instead of edge-to-edge rows.
+  - ✅ **Settings** and the **transaction form** both declare `AppScaffold.contentMaxWidth`, so a desktop window shows a readable column instead of edge-to-edge rows — and the app-bar title lands on that column's edge rather than 55 px to its left (§J).
   - ✅ ARB: `categoriesSelectHint` (the detail-pane placeholder) in en/my/ja; `l10n_untranslated.json` = `{}`.
   - ✅ Tests: `responsive_layout_test.dart` (stack-vs-row, width caps, the modal-card branch, insets) plus `category_list_page_test.dart`, `calendar_page_test.dart` and `settings_page_responsive_test.dart`, each walking **every mandated width (360/390/430/768/1024/1440)** at text scale **1.0 and 2.0** and asserting `takeException()` is null. All type-check via the kernel loop.
   - ⏳ **On-device verification still to do** — same pipe ceiling as the Profile item above. From your own terminal: `./tool/build_dev_apk.sh`, then rotate the emulator to landscape (the sidebar layout) and check Calendar shows two panes, Categories edits inline, and nothing overflows at any width.
@@ -551,8 +551,9 @@ Eleven refactor commits, each green on its own tests before pushing:
    a data migration.
 5. **Design.md verdict today** — tokens, radius, type, cards, segments,
    rows+separators, splash, skeleton, copy, calendar spec: enforced by Rules
-   1–12, suite **1437 green** (and green *locally*, not only on CI — §H.1), with
-   every screen now walked at all six mandated widths × two text scales (§I).
+   1–12, suite **1429 green** (and green *locally*, not only on CI — §H.1), with
+   every screen now walked at all six mandated widths × two text scales (§I) and
+   the four responsiveness defects of §G.8 fixed and pinned (§J).
    Known accepted deviations: menu-row height 72 vs
    64 (§5.7 wins), `TabBar` page tabs + `FilterChip` multi-filters +
    `SwitchListTile` kept as distinct components, 3 AppScaffold-exempt frame
@@ -592,6 +593,9 @@ Eleven refactor commits, each green on its own tests before pushing:
    logical px). Investigated 16 Oct 2026; four distinct defects, none of which
    any existing test can see. **"1437 green" means nothing throws, and that is
    all it means.**
+   **ALL FIXED 16 Oct 2026 — see §J.** The diagnosis below is kept as written
+   (it describes the pre-fix state); §J records the fixes, the sixth defect the
+   new tests then found, and the test counts.
    - **R1 — the Calendar's month label ellipsizes inside a pane that is too
      narrow for its own header.** `MonthSwitcher` spends **exactly 120 px**
      (measured, constant at every pane width) on chrome: two 48 px `IconButton`
@@ -791,6 +795,86 @@ judgment call with its measured headroom, and `top_categories_card` passes 0.7
 because its trailing pair needs ~198 px of a 304 px row at 1×. Pinned by
 `should_not_truncate_the_amount_where_the_row_fits`; the other three rows are covered
 by their page goldens, though only for gross changes (see above).
+
+### J. The responsiveness defects (R1–R5) fixed, plus a sixth the new tests found (16 Oct 2026)
+
+Follows §G.8. The owner's direction was to fix the responsiveness **first**,
+against the 2026 Google (M3 / adaptive) and Apple (HIG) rules, before any backend
+work. `flutter test`: **1429 green**; `flutter analyze`: 0 issues; **every golden
+unchanged**, which is itself the check that migrating eight pages onto the new
+cap was inert.
+
+**R1 — the month label had no floor. FIXED.** `calendar_page.dart`'s hand-rolled
+`_WideBody` (`Expanded(flex: 4)` beside `flex: 6`, no `ConstrainedBox`) is
+**deleted**; the page now branches on `TwoPaneLayout.fits` and hands the split to
+`TwoPaneLayout` with `masterMinWidth: 300`, `detailMinWidth: 260`. At an 894 px
+window — where the shell leaves a 654 px body — the month pane goes from **252 →
+300 px** and the label's available box from **108 → 156 px**.
+
+**R2 — the title disagreed with its own content. FIXED.** `AppScaffold` gained
+`contentMaxWidth` / `contentInset`. The scaffold now caps *and centres* the body
+column and derives the app-bar title's `titleSpacing` from the same column
+(`gutter + inset`), so the two edges agree by construction rather than by
+coincidence. The eight pages that carried a `ConstrainedPane` now declare the cap
+on the frame instead. Pinned at 894 px and at all six mandated widths by
+`app_scaffold_test.dart`.
+
+**R3 — the shared primitive was bypassed. FIXED.** `TwoPaneLayout` gained
+`masterMinWidth`, `detailMinWidth`, `minBodyWidth` and a static `fits(...)`, and
+the split now uses an **explicit master width** (`share.clamp(floor, ceiling)`)
+rather than a flex share — a share cannot express a floor. The calendar is its
+second caller. It also stacks when the body cannot hold both panes at their
+floors, which a size class alone would have allowed.
+
+**A sixth defect — found by the new test, and it was the wrong axis.** The day
+row's amount was capped at `MediaQuery.sizeOf(context).width * 0.4` — the
+**window** — while the row lives in a *pane*. In the shell at an 894 px window
+that permitted a **357.6 px** amount inside a **330 px** tile, i.e. no cap at all;
+`ListTile` measures `trailing` against the whole tile and hands the title whatever
+is left, so an uncapped amount both throws its "consumes the entire tile width"
+assertion and starves the title. Now capped against the tile the row actually has
+(`LayoutBuilder`), because a `MediaQuery` read cannot see a pane.
+
+**R5 — why the old walk could not see any of this, and what the new tests do
+instead.** The walk's oracle is `takeException()`, and `TextOverflow.ellipsis`
+never throws, so a truncating label is invisible to it. The new tests therefore
+assert on the **available box width** — font-independent, and exactly what the
+original probe measured. The calendar test **sweeps the body width in 32 px steps**
+rather than sampling the six mandated widths, because the floor binds only in a
+band (a body still wide enough to split, ≥ 584 px, but narrow enough that the
+4-of-10 share falls under the floor, ≤ ~774 px) — and sampling steps straight over
+it, which is precisely how the defect survived a green suite. Verified to bite: with
+the floors weakened to 100 px it fails at a 616 px body with 92.8 px available.
+
+**`ConstrainedPane` is deleted.** After the migration it had **zero** call sites
+in `lib/` — every other shared primitive has at least one (`ModalFormScaffold` 1,
+`ResponsiveInsets` 3, `TwoPaneLayout` 2). Leaving a second way to cap a page's
+content is how R2 comes back, so the cap has one owner now. Its three unit tests
+and its walk case go with it; the coverage moves to `app_scaffold_test.dart` and
+the rewritten `settings_page_responsive_test.dart`, which measure the frame's
+column instead of a page-level widget.
+
+**Coverage of the eight migrated pages.** Six have goldens (settings, account,
+sign-in, welcome, data transfer, transactions list) and **all passed unchanged**,
+which is the real check that moving the cap from the page to the frame was inert.
+`MonthStartsOnPage` had no golden and a hand-rolled three-width loop that missed
+360/430/1440 — the widths the migration was therefore never checked at — so that
+loop is replaced by the shared `widthWalkGroup`. `TransactionFormPage` has **no
+page test at all** (only `transaction_form_state_test.dart`, for the notifier), so
+the page it renders is unverified; standing one up needs the whole page wired to
+providers and is left as a gap rather than half-done here.
+
+**Still open (owner's call, not a defect to fix silently):**
+
+- **R4** — `Platform.md` §5 still promises Settings and Categories master–detail
+  layouts that were never built. Settings is a single capped column at every
+  width, by design. Either implement §5 or amend it; the doc is currently wrong.
+- **`TransactionFormPage` has no page test**, and no golden (§ above).
+- **The day pane's 260 px floor is tight at the narrowest split** (a body of
+  584 px). The amount is capped and the title ellipsizes, so nothing throws, but
+  the title is cramped there. Raising the floor is a breakpoint change (it would
+  move the calendar's split from a ~864 px window upward) and a design decision,
+  so it is left as measured and recorded rather than changed unilaterally.
 
 ### C. Judgment items — done
 

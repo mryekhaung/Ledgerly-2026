@@ -142,79 +142,79 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
         ),
       ],
       useSafeArea: false,
+      // Declared on the scaffold so the title lines up with the column it caps
+      // (`AppScaffold.contentMaxWidth`).
+      contentMaxWidth: AppSpacing.proseMaxWidth,
       body: SafeArea(
-        child: ConstrainedPane(
-          maxWidth: AppSpacing.proseMaxWidth,
-          child: Column(
-            children: <Widget>[
-              // Search input
-              Padding(
-                padding: ResponsiveInsets.pageHorizontal(context)
-                    .copyWith(top: AppSpacing.sm, bottom: AppSpacing.xs),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: _onSearchChanged,
-                  decoration: InputDecoration(
-                    hintText: strings('transactionsSearchHint'),
-                    prefixIcon: const Icon(AppIcons.search, size: 22),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(AppIcons.close, size: 20),
-                            onPressed: () {
-                              _searchController.clear();
-                              notifier.search('');
-                            },
-                          )
-                        : null,
-                    filled: true,
-                    fillColor: colors.surfaceSubtle,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.sm,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: AppRadius.borderMd,
-                      borderSide: BorderSide(color: colors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: AppRadius.borderMd,
-                      borderSide: BorderSide(color: colors.border),
-                    ),
+        child: Column(
+          children: <Widget>[
+            // Search input
+            Padding(
+              padding: ResponsiveInsets.pageHorizontal(context)
+                  .copyWith(top: AppSpacing.sm, bottom: AppSpacing.xs),
+              child: TextField(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                decoration: InputDecoration(
+                  hintText: strings('transactionsSearchHint'),
+                  prefixIcon: const Icon(AppIcons.search, size: 22),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(AppIcons.close, size: 20),
+                          onPressed: () {
+                            _searchController.clear();
+                            notifier.search('');
+                          },
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: colors.surfaceSubtle,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: AppRadius.borderMd,
+                    borderSide: BorderSide(color: colors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: AppRadius.borderMd,
+                    borderSide: BorderSide(color: colors.border),
                   ),
                 ),
               ),
+            ),
 
-              // Filter chips bar
-              FilterChipsBar(
-                filter: state.filter,
-                onDirectionSelected: (direction) {
-                  notifier.applyFilter(
-                    state.filter.copyWith(
-                      direction: direction,
-                      clearDirection: direction == null,
-                    ),
-                  );
-                },
-                onPickCategory: () => _pickCategory(state.filter),
-                onClearCategory: () {
-                  notifier.applyFilter(
-                    state.filter.copyWith(clearCategoryId: true),
-                  );
-                },
-                onOpenFilterSheet: () => _openFilterSheet(state.filter),
-                onClearAll: () {
-                  _searchController.clear();
-                  notifier.clearFilter();
-                },
-              ),
+            // Filter chips bar
+            FilterChipsBar(
+              filter: state.filter,
+              onDirectionSelected: (direction) {
+                notifier.applyFilter(
+                  state.filter.copyWith(
+                    direction: direction,
+                    clearDirection: direction == null,
+                  ),
+                );
+              },
+              onPickCategory: () => _pickCategory(state.filter),
+              onClearCategory: () {
+                notifier.applyFilter(
+                  state.filter.copyWith(clearCategoryId: true),
+                );
+              },
+              onOpenFilterSheet: () => _openFilterSheet(state.filter),
+              onClearAll: () {
+                _searchController.clear();
+                notifier.clearFilter();
+              },
+            ),
 
-              const Divider(height: 1),
+            const Divider(height: 1),
 
-              // Transaction list body
-              Expanded(child: _buildBody(context, state, notifier)),
-            ],
-          ),
+            // Transaction list body
+            Expanded(child: _buildBody(context, state, notifier)),
+          ],
         ),
       ),
     );

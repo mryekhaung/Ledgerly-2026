@@ -9,7 +9,6 @@ import 'package:ledgerly/features/auth/presentation/widgets/sign_in/email_form.d
 import 'package:ledgerly/features/auth/presentation/widgets/sign_in/header.dart';
 import 'package:ledgerly/features/auth/presentation/widgets/sign_in/provider_buttons.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
-import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Email + provider sign-in page.
@@ -87,37 +86,36 @@ class _SignInPageState extends ConsumerState<SignInPage> {
     return AppScaffold(
       title: _isSignUp ? strings('signUpTitle') : strings('signInTitle'),
       useSafeArea: false,
+      // Declared on the scaffold so the title lines up with the column it caps
+      // (`AppScaffold.contentMaxWidth`). The extra `Center` this used to carry
+      // was redundant: the scaffold's own column already centres the body.
+      contentMaxWidth: AppSpacing.proseMaxWidth,
       body: SafeArea(
-        child: Center(
-          child: ConstrainedPane(
-            maxWidth: AppSpacing.proseMaxWidth,
-            child: ListView(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppSpacing.pageHorizontal(
-                  MediaQuery.sizeOf(context).width,
-                ),
-                vertical: AppSpacing.lg,
-              ),
-              children: <Widget>[
-                SignInHeader(isSignUp: _isSignUp),
-                SignInEmailForm(
-                  isSignUp: _isSignUp,
-                  isLoading: authState.isLoading,
-                  onSubmit: _submitEmail,
-                  onToggleMode: () {
-                    setState(() {
-                      _isSignUp = !_isSignUp;
-                    });
-                  },
-                ),
-                ProviderButtons(
-                  isLoading: authState.isLoading,
-                  onGoogle: _signInWithGoogle,
-                  onApple: _signInWithApple,
-                ),
-              ],
+        child: ListView(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.pageHorizontal(
+              MediaQuery.sizeOf(context).width,
             ),
+            vertical: AppSpacing.lg,
           ),
+          children: <Widget>[
+            SignInHeader(isSignUp: _isSignUp),
+            SignInEmailForm(
+              isSignUp: _isSignUp,
+              isLoading: authState.isLoading,
+              onSubmit: _submitEmail,
+              onToggleMode: () {
+                setState(() {
+                  _isSignUp = !_isSignUp;
+                });
+              },
+            ),
+            ProviderButtons(
+              isLoading: authState.isLoading,
+              onGoogle: _signInWithGoogle,
+              onApple: _signInWithApple,
+            ),
+          ],
         ),
       ),
     );

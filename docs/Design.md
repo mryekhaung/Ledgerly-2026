@@ -258,9 +258,15 @@ widget only.
 
 The shared page frame. Every page uses it — no raw `Scaffold` in features.
 
-- Owns: safe areas, top bar (adaptive), bottom nav inset, background (`surface`), max content width
-  (`ConstrainedBox` 1200), and the scroll-under-glass insets.
-- Props: `title`, `leading`, `actions`, `bottomNav`, `floatingAction`, `body`, `isScrollable`.
+- Owns: safe areas, top bar (adaptive), bottom nav inset, background (`surface`), the content column,
+  and the scroll-under-glass insets.
+- The **content column** is capped at 1200 px by default, or at the page's `contentMaxWidth` when it
+  declares one (a form or prose list: 560). The frame caps *and centres* the column and derives the
+  top bar title's inset from it, so the title's left edge lands on the content's rather than at a
+  fixed 16 px. A page that capped its own body could not do this — that was the 55 px title/content
+  offset (`docs/Roadmap.md` §G.8 R2 / §J).
+- Props: `title`, `leading`, `actions`, `bottomNav`, `floatingAction`, `body`, `isScrollable`,
+  `contentMaxWidth`, `contentInset`.
 - **Top bar**: iOS large collapsing title w/ glass toolbar; Android M3 Large Top App Bar.
 
 ### 5.2 `AppCard`
