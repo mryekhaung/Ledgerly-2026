@@ -4,15 +4,14 @@ import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
-import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
-import 'package:ledgerly/core/widgets/amount_text.dart';
-import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
-import 'package:ledgerly/core/widgets/category_gem.dart';
-import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/budgets/domain/entities/budget.dart';
 import 'package:ledgerly/features/budgets/presentation/providers/budget_providers.dart';
+import 'package:ledgerly/features/budgets/presentation/widgets/budget_form/amount_section.dart';
+import 'package:ledgerly/features/budgets/presentation/widgets/budget_form/preview_card.dart';
+import 'package:ledgerly/features/budgets/presentation/widgets/budget_form/scope_section.dart';
+import 'package:ledgerly/features/budgets/presentation/widgets/budget_form/threshold_section.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -21,10 +20,17 @@ import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart
 import 'package:material_ui/material_ui.dart';
 
 /// Page for adding or editing a budget limit.
+///
+/// Composition root only: sections live in `widgets/budget_form/`
+/// (`docs/Conventions.md` §1).
 class BudgetFormPage extends ConsumerStatefulWidget {
+  /// Creates the page.
   const BudgetFormPage({this.budgetId, this.initialType, super.key});
 
+  /// The budget being edited, or null when creating.
   final String? budgetId;
+
+  /// The initial scope (`total` or category).
   final String? initialType;
 
   @override
@@ -130,11 +136,11 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
   Widget build(BuildContext context) {
     // Keep form notifier alive
     final formState = ref.watch(budgetFormNotifierProvider);
-    final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
     final currency = ref.watch(currencyProvider);
     final isNew = widget.budgetId == null;
+    final notifier = ref.read(budgetFormNotifierProvider.notifier);
 
     final categoriesAsync = ref.watch(
       pickableCategoriesProvider(CategoryKind.expense),
@@ -207,241 +213,47 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: <Widget>[
-          // Budget Scope Choice (Total vs Category)
-          Text(
-            strings('budgetFieldCategory'),
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          SegmentedTabs<bool>(
-            tabs: <SegmentedTab<bool>>[
-              SegmentedTab<bool>(
-                value: true,
-                label: strings('budgetsTotal'),
-                icon: AppIcons.insights,
-              ),
-              SegmentedTab<bool>(
-                value: false,
-                label: strings('budgetsCategory'),
-                icon: AppIcons.category,
-              ),
-            ],
-            selected: isTotal,
-            onChanged: (newIsTotal) {
+          BudgetScopeSection(
+            isTotal: isTotal,
+            categories: categories,
+            selectedCategoryId:
+                formState.categoryId ??
+                (categories.isNotEmpty ? categories.first.id : null),
+            onScopeChanged: (newIsTotal) {
               if (newIsTotal) {
-                ref.read(budgetFormNotifierProvider.notifier).setCategory(null);
+                notifier.setCategory(null);
               } else {
                 if (categories.isNotEmpty) {
-                  ref
-                      .read(budgetFormNotifierProvider.notifier)
-                      .setCategory(categories.first.id);
+                  notifier.setCategory(categories.first.id);
                 }
               }
             },
+            onCategoryChanged: notifier.setCategory,
           ),
-          const SizedBox(height: AppSpacing.md),
-
-          // If Category Budget, render Category Dropdown Selector
-          if (!isTotal) ...<Widget>[
-            DropdownButtonFormField<String>(
-              initialValue:
-                  formState.categoryId ??
-                  (categories.isNotEmpty ? categories.first.id : null),
-              decoration: InputDecoration(
-                labelText: strings('budgetFieldCategory'),
-                border: const OutlineInputBorder(
-                  borderRadius: AppRadius.borderMd,
-                ),
-              ),
-              items: categories.map((cat) {
-                return DropdownMenuItem<String>(
-                  value: cat.id,
-                  child: Row(
-                    children: <Widget>[
-                      CategoryGem(
-                        colorValue: cat.colorValue,
-                        iconKey: cat.iconKey,
-                        size: CategoryGemSize.sm,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(cat.name),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (val) {
-                if (val != null) {
-                  ref
-                      .read(budgetFormNotifierProvider.notifier)
-                      .setCategory(val);
-                }
-              },
-            ),
-            const SizedBox(height: AppSpacing.md),
-          ],
-
-          // Amount Limit Field
-          Text(
-            strings('budgetFieldAmount'),
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          TextFormField(
+          BudgetAmountSection(
             controller: _amountController,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(
-              prefixText: '${currency.name.toUpperCase()} ',
-              hintText: '0',
-              errorText: formState.fieldErrors['amount'] != null
-                  ? strings(formState.fieldErrors['amount']!)
-                  : null,
-              border: const OutlineInputBorder(
-                borderRadius: AppRadius.borderMd,
-              ),
-            ),
+            currency: currency,
+            errorText: formState.fieldErrors['amount'] != null
+                ? strings(formState.fieldErrors['amount']!)
+                : null,
             onChanged: (val) {
               final parsed = double.tryParse(val) ?? 0.0;
               final exponent = currency.exponent;
               final minor = (parsed * (exponent == 0 ? 1 : 100)).round();
-              ref
-                  .read(budgetFormNotifierProvider.notifier)
-                  .setAmountMinor(minor);
+              notifier.setAmountMinor(minor);
             },
           ),
-          const SizedBox(height: AppSpacing.lg),
-
-          // Alert Threshold Slider
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                strings('budgetFieldThreshold'),
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: colors.warningSubtle,
-                  borderRadius: AppRadius.borderSm,
-                ),
-                child: Text(
-                  '${(formState.alertThreshold * 100).round()}%',
-                  style: AppTypography.caption.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colors.warning,
-                  ),
-                ),
-              ),
-            ],
+          BudgetThresholdSection(
+            threshold: formState.alertThreshold,
+            onChanged: notifier.setAlertThreshold,
           ),
-          const SizedBox(height: 4),
-          Slider(
-            value: formState.alertThreshold,
-            min: 0.5,
-            max: 1.0,
-            divisions: 10,
-            activeColor: colors.warning,
-            onChanged: (val) {
-              ref
-                  .read(budgetFormNotifierProvider.notifier)
-                  .setAlertThreshold(val);
-            },
+          BudgetPreviewCard(
+            isTotal: isTotal,
+            selectedCategory: selectedCategory,
+            amountMinor: formState.amountMinor,
+            currency: formState.currency,
+            alertThreshold: formState.alertThreshold,
           ),
-          Text(
-            AppStrings.fill(context, 'budgetThresholdHint', <String, Object>{
-              'percent': (formState.alertThreshold * 100).round(),
-            }),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-
-          // Live Preview Card
-          Text(
-            strings('categoriesPreview'),
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          AppCard(
-            border: Border.all(color: colors.border.withValues(alpha: 0.4)),
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    if (isTotal)
-                      Icon(
-                        AppIcons.insights,
-                        color: colors.brandPrimary,
-                        size: 24,
-                      )
-                    else if (selectedCategory != null)
-                      CategoryGem(
-                        colorValue: selectedCategory.colorValue,
-                        iconKey: selectedCategory.iconKey,
-                        size: CategoryGemSize.sm,
-                      )
-                    else
-                      const Icon(AppIcons.category, size: 24),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        isTotal
-                            ? strings('budgetsTotal')
-                            : (selectedCategory?.name ??
-                                  strings('budgetsCategory')),
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    AmountText(
-                      Money.minor(formState.amountMinor, formState.currency),
-                      style: AmountStyle.row,
-                      signed: false,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                ClipRRect(
-                  borderRadius: AppRadius.borderSm,
-                  child: LinearProgressIndicator(
-                    value: formState.alertThreshold,
-                    minHeight: 8,
-                    backgroundColor: colors.border.withValues(alpha: 0.35),
-                    valueColor: AlwaysStoppedAnimation<Color>(colors.warning),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  AppStrings.fill(
-                    context,
-                    'budgetThresholdLive',
-                    <String, Object>{
-                      'percent': (formState.alertThreshold * 100).round(),
-                    },
-                  ),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 40),
         ],
       ),
     );
