@@ -721,6 +721,66 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
+  // Rule 10 — cards use AppCard
+  // ---------------------------------------------------------------------------
+
+  group('design rule: cards use AppCard (docs/Design.md §5.2)', () {
+    test('should_not_build_a_raw_material_card', () {
+      // `AppCard(` ends in `Card(` too, so the lookbehind keeps the sanctioned
+      // component out: only a bare `Card(` — the generic M3 container the
+      // anti-pattern list forbids as the default — is flagged.
+      final sites = scan(const <String>[
+        'lib/features',
+        'lib/core',
+      ], RegExp(r'(?<![A-Za-z])Card\('));
+
+      expectWithinBudget(
+        'raw Card',
+        'docs/Design.md §5.2 — AppCard owns surfaceRaised, radius.lg, padding '
+            'lg and the press state, so a raw Card drifts on all four',
+        sites,
+        // Burned to zero: account/goal/recurring/budget/account-page cards
+        // all route through AppCard (status borders via its `border` slot).
+        const <String, int>{},
+      );
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule 11 — segmented controls use SegmentedTabs
+  // ---------------------------------------------------------------------------
+
+  group('design rule: segments use SegmentedTabs (docs/Design.md §5.5)', () {
+    test('should_not_build_a_raw_material_segmented_button', () {
+      // §5.5 names `SegmentedTabs` the adaptive control (glass on iOS, M3
+      // elsewhere) with a 32 px pill, `label`-token text and a sliding
+      // indicator. A raw `SegmentedButton` bypasses all of that — including
+      // the iOS press treatment — so every 2–3 option control routes through
+      // `SegmentedTabs`. Page-level `TabBar`s and filter `FilterChip`s are a
+      // different component and are untouched by this rule.
+      //
+      // Call sites are generic (`SegmentedButton<int>(`), so the pattern
+      // allows an optional type-argument list between the name and the paren.
+      final sites = scan(const <String>[
+        'lib/features',
+        'lib/core',
+        'lib/app',
+      ], RegExp(r'(?<![A-Za-z])SegmentedButton\s*(<[^>\n]*>)?\('));
+
+      expectWithinBudget(
+        'raw SegmentedButton',
+        'docs/Design.md §5.5 — SegmentedTabs owns the pill, the 32 px height, '
+            'the brandSubtle indicator and the platform press, so a raw '
+            'SegmentedButton drifts on all four',
+        sites,
+        // Burned to zero: direction/kind/mode/scope toggles and the settings
+        // segmented rows all route through SegmentedTabs.
+        const <String, int>{},
+      );
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Scanner self-check — a rule that cannot detect is worse than no rule
   // ---------------------------------------------------------------------------
 
@@ -776,6 +836,22 @@ void main() {
             .hasMatch("child: Text('No Account specified')"),
         isTrue,
       );
+    });
+
+    test('should_flag_a_raw_card_but_pass_app_card', () {
+      final pattern = RegExp(r'(?<![A-Za-z])Card\(');
+
+      expect(pattern.hasMatch('return Card('), isTrue);
+      expect(pattern.hasMatch('return AppCard('), isFalse);
+    });
+
+    test('should_flag_a_raw_segmented_button_but_pass_segmented_tabs', () {
+      final pattern = RegExp(r'(?<![A-Za-z])SegmentedButton\s*(<[^>\n]*>)?\(');
+
+      expect(pattern.hasMatch('return SegmentedButton<int>('), isTrue);
+      expect(pattern.hasMatch('return SegmentedButton('), isTrue);
+      expect(pattern.hasMatch('return SegmentedTabs<int>('), isFalse);
+      expect(pattern.hasMatch('return SegmentedTabs('), isFalse);
     });
 
     test('should_skip_generated_localizations', () {

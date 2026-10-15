@@ -8,6 +8,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
+import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -257,24 +258,24 @@ class _TransactionFilterSheetState
                   ?.copyWith(color: colors.textSecondary),
             ),
             const SizedBox(height: AppSpacing.xs),
-            SegmentedButton<TransactionDirection?>(
-              segments: <ButtonSegment<TransactionDirection?>>[
-                ButtonSegment<TransactionDirection?>(
+            SegmentedTabs<TransactionDirection?>(
+              tabs: <SegmentedTab<TransactionDirection?>>[
+                SegmentedTab<TransactionDirection?>(
                   value: null,
-                  label: Text(strings('filterAll')),
+                  label: strings('filterAll'),
                 ),
-                ButtonSegment<TransactionDirection?>(
+                SegmentedTab<TransactionDirection?>(
                   value: TransactionDirection.expense,
-                  label: Text(strings('filterExpense')),
+                  label: strings('filterExpense'),
                 ),
-                ButtonSegment<TransactionDirection?>(
+                SegmentedTab<TransactionDirection?>(
                   value: TransactionDirection.income,
-                  label: Text(strings('filterIncome')),
+                  label: strings('filterIncome'),
                 ),
               ],
-              selected: <TransactionDirection?>{_direction},
-              onSelectionChanged: (newSelection) {
-                setState(() => _direction = newSelection.first);
+              selected: _direction,
+              onChanged: (direction) {
+                setState(() => _direction = direction);
               },
             ),
             const SizedBox(height: AppSpacing.lg),

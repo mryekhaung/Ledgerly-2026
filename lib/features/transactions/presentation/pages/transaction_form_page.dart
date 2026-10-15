@@ -10,6 +10,7 @@ import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/form_field_surface.dart';
 import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
+import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -301,21 +302,21 @@ class _DirectionToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
 
-    return SegmentedButton<TransactionDirection>(
-      segments: <ButtonSegment<TransactionDirection>>[
-        ButtonSegment<TransactionDirection>(
+    return SegmentedTabs<TransactionDirection>(
+      tabs: <SegmentedTab<TransactionDirection>>[
+        SegmentedTab<TransactionDirection>(
           value: TransactionDirection.expense,
-          label: Text(strings('transactionDirectionExpense')),
-          icon: const Icon(AppIcons.increase),
+          label: strings('transactionDirectionExpense'),
+          icon: AppIcons.increase,
         ),
-        ButtonSegment<TransactionDirection>(
+        SegmentedTab<TransactionDirection>(
           value: TransactionDirection.income,
-          label: Text(strings('transactionDirectionIncome')),
-          icon: const Icon(AppIcons.decrease),
+          label: strings('transactionDirectionIncome'),
+          icon: AppIcons.decrease,
         ),
       ],
-      selected: <TransactionDirection>{direction},
-      onSelectionChanged: (selection) => onChanged(selection.first),
+      selected: direction,
+      onChanged: onChanged,
     );
   }
 }

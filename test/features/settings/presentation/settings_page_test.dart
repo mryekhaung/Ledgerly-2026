@@ -4,6 +4,7 @@ import 'package:ledgerly/app/di/app_environment.dart';
 import 'package:ledgerly/app/di/injection.dart';
 import 'package:ledgerly/core/database/connection/database_connection.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
+import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
@@ -193,11 +194,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final button = tester.widget<SegmentedButton<int>>(
-        find.byType(SegmentedButton<int>).last,
+      final control = tester.widget<SegmentedTabs<int>>(
+        find.byType(SegmentedTabs<int>).last,
       );
       // Sunday is index 1 in the options list.
-      expect(button.selected, <int>{1});
+      expect(control.selected, 1);
     });
 
     testWidgets(

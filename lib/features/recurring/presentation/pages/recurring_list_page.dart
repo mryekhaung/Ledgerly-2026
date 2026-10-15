@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
+import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/recurring/presentation/providers/recurring_providers.dart';
 import 'package:ledgerly/features/recurring/presentation/widgets/recurring_item_card.dart';
 import 'package:ledgerly/features/recurring/presentation/widgets/recurring_pending_banner.dart';
@@ -91,23 +92,23 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
 
           // Tabs: Active vs Paused
           Center(
-            child: SegmentedButton<int>(
-              segments: <ButtonSegment<int>>[
-                ButtonSegment<int>(
+            child: SegmentedTabs<int>(
+              tabs: <SegmentedTab<int>>[
+                SegmentedTab<int>(
                   value: 0,
-                  label: Text('Active (${activeItems.length})'),
-                  icon: const Icon(AppIcons.success, size: 16),
+                  label: 'Active (${activeItems.length})',
+                  icon: AppIcons.success,
                 ),
-                ButtonSegment<int>(
+                SegmentedTab<int>(
                   value: 1,
-                  label: Text('Paused (${pausedItems.length})'),
-                  icon: const Icon(AppIcons.pauseCircle, size: 16),
+                  label: 'Paused (${pausedItems.length})',
+                  icon: AppIcons.pauseCircle,
                 ),
               ],
-              selected: {_selectedTabIndex},
-              onSelectionChanged: (selection) {
+              selected: _selectedTabIndex,
+              onChanged: (index) {
                 setState(() {
-                  _selectedTabIndex = selection.first;
+                  _selectedTabIndex = index;
                 });
               },
             ),

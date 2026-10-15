@@ -7,8 +7,10 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
+import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/budgets/domain/entities/budget.dart';
 import 'package:ledgerly/features/budgets/presentation/providers/budget_providers.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
@@ -213,22 +215,21 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
-          SegmentedButton<bool>(
-            segments: <ButtonSegment<bool>>[
-              ButtonSegment<bool>(
+          SegmentedTabs<bool>(
+            tabs: <SegmentedTab<bool>>[
+              SegmentedTab<bool>(
                 value: true,
-                label: Text(strings('budgetsTotal')),
-                icon: const Icon(AppIcons.insights),
+                label: strings('budgetsTotal'),
+                icon: AppIcons.insights,
               ),
-              ButtonSegment<bool>(
+              SegmentedTab<bool>(
                 value: false,
-                label: Text(strings('budgetsCategory')),
-                icon: const Icon(AppIcons.category),
+                label: strings('budgetsCategory'),
+                icon: AppIcons.category,
               ),
             ],
-            selected: <bool>{isTotal},
-            onSelectionChanged: (selection) {
-              final newIsTotal = selection.first;
+            selected: isTotal,
+            onChanged: (newIsTotal) {
               if (newIsTotal) {
                 ref.read(budgetFormNotifierProvider.notifier).setCategory(null);
               } else {
@@ -373,77 +374,71 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
-          Card(
-            color: colors.surfaceRaised,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppRadius.borderLg,
-              side: BorderSide(color: colors.border.withValues(alpha: 0.4)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      if (isTotal)
-                        Icon(
-                          AppIcons.insights,
-                          color: colors.brandPrimary,
-                          size: 24,
-                        )
-                      else if (selectedCategory != null)
-                        CategoryGem(
-                          colorValue: selectedCategory.colorValue,
-                          iconKey: selectedCategory.iconKey,
-                          size: CategoryGemSize.sm,
-                        )
-                      else
-                        const Icon(AppIcons.category, size: 24),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Text(
-                          isTotal
-                              ? strings('budgetsTotal')
-                              : (selectedCategory?.name ??
-                                    strings('budgetsCategory')),
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+          AppCard(
+            border: Border.all(color: colors.border.withValues(alpha: 0.4)),
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    if (isTotal)
+                      Icon(
+                        AppIcons.insights,
+                        color: colors.brandPrimary,
+                        size: 24,
+                      )
+                    else if (selectedCategory != null)
+                      CategoryGem(
+                        colorValue: selectedCategory.colorValue,
+                        iconKey: selectedCategory.iconKey,
+                        size: CategoryGemSize.sm,
+                      )
+                    else
+                      const Icon(AppIcons.category, size: 24),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        isTotal
+                            ? strings('budgetsTotal')
+                            : (selectedCategory?.name ??
+                                  strings('budgetsCategory')),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      AmountText(
-                        Money.minor(formState.amountMinor, formState.currency),
-                        style: AmountStyle.row,
-                        signed: false,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  ClipRRect(
-                    borderRadius: AppRadius.borderSm,
-                    child: LinearProgressIndicator(
-                      value: formState.alertThreshold,
-                      minHeight: 8,
-                      backgroundColor: colors.border.withValues(alpha: 0.35),
-                      valueColor: AlwaysStoppedAnimation<Color>(colors.warning),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    AppStrings.fill(
-                      context,
-                      'budgetThresholdLive',
-                      <String, Object>{
-                        'percent': (formState.alertThreshold * 100).round(),
-                      },
+                    AmountText(
+                      Money.minor(formState.amountMinor, formState.currency),
+                      style: AmountStyle.row,
+                      signed: false,
                     ),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colors.textSecondary,
-                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                ClipRRect(
+                  borderRadius: AppRadius.borderSm,
+                  child: LinearProgressIndicator(
+                    value: formState.alertThreshold,
+                    minHeight: 8,
+                    backgroundColor: colors.border.withValues(alpha: 0.35),
+                    valueColor: AlwaysStoppedAnimation<Color>(colors.warning),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  AppStrings.fill(
+                    context,
+                    'budgetThresholdLive',
+                    <String, Object>{
+                      'percent': (formState.alertThreshold * 100).round(),
+                    },
+                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 40),

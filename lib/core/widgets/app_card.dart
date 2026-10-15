@@ -30,6 +30,7 @@ class AppCard extends StatefulWidget {
     this.padding = const EdgeInsets.all(AppSpacing.lg),
     this.margin,
     this.borderRadius = AppRadius.borderLg,
+    this.border,
     this.semanticsLabel,
     this.color,
     super.key,
@@ -49,6 +50,11 @@ class AppCard extends StatefulWidget {
 
   /// Corner radius. Defaults to `AppRadius.borderLg` (20 px).
   final BorderRadius borderRadius;
+
+  /// Optional hairline border. Defaults to none per §5.2 (tint + shadow,
+  /// not a box outline). Status-signalling borders (goal completed, recurring
+  /// due) pass their `BorderSide` here instead of hand-rolling a `Card`.
+  final BoxBorder? border;
 
   /// Optional semantic label for screen readers.
   final String? semanticsLabel;
@@ -95,6 +101,7 @@ class _AppCardState extends State<AppCard> {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: widget.borderRadius,
+        border: widget.border,
         boxShadow: shadows,
       ),
       child: widget.child,

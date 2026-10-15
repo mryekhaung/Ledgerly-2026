@@ -8,6 +8,7 @@ import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/list_row.dart';
+import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
 import 'package:ledgerly/features/profile/presentation/widgets/avatar.dart';
@@ -508,22 +509,16 @@ class _ChoiceRow<T> extends StatelessWidget {
                   ?.copyWith(color: colors.textPrimary),
             ),
           if (label != null) const SizedBox(height: AppSpacing.md),
-          SegmentedButton<int>(
-            segments: <ButtonSegment<int>>[
+          SegmentedTabs<int>(
+            tabs: <SegmentedTab<int>>[
               for (var i = 0; i < options.length; i++)
-                ButtonSegment<int>(value: i, label: Text(options[i].label)),
+                SegmentedTab<int>(value: i, label: options[i].label),
             ],
             // Index-based selection so T may be nullable and need no equality
             // contract beyond `==` (which `CurrencyCode` etc. already have).
-            selected: <int>{if (_selected != null) options.indexOf(_selected!)},
-            showSelectedIcon: false,
-            onSelectionChanged: (selection) =>
-                onChanged(options[selection.first].value),
-            style: ButtonStyle(
-              textStyle: WidgetStatePropertyAll<TextStyle?>(
-                Theme.of(context).textTheme.labelMedium,
-              ),
-            ),
+            // -1 selects nothing, mirroring the old empty-set selection.
+            selected: _selected != null ? options.indexOf(_selected!) : -1,
+            onChanged: (index) => onChanged(options[index].value),
           ),
         ],
       ),

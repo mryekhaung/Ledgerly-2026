@@ -10,6 +10,7 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/recurring/domain/entities/recurring_frequency.dart';
@@ -43,286 +44,270 @@ class RecurringItemCard extends ConsumerWidget {
       RecurringFrequency.yearly => strings('recurringFrequencyYearly'),
     };
 
-    return Card(
-      elevation: 0,
+    return AppCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      color: colors.surfaceRaised,
-      shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.borderLg,
-        side: BorderSide(
-          color: isDue
-              ? colors.warning.withValues(alpha: 0.6)
-              : colors.border.withValues(alpha: 0.4),
-          width: isDue ? 1.5 : 1.0,
-        ),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      border: Border.all(
+        color: isDue
+            ? colors.warning.withValues(alpha: 0.6)
+            : colors.border.withValues(alpha: 0.4),
+        width: isDue ? 1.5 : 1.0,
       ),
-      child: InkWell(
-        borderRadius: AppRadius.borderLg,
-        onTap: () => context.pushNamed(
-          AppRoutes.recurringEditName,
-          pathParameters: {'id': item.id},
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      onTap: () => context.pushNamed(
+        AppRoutes.recurringEditName,
+        pathParameters: {'id': item.id},
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  CategoryGem(
-                    colorValue: category?.colorValue ?? 0xFF888888,
-                    iconKey: category?.iconKey ?? 'receipt',
-                    size: CategoryGemSize.md,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          category?.name ?? strings('budgetsCategory'),
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+              CategoryGem(
+                colorValue: category?.colorValue ?? 0xFF888888,
+                iconKey: category?.iconKey ?? 'receipt',
+                size: CategoryGemSize.md,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      category?.name ?? strings('budgetsCategory'),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (item.note != null &&
+                        item.note!.trim().isNotEmpty) ...<Widget>[
+                      const SizedBox(height: 2),
+                      Text(
+                        item.note!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.textSecondary,
                         ),
-                        if (item.note != null &&
-                            item.note!.trim().isNotEmpty) ...<Widget>[
-                          const SizedBox(height: 2),
-                          Text(
-                            item.note!,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colors.textSecondary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              AmountText(
+                item.amount,
+                style: AmountStyle.row,
+                signed: true,
+                color: item.direction == TransactionDirection.income
+                    ? colors.moneyIn
+                    : colors.moneyOut,
+              ),
+              PopupMenuButton<String>(
+                icon: Icon(
+                  AppIcons.more,
+                  size: 20,
+                  color: colors.textSecondary,
+                ),
+                onSelected: (value) async {
+                  final scheduler = ref.read(
+                    recurringSchedulerNotifierProvider.notifier,
+                  );
+                  switch (value) {
+                    case 'skip':
+                      await scheduler.skipOccurrence(item.id);
+                      if (context.mounted) {
+                        AppFeedback.confirm(
+                          context,
+                          message: strings('recurringSkippedSuccess'),
+                        );
+                      }
+                      break;
+                    case 'pause':
+                      await scheduler.setArchived(item.id, !item.isArchived);
+                      break;
+                    case 'edit':
+                      if (context.mounted) {
+                        unawaited(
+                          context.pushNamed(
+                            AppRoutes.recurringEditName,
+                            pathParameters: {'id': item.id},
                           ),
-                        ],
+                        );
+                      }
+                      break;
+                    case 'delete':
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: Text(strings('recurringConfirmDelete')),
+                          content: Text(
+                            strings('recurringConfirmDeleteMessage'),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: Text(strings('actionCancel')),
+                            ),
+                            FilledButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: Text(strings('actionDelete')),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm == true) {
+                        await scheduler.delete(item.id);
+                        if (context.mounted) {
+                          AppFeedback.confirm(
+                            context,
+                            message: strings('recurringDeletedSuccess'),
+                          );
+                        }
+                      }
+                      break;
+                  }
+                },
+                itemBuilder: (ctx) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    value: 'skip',
+                    child: Row(
+                      children: <Widget>[
+                        const Icon(AppIcons.skipNext, size: 18),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(strings('recurringActionSkip')),
                       ],
                     ),
                   ),
-                  AmountText(
-                    item.amount,
-                    style: AmountStyle.row,
-                    signed: true,
-                    color: item.direction == TransactionDirection.income
-                        ? colors.moneyIn
-                        : colors.moneyOut,
-                  ),
-                  PopupMenuButton<String>(
-                    icon: Icon(
-                      AppIcons.more,
-                      size: 20,
-                      color: colors.textSecondary,
-                    ),
-                    onSelected: (value) async {
-                      final scheduler = ref.read(
-                        recurringSchedulerNotifierProvider.notifier,
-                      );
-                      switch (value) {
-                        case 'skip':
-                          await scheduler.skipOccurrence(item.id);
-                          if (context.mounted) {
-                            AppFeedback.confirm(
-                              context,
-                              message: strings('recurringSkippedSuccess'),
-                            );
-                          }
-                          break;
-                        case 'pause':
-                          await scheduler.setArchived(
-                            item.id,
-                            !item.isArchived,
-                          );
-                          break;
-                        case 'edit':
-                          if (context.mounted) {
-                            unawaited(
-                              context.pushNamed(
-                                AppRoutes.recurringEditName,
-                                pathParameters: {'id': item.id},
-                              ),
-                            );
-                          }
-                          break;
-                        case 'delete':
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: Text(strings('recurringConfirmDelete')),
-                              content: Text(
-                                strings('recurringConfirmDeleteMessage'),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () => Navigator.of(ctx).pop(false),
-                                  child: Text(strings('actionCancel')),
-                                ),
-                                FilledButton(
-                                  onPressed: () => Navigator.of(ctx).pop(true),
-                                  child: Text(strings('actionDelete')),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (confirm == true) {
-                            await scheduler.delete(item.id);
-                            if (context.mounted) {
-                              AppFeedback.confirm(
-                                context,
-                                message: strings('recurringDeletedSuccess'),
-                              );
-                            }
-                          }
-                          break;
-                      }
-                    },
-                    itemBuilder: (ctx) => <PopupMenuEntry<String>>[
-                      PopupMenuItem<String>(
-                        value: 'skip',
-                        child: Row(
-                          children: <Widget>[
-                            const Icon(AppIcons.skipNext, size: 18),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(strings('recurringActionSkip')),
-                          ],
+                  PopupMenuItem<String>(
+                    value: 'pause',
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          item.isArchived ? AppIcons.play : AppIcons.pause,
+                          size: 18,
                         ),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'pause',
-                        child: Row(
-                          children: <Widget>[
-                            Icon(
-                              item.isArchived ? AppIcons.play : AppIcons.pause,
-                              size: 18,
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(
-                              item.isArchived
-                                  ? strings('recurringActionResume')
-                                  : strings('recurringActionPause'),
-                            ),
-                          ],
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          item.isArchived
+                              ? strings('recurringActionResume')
+                              : strings('recurringActionPause'),
                         ),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'edit',
-                        child: Row(
-                          children: <Widget>[
-                            const Icon(AppIcons.edit, size: 18),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(strings('budgetsEdit')),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuDivider(),
-                      PopupMenuItem<String>(
-                        value: 'delete',
-                        child: Row(
-                          children: <Widget>[
-                            Icon(
-                              AppIcons.destructive,
-                              size: 18,
-                              color: colors.moneyOut,
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(
-                              strings('recurringActionDelete'),
-                              style: AppTypography.body.copyWith(
-                                color: colors.moneyOut,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Wrap(
-                spacing: AppSpacing.xs,
-                runSpacing: AppSpacing.xs,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: <Widget>[
-                  // Frequency badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xs + 2,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colors.brandPrimary.withValues(alpha: 0.1),
-                      borderRadius: AppRadius.borderSm,
-                    ),
-                    child: Text(
-                      frequencyLabel,
-                      style: AppTypography.caption.copyWith(
-                        color: colors.brandPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      ],
                     ),
                   ),
-
-                  // Auto vs Manual chip
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xs + 2,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color:
-                          (item.autoAdd ? colors.moneyIn : colors.textSecondary)
-                              .withValues(alpha: 0.12),
-                      borderRadius: AppRadius.borderSm,
-                    ),
-                    child: Text(
-                      item.autoAdd ? 'Auto' : 'Manual',
-                      style: AppTypography.caption.copyWith(
-                        color: item.autoAdd
-                            ? colors.moneyIn
-                            : colors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  PopupMenuItem<String>(
+                    value: 'edit',
+                    child: Row(
+                      children: <Widget>[
+                        const Icon(AppIcons.edit, size: 18),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(strings('budgetsEdit')),
+                      ],
                     ),
                   ),
-
-                  // Due indicator
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xs + 2,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDue
-                          ? colors.warning.withValues(alpha: 0.15)
-                          : colors.surface,
-                      borderRadius: AppRadius.borderSm,
-                      border: Border.all(
-                        color: isDue
-                            ? colors.warning
-                            : colors.border.withValues(alpha: 0.5),
-                        width: 0.5,
-                      ),
-                    ),
-                    child: Text(
-                      isDue
-                          ? strings('recurringDueToday')
-                          : (isTomorrow
-                                ? strings('recurringDueTomorrow')
-                                : '${item.nextDueDate}'),
-                      style: AppTypography.caption.copyWith(
-                        color: isDue ? colors.warning : colors.textSecondary,
-                        fontWeight: isDue ? FontWeight.w600 : FontWeight.w500,
-                      ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem<String>(
+                    value: 'delete',
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          AppIcons.destructive,
+                          size: 18,
+                          color: colors.moneyOut,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          strings('recurringActionDelete'),
+                          style: AppTypography.body.copyWith(
+                            color: colors.moneyOut,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ],
           ),
-        ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[
+              // Frequency badge
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xs + 2,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: colors.brandPrimary.withValues(alpha: 0.1),
+                  borderRadius: AppRadius.borderSm,
+                ),
+                child: Text(
+                  frequencyLabel,
+                  style: AppTypography.caption.copyWith(
+                    color: colors.brandPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+
+              // Auto vs Manual chip
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xs + 2,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: (item.autoAdd ? colors.moneyIn : colors.textSecondary)
+                      .withValues(alpha: 0.12),
+                  borderRadius: AppRadius.borderSm,
+                ),
+                child: Text(
+                  item.autoAdd ? 'Auto' : 'Manual',
+                  style: AppTypography.caption.copyWith(
+                    color: item.autoAdd ? colors.moneyIn : colors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+
+              // Due indicator
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xs + 2,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: isDue
+                      ? colors.warning.withValues(alpha: 0.15)
+                      : colors.surface,
+                  borderRadius: AppRadius.borderSm,
+                  border: Border.all(
+                    color: isDue
+                        ? colors.warning
+                        : colors.border.withValues(alpha: 0.5),
+                    width: 0.5,
+                  ),
+                ),
+                child: Text(
+                  isDue
+                      ? strings('recurringDueToday')
+                      : (isTomorrow
+                            ? strings('recurringDueTomorrow')
+                            : '${item.nextDueDate}'),
+                  style: AppTypography.caption.copyWith(
+                    color: isDue ? colors.warning : colors.textSecondary,
+                    fontWeight: isDue ? FontWeight.w600 : FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

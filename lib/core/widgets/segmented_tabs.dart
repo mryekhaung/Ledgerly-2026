@@ -154,22 +154,31 @@ class _SegmentItem<T> extends StatelessWidget {
         child: SizedBox(
           height: 28,
           child: Center(
+            // The label must be bounded (Flexible) so a long translation
+            // (Burmese/Japanese) ellipsizes instead of overflowing the tab:
+            // a min-size Row hands its children unbounded width, under which
+            // `ellipsis` never engages and the Row overflows (docs/Design.md
+            // §7 — long my/ja strings are expected, not exceptional).
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 if (tab.icon != null) ...<Widget>[
                   Icon(tab.icon, size: 14, color: textColor),
                   const SizedBox(width: AppSpacing.xs),
                 ],
-                Text(
-                  tab.label,
-                  style: AppTypography.label.copyWith(
-                    color: textColor,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                Flexible(
+                  child: Text(
+                    tab.label,
+                    style: AppTypography.label.copyWith(
+                      color: textColor,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

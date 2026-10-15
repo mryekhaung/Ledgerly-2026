@@ -4,6 +4,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
+import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/category_catalog.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_form_notifier.dart';
@@ -87,22 +88,21 @@ class CategoryFormBody extends ConsumerWidget {
           const SizedBox(height: AppSpacing.xl),
           _FieldLabel(label: strings('categoriesKindLabel')),
           const SizedBox(height: AppSpacing.sm),
-          SegmentedButton<CategoryKind>(
-            segments: <ButtonSegment<CategoryKind>>[
-              ButtonSegment<CategoryKind>(
+          SegmentedTabs<CategoryKind>(
+            tabs: <SegmentedTab<CategoryKind>>[
+              SegmentedTab<CategoryKind>(
                 value: CategoryKind.expense,
-                label: Text(strings('transactionDirectionExpense')),
-                icon: const Icon(AppIcons.increase),
+                label: strings('transactionDirectionExpense'),
+                icon: AppIcons.increase,
               ),
-              ButtonSegment<CategoryKind>(
+              SegmentedTab<CategoryKind>(
                 value: CategoryKind.income,
-                label: Text(strings('transactionDirectionIncome')),
-                icon: const Icon(AppIcons.decrease),
+                label: strings('transactionDirectionIncome'),
+                icon: AppIcons.decrease,
               ),
             ],
-            selected: <CategoryKind>{state.kind},
-            onSelectionChanged: (selection) =>
-                notifier.setKind(selection.first),
+            selected: state.kind,
+            onChanged: notifier.setKind,
           ),
 
           const SizedBox(height: AppSpacing.xl),

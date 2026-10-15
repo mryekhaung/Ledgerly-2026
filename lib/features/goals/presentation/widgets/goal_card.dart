@@ -8,6 +8,7 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/domain/usecases/delete_savings_goal.dart';
@@ -95,307 +96,287 @@ class GoalCard extends ConsumerWidget {
 
     final goalColor = Color(goal.colorValue);
 
-    return Card(
-      elevation: 0,
+    return AppCard(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.borderLg,
-        side: BorderSide(
-          color: isCompleted
-              ? colors.moneyIn.withValues(alpha: 0.5)
-              : colors.border,
-          width: isCompleted ? 1.5 : 1,
-        ),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      border: Border.all(
+        color: isCompleted
+            ? colors.moneyIn.withValues(alpha: 0.5)
+            : colors.border,
+        width: isCompleted ? 1.5 : 1,
       ),
-      color: colors.surfaceRaised,
-      child: InkWell(
-        onTap: onTap ?? () => GoalContributionDialog.show(context, goal: goal),
-        borderRadius: AppRadius.borderLg,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      onTap: onTap ?? () => GoalContributionDialog.show(context, goal: goal),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top row: Gem + Title + Menu
+          Row(
             children: [
-              // Top row: Gem + Title + Menu
-              Row(
-                children: [
-                  CategoryGem(
-                    colorValue: goal.colorValue,
-                    iconKey: goal.iconKey,
-                    size: CategoryGemSize.lg,
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              CategoryGem(
+                colorValue: goal.colorValue,
+                iconKey: goal.iconKey,
+                size: CategoryGemSize.lg,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                goal.name,
-                                style: AppTypography.title.copyWith(
-                                  color: colors.textPrimary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                        Flexible(
+                          child: Text(
+                            goal.name,
+                            style: AppTypography.title.copyWith(
+                              color: colors.textPrimary,
                             ),
-                            if (isCompleted) ...[
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: colors.moneyIn.withValues(alpha: 0.15),
-                                  borderRadius: AppRadius.borderSm,
-                                ),
-                                child: Text(
-                                  '100%',
-                                  style: AppTypography.caption.copyWith(
-                                    color: colors.moneyIn,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        const SizedBox(height: 2),
-                        // Deadline / Days info
-                        if (goal.targetDate != null)
-                          Text(
-                            isOverdue
-                                ? AppStrings.fill(context, 'goalDaysOverdue', {
-                                    'days': daysRemaining?.abs() ?? 0,
-                                  })
-                                : daysRemaining != null && daysRemaining >= 0
-                                ? AppStrings.fill(context, 'goalDaysLeft', {
-                                    'days': daysRemaining,
-                                  })
-                                : '',
-                            style: AppTypography.label.copyWith(
-                              color: isOverdue
-                                  ? colors.moneyOut
-                                  : colors.textSecondary,
-                              fontWeight: isOverdue
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
+                        if (isCompleted) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colors.moneyIn.withValues(alpha: 0.15),
+                              borderRadius: AppRadius.borderSm,
+                            ),
+                            child: Text(
+                              '100%',
+                              style: AppTypography.caption.copyWith(
+                                color: colors.moneyIn,
+                              ),
                             ),
                           ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    // Deadline / Days info
+                    if (goal.targetDate != null)
+                      Text(
+                        isOverdue
+                            ? AppStrings.fill(context, 'goalDaysOverdue', {
+                                'days': daysRemaining?.abs() ?? 0,
+                              })
+                            : daysRemaining != null && daysRemaining >= 0
+                            ? AppStrings.fill(context, 'goalDaysLeft', {
+                                'days': daysRemaining,
+                              })
+                            : '',
+                        style: AppTypography.label.copyWith(
+                          color: isOverdue
+                              ? colors.moneyOut
+                              : colors.textSecondary,
+                          fontWeight: isOverdue
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
+              // Quick Deposit Button
+              IconButton(
+                icon: Icon(AppIcons.addCircle, color: colors.moneyIn, size: 28),
+                tooltip: strings('depositAction'),
+                onPressed: () => GoalContributionDialog.show(
+                  context,
+                  goal: goal,
+                  initialMode: GoalContributionMode.deposit,
+                ),
+              ),
+
+              // Popup Menu
+              PopupMenuButton<String>(
+                icon: const Icon(AppIcons.more),
+                onSelected: (action) {
+                  switch (action) {
+                    case 'deposit':
+                      unawaited(
+                        GoalContributionDialog.show(
+                          context,
+                          goal: goal,
+                          initialMode: GoalContributionMode.deposit,
+                        ),
+                      );
+                    case 'withdraw':
+                      unawaited(
+                        GoalContributionDialog.show(
+                          context,
+                          goal: goal,
+                          initialMode: GoalContributionMode.withdraw,
+                        ),
+                      );
+                    case 'edit':
+                      onEdit?.call();
+                    case 'archive':
+                      unawaited(_handleToggleArchive(context, ref));
+                    case 'delete':
+                      unawaited(_handleDelete(context, ref));
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'deposit',
+                    child: Row(
+                      children: [
+                        Icon(
+                          AppIcons.decrease,
+                          color: colors.moneyIn,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(strings('depositTitle')),
                       ],
                     ),
                   ),
-
-                  // Quick Deposit Button
-                  IconButton(
-                    icon: Icon(
-                      AppIcons.addCircle,
-                      color: colors.moneyIn,
-                      size: 28,
+                  PopupMenuItem(
+                    value: 'withdraw',
+                    child: Row(
+                      children: [
+                        Icon(
+                          AppIcons.increase,
+                          color: colors.moneyOut,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(strings('withdrawTitle')),
+                      ],
                     ),
-                    tooltip: strings('depositAction'),
-                    onPressed: () => GoalContributionDialog.show(
-                      context,
-                      goal: goal,
-                      initialMode: GoalContributionMode.deposit,
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        const Icon(AppIcons.edit, size: 18),
+                        const SizedBox(width: 8),
+                        Text(strings('editGoal')),
+                      ],
                     ),
                   ),
-
-                  // Popup Menu
-                  PopupMenuButton<String>(
-                    icon: const Icon(AppIcons.more),
-                    onSelected: (action) {
-                      switch (action) {
-                        case 'deposit':
-                          unawaited(
-                            GoalContributionDialog.show(
-                              context,
-                              goal: goal,
-                              initialMode: GoalContributionMode.deposit,
-                            ),
-                          );
-                        case 'withdraw':
-                          unawaited(
-                            GoalContributionDialog.show(
-                              context,
-                              goal: goal,
-                              initialMode: GoalContributionMode.withdraw,
-                            ),
-                          );
-                        case 'edit':
-                          onEdit?.call();
-                        case 'archive':
-                          unawaited(_handleToggleArchive(context, ref));
-                        case 'delete':
-                          unawaited(_handleDelete(context, ref));
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'deposit',
-                        child: Row(
-                          children: [
-                            Icon(
-                              AppIcons.decrease,
-                              color: colors.moneyIn,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(strings('depositTitle')),
-                          ],
+                  PopupMenuItem(
+                    value: 'archive',
+                    child: Row(
+                      children: [
+                        Icon(
+                          goal.isArchived
+                              ? AppIcons.unarchive
+                              : AppIcons.archive,
+                          size: 18,
                         ),
-                      ),
-                      PopupMenuItem(
-                        value: 'withdraw',
-                        child: Row(
-                          children: [
-                            Icon(
-                              AppIcons.increase,
-                              color: colors.moneyOut,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(strings('withdrawTitle')),
-                          ],
+                        const SizedBox(width: 8),
+                        Text(
+                          goal.isArchived
+                              ? strings('unarchiveGoal')
+                              : strings('archiveGoal'),
                         ),
-                      ),
-                      const PopupMenuDivider(),
-                      PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            const Icon(AppIcons.edit, size: 18),
-                            const SizedBox(width: 8),
-                            Text(strings('editGoal')),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'archive',
-                        child: Row(
-                          children: [
-                            Icon(
-                              goal.isArchived
-                                  ? AppIcons.unarchive
-                                  : AppIcons.archive,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              goal.isArchived
-                                  ? strings('unarchiveGoal')
-                                  : strings('archiveGoal'),
-                            ),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(
-                              AppIcons.destructive,
-                              color: colors.moneyOut,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              strings('deleteGoal'),
-                              style: AppTypography.body.copyWith(
-                                color: colors.moneyOut,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.md),
-
-              // Progress Bar
-              ClipRRect(
-                borderRadius: AppRadius.borderSm,
-                child: LinearProgressIndicator(
-                  value: goal.progress,
-                  minHeight: 8,
-                  backgroundColor: colors.border,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    isCompleted ? colors.moneyIn : goalColor,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.sm),
-
-              // Bottom amounts row: Current / Target + Percentage
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      AmountText(
-                        goal.currentAmount,
-                        style: AmountStyle.row,
-                        signed: false,
-                        color: isCompleted
-                            ? colors.moneyIn
-                            : colors.textPrimary,
-                      ),
-                      Text(
-                        ' / ',
-                        style: AppTypography.label.copyWith(
-                          color: colors.textSecondary,
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(
+                          AppIcons.destructive,
+                          color: colors.moneyOut,
+                          size: 18,
                         ),
-                      ),
-                      AmountText(
-                        goal.targetAmount,
-                        style: AmountStyle.row,
-                        signed: false,
-                        color: colors.textSecondary,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    '$percent%',
-                    style: AppTypography.label.copyWith(
-                      color: isCompleted
-                          ? colors.moneyIn
-                          : colors.textSecondary,
-                      fontWeight: FontWeight.w600,
+                        const SizedBox(width: 8),
+                        Text(
+                          strings('deleteGoal'),
+                          style: AppTypography.body.copyWith(
+                            color: colors.moneyOut,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-
-              // Remaining hint or Completed badge
-              if (isCompleted) ...[
-                const SizedBox(height: 4),
-                Text(
-                  strings('goalCompleted'),
-                  style: AppTypography.label.copyWith(color: colors.moneyIn),
-                ),
-              ] else ...[
-                const SizedBox(height: 4),
-                Text(
-                  AppStrings.fill(context, 'goalRemaining', {
-                    'amount': '${goal.remainingAmount.amountMinor}',
-                  }),
-                  style: AppTypography.label.copyWith(
-                    color: colors.textSecondary,
-                  ),
-                ),
-              ],
             ],
           ),
-        ),
+
+          const SizedBox(height: AppSpacing.md),
+
+          // Progress Bar
+          ClipRRect(
+            borderRadius: AppRadius.borderSm,
+            child: LinearProgressIndicator(
+              value: goal.progress,
+              minHeight: 8,
+              backgroundColor: colors.border,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isCompleted ? colors.moneyIn : goalColor,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: AppSpacing.sm),
+
+          // Bottom amounts row: Current / Target + Percentage
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  AmountText(
+                    goal.currentAmount,
+                    style: AmountStyle.row,
+                    signed: false,
+                    color: isCompleted ? colors.moneyIn : colors.textPrimary,
+                  ),
+                  Text(
+                    ' / ',
+                    style: AppTypography.label.copyWith(
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                  AmountText(
+                    goal.targetAmount,
+                    style: AmountStyle.row,
+                    signed: false,
+                    color: colors.textSecondary,
+                  ),
+                ],
+              ),
+              Text(
+                '$percent%',
+                style: AppTypography.label.copyWith(
+                  color: isCompleted ? colors.moneyIn : colors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+
+          // Remaining hint or Completed badge
+          if (isCompleted) ...[
+            const SizedBox(height: 4),
+            Text(
+              strings('goalCompleted'),
+              style: AppTypography.label.copyWith(color: colors.moneyIn),
+            ),
+          ] else ...[
+            const SizedBox(height: 4),
+            Text(
+              AppStrings.fill(context, 'goalRemaining', {
+                'amount': '${goal.remainingAmount.amountMinor}',
+              }),
+              style: AppTypography.label.copyWith(color: colors.textSecondary),
+            ),
+          ],
+        ],
       ),
     );
   }

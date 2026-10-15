@@ -7,6 +7,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
+import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
@@ -106,22 +107,21 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
         padding: const EdgeInsets.all(AppSpacing.md),
         children: <Widget>[
           // Direction selector (Expense / Income)
-          SegmentedButton<TransactionDirection>(
-            segments: <ButtonSegment<TransactionDirection>>[
-              ButtonSegment<TransactionDirection>(
+          SegmentedTabs<TransactionDirection>(
+            tabs: <SegmentedTab<TransactionDirection>>[
+              SegmentedTab<TransactionDirection>(
                 value: TransactionDirection.expense,
-                label: Text(strings('transactionDirectionExpense')),
-                icon: const Icon(AppIcons.increase, size: 16),
+                label: strings('transactionDirectionExpense'),
+                icon: AppIcons.increase,
               ),
-              ButtonSegment<TransactionDirection>(
+              SegmentedTab<TransactionDirection>(
                 value: TransactionDirection.income,
-                label: Text(strings('transactionDirectionIncome')),
-                icon: const Icon(AppIcons.decrease, size: 16),
+                label: strings('transactionDirectionIncome'),
+                icon: AppIcons.decrease,
               ),
             ],
-            selected: {formState.direction},
-            onSelectionChanged: (selection) {
-              final newDirection = selection.first;
+            selected: formState.direction,
+            onChanged: (newDirection) {
               ref
                   .read(recurringFormNotifierProvider.notifier)
                   .setDirection(newDirection);

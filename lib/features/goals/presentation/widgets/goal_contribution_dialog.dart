@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/domain/usecases/add_goal_contribution.dart';
@@ -235,23 +236,23 @@ class _GoalContributionDialogState
           const SizedBox(height: AppSpacing.md),
 
           // Deposit / Withdraw segment toggle
-          SegmentedButton<GoalContributionMode>(
-            segments: [
-              ButtonSegment(
+          SegmentedTabs<GoalContributionMode>(
+            tabs: [
+              SegmentedTab(
                 value: GoalContributionMode.deposit,
-                label: Text(strings('depositAction')),
-                icon: const Icon(AppIcons.decrease, size: 18),
+                label: strings('depositAction'),
+                icon: AppIcons.decrease,
               ),
-              ButtonSegment(
+              SegmentedTab(
                 value: GoalContributionMode.withdraw,
-                label: Text(strings('withdrawAction')),
-                icon: const Icon(AppIcons.increase, size: 18),
+                label: strings('withdrawAction'),
+                icon: AppIcons.increase,
               ),
             ],
-            selected: {_mode},
-            onSelectionChanged: (selected) {
+            selected: _mode,
+            onChanged: (mode) {
               setState(() {
-                _mode = selected.first;
+                _mode = mode;
                 _error = null;
               });
             },

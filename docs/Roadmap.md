@@ -243,7 +243,7 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
   - Quick contribution and withdrawal bottom sheet (`GoalContributionDialog`) with optional linked account selection.
   - Active, Completed, and Archived tabs with empty states and full CRUD form (`GoalFormPage`).
 
-## Phase 3.5 — "Design debt burn-down" (v0.3.1) — IN PROGRESS (A + B complete)
+## Phase 3.5 — "Design debt burn-down" (v0.3.1) — COMPLETE (A + B + C)
 
 Design compliance was drifting because nothing enforced `docs/Design.md`:
 `design_tokens_test.dart` only asserts token *values*, and the `banned-imports`
@@ -346,17 +346,75 @@ token *usage*, so ~35 sites still hand-write `BorderRadius.circular(12)`,
 exist. The rule permits that value-level bypass. Tightening it to require the
 token at those exact values is the natural next increment.
 
-### C. Judgment items — not auto-detectable (NOT STARTED)
+**Known gaps left by C (follow-up):** recurring-list `Active (n)` / `Paused (n)`
+labels are still hardcoded English (they dodge Rule 6 via string
+interpolation) — they need `recurringActiveTab` / `recurringPausedTab` ARB keys
+with a count placeholder. Insight/chart cards still hand-roll `Container` +
+`BoxDecoration` (`surfaceSubtle` + `borderMd`) instead of `AppCard`.
 
-- ☐ **Icon system** — no enforced icon set; icons are picked ad hoc.
-- ☐ **`ListRow` adoption** — 0 used against 14 `ListTile` (`docs/Design.md` §5.6).
-- ☐ **`AppCard` adoption** — cards mostly hand-rolled from `Container` +
-  `BoxDecoration` (§5.2).
-- ☐ **`SegmentedTabs`** — segmented controls are rebuilt per screen.
-- ☐ **Golden tests** — few screens are pinned; regression is invisible.
-- ☐ **Calendar spec deviations** (§6) — `_Capsule` hardcodes `width: 24` where
-  the spec says "60% of cell"; the height step is `step * 64` against the spec's
-  five-step quantization; `BoxShape.circle` where the spec says `radius.md`.
+**Pre-existing local failures (not from this phase):** a full `flutter test`
+run shows 14 failures that reproduce identically on the clean tree
+(`git stash` baseline): `auth_pages_test` AccountPage, 4×
+`month_year_picker_page_test`, `avatar_editor_memory_test`,
+`profile_pages_test` discard-dialog, 2× `transactions_list_page_test`,
+5× `calendar_page_test` (month picker, wide split, overflow menu, 2× capsule
+spec). CI is the oracle for whether these reproduce there.
+
+### C. Judgment items — done
+
+The first four items turned out to be *mechanically* expressible after all, so
+they were pulled forward into A's enforce-the-rule shape rather than left as
+hand-audit chores.
+
+- ☑ **Icon system** — `lib/app/theme/app_icons.dart`, ~70 role-named constants.
+  104 ad-hoc `Icons.*` references with two or three competing variants per core
+  concept (delete, edit, calendar, close, person, check) collapsed to one glyph
+  each. **Rule 8** and a duplicate-glyph assertion in
+  `design_rules_test.dart` keep it that way. Two named exemptions survive
+  because they are not chrome: the DB-backed `CategoryIcons`/`AccountIcons`
+  catalogues, and the two provider brand marks — both re-asserted by their own
+  test so the list cannot rot.
+- ☑ **`ListRow` adoption** — `docs/Design.md` §5.6. Raw `ListTile` in a plain
+  list went 9 → 5, `ListRow` 0 → 5. The roadmap's "0 vs 14" decomposed into
+  5 `SwitchListTile` (no `ListRow` equivalent — a switch *is* the row), 4
+  date-picker *fields* and rich-trailing rows, and **3** genuine list rows.
+  **Rule 9** pins the 4 remaining raw `ListTile`s with re-asserted exemptions.
+  Forcing the field rows into `ListRow` would have silently dropped their
+  trailing overflow menu, so they were deliberately left alone.
+- ☑ **`AppCard` adoption** — **Rule 10** (`should_not_build_a_raw_material_card`,
+  lookbehind so `AppCard(` itself never matches) burned the 7 raw `Card(`
+  sites to zero: account/goal/recurring/budget-summary/budget-form-preview/
+  account-page action group all route through `AppCard` now. `AppCard` gained
+  an optional `border` slot (default none per §5.2) so status-signalling
+  borders (goal-completed green, recurring-due amber) survive without a
+  hand-rolled `Card`. Remaining hand-rolled `Container` + `BoxDecoration`
+  cards (insight/chart cards on `surfaceSubtle` + `borderMd`) are a different
+  treatment, not the M3-`Card` anti-pattern — unifying them is a follow-up.
+- ☑ **`SegmentedTabs`** — **Rule 11** (`should_not_build_a_raw_material_
+  segmented_button`, generic-aware pattern: call sites are
+  `SegmentedButton<int>(`, which a bare `SegmentedButton\(` never matches —
+  the scanner self-check caught that blindness before it landed). All 8 raw
+  sites migrated: transaction direction, category kind, filter direction
+  (All/Expense/Income), goal deposit/withdraw, budget total/category,
+  recurring direction, recurring Active/Paused, settings theme + week-start.
+  `TabBar`s (page-level tabs) and `FilterChip`s (multi-filters) are a
+  different component and stay. The migration caught a real layout bug:
+  long Burmese labels overflowed `_SegmentItem`'s min-size `Row` (unbounded
+  width disables `ellipsis`), fixed with a `Flexible` label — the `my` locale
+  settings test goes red without it.
+- ☑ **Golden tests** — `test/core/widgets/design_system_golden_test.dart`
+  pins `AppCard` / `ListRow` / `SegmentedTabs` × light/dark (6 PNGs under
+  `test/core/widgets/goldens/`, 2% tolerant comparator like the avatar
+  goldens). `AppScaffold` stays out: viewport-dependent goldens pin the test
+  window, not the component.
+- ☑ **Calendar spec deviations** (§6) — all three fixed in `d617299`:
+  `_Capsule` width is now `cellWidth * 0.6` measured through `LayoutBuilder`
+  (so it scales to tablet instead of hardcoding 24); the selected cell is a
+  `brandSubtle` fill at `radius.md` with today's `radius.full` ring drawn *over*
+  it in a `Stack` (was `BoxShape.circle`); and the intensity ramp was
+  **inverted** — `step * 64` faded the already-subtle tint *out*, making the
+  busiest day the palest capsule, so it now `Color.lerp`s from `moneyOutSubtle`
+  toward full `moneyOut`. Three tests pin each.
 
 ## Phase 4 — "Sync & Polish" (v0.4) — NOT STARTED
 

@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/list_row.dart';
 import 'package:ledgerly/features/auth/domain/entities/auth_provider_type.dart';
@@ -295,14 +296,10 @@ class AccountPage extends ConsumerWidget {
             ],
 
             // Account Actions
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                // `AppRadius.borderMd` rather than a bare `circular(12)`, so the
-                // value and the token cannot drift apart (docs/Design.md §4.2).
-                borderRadius: AppRadius.borderMd,
-                side: BorderSide(color: colors.border),
-              ),
+            AppCard(
+              padding: EdgeInsets.zero,
+              borderRadius: AppRadius.borderMd,
+              border: Border.all(color: colors.border),
               child: Column(
                 children: <Widget>[
                   ListRow(
