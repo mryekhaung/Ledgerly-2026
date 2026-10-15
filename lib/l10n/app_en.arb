@@ -868,6 +868,14 @@
   "@accountLinkGoogle": {
     "description": "Button to link current guest session to Google."
   },
+  "accountLinkFailed": "Account linking failed",
+  "@accountLinkFailed": {
+    "description": "Fallback when account linking fails without details."
+  },
+  "accountLinkSuccess": "Account successfully linked",
+  "@accountLinkSuccess": {
+    "description": "Confirmation when account linking succeeds."
+  },
   "accountLinkApple": "Link Apple ID",
   "@accountLinkApple": {
     "description": "Button to link current guest session to Apple."

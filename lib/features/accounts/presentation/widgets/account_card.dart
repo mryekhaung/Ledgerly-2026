@@ -180,7 +180,7 @@ class AccountCard extends ConsumerWidget {
               ),
               OverflowMenuItem<String>(
                 value: 'delete',
-                label: strings('accountsDelete'),
+                label: strings('accountDeleteTitle'),
                 icon: AppIcons.destructive,
                 destructive: true,
               ),

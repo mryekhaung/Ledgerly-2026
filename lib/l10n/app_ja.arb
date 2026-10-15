@@ -208,6 +208,8 @@
   "accountLinkBannerTitle": "データを安全に保護",
   "accountLinkBannerBody": "アカウントを連携すると、機種変更時でもデータを引き継げます。",
   "accountLinkGoogle": "Googleアカウントを連携",
+  "accountLinkFailed": "アカウントのリンクに失敗しました",
+  "accountLinkSuccess": "アカウントを連携しました",
   "accountLinkApple": "Appleで連携",
   "accountSignOut": "ログアウト",
   "accountSignOutConfirm": "ログアウトしてもよろしいですか？",

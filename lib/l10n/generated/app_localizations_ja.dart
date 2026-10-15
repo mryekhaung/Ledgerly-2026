@@ -648,6 +648,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accountLinkGoogle => 'Googleアカウントを連携';
 
   @override
+  String get accountLinkFailed => 'アカウントのリンクに失敗しました';
+
+  @override
+  String get accountLinkSuccess => 'アカウントを連携しました';
+
+  @override
   String get accountLinkApple => 'Appleで連携';
 
   @override

@@ -65,7 +65,7 @@ class RecurringItemCard extends ConsumerWidget {
             children: <Widget>[
               CategoryGem(
                 colorValue: category?.colorValue ?? 0xFF888888,
-                iconKey: category?.iconKey ?? 'receipt',
+                iconKey: category?.iconKey,
                 size: CategoryGemSize.md,
               ),
               const SizedBox(width: AppSpacing.sm),

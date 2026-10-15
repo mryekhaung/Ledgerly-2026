@@ -76,14 +76,14 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(strings('cancel')),
+            child: Text(strings('actionCancel')),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: FilledButton.styleFrom(
               backgroundColor: AppThemeColors.of(context).warning,
             ),
-            child: Text(strings('delete')),
+            child: Text(strings('actionDelete')),
           ),
         ],
       ),

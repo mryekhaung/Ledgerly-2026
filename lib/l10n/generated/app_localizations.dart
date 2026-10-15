@@ -1348,6 +1348,18 @@ abstract class AppLocalizations {
   /// **'Link Google Account'**
   String get accountLinkGoogle;
 
+  /// Fallback when account linking fails without details.
+  ///
+  /// In en, this message translates to:
+  /// **'Account linking failed'**
+  String get accountLinkFailed;
+
+  /// Confirmation when account linking succeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Account successfully linked'**
+  String get accountLinkSuccess;
+
   /// Button to link current guest session to Apple.
   ///
   /// In en, this message translates to:

@@ -84,6 +84,9 @@ abstract final class AppStrings {
       'recurringPausedTab' => l10n.recurringPausedTab(
         _require(values, 'count') as int,
       ),
+      'recurringProcessedSuccess' => l10n.recurringProcessedSuccess(
+        _require(values, 'count') as int,
+      ),
       'backupMetadataSummary' => l10n.backupMetadataSummary(
         _require(values, 'categories') as int,
         _require(values, 'transactions') as int,
@@ -551,9 +554,18 @@ abstract final class AppStringLookup {
     'goalWithdrawnSuccess' => l10n.goalWithdrawnSuccess,
     'settingsSavingsGoals' => l10n.settingsSavingsGoals,
     'settingsSavingsGoalsSubtitle' => l10n.settingsSavingsGoalsSubtitle,
-    // Unknown keys resolve to the generic validation message rather than the raw
-    // key: a validator added ahead of its translation should read like an error,
-    // not like a bug report.
-    _ => l10n.failureValidation,
+    'accountNameHint' => l10n.accountNameHint,
+    'authErrorSignInFailed' => l10n.authErrorSignInFailed,
+    'signInOrDivider' => l10n.signInOrDivider,
+    'goalNoAccountOption' => l10n.goalNoAccountOption,
+    'goalNoDate' => l10n.goalNoDate,
+    // Unknown keys throw rather than rendering a misleading message: a
+    // validator added ahead of its translation must surface in tests, not as
+    // a wrong sentence in the UI (the silent `failureValidation` fallback hid
+    // exactly this class of bug).
+    _ => throw FlutterError(
+      'AppStrings.lookup() has no case for "$key". Add one in '
+      'lib/core/presentation/app_strings.dart.',
+    ),
   };
 }

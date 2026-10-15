@@ -62,6 +62,9 @@ abstract final class CategoryIcons {
   /// canonical key whose glyph they meant. Append-only: a stored row is never
   /// rewritten, so an alias removed here blinds that row back to the fallback.
   /// Never exposed in [keys] — the picker offers canonical keys only.
+  ///
+  /// Covers both the category seeds and the goal icon set, which shared the
+  /// same pre-vocabulary naming.
   static const Map<String, String> _legacyAliases = <String, String>{
     'restaurant': 'food',
     'directions_bus': 'transport',
@@ -73,6 +76,10 @@ abstract final class CategoryIcons {
     'school': 'education',
     'more_horiz': 'tag',
     'payments': 'salary',
+    'laptop': 'invest',
+    'flight': 'travel',
+    'directions_car': 'car',
+    'favorite': 'gift',
   };
 
   /// The default glyph shown in the form's live preview.

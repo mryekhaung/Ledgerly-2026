@@ -675,6 +675,12 @@ class AppLocalizationsMy extends AppLocalizations {
   String get accountLinkGoogle => 'Google အကောင့် ချိတ်ဆက်မည်';
 
   @override
+  String get accountLinkFailed => 'အကောင့်ချိတ်ဆက်မှု မအောင်မြင်ပါ';
+
+  @override
+  String get accountLinkSuccess => 'အကောင့်ချိတ်ဆက်မှု အောင်မြင်ပါသည်';
+
+  @override
   String get accountLinkApple => 'Apple ID ချိတ်ဆက်မည်';
 
   @override

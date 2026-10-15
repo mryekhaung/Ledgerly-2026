@@ -70,7 +70,8 @@ class _SignInPageState extends ConsumerState<SignInPage> {
       final failure = ref.read(authNotifierProvider).failure;
       AppFeedback.failure(
         context,
-        message: failure?.message ?? 'Authentication failed',
+        message:
+            failure?.message ?? AppStrings.of(context)('authErrorSignInFailed'),
       );
     }
   }

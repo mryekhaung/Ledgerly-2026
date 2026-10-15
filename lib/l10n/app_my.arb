@@ -208,6 +208,8 @@
   "accountLinkBannerTitle": "သင့်စာရင်းများကို လုံခြုံစွာ သိမ်းဆည်းပါ",
   "accountLinkBannerBody": "ဖုန်းလဲသည့်အခါ စာရင်းများမပျောက်စေရန် အကောင့်ဖြင့် ချိတ်ဆက်ထားပါ။",
   "accountLinkGoogle": "Google အကောင့် ချိတ်ဆက်မည်",
+  "accountLinkFailed": "အကောင့်ချိတ်ဆက်မှု မအောင်မြင်ပါ",
+  "accountLinkSuccess": "အကောင့်ချိတ်ဆက်မှု အောင်မြင်ပါသည်",
   "accountLinkApple": "Apple ID ချိတ်ဆက်မည်",
   "accountSignOut": "အကောင့်မှ ထွက်မည်",
   "accountSignOutConfirm": "အကောင့်မှ ထွက်ရန် သေချာပါသလား။",

@@ -10,30 +10,24 @@ import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
+import 'package:ledgerly/features/categories/presentation/category_catalog.dart';
 import 'package:ledgerly/features/goals/presentation/providers/goals_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:material_ui/material_ui.dart';
 
-const List<int> _kGoalColors = [
-  0xFF2E7D32, // Emerald
-  0xFF1976D2, // Blue
-  0xFF7B1FA2, // Purple
-  0xFF00796B, // Teal
-  0xFFE65100, // Orange
-  0xFFC2185B, // Pink
-  0xFF303F9F, // Indigo
-  0xFFF57F17, // Amber
-];
-
-const List<String> _kGoalIcons = [
+/// The goal icon picker: a curated subset of the category vocabulary.
+///
+/// Keys must be `CategoryIcons` vocabulary keys — anything else renders as the
+/// fallback glyph for every option (guarded by `category_catalog_test.dart`).
+const List<String> _kGoalIcons = <String>[
   'savings',
-  'laptop',
-  'flight',
-  'directions_car',
+  'invest',
+  'travel',
+  'car',
   'home',
-  'school',
-  'shopping_bag',
-  'favorite',
+  'education',
+  'shopping',
+  'gift',
 ];
 
 /// Page for creating or editing a savings goal.
@@ -294,8 +288,8 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
             ),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
               children: [
                 for (final iconKey in _kGoalIcons)
                   GestureDetector(
@@ -334,10 +328,12 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
             ),
             const SizedBox(height: AppSpacing.sm),
             Wrap(
-              spacing: 10,
-              runSpacing: 10,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
               children: [
-                for (final colorVal in _kGoalColors)
+                // The shared category palette: goals render through
+                // `CategoryGem`, so they pick from the same family.
+                for (final colorVal in CategoryPalette.colors)
                   GestureDetector(
                     onTap: () => ref
                         .read(goalFormProvider.notifier)

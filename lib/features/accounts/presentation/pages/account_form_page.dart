@@ -101,14 +101,14 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(strings('cancel')),
+            child: Text(strings('actionCancel')),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: FilledButton.styleFrom(
               backgroundColor: AppThemeColors.of(context).warning,
             ),
-            child: Text(strings('delete')),
+            child: Text(strings('actionDelete')),
           ),
         ],
       ),
@@ -194,7 +194,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
         if (formState.isEditing)
           IconButton(
             icon: Icon(AppIcons.destructive, color: colors.warning),
-            tooltip: strings('accountsDelete'),
+            tooltip: strings('accountDeleteTitle'),
             onPressed: _handleDelete,
           ),
       ],
@@ -366,7 +366,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text(strings('save')),
+                : Text(strings('actionSave')),
           ),
         ),
       ),

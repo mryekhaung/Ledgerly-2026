@@ -669,6 +669,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountLinkGoogle => 'Link Google Account';
 
   @override
+  String get accountLinkFailed => 'Account linking failed';
+
+  @override
+  String get accountLinkSuccess => 'Account successfully linked';
+
+  @override
   String get accountLinkApple => 'Link Apple ID';
 
   @override

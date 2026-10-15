@@ -35,12 +35,16 @@ class AccountPage extends ConsumerWidget {
     if (!context.mounted) return;
     if (success) {
       AppFeedback.selection();
-      AppFeedback.confirm(context, message: 'Account successfully linked');
+      AppFeedback.confirm(
+        context,
+        message: AppStrings.of(context)('accountLinkSuccess'),
+      );
     } else {
       final failure = ref.read(authNotifierProvider).failure;
       AppFeedback.failure(
         context,
-        message: failure?.message ?? 'Account linking failed',
+        message:
+            failure?.message ?? AppStrings.of(context)('accountLinkFailed'),
       );
     }
   }
