@@ -45,22 +45,22 @@ are exported. Widgets never reference the raw palette.
 | `ink900` | `#0F1720` | Neutral darkest |
 | `ink700` | `#26313D` | Neutral dark |
 | `ink600` | `#2C3844` | Neutral dark-mid — dark hairline |
-| `ink500` | `#5A6675` | Neutral mid |
-| `ink400` | `#6B7480` | Neutral mid-light — light `textTertiary` (4.74:1 on white) |
+| `ink500` | `#575F6D` | Neutral mid — light `textSecondary` (6.00:1 on the page) |
+| `ink400` | `#67707C` | Neutral mid-light — light `textTertiary` (4.68:1 on the page) |
 | `ink350` | `#7E8896` | Neutral light — dark `textTertiary`, light focus ring |
 | `ink300` | `#98A2B0` | Neutral light |
 | `ink200` | `#DCE1E9` | Neutral lighter — light hairline |
 | `ink100` | `#E4E8EE` | Neutral lighter |
-| `ink50` | `#F5F7FA` | Neutral lightest |
+| `ink50` | `#F5F7FA` | Neutral lightest — the light **page** (§2.7) |
 | `jade600` | `#0E7C66` | **Brand primary** |
 | `jade500` | `#12987C` | Brand primary hover/pressed |
 | `jade100` | `#A3DBC8` | Brand tint — `brandSubtle` (light) |
 | `jadeOnTintLight` | `#0A5A4A` | Text/icon on the light brand tint |
 | `coral500` | `#CC3438` | **Expense / negative** — AA on white (5.10:1). See §2.4 |
 | `coral100` | `#FDE7E7` | Expense tint |
-| `sage500` | `#1E7A45` | **Income / positive** — AA on white (5.35:1). See §2.4 |
+| `sage500` | `#1C7340` | **Income / positive** — AA on white (5.87:1). See §2.4 |
 | `sage100` | `#E3F6E9` | Income tint |
-| `amber500` | `#9C6606` | Warning / budget at risk — 4.86:1 on white |
+| `amber500` | `#9C6606` | Warning / budget at risk — 4.53:1 on the page |
 | `amber100` | `#FCF0D8` | Warning tint |
 | `violet500` | `#6B5BD2` | Category accent slot 5 |
 
@@ -68,30 +68,36 @@ are exported. Widgets never reference the raw palette.
 
 | Token | Value | Use |
 |---|---|---|
-| `surface` | `#FFFFFF` | Page background |
-| `surfaceRaised` | `#FFFFFF` | Cards/rows that need to lift off `surfaceSubtle` |
-| `surfaceSubtle` | `#F5F7FA` | Grouped sections, calendar backdrop |
-| `surfaceSunken` | `#EDF0F5` | Keypad tray, inset wells |
+| `surface` | `#F5F7FA` | **Page** background — grouped-section grey, not white (§2.7) |
+| `surfaceRaised` | `#FFFFFF` | Cards/rows — the brightest surface, which is what lifts them |
+| `surfaceSubtle` | `#F7F9FB` | Grouped sections, field fills, calendar backdrop |
+| `surfaceSunken` | `#F1F4F8` | Keypad tray, inset wells |
 | `border` | `#DCE1E9` | Hairlines — **only** separators, never box outlines |
-| `borderStrong` | `#7E8896` | Focus rings, selected outlines — 3.89:1, clears the 3:1 UI-mark floor |
+| `borderStrong` | `#7E8896` | Focus rings, selected outlines — 3.35:1, clears the 3:1 UI-mark floor |
 | `textPrimary` | `#0F1720` | Amounts, titles |
-| `textSecondary` | `#5A6675` | Labels, metadata |
-| `textTertiary` | `#6B7480` | Placeholders, disabled, weekend headers — 4.74:1 |
+| `textSecondary` | `#575F6D` | Labels, metadata — 6.00:1 on the page |
+| `textTertiary` | `#67707C` | Placeholders, disabled, weekend headers — 4.68:1 on the page |
 | `textOnBrand` | `#FFFFFF` | Text on `brandPrimary` |
 | `brandPrimary` | `#0E7C66` | FAB, selected tab, primary button, **selected fill** |
 | `brandSubtle` | `#A3DBC8` | Tinted fill: selected chip background, nav indicator, today ring's tint |
 | `onBrandSubtle` | `#0A5A4A` | Text/icon **on** `brandSubtle` — 5.25:1 |
 | `selectedFill` | `#0E7C66` | **Solid** selected state (day cell, chosen option) — see §2.6 |
 | `onSelectedFill` | `#FFFFFF` | Text/icon on `selectedFill` |
-| `moneyOut` | `#CC3438` | Expense amounts — 5.10:1 on `surface` |
+| `moneyOut` | `#CC3438` | Expense amounts — 4.75:1 on the page |
 | `moneyOutSubtle` | `#FDE7E7` | Expense capsule fill |
-| `moneyIn` | `#1E7A45` | Income amounts — 5.35:1 on `surface` |
+| `moneyIn` | `#1C7340` | Income amounts — 5.47:1 on the page |
 | `moneyInSubtle` | `#E3F6E9` | Income capsule fill |
-| `warning` | `#9C6606` | Budget near limit — 4.86:1 on white |
+| `warning` | `#9C6606` | Budget near limit — 4.53:1 on the page |
 | `warningSubtle` | `#FCF0D8` | Warning capsule fill |
 | `overlay` | `#0F1720` @ 32% | Scrims |
 | `glassTint` | `#FFFFFF` @ 62% | Glass surface fill (see §2.5) |
 | `glassStroke` | `#FFFFFF` @ 45% | Glass hairline highlight |
+
+> **Ratios are against the `surface` the token actually sits on.** §2.7 moved the
+> light page from `#FFFFFF` to `#F5F7FA`, so every light-mode ratio above shifted
+> down and three tokens moved with it to hold AA: `textSecondary`, `textTertiary`
+> and `moneyIn`. The old table quoted ratios against white, which stopped being
+> the page background — a doc that no longer described the app.
 
 > **`textTertiary` is not decorative.** It used to be `#98A2B0` at **2.58:1** on
 > white — the weekday header was an unreadable label rather than a de-emphasised
@@ -155,6 +161,70 @@ Rules:
    and `brandPrimary` must never be painted on `brandSubtle`.
 3. **Light and dark are the same design.** Same role, same contrast, within 30 %.
 
+### 2.7 Surface ramp (a card has to be able to lift)
+
+§K audited every *colour role* and left the surface ramp unexamined, on the
+assumption that four named surfaces were four different surfaces. In light mode
+they were not:
+
+| Role | Before §L | After §L |
+|---|---|---|
+| `surfaceSunken` | `#EDF0F5` | `#F1F4F8` |
+| `surface` | `#FFFFFF` | `#F5F7FA` |
+| `surfaceSubtle` | `#F5F7FA` | `#F7F9FB` |
+| `surfaceRaised` | `#FFFFFF` | `#FFFFFF` |
+
+`surface` and `surfaceRaised` were **the same colour**, and `surfaceSubtle` was
+*darker* than the "raised" surface §2.2 defines as the one that lifts off it. A
+card therefore sat at **1.00:1** against the page behind it. Measured, not
+argued: in `test/features/accounts/presentation/goldens/accounts_light.png`
+**83.6 %** of the screen was one identical `#FFFFFF` — page and card alike —
+while the dark twin separated the same two roles into 61.4 % `#0E1218` and
+21.7 % `#182029`. No test could see it, because no test compared two surfaces.
+
+White is the brightest value light mode has, so the only way to make a card
+*lift* is to lower the page. Every hue (jade / coral / sage) is untouched; this
+moves neutrals only. After §L the same screen reads **61.1 % page / 22.6 %
+card** — structurally the same picture dark mode was already drawing.
+
+**How far down the page goes is solved, not chosen.** The binding constraints are
+AA floors on the surfaces the ink actually lands on:
+
+| Foreground | Surface it lands on | Floor it imposes |
+|---|---|---|
+| `warning` | the page | page luminance ≥ 0.9213 |
+| `textTertiary` | the keypad tray (`surfaceSunken`) | ≥ 0.8917 |
+
+Light mode has very little headroom here — that is why the ramp is tight rather
+than dramatic, and why `warning` is asserted only on `surface` and
+`surfaceRaised` (it is never painted on a well or a band).
+
+**The two ramps are not the same width, and should not be.** Light spans L\* 96.1
+→ 100.0 (3.9 pts); dark spans 3.8 → 11.9 (8.1 pts). Dark's steps are twice as
+wide because dark mode gets **no shadow** — `AppElevation.raised` is empty there
+and the surface ramp does all the work (§4.3). Light keeps its `raised` shadow,
+so a tight ramp plus a shadow separates as well as dark's wide ramp alone. What
+must match is not the width but the *relationship*: the card lift, which is
+1.07:1 light and 1.14:1 dark — 6 % apart.
+
+**Rules**
+
+1. **The ramp is strictly ascending in both modes** — `surfaceSunken` < `surface`
+   < `surfaceSubtle` < `surfaceRaised`. Asserted in
+   `test/app/theme/design_tokens_test.dart`.
+2. **`surfaceRaised` must clear 1.05:1 against `surface` in both modes.** A card
+   that cannot be told from the page is not a card.
+3. **The two modes must lift a card by the same amount** (within 30 %) — the §2.6.3
+   parity rule, extended from colour roles to surface relationships. Light
+   separates its card by 1.07:1, dark by 1.14:1 — 6 % apart. The ramp *width*
+   is deliberately not asserted: it is 3.9 L\* in light and 8.1 in dark, because
+   dark has no shadow to lean on.
+4. **Never "brighten the page for airiness."** White is the ceiling; the page is
+   already at the darkest value that keeps `warning` legible on it.
+5. **The day-capsule ramp is coupled to this.** Lowering the page brought the
+   light `*Subtle` tints closer to it, so capsule step 1 fell to 2.48:1 and had
+   to be re-raised from 60 % to 66 % (§6.2).
+
 ### 2.4 Money color rule (do not deviate)
 
 > **Out = expense = `moneyOut` (coral/red family). In = income = `moneyIn` (sage/green family).**
@@ -177,8 +247,8 @@ Amounts are the most important content on screen, so both money colors **must re
 |---|---|---|
 | `moneyOut` `#CC3438` on `#FFFFFF` | 5.10 | ✅ AA |
 | `moneyOut` `#CC3438` on `#F5F7FA` | 4.75 | ✅ AA |
-| `moneyIn` `#1E7A45` on `#FFFFFF` | 5.35 | ✅ AA |
-| `moneyIn` `#1E7A45` on `#F5F7FA` | 4.99 | ✅ AA |
+| `moneyIn` `#1C7340` on `#FFFFFF` | 5.87 | ✅ AA |
+| `moneyIn` `#1C7340` on the `#F5F7FA` page | 5.47 | ✅ AA |
 | dark `moneyOut` `#E85D66` on `#0E1218` | 5.53 | ✅ AA |
 | dark `moneyIn` `#3FAD64` on `#0E1218` | 6.59 | ✅ AA |
 
@@ -186,11 +256,17 @@ The dark values were **lowered** from `#FF6B6F` (6.78) and `#4CC777` (8.71) —
 over-brightening the accents is what made the two modes read as different apps
 (§K.2). They are now within 8 % and 23 % of their light twins instead of 33 % and 63 %.
 
+Light `moneyIn` was **darkened** from `#1E7A45` (5.35:1 on white) in §L: on the new
+`#F5F7FA` page that measured only 4.99:1, which put it 32 % away from dark's 6.59:1
+and broke the §2.6.3 parity rule. `#1C7340` is 5.47:1 there — 20 % away, and still
+AA on all four light surfaces (§2.7).
+
 > **This table only ever covered the money colours.** Every other role — the text
 > ramp, `brandPrimary`, `warning`, the focus ring, all fills, the selected state,
 > the FAB and the capsule ramp — was unmeasured, which is exactly why §K found an
 > invisible selected day and an invisible capsule shipping green. §2.6 and the
-> `§K` group in `design_tokens_test.dart` close that gap.
+> `§K` group in `design_tokens_test.dart` close that gap. §L then found the one
+> thing left: the surfaces themselves were never compared to each other.
 
 > Historical note: the first draft used `#E5484D` / `#2E9E5B`, which only reached 3.91 and 3.41 on
 > white — **too low for text**. They were kept as-is nowhere: the palette above is the corrected
@@ -456,12 +532,14 @@ that day's net spend magnitude.
   95th-percentile absolute net of the visible period. Quantize into **5 steps** (`0, .25, .5, .75, 1`)
   so the grid reads as texture, not noise.
   - Step 0 (no transactions): no capsule at all.
-  - Steps 1–4: a **lerp from 60 % toward the full colour** — `moneyOut` /
+  - Steps 1–4: a **lerp from 66 % toward the full colour** — `moneyOut` /
     `moneyInSubtle` → `moneyOut` / `moneyIn` — so every step is visible. The
     `*Subtle` tints measure 1.13–1.25:1 on their surface, so starting the ramp
     *at* them made step 1 a bar nobody could see ("the black bar", §K.1-3). The
-    four steps land at 2.66 / 3.34 / 4.19 / 5.35 (light income) through
-    3.52 / 4.43 / 5.43 / 6.59 (dark income); asserted in `design_tokens_test.dart`.
+    four steps land at 2.75/3.43/4.27/5.47 (light income) through 3.91/4.82/5.82/
+    6.59 (dark income); asserted in `design_tokens_test.dart`. **The start was
+    raised from 60 % to 66 % in §L** — lowering the page (§2.7) brought the light
+    tints closer to it, dropping step 1 to 2.48:1, back under the floor.
 - **Today**: `brandPrimary` 1.5 px ring around the cell, `radius.full`.
 - **Selected**: a **solid** `selectedFill` circle (`radius.full`) behind the whole
   cell, with the day number in `onSelectedFill` w600 — the Google Calendar /
@@ -573,12 +651,17 @@ as a calendar month; anything else switches the screen to pay-cycle mode.
       (`surface`, `surfaceRaised`, `surfaceSubtle`)
 - [ ] Every selected fill ≥3:1; **no `brandPrimary` painted on `brandSubtle`** (§2.6.2)
 - [ ] Light and dark agree within **30 %** on every text and accent role (§2.6.3)
+- [ ] The surface ramp ascends in **both** modes and `surfaceRaised` clears
+      **1.05:1** against `surface` — a card must be tellable from its page (§2.7)
+- [ ] The two modes lift a card by the same amount, within 30 % (§2.7.3)
 - [ ] `RepaintBoundary` around the calendar grid and any chart
 - [ ] Golden tests per platform × light/dark for design-system components
 - [ ] Screenshot reviewed in `--profile` on a low-end device, no jank while scrolling the grid
 
-The four contrast bullets are **asserted, not reviewed** — they are the tests
-`test/app/theme/design_tokens_test.dart` runs. They exist because the §K audit
-found every one of them shipping green: the old suite checked only
+The contrast and surface bullets are **asserted, not reviewed** — they are the
+tests `test/app/theme/design_tokens_test.dart` runs. They exist because the §K
+audit found every one of them shipping green: the old suite checked only
 `textPrimary`, `moneyOut`, `moneyIn` and dark `brandPrimary`, each on `surface`
-alone.
+alone. §L then showed the remaining blind spot — the suite compared every token
+to a surface, but never compared two surfaces to each other, which is how a card
+and its page came to be the same colour.

@@ -223,14 +223,17 @@ class _Capsule extends StatelessWidget {
     // `moneyOut` — the previous `step * 64` alpha instead faded the subtle tint
     // out, making a busy day the palest capsule on the grid.
     //
-    // The ramp starts at **60 %** of the way to the full colour rather than at
+    // The ramp starts at **66 %** of the way to the full colour rather than at
     // the subtle tint itself. `*Subtle` measures 1.13–1.25:1 on its surface, so a
     // step-1 day drew a bar that was simply not there — the "black bar" in the
-    // owner's dark-mode screenshot (docs/Roadmap.md §K.1-3). From 60 % the four
-    // steps land at 2.66/3.34/4.19/5.35 (light income) through 3.52/4.43/5.43/
+    // owner's dark-mode screenshot (docs/Roadmap.md §K.1-3). From 66 % the four
+    // steps land at 2.75/3.43/4.27/5.35 (light income) through 3.91/4.82/5.82/
     // 6.59 (dark income), i.e. every step is visible and every step differs.
+    // The start was **raised from 60 %** in §L: lowering the page to #F5F7FA
+    // brought the light tints closer to it, so step 1 fell to 2.48:1 and
+    // dropped back under the visibility floor the §K tests set.
     // Asserted in `test/features/transactions/.../day_cell_test.dart`.
-    final t = 0.60 + 0.40 * (intensity.step - 1) / 3;
+    final t = 0.66 + 0.34 * (intensity.step - 1) / 3;
     final color = Color.lerp(subtle, full, t)!;
 
     return Container(

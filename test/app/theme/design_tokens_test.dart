@@ -27,8 +27,9 @@ double _contrast(Color a, Color b) {
 /// `lib/features/transactions/presentation/widgets/calendar/day_cell.dart`.
 ///
 /// Kept here so the assertion and the implementation name the same number; if
-/// the widget's ramp moves, this must move with it.
-const double _capsuleRampStart = 0.60;
+/// the widget's ramp moves, this must move with it. Raised from 0.60 in §L,
+/// when the light page became #F5F7FA and step 1 lost separation from it.
+const double _capsuleRampStart = 0.66;
 
 /// Token-level assertions.
 ///
@@ -634,6 +635,155 @@ void main() {
               '${darkRatio.toStringAsFixed(2)})',
         );
       }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // §L — the light surface ramp had no card in it
+  // ---------------------------------------------------------------------------
+  //
+  // §K audited *colour roles* and left the surface ramp unexamined, on the
+  // assumption that four named surfaces were four different surfaces. In light
+  // mode they were not: `surface` and `surfaceRaised` were both #FFFFFF, and
+  // `surfaceSubtle` (#F5F7FA) was *darker* than the "raised" surface §2.2
+  // defines as the one that lifts off it. A card therefore had 1.00:1 against
+  // the page — measured as 83.6% identical pixels across an accounts screen —
+  // while dark mode separated the same two roles into 61.4% and 21.7%. That is
+  // the structural half of "the two modes look like different apps", and no
+  // test in §K could see it because none of them compared two surfaces.
+  //
+  // White is the brightest value light mode has, so the only fix is to lower
+  // the page. How far is solved, not chosen: `warning` on the page and
+  // `textTertiary` on the keypad tray are the binding AA constraints.
+
+  group('surface ramp (docs/Design.md §2.7, docs/Roadmap.md §L)', () {
+    const light = AppColorsLight();
+    const dark = AppColorsDark();
+
+    test('the_four_surfaces_form_a_strictly_ascending_ramp', () {
+      // §2.2 defines `surfaceRaised` as the surface that lifts off
+      // `surfaceSubtle`. That only means something if the ramp is ordered, so
+      // assert the ordering in both modes rather than trusting the hex.
+      for (final entry in <(String, AppColors)>[
+        ('light', light),
+        ('dark', dark),
+      ]) {
+        final (label, colors) = entry;
+        final ramp = <double>[
+          _luminance(colors.surfaceSunken),
+          _luminance(colors.surface),
+          _luminance(colors.surfaceSubtle),
+          _luminance(colors.surfaceRaised),
+        ];
+        for (var i = 1; i < ramp.length; i++) {
+          expect(
+            ramp[i],
+            greaterThan(ramp[i - 1]),
+            reason:
+                '$label surface ramp must ascend (sunken < surface < subtle '
+                '< raised); got luminances ${ramp.join(', ')}',
+          );
+        }
+      }
+    });
+
+    test('a_card_is_actually_separated_from_the_page_behind_it', () {
+      // The §L defect was 1.00:1 — invisible. A real lift has to be visible,
+      // so this is the number that proves the card exists. Both modes are
+      // asserted: light had the defect, and a fix that only works on white
+      // would not be a fix.
+      for (final entry in <(String, AppColors)>[
+        ('light', light),
+        ('dark', dark),
+      ]) {
+        final (label, colors) = entry;
+        final separation = _contrast(colors.surfaceRaised, colors.surface);
+        expect(
+          separation,
+          greaterThanOrEqualTo(1.05),
+          reason:
+              '$label card-vs-page separation is only '
+              '${separation.toStringAsFixed(3)}:1 — the card is not lifted',
+        );
+      }
+    });
+
+    test('the_two_modes_lift_a_card_by_the_same_amount', () {
+      // Extends the §K parity rule to surfaces: the same role relationship
+      // must resolve the same way in both modes. Light separates its card by
+      // 1.07:1 and dark by 1.14:1, so the two modes are one design.
+      //
+      // The ramp *width* is deliberately not asserted. It is 3.9 L* in light
+      // and 8.1 in dark, because dark mode gets no shadow at all (§4.3) and so
+      // needs twice the surface steps to carry the same elevation.
+      final lightSeparation = _contrast(light.surfaceRaised, light.surface);
+      final darkSeparation = _contrast(dark.surfaceRaised, dark.surface);
+      final drift = (darkSeparation - lightSeparation) / lightSeparation * 100;
+
+      expect(
+        drift.abs(),
+        lessThanOrEqualTo(30),
+        reason:
+            'card lift drifts ${drift.toStringAsFixed(1)}% between modes '
+            '(${lightSeparation.toStringAsFixed(3)} vs '
+            '${darkSeparation.toStringAsFixed(3)}) — the two modes disagree '
+            'about what a raised surface means',
+      );
+    });
+
+    test('every_role_stays_legible_on_the_light_surface_it_lands_on', () {
+      // Lowering the page is only safe while the ink still clears AA on it.
+      // The keypad tray (`surfaceSunken`) is the tight one: it carries the
+      // amount display in `textTertiary`, and the page (`surface`) carries
+      // `warning`. Both are asserted here so a future "let's darken the page a
+      // touch more" fails instead of shipping.
+      for (final surface in <Color>[
+        light.surfaceSunken,
+        light.surfaceSubtle,
+        light.surface,
+        light.surfaceRaised,
+      ]) {
+        final hex = surface.toARGB32().toRadixString(16);
+        for (final entry in <(String, Color)>[
+          ('textPrimary', light.textPrimary),
+          ('textSecondary', light.textSecondary),
+          ('textTertiary', light.textTertiary),
+          ('moneyOut', light.moneyOut),
+          ('moneyIn', light.moneyIn),
+          ('brandPrimary', light.brandPrimary),
+        ]) {
+          final (label, token) = entry;
+          expect(
+            _contrast(token, surface),
+            greaterThanOrEqualTo(4.5),
+            reason: 'light $label on $hex must clear AA on every surface',
+          );
+        }
+      }
+
+      // `warning` is a page/card colour, never a well or a band, so it is
+      // held to the two surfaces it actually appears on. Folding it into the
+      // loop above would demand an AA floor light mode cannot meet on the
+      // darkest surfaces without turning the page back into white.
+      for (final surface in <Color>[light.surface, light.surfaceRaised]) {
+        expect(
+          _contrast(light.warning, surface),
+          greaterThanOrEqualTo(4.5),
+          reason:
+              'light warning on ${surface.toARGB32().toRadixString(16)} '
+              'must clear AA',
+        );
+      }
+    });
+
+    test('the_dark_ramp_still_lifts_the_card_above_the_page', () {
+      // Guards the direction of the dark ramp: raising the card is what makes
+      // dark mode read as elevated, and §K's surface work must not have
+      // flattened it to match light.
+      expect(
+        _luminance(dark.surfaceRaised),
+        greaterThan(_luminance(dark.surface)),
+      );
     });
   });
 }

@@ -1149,6 +1149,137 @@ the narrowest split.
 ¥1,234,567 amount overflows a 360 px card at 2× text scale (§8), so the size
 divergence stays and is recorded here rather than "fixed" into an overflow.
 
+---
+
+### L. The light surface ramp had no card in it (16 Oct 2026) — FIXED
+
+§K audited every **colour role** and left the **surface ramp** unexamined, on the
+assumption that four named surfaces were four different surfaces. In light mode
+they were not. This is the structural half of the owner's *"the two modes look
+like different apps"*, and it is the reason the app did not read as premium: a
+card that cannot be told from the page it sits on is not a card.
+
+#### L.1 The defect, measured
+
+`docs/Design.md` §2.2 defines `surfaceRaised` as *"cards/rows that need to lift
+off `surfaceSubtle`"*. The light values were:
+
+| Role | Value | Luminance |
+|---|---|---|
+| `surfaceSunken` | `#EDF0F5` | 0.8693 |
+| `surface` | `#FFFFFF` | 1.0000 |
+| `surfaceSubtle` | `#F5F7FA` | 0.9284 |
+| `surfaceRaised` | `#FFFFFF` | 1.0000 |
+
+`surface` and `surfaceRaised` were **the same colour** (1.00:1), and
+`surfaceSubtle` was *darker* than the "raised" surface defined as lifting off
+it — the ramp was inverted against its own spec. Because §2.2 also bans `border`
+from card outlines ("only separators, never box outlines") and §4.3 keeps the
+light shadow to a 1 px / 2 px whisper, **nothing** separated a card from the
+page. The pixel probe makes it unambiguous:
+
+| Screen | Page | Card |
+|---|---|---|
+| `accounts_light.png` (before) | `#FFFFFF` **83.6 %** | `#FFFFFF` *(same colour)* |
+| `accounts_dark.png` | `#0E1218` 61.4 % | `#182029` 21.7 % |
+
+No test could see it, because no test compared **two surfaces** to each other —
+§K compares every token to a surface, which is a different question.
+
+#### L.2 The fix, and why the ramp is as tight as it is
+
+White is the brightest value light mode has, so the only way to make a card lift
+is to lower the page. Every hue (jade / coral / sage) is untouched; this moves
+neutrals only. The result is a strictly ascending ramp that mirrors dark's
+*ordering*:
+
+| Role | Before | After | L\* |
+|---|---|---|---|
+| `surfaceSunken` | `#EDF0F5` | `#F1F4F8` | 96.1 |
+| `surface` | `#FFFFFF` | `#F5F7FA` | 97.2 |
+| `surfaceSubtle` | `#F5F7FA` | `#F7F9FB` | 97.8 |
+| `surfaceRaised` | `#FFFFFF` | `#FFFFFF` | 100.0 |
+
+How far down the page could go was **solved, not chosen** — the binding
+constraints are AA floors on the surfaces the ink actually lands on:
+
+| Foreground | Lands on | Floor |
+|---|---|---|
+| `warning` | the page | luminance ≥ 0.9213 |
+| `textTertiary` | the keypad tray (`surfaceSunken`) | ≥ 0.8917 |
+
+`surfaceSunken` is the tight one because `amount_keypad.dart:254,303` paints the
+amount display and the inert keys in `textTertiary`. Light mode has very little
+headroom here, which is exactly why the ramp spans only 3.9 L\* against dark's
+8.1 — and why that asymmetry is **correct**, not a parity failure: dark mode gets
+no shadow at all (`AppElevation.raised` is empty in dark, §4.3), so its surface
+steps must be twice as wide to carry the same elevation.
+
+The ramps are **not** asserted to be the same width. What is asserted is the
+relationship that matters:
+
+| | Light | Dark |
+|---|---|---|
+| card-vs-page separation | **1.0732:1** | **1.1422:1** |
+| drift | — | **+6.4 %** (limit 30 %) |
+
+After the fix the same accounts screen reads **61.1 % page / 22.6 % card** —
+structurally the picture dark mode was already drawing.
+
+#### L.3 Three tokens moved with the page (and why)
+
+Lowering the page lowered every light-mode ratio, and three tokens failed
+something as a direct result. Each was fixed in the direction that preserves AA:
+
+| Token | Was | Now | Why it had to move |
+|---|---|---|---|
+| `textSecondary` | `#5A6675` | `#575F6D` | 5.85 → 5.45 on the page, which is **33.5 %** from dark's 7.27 — over the §2.6.3 limit. Now 6.00 (21 %). |
+| `moneyIn` | `#1E7A45` | `#1C7340` | 5.35 → 4.99 on the page, **32.2 %** from dark's 6.59. Now 5.47 (20 %), still AA on all four surfaces. |
+| `textTertiary` | `#6B7480` | `#67707C` | 4.74 → 4.43 on the page, **under AA**. Now 4.68. |
+
+The light values were **darkened**, never the dark ones brightened: lowering
+dark-mode contrast to close a gap would trade away legibility to win a metric.
+
+#### L.4 A fourth consequence: the day capsule
+
+Lowering the page also brought the light `*Subtle` tints closer to it, so
+**capsule step 1 fell to 2.48:1** and dropped back under the 2.5 visibility floor
+§K set. The ramp start in `day_cell.dart` was raised **60 % → 66 %**; the four
+steps now land at 2.75/3.43/4.27/5.47 (light income) and 3.91/4.82/5.82/6.59
+(dark income). This is the capsule ramp coupled to the surface ramp — neither can
+be changed alone.
+
+#### L.5 Verification
+
+- **New group** `surface ramp (docs/Design.md §2.7)` in
+  `test/app/theme/design_tokens_test.dart` — 5 tests: the ramp ascends in both
+  modes; a card clears 1.05:1 against its page in both modes; the two modes lift a
+  card by the same amount; every role stays AA on every light surface it lands on
+  (`warning` scoped to `surface`/`surfaceRaised`, where it is actually painted);
+  dark's ramp still lifts the card.
+- **Two assertions rewritten, not worked around.**
+  `app_test.dart`'s `should_use_light_theme_when_platform_is_light` pinned
+  `scaffoldBackgroundColor` to **white** — pinning the very colour that made the
+  card invisible. It now asserts the `surface` token, and a new test asserts
+  `colorScheme.surfaceContainerHigh != colorScheme.surface` end-to-end, so the
+  ramp has to reach the *running app*, not just the token layer.
+- **`flutter test`: 1444 green** (was 1438). **16 of 36 goldens regenerated**;
+  **zero dark goldens changed**, confirming the fix is light-mode-only.
+- **`tool/audit_contrast.py` rewritten to parse the live tokens** from
+  `app_colors.dart` instead of carrying a frozen copy of the pre-§K palette. The
+  old script went on reporting an invisible selected day for months after §K had
+  fixed it — a stale audit is worse than none. It also caught an arithmetic error
+  in this section's own first draft: dark's card lift is 1.1422:1, not the 1.1021
+  hand-calculated while choosing the ramp.
+- `flutter analyze`: 0 issues. `dart format --set-exit-if-changed`: clean.
+
+**Deliberately not changed:** the ramp width is not forced into parity with dark
+(see §L.2 — light has a shadow, dark does not); `border` was not lifted to
+compensate for sitting on a greyer page (1.22:1 is still a legible hairline and
+§2.2 scopes it to separators); and the light `raised` shadow is unchanged, so
+light mode now separates a card **twice** — by surface *and* by shadow — which is
+the point.
+
 ### C. Judgment items — done
 
 The first four items turned out to be *mechanically* expressible after all, so

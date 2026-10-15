@@ -22,14 +22,25 @@ abstract final class AppPalette {
   /// `darkSurface` (1.57:1 vs 1.42:1) — §K.4.
   static const ink600 = Color(0xFF2C3844);
 
-  static const ink500 = Color(0xFF5A6675);
+  /// Light-mode `textSecondary` — labels and metadata. **Darkened from
+  /// `#5A6675`** when the page stopped being white: 5.85:1 on white fell to
+  /// 5.45:1 on the `#F5F7FA` page, which put it 33 % away from dark's 7.27:1
+  /// and broke the §2.6.3 parity rule. This is 6.00:1 on the page, 21 % away
+  /// (§L).
+  static const ink500 = Color(0xFF575F6D);
 
-  /// Light-mode `textTertiary` — 4.74:1 on white (AA). `ink300` reached only
-  /// 2.58:1, which is why the weekday header was unreadable (§K.1-4).
-  static const ink400 = Color(0xFF6B7480);
+  /// Light-mode `textTertiary` — **darkened from `#6B7480`** when the page
+  /// stopped being white (§L). At `#6B7480` this measured 4.74:1 on white but
+  /// only 4.43:1 on the new `#F5F7FA` page, so the token moved with the surface
+  /// it has to stay legible on. This is 4.68:1 there and 5.02:1 on white.
+  ///
+  /// `ink300` reached only 2.58:1 on white, which is why the weekday header was
+  /// unreadable (§K.1-4) — it is kept below, not used for text.
+  static const ink400 = Color(0xFF67707C);
 
   /// Dark-mode `textTertiary` — 5.23:1 on `darkSurface` (AA). Also the light
-  /// focus ring (`borderStrong`), 3.89:1 on white.
+  /// focus ring (`borderStrong`), 3.35:1 on the `#F5F7FA` page and 3.89:1 on
+  /// white, so it clears the 3:1 UI-mark floor on both (§L).
   static const ink350 = Color(0xFF7E8896);
 
   static const ink300 = Color(0xFF98A2B0);
@@ -39,6 +50,50 @@ abstract final class AppPalette {
 
   static const ink100 = Color(0xFFE4E8EE);
   static const ink50 = Color(0xFFF5F7FA);
+
+  // --- Light surface ramp (docs/Design.md §2.2, §2.7) ---
+  //
+  // A monotonic four-step ramp, darkest first, deliberately mirroring the dark
+  // ramp's shape below. Before §L the light ramp was `surface` #FFFFFF,
+  // `surfaceRaised` #FFFFFF, `surfaceSubtle` #F5F7FA — which is *inverted*
+  // against §2.2's own definition of `surfaceRaised` as "cards/rows that need
+  // to lift off `surfaceSubtle`", and left a card with **zero** optical
+  // separation from the page. Measured, not argued: in
+  // `test/features/accounts/presentation/goldens/accounts_light.png` 83.6 % of
+  // the screen was one identical #FFFFFF, page and card alike, while the dark
+  // twin separated them into 61.4 % #0E1218 and 21.7 % #182029. That is the
+  // structural half of "the two modes look like different apps".
+  //
+  // White is the brightest value light mode can offer, so the only way to make
+  // a card *lift* is to lower the page. Every hue (jade/coral/sage) is
+  // untouched; this moves neutrals only.
+  //
+  // How far down the page can go is not a taste call — it is solved. The
+  // binding constraints are that `warning` must clear AA on the page (it needs
+  // surface Y >= 0.9213) and `textTertiary` must clear AA on the keypad tray
+  // (0.8917). Light mode has very little headroom here, which is exactly why
+  // the ramp is tight: it is the widest one that keeps every role legible on
+  // the surface it actually lands on. Verified in
+  // `test/app/theme/design_tokens_test.dart`.
+
+  /// Light `surface` — the page background. Grouped-section grey, the way iOS
+  /// `systemGroupedBackground` and M3 `surfaceContainerLow` work.
+  static const lightSurface = Color(0xFFF5F7FA);
+
+  /// Light `surfaceRaised` — cards and rows. The brightest surface in the mode,
+  /// which is what makes a card read as lifted: 1.07:1 against the page, where
+  /// dark separates the same two roles by 1.14:1.
+  static const lightSurfaceRaised = Color(0xFFFFFFFF);
+
+  /// Light `surfaceSubtle` — grouped sections, field fills, skeletons, the
+  /// segmented-control track. Sits **between** the page and a card, which is
+  /// where dark mode puts the same role, so a band reads as slightly raised in
+  /// both modes rather than advancing in one and receding in the other.
+  static const lightSurfaceSubtle = Color(0xFFF7F9FB);
+
+  /// Light `surfaceSunken` — keypad tray, press washes, inset wells. The
+  /// darkest light surface, so a well reads as pressed-in rather than quiet.
+  static const lightSurfaceSunken = Color(0xFFF1F4F8);
 
   static const jade600 = Color(0xFF0E7C66);
   static const jade500 = Color(0xFF12987C);
@@ -56,7 +111,11 @@ abstract final class AppPalette {
   static const coral500 = Color(0xFFCC3438);
   static const coral100 = Color(0xFFFDE7E7);
 
-  static const sage500 = Color(0xFF1E7A45);
+  /// Income / positive. **Darkened from `#1E7A45`** in §L: that reached 5.35:1
+  /// on white but only 4.99:1 on the new `#F5F7FA` page, which put it 32 % away
+  /// from dark's 6.59:1 and broke the §2.6.3 parity rule. This is 5.47:1 on the
+  /// page and still clears AA on all four light surfaces (§2.4).
+  static const sage500 = Color(0xFF1C7340);
   static const sage100 = Color(0xFFE3F6E9);
 
   /// Light warning. `#C98A0B` measured **2.95:1** on white — a budget-at-risk
@@ -161,16 +220,16 @@ final class AppColorsLight implements AppColors {
   const AppColorsLight();
 
   @override
-  Color get surface => const Color(0xFFFFFFFF);
+  Color get surface => AppPalette.lightSurface;
 
   @override
-  Color get surfaceRaised => const Color(0xFFFFFFFF);
+  Color get surfaceRaised => AppPalette.lightSurfaceRaised;
 
   @override
-  Color get surfaceSubtle => AppPalette.ink50;
+  Color get surfaceSubtle => AppPalette.lightSurfaceSubtle;
 
   @override
-  Color get surfaceSunken => const Color(0xFFEDF0F5);
+  Color get surfaceSunken => AppPalette.lightSurfaceSunken;
 
   @override
   Color get border => AppPalette.ink200;

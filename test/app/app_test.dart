@@ -5,6 +5,7 @@ import 'package:ledgerly/app/app.dart';
 import 'package:ledgerly/app/router/app_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/router/nav_destinations.dart';
+import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/core/platform/adaptive_style.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
@@ -82,7 +83,32 @@ void main() {
       final theme = Theme.of(context);
 
       expect(theme.brightness, Brightness.light);
-      expect(theme.scaffoldBackgroundColor, const Color(0xFFFFFFFF));
+      // The page is the `surface` token, not white: light mode separates a card
+      // from the page behind it by lowering the page, because white is the
+      // brightest value the mode has (docs/Design.md §2.7). Pinning white here
+      // is what let the invisible card ship — the two were the same colour.
+      expect(theme.scaffoldBackgroundColor, const AppColorsLight().surface);
+      expect(theme.scaffoldBackgroundColor, const Color(0xFFF5F7FA));
+    });
+
+    testWidgets('should_let_a_card_lift_off_the_page_in_light_mode', (
+      tester,
+    ) async {
+      await tester.pumpWidget(hostApp());
+      await tester.pumpAndSettle();
+
+      final context = tester.element(find.byType(Scaffold).first);
+      final scheme = Theme.of(context).colorScheme;
+
+      // End-to-end check that the §L ramp reaches the running app and not just
+      // the token layer: the card surface must actually differ from the page.
+      expect(
+        scheme.surfaceContainerHigh,
+        isNot(scheme.surface),
+        reason:
+            'a card the same colour as the page is not a card — this was '
+            '1.00:1 before §L',
+      );
     });
   });
 
