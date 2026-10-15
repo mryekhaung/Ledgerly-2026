@@ -20,17 +20,22 @@ class SeedCategory {
 }
 
 /// The default category set for a fresh install. Spec: `docs/DataModel.md` §6.
+///
+/// `iconKey`s must be `CategoryIcons` vocabulary keys (semantic names like
+/// `food`, never Material names like `restaurant`): unknown keys render as the
+/// fallback glyph, so a wrong key here turns every seed row into the same tag
+/// icon. Guarded by `seed_test.dart`.
 const List<SeedCategory> defaultCategories = <SeedCategory>[
-  SeedCategory('Food', 'restaurant', 0xFFE8735A, 'expense'),
-  SeedCategory('Transport', 'directions_bus', 0xFF5A8FE8, 'expense'),
-  SeedCategory('Groceries', 'shopping_basket', 0xFF6FB98F, 'expense'),
-  SeedCategory('Bills', 'receipt_long', 0xFF8A7FE8, 'expense'),
-  SeedCategory('Health', 'local_hospital', 0xFFE85A7F, 'expense'),
-  SeedCategory('Shopping', 'shopping_bag', 0xFFE8B25A, 'expense'),
-  SeedCategory('Entertainment', 'movie', 0xFF5ACBE8, 'expense'),
-  SeedCategory('Education', 'school', 0xFF7F8AE8, 'expense'),
-  SeedCategory('Other', 'more_horiz', 0xFF9AA0A6, 'expense'),
-  SeedCategory('Salary', 'payments', 0xFF6FB98F, 'income'),
+  SeedCategory('Food', 'food', 0xFFE8735A, 'expense'),
+  SeedCategory('Transport', 'transport', 0xFF5A8FE8, 'expense'),
+  SeedCategory('Groceries', 'groceries', 0xFF6FB98F, 'expense'),
+  SeedCategory('Bills', 'bills', 0xFF8A7FE8, 'expense'),
+  SeedCategory('Health', 'health', 0xFFE85A7F, 'expense'),
+  SeedCategory('Shopping', 'shopping', 0xFFE8B25A, 'expense'),
+  SeedCategory('Entertainment', 'entertainment', 0xFF5ACBE8, 'expense'),
+  SeedCategory('Education', 'education', 0xFF7F8AE8, 'expense'),
+  SeedCategory('Other', 'tag', 0xFF9AA0A6, 'expense'),
+  SeedCategory('Salary', 'salary', 0xFF6FB98F, 'income'),
   SeedCategory('Other Income', 'savings', 0xFF5ACBE8, 'income'),
 ];
 

@@ -50,7 +50,30 @@ abstract final class CategoryIcons {
   ];
 
   /// Resolves [key] to a glyph, falling back to [fallbackKey]'s icon.
-  static IconData iconFor(String? key) => _icons[key] ?? _icons[fallbackKey]!;
+  ///
+  /// Pre-vocabulary installs stored Material names (`restaurant`,
+  /// `directions_bus`, …) rather than semantic keys, and old backups can still
+  /// carry them. [_legacyAliases] heals those rows to the glyph they always
+  /// meant — without it every one of them renders as the fallback tag.
+  static IconData iconFor(String? key) =>
+      _icons[key] ?? _icons[_legacyAliases[key]] ?? _icons[fallbackKey]!;
+
+  /// Material-name keys written before the semantic vocabulary, mapped to the
+  /// canonical key whose glyph they meant. Append-only: a stored row is never
+  /// rewritten, so an alias removed here blinds that row back to the fallback.
+  /// Never exposed in [keys] — the picker offers canonical keys only.
+  static const Map<String, String> _legacyAliases = <String, String>{
+    'restaurant': 'food',
+    'directions_bus': 'transport',
+    'shopping_basket': 'groceries',
+    'receipt_long': 'bills',
+    'local_hospital': 'health',
+    'shopping_bag': 'shopping',
+    'movie': 'entertainment',
+    'school': 'education',
+    'more_horiz': 'tag',
+    'payments': 'salary',
+  };
 
   /// The default glyph shown in the form's live preview.
   static IconData get defaultIcon => _icons[fallbackKey]!;

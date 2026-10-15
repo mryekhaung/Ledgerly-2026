@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/database/daos/clock.dart';
 import 'package:ledgerly/core/database/seed.dart';
+import 'package:ledgerly/features/categories/presentation/category_catalog.dart';
 
 import 'db_harness.dart';
 
@@ -40,6 +41,28 @@ void main() {
       // make the list untappable in practice.
       final iconKeys = defaultCategories.map((c) => c.iconKey).toSet();
       expect(iconKeys.length, defaultCategories.length);
+    });
+
+    test('should_use_only_catalogue_vocabulary_icon_keys', () {
+      // A key outside `CategoryIcons.keys` renders as the fallback glyph, so
+      // one wrong key here turns that row — and, repeated, the whole list —
+      // into identical tag icons.
+      for (final category in defaultCategories) {
+        expect(
+          CategoryIcons.keys,
+          contains(category.iconKey),
+          reason: '${category.name} uses ${category.iconKey}',
+        );
+      }
+    });
+
+    test('should_resolve_every_seed_to_a_distinct_glyph', () {
+      // Vocabulary membership alone is not enough: the mapping itself must
+      // produce visibly different gems per row.
+      final glyphs = defaultCategories
+          .map((c) => CategoryIcons.iconFor(c.iconKey))
+          .toSet();
+      expect(glyphs.length, defaultCategories.length);
     });
 
     test('should_give_every_row_an_opaque_argb32_colour', () {

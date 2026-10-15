@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
+import 'package:ledgerly/core/widgets/list_row.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/category_list_state.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_form_page.dart';
@@ -139,23 +141,21 @@ void main() {
       await tester.pumpAndSettle();
 
       // The tint is the only cue linking the row to the pane, so it must be a
-      // real surface change. Find the Material wrapping the Food row.
-      final foodMaterial = tester.widget<Material>(
-        find
-            .ancestor(of: find.text('Food'), matching: find.byType(Material))
-            .first,
-      );
-      final transportMaterial = tester.widget<Material>(
+      // real surface change. The row is a ListRow wrapped in a tinted
+      // Container — find that wrapper above the row text.
+      Container tintOf(String label) => tester.widget<Container>(
         find
             .ancestor(
-              of: find.text('Transport'),
-              matching: find.byType(Material),
+              of: find.text(label),
+              matching: find.byWidgetPredicate(
+                (w) => w is Container && w.child is ListRow,
+              ),
             )
             .first,
       );
 
-      expect(foodMaterial.color, isNot(Colors.transparent));
-      expect(transportMaterial.color, Colors.transparent);
+      expect(tintOf('Food').color, const AppColorsLight().brandSubtle);
+      expect(tintOf('Transport').color, Colors.transparent);
     });
 
     testWidgets('should_show_the_edit_title_in_the_pane', (tester) async {
