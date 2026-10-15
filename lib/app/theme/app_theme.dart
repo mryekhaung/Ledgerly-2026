@@ -1,4 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -32,6 +33,23 @@ abstract final class AppTheme {
     Brightness.dark,
     platform ?? AppPlatform.resolve(),
   );
+
+  /// System-bar style for edge-to-edge chrome (`docs/Platform.md` §2).
+  ///
+  /// Both bars are transparent — content draws behind them — so the icon
+  /// brightness must come from the theme: dark icons on light surfaces, light
+  /// icons on dark ones. Without this the OS default applies everywhere, which
+  /// is white icons on the light theme = an invisible status bar.
+  static SystemUiOverlayStyle systemOverlayStyle(Brightness brightness) =>
+      brightness == Brightness.dark
+      ? SystemUiOverlayStyle.light.copyWith(
+          statusBarColor: Colors.transparent,
+          systemNavigationBarColor: Colors.transparent,
+        )
+      : SystemUiOverlayStyle.dark.copyWith(
+          statusBarColor: Colors.transparent,
+          systemNavigationBarColor: Colors.transparent,
+        );
 
   static ThemeData _build(
     AppColors colors,
@@ -152,6 +170,7 @@ abstract final class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
+        systemOverlayStyle: systemOverlayStyle(brightness),
         titleTextStyle: AppTypography.titleLarge.copyWith(
           color: colors.textPrimary,
         ),

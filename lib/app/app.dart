@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_router.dart';
@@ -123,7 +124,15 @@ class LedgerlyApp extends ConsumerWidget {
             colors: effectiveBrightness == Brightness.dark
                 ? darkColors
                 : lightColors,
-            child: child ?? const SizedBox.shrink(),
+            // Declarative edge-to-edge bar style: dark icons on light
+            // surfaces and vice versa. `AnnotatedRegion` (not a
+            // `SystemChrome.set…` call in `build`) so theme switches apply
+            // without a side effect, and pages without an `AppBar` are
+            // covered too (`docs/Platform.md` §2).
+            child: AnnotatedRegion<SystemUiOverlayStyle>(
+              value: AppTheme.systemOverlayStyle(effectiveBrightness),
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         ),
       ),

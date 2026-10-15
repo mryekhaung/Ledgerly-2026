@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
+import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -348,6 +349,40 @@ void main() {
         greaterThan(AppRowHeight.absoluteMinimum),
       );
       expect(AppRowHeight.twoLine, greaterThan(AppRowHeight.singleLine));
+    });
+  });
+
+  group('system bars (docs/Platform.md §2)', () {
+    test('should_show_dark_icons_on_light_surfaces', () {
+      final style = AppTheme.systemOverlayStyle(Brightness.light);
+
+      // White-on-white is the invisible-status-bar bug: edge-to-edge bars are
+      // transparent, so the icons must contrast the light surface.
+      expect(style.statusBarIconBrightness, Brightness.dark);
+      expect(style.statusBarColor, Colors.transparent);
+      expect(style.systemNavigationBarColor, Colors.transparent);
+    });
+
+    test('should_show_light_icons_on_dark_surfaces', () {
+      final style = AppTheme.systemOverlayStyle(Brightness.dark);
+
+      expect(style.statusBarIconBrightness, Brightness.light);
+      expect(style.statusBarColor, Colors.transparent);
+      expect(style.systemNavigationBarColor, Colors.transparent);
+    });
+
+    test('should_match_the_app_bar_overlay_to_the_theme', () {
+      expect(
+        AppTheme.light()
+            .appBarTheme
+            .systemOverlayStyle
+            ?.statusBarIconBrightness,
+        Brightness.dark,
+      );
+      expect(
+        AppTheme.dark().appBarTheme.systemOverlayStyle?.statusBarIconBrightness,
+        Brightness.light,
+      );
     });
   });
 }
