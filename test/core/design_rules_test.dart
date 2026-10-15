@@ -185,9 +185,15 @@ void main() {
   // ---------------------------------------------------------------------------
 
   /// The curated avatar palette is *data*, not theme: N hex values the user
-  /// picks between, authored in one file by definition, so it is exempt.
+  /// picks between, authored in one file by definition.
+  ///
+  /// It lives in `domain/` as raw `0xFFRRGGBB` **ints**, not `Color` values, so
+  /// `domain/` stays pure Dart (`Agent.md` §3.1) and the regex below never
+  /// matches it — `\bColor\(0x` needs the `Color(` prefix. No `include:` filter
+  /// is therefore needed. The guard test at the bottom of this group protects
+  /// the set instead, because a rule that cannot see a file cannot defend it.
   const avatarPalettePath =
-      'lib/features/profile/presentation/widgets/avatar_palette.dart';
+      'lib/features/profile/domain/entities/avatar_palette.dart';
 
   group('design rule: colours come from tokens (docs/Design.md §2)', () {
     test('should_not_hardcode_a_colour_in_a_widget', () {
@@ -195,7 +201,6 @@ void main() {
         const <String>['lib/features', 'lib/core/widgets'],
         // `\b` matters: without it `AppThemeColors.of` matches `Colors.of`.
         RegExp(r'\bColor\(0x|\bColors\.(?!transparent)[a-z]'),
-        include: (path) => path != avatarPalettePath,
       );
 
       expectWithinBudget(
@@ -211,12 +216,14 @@ void main() {
     });
 
     test('should_keep_the_avatar_palette_as_the_single_colour_data_source', () {
-      // Re-asserts the exemption so a later reader does not "fix" the palette
-      // file and delete the curated set the avatar feature depends on.
+      // Re-asserts the curated set so a later reader does not "fix" the palette
+      // file and delete the values the avatar feature depends on. The design
+      // rule above cannot defend it: the regex looks for `Color(0x`, and this
+      // file holds bare ints so that `domain/` stays free of `Color`.
       final palette = File(avatarPalettePath);
       expect(palette.existsSync(), isTrue);
       expect(
-        palette.readAsStringSync().contains('Color(0x'),
+        palette.readAsStringSync().contains('0xFF'),
         isTrue,
         reason:
             'The curated avatar palette intentionally holds raw hex values.',

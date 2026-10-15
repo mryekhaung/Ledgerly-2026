@@ -219,6 +219,24 @@ sub-section pattern as 9.6.
 - **v2.1 original items** (cat, sprout, headband… drawn by us as SVG with the same token scheme) → fills the *Item* tab.
 - Photo avatars, avatar sync (it is one small JSON value, so it syncs for free with settings/profile in v0.4).
 
+### 10.1 v1 renderer removed (16 Oct 2026)
+The procedural robot-face renderer this spec replaces is **gone**:
+`presentation/widgets/avatar_painter.dart` (`AvatarPainter`, 390 lines) and its
+test (270 lines) were deleted, along with `presentation/widgets/avatar_palette.dart`
+(85 lines) — a second class also called `AvatarPalette`, holding the `Color`
+tints (`headFor`/`rimFor`/`inkFor`/`eyeHighlightFor`) and imported only by the
+painter. Nothing in `lib/` constructed any of them.
+
+Not to be confused with **`domain/entities/avatar_palette.dart`**, which stays:
+it holds the curated `0xFFRRGGBB` **int** lists (`backgrounds` 8 · `inks` 4 ·
+`hairs` 10 · `skins` 7 · `outfits` 10, per §9.4) as pure Dart, and is used by
+`avatar_catalog`, `avatar_config`, the editor's *Colors* tab and the Rule 1
+guard in `test/core/design_rules_test.dart`.
+
+Recoverable from git history if a procedural path is ever wanted again — but
+note the art licence is the reason it was replaced, not performance: Open Peeps
+is CC0, so there is no reason to fall back.
+
 ## 11. Open questions
 - Expose the `mask` group? (decide in the spike)
 - Circle-only or user-selectable shape?

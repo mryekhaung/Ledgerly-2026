@@ -530,8 +530,8 @@ Eleven refactor commits, each green on its own tests before pushing:
   key without a case can never ship silently again. Deliberately excluded
   (unchanged): generated code, `app_strings` (registry),
   `money`/`money_formatter`, DAOs/datasources/providers (cohesive data
-  layer), `app_theme`/`app_router`/`adaptive_nav`/`amount_keypad`/
-  `avatar_painter` (cohesive components), `avatar_catalog` (data table).
+  layer), `app_theme`/`app_router`/`adaptive_nav`/`amount_keypad` (cohesive
+  components), `avatar_catalog` (data table).
 3. **Screen goldens for the rest — DONE** (see §H). Every screen is now pinned
    at `TestWidths.phone × 900`, light + dark: the four in §E plus accounts,
    budgets, goals, recurring, insights, data_transfer, welcome, sign-in and
@@ -557,10 +557,28 @@ Eleven refactor commits, each green on its own tests before pushing:
    drop it from the index. `Auth.md` matters more than it looks: Phase 4's
    merge-on-first-login and account-deletion flows (and the store compliance in
    `Platform.md` §7) currently have no written spec.
-7. **`AvatarPainter` is dead code.** Kept as the v2.1 reference, but nothing in
-   `lib/` constructs it, so it is only exercised by its own test. Either delete
-   the class and its test, or record the decision that it is the intended
-   renderer for a future avatar path. See `docs/Avatar.md`.
+7. **`AvatarPainter` was dead code — DELETED (16 Oct 2026).** Nothing in `lib/`
+   constructed it; only its own test referenced it. `Avatar` — the widget
+   actually in use — renders through `flutter_svg` + `AvatarSvgComposer`, which
+   `docs/Avatar.md` §5 declares as *the* renderer. `Avatar.md` never names the
+   painter, and its status line says v2 "**replaces the procedural robot-face
+   avatar (background/backdrop/shape/eyes/mouth)**" — which is precisely the
+   painter's part list. So it was not a fallback; it was the superseded v1.
+   Removed: `avatar_painter.dart` (390 lines), `avatar_painter_test.dart`
+   (270 lines), and — found on the way — `presentation/widgets/avatar_palette.dart`
+   (85 lines), a **second** class also named `AvatarPalette` that only the
+   painter imported. It held the `Color` tints (`headFor`/`rimFor`/`inkFor`/
+   `eyeHighlightFor`) and was distinct from `domain/entities/avatar_palette.dart`,
+   which holds the curated `0xFFRRGGBB` ints and is still used by the catalog,
+   the config, the editor's colour tab and the design-rule guard. 745 lines
+   gone, all recoverable from git history.
+   - `test/core/design_rules_test.dart` had a Rule 1 exemption pointing at the
+     deleted presentation palette. It is retargeted to the domain palette and
+     the now-unnecessary `include:` filter is dropped: the domain file holds
+     bare ints, so `\bColor\(0x` never matched it anyway. Its guard test's
+     assertion moved from `Color(0x` to `0xFF` to match. That guard is the only
+     thing protecting the curated set, because a regex that cannot see a file
+     cannot defend it.
 
 ### H. Screen goldens completed + five real bugs the work exposed (16 Oct 2026)
 
