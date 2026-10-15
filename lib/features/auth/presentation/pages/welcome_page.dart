@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -166,7 +167,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                       ),
                     ),
                     child: Icon(
-                      Icons.account_balance_wallet_rounded,
+                      AppIcons.wallet,
                       size: 40,
                       color: colors.brandPrimary,
                     ),
@@ -205,7 +206,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                       Row(
                         children: <Widget>[
                           Icon(
-                            Icons.calendar_today_rounded,
+                            AppIcons.calendar,
                             size: 20,
                             color: colors.brandPrimary,
                           ),
@@ -256,7 +257,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                         child: Row(
                           children: <Widget>[
                             Icon(
-                              Icons.info_outline_rounded,
+                              AppIcons.info,
                               size: 16,
                               color: colors.brandPrimary,
                             ),
@@ -304,7 +305,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    icon: const Icon(Icons.person_outline_rounded),
+                    icon: const Icon(AppIcons.person),
                     label: Text(
                       strings('continueAsGuest'),
                       style: AppTypography.body.copyWith(
@@ -358,7 +359,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                         await context.pushNamed(AppRoutes.signInName);
                       }
                     },
-                    icon: const Icon(Icons.email_outlined, size: 20),
+                    icon: const Icon(AppIcons.email, size: 20),
                     label: Text(strings('signInWithEmail')),
                   ),
                 ],

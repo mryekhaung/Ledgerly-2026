@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
@@ -248,7 +249,7 @@ class _PreviewCard extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Icon(Icons.calendar_today, size: 20, color: colors.brandPrimary),
+              Icon(AppIcons.calendar, size: 20, color: colors.brandPrimary),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(

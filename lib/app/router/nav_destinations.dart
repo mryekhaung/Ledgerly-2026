@@ -1,4 +1,5 @@
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// One primary destination in the app shell.
@@ -15,32 +16,32 @@ enum NavDestination {
   calendar(
     route: AppRoutes.calendar,
     labelKey: 'navigationCalendar',
-    icon: Icons.calendar_today_outlined,
-    selectedIcon: Icons.calendar_today,
+    icon: AppIcons.calendar,
+    selectedIcon: AppIcons.calendarSelected,
   ),
 
   /// Spending insights.
   insights(
     route: AppRoutes.insights,
     labelKey: 'navigationInsights',
-    icon: Icons.pie_chart_outline,
-    selectedIcon: Icons.pie_chart,
+    icon: AppIcons.insights,
+    selectedIcon: AppIcons.insightsSelected,
   ),
 
   /// Category management.
   categories(
     route: AppRoutes.categories,
     labelKey: 'navigationCategories',
-    icon: Icons.grid_view_outlined,
-    selectedIcon: Icons.grid_view_rounded,
+    icon: AppIcons.home,
+    selectedIcon: AppIcons.homeSelected,
   ),
 
   /// App settings.
   settings(
     route: AppRoutes.settings,
     labelKey: 'navigationSettings',
-    icon: Icons.settings_outlined,
-    selectedIcon: Icons.settings,
+    icon: AppIcons.settings,
+    selectedIcon: AppIcons.settingsSelected,
   );
 
   const NavDestination({

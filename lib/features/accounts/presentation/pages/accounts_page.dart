@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -140,7 +141,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
       ),
       actions: <Widget>[
         IconButton(
-          icon: const Icon(Icons.swap_horiz),
+          icon: const Icon(AppIcons.transfer),
           tooltip: strings('accountsTransferButton'),
           onPressed: _navigateToTransfer,
         ),
@@ -152,19 +153,19 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
           activeAccountsAsync.when(
             loading: () => const LoadingPlaceholder(),
             error: (_, _) => StatePlaceholder(
-              icon: Icons.error_outline,
+              icon: AppIcons.error,
               title: strings('stateErrorTitle'),
               body: strings('stateErrorBody'),
             ),
             data: (accounts) {
               if (accounts.isEmpty) {
                 return StatePlaceholder(
-                  icon: Icons.account_balance_wallet_outlined,
+                  icon: AppIcons.wallet,
                   title: strings('accountsEmptyTitle'),
                   body: strings('accountsEmptyBody'),
                   action: FilledButton.icon(
                     onPressed: _navigateToAdd,
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(AppIcons.add),
                     label: Text(strings('accountsAddButton')),
                   ),
                 );
@@ -202,14 +203,14 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
           archivedAccountsAsync.when(
             loading: () => const LoadingPlaceholder(),
             error: (_, _) => StatePlaceholder(
-              icon: Icons.error_outline,
+              icon: AppIcons.error,
               title: strings('stateErrorTitle'),
               body: strings('stateErrorBody'),
             ),
             data: (archived) {
               if (archived.isEmpty) {
                 return StatePlaceholder(
-                  icon: Icons.archive_outlined,
+                  icon: AppIcons.archive,
                   title: strings('accountsEmptyTitle'),
                   body: strings('accountsArchivedTab'),
                 );
@@ -243,7 +244,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
                 onPressed: _navigateToAdd,
                 backgroundColor: colors.brandPrimary,
                 foregroundColor: colors.textOnBrand,
-                child: const Icon(Icons.add),
+                child: const Icon(AppIcons.add),
               )
             : null,
         orElse: () => null,

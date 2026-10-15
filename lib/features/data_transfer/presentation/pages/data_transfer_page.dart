@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -280,7 +281,7 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             TextButton.icon(
-              icon: const Icon(Icons.paste_rounded, size: 18),
+              icon: const Icon(AppIcons.paste, size: 18),
               label: Text(strings('dataTransferPaste')),
               onPressed: () async {
                 final data = await Clipboard.getData(Clipboard.kTextPlain);
@@ -482,7 +483,7 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton.icon(
-                    icon: const Icon(Icons.paste_rounded, size: 18),
+                    icon: const Icon(AppIcons.paste, size: 18),
                     label: Text(strings('dataTransferPaste')),
                     onPressed: () async {
                       final data = await Clipboard.getData(

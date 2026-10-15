@@ -1,3 +1,4 @@
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -114,7 +115,7 @@ class _MonthSwitcher extends StatelessWidget {
       children: <Widget>[
         IconButton(
           onPressed: onPrevious,
-          icon: const Icon(Icons.chevron_left),
+          icon: const Icon(AppIcons.chevronLeft),
           tooltip: strings('calendarPreviousMonth'),
         ),
         Expanded(
@@ -126,7 +127,7 @@ class _MonthSwitcher extends StatelessWidget {
         ),
         IconButton(
           onPressed: onNext,
-          icon: const Icon(Icons.chevron_right),
+          icon: const Icon(AppIcons.chevronRight),
           tooltip: strings('calendarNextMonth'),
         ),
       ],

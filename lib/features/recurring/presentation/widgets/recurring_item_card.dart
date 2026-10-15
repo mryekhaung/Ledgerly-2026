@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -111,7 +112,7 @@ class RecurringItemCard extends ConsumerWidget {
                   ),
                   PopupMenuButton<String>(
                     icon: Icon(
-                      Icons.more_vert,
+                      AppIcons.more,
                       size: 20,
                       color: colors.textSecondary,
                     ),
@@ -182,7 +183,7 @@ class RecurringItemCard extends ConsumerWidget {
                         value: 'skip',
                         child: Row(
                           children: <Widget>[
-                            const Icon(Icons.skip_next, size: 18),
+                            const Icon(AppIcons.skipNext, size: 18),
                             const SizedBox(width: AppSpacing.sm),
                             Text(strings('recurringActionSkip')),
                           ],
@@ -193,7 +194,7 @@ class RecurringItemCard extends ConsumerWidget {
                         child: Row(
                           children: <Widget>[
                             Icon(
-                              item.isArchived ? Icons.play_arrow : Icons.pause,
+                              item.isArchived ? AppIcons.play : AppIcons.pause,
                               size: 18,
                             ),
                             const SizedBox(width: AppSpacing.sm),
@@ -209,7 +210,7 @@ class RecurringItemCard extends ConsumerWidget {
                         value: 'edit',
                         child: Row(
                           children: <Widget>[
-                            const Icon(Icons.edit, size: 18),
+                            const Icon(AppIcons.edit, size: 18),
                             const SizedBox(width: AppSpacing.sm),
                             Text(strings('budgetsEdit')),
                           ],
@@ -221,7 +222,7 @@ class RecurringItemCard extends ConsumerWidget {
                         child: Row(
                           children: <Widget>[
                             Icon(
-                              Icons.delete,
+                              AppIcons.destructive,
                               size: 18,
                               color: colors.moneyOut,
                             ),

@@ -547,6 +547,110 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
+  // Rule 8 — icons come from the AppIcons vocabulary
+  // ---------------------------------------------------------------------------
+
+  group('design rule: icons come from AppIcons (docs/Design.md §5)', () {
+    /// Files that legitimately hold raw `Icons.*` values.
+    ///
+    /// These are **data**, not chrome: a catalogue is a curated, user-visible,
+    /// database-backed list of glyph choices, authored in one file by
+    /// definition. The same reasoning as the avatar palette under Rule 1.
+    ///
+    /// Everything else must go through `AppIcons`, so an icon is chosen by the
+    /// *role it plays* rather than by whichever Material variant the author
+    /// happened to reach for.
+    const cataloguePaths = <String>[
+      'lib/features/categories/presentation/category_catalog.dart',
+      'lib/features/accounts/presentation/account_catalog.dart',
+      // The registry itself is where raw `Icons.*` is supposed to live.
+      'lib/app/theme/app_icons.dart',
+    ];
+
+    /// Third-party brand marks. These are not chips from the app's own
+    /// vocabulary — they must render the provider's actual logo, so a role name
+    /// would only obscure a value that is already fixed.
+    final brandIconPattern = RegExp(
+      r'Icons\.(g_mobiledata_rounded|apple_rounded)\b',
+    );
+
+    test('should_not_reach_for_a_raw_material_icon', () {
+      final sites = scan(
+        const <String>['lib/features', 'lib/core', 'lib/app'],
+        RegExp(r'\bIcons\.[A-Za-z]'),
+        include: (path) => !cataloguePaths.contains(path),
+        // Provider brand marks must render the real logo, so they keep the
+        // literal glyph rather than a role name that would only obscure it.
+        dismiss: (line) => brandIconPattern.hasMatch(line),
+      );
+
+      expectWithinBudget(
+        'raw Material icon',
+        'docs/Design.md §5 — pick an icon by role from AppIcons instead of a '
+            'per-call-site Material variant, so a concept has one glyph',
+        sites,
+        // Burned to zero where it counts. The migration collapsed the real
+        // drift — delete, edit, calendar, close, person and check each had two
+        // or three competing variants — and the only raw uses left are the
+        // domain catalogues and the two provider brand marks, exempt above.
+        const <String, int>{},
+      );
+    });
+
+    test('should_keep_the_icon_vocabulary_free_of_duplicate_roles', () {
+      // A role registry that maps two names to the same glyph is a smell: it
+      // means the vocabulary grew a synonym instead of a concept. This is cheap
+      // to assert and catches a copy-paste addition.
+      final source = File('lib/app/theme/app_icons.dart').readAsStringSync();
+      final glyphs = RegExp(
+        r'static const IconData \w+ = (Icons\.\w+);',
+      ).allMatches(source).map((m) => m.group(1)!).toList();
+
+      expect(glyphs, isNotEmpty, reason: 'the registry must declare icons');
+      final duplicates = <String>{};
+      final seen = <String>{};
+      for (final glyph in glyphs) {
+        if (!seen.add(glyph)) duplicates.add(glyph);
+      }
+      expect(
+        duplicates,
+        isEmpty,
+        reason:
+            'These glyphs are declared under more than one role, which means '
+            'the vocabulary has a synonym rather than a concept: $duplicates',
+      );
+    });
+
+    test('should_keep_the_exempted_catalogues_as_the_icon_data_source', () {
+      // Re-asserts the exemption, so a later reader does not "fix" a catalogue
+      // by routing it through AppIcons and collapsing the curated set.
+      for (final path in cataloguePaths.skip(2)) {
+        final source = File(path).readAsStringSync();
+        expect(
+          RegExp(r'\bIcons\.[A-Za-z]').hasMatch(source),
+          isTrue,
+          reason:
+              '$path is exempted from the AppIcons rule because it is a '
+              'curated, DB-backed glyph catalogue; if that is no longer true, '
+              'remove it from cataloguePaths.',
+        );
+      }
+    });
+
+    test('should_hold_brand_marks_to_a_named_exemption', () {
+      // The brand pattern must match the real call sites and nothing else, so
+      // the exemption stays a whitelist rather than a hole.
+      expect(brandIconPattern.hasMatch('Icons.g_mobiledata_rounded'), isTrue);
+      expect(brandIconPattern.hasMatch('Icons.apple_rounded'), isTrue);
+      expect(
+        brandIconPattern.hasMatch('Icons.delete_outline'),
+        isFalse,
+        reason: 'a normal chrome icon must not slip into the brand exemption',
+      );
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Scanner self-check — a rule that cannot detect is worse than no rule
   // ---------------------------------------------------------------------------
 

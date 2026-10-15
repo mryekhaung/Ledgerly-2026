@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -124,7 +125,7 @@ class AccountCard extends ConsumerWidget {
                         if (!account.includeInTotal) ...[
                           const SizedBox(width: AppSpacing.xs),
                           Icon(
-                            Icons.visibility_off_outlined,
+                            AppIcons.conceal,
                             size: 13,
                             color: colors.textTertiary,
                           ),
@@ -151,7 +152,7 @@ class AccountCard extends ConsumerWidget {
               // Overflow Menu
               PopupMenuButton<String>(
                 icon: Icon(
-                  Icons.more_vert,
+                  AppIcons.more,
                   color: colors.textTertiary,
                   size: 20,
                 ),
@@ -175,7 +176,7 @@ class AccountCard extends ConsumerWidget {
                     value: 'transfer',
                     child: Row(
                       children: <Widget>[
-                        const Icon(Icons.swap_horiz, size: 18),
+                        const Icon(AppIcons.transfer, size: 18),
                         const SizedBox(width: AppSpacing.sm),
                         Text(strings('accountsTransferButton')),
                       ],
@@ -185,7 +186,7 @@ class AccountCard extends ConsumerWidget {
                     value: 'edit',
                     child: Row(
                       children: <Widget>[
-                        const Icon(Icons.edit_outlined, size: 18),
+                        const Icon(AppIcons.edit, size: 18),
                         const SizedBox(width: AppSpacing.sm),
                         Text(strings('accountsEditTitle')),
                       ],
@@ -197,8 +198,8 @@ class AccountCard extends ConsumerWidget {
                       children: <Widget>[
                         Icon(
                           account.isArchived
-                              ? Icons.unarchive_outlined
-                              : Icons.archive_outlined,
+                              ? AppIcons.unarchive
+                              : AppIcons.archive,
                           size: 18,
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -216,7 +217,7 @@ class AccountCard extends ConsumerWidget {
                     child: Row(
                       children: <Widget>[
                         Icon(
-                          Icons.delete_outline,
+                          AppIcons.destructive,
                           size: 18,
                           color: colors.warning,
                         ),

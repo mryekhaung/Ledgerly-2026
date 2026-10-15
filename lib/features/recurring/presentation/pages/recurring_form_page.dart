@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -110,12 +111,12 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
               ButtonSegment<TransactionDirection>(
                 value: TransactionDirection.expense,
                 label: Text(strings('transactionDirectionExpense')),
-                icon: const Icon(Icons.arrow_upward, size: 16),
+                icon: const Icon(AppIcons.increase, size: 16),
               ),
               ButtonSegment<TransactionDirection>(
                 value: TransactionDirection.income,
                 label: Text(strings('transactionDirectionIncome')),
-                icon: const Icon(Icons.arrow_downward, size: 16),
+                icon: const Icon(AppIcons.decrease, size: 16),
               ),
             ],
             selected: {formState.direction},
@@ -278,10 +279,10 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(color: colors.border.withValues(alpha: 0.5)),
             ),
-            leading: Icon(Icons.calendar_today, color: colors.brandPrimary),
+            leading: Icon(AppIcons.calendar, color: colors.brandPrimary),
             title: Text(strings('recurringFieldStartDate')),
             subtitle: Text('${formState.startDate}'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+            trailing: const Icon(AppIcons.chevronForward, size: 14),
             onTap: () => _pickDate(
               initialDate: formState.startDate,
               onPicked: (d) => ref
@@ -314,10 +315,10 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(color: colors.border.withValues(alpha: 0.5)),
               ),
-              leading: Icon(Icons.event, color: colors.moneyOut),
+              leading: Icon(AppIcons.event, color: colors.moneyOut),
               title: Text(strings('recurringFieldEndDate')),
               subtitle: Text('${formState.endDate}'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+              trailing: const Icon(AppIcons.chevronForward, size: 14),
               onTap: () => _pickDate(
                 initialDate: formState.endDate!,
                 onPicked: (d) => ref

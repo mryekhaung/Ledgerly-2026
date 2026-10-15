@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -187,7 +188,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
                 TextButton.icon(
                   onPressed: formState.isSaving ? null : _handleDelete,
                   icon: Icon(
-                    Icons.delete_outline,
+                    AppIcons.destructive,
                     size: 18,
                     color: colors.moneyOut,
                   ),
@@ -217,12 +218,12 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
               ButtonSegment<bool>(
                 value: true,
                 label: Text(strings('budgetsTotal')),
-                icon: const Icon(Icons.pie_chart_outline),
+                icon: const Icon(AppIcons.insights),
               ),
               ButtonSegment<bool>(
                 value: false,
                 label: Text(strings('budgetsCategory')),
-                icon: const Icon(Icons.category_outlined),
+                icon: const Icon(AppIcons.category),
               ),
             ],
             selected: <bool>{isTotal},
@@ -387,7 +388,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
                     children: <Widget>[
                       if (isTotal)
                         Icon(
-                          Icons.pie_chart_outline,
+                          AppIcons.insights,
                           color: colors.brandPrimary,
                           size: 24,
                         )
@@ -398,7 +399,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
                           size: CategoryGemSize.sm,
                         )
                       else
-                        const Icon(Icons.category, size: 24),
+                        const Icon(AppIcons.category, size: 24),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: Text(

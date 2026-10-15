@@ -1,3 +1,4 @@
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -20,19 +21,19 @@ class BudgetStatusPill extends StatelessWidget {
         colors.moneyIn,
         colors.moneyIn.withValues(alpha: 0.12),
         strings('budgetStatusSafe'),
-        Icons.check_circle_outline,
+        AppIcons.success,
       ),
       BudgetStatus.warning => (
         colors.warning,
         colors.warningSubtle,
         strings('budgetStatusWarning'),
-        Icons.warning_amber_rounded,
+        AppIcons.warning,
       ),
       BudgetStatus.exceeded => (
         colors.moneyOut,
         colors.moneyOut.withValues(alpha: 0.12),
         strings('budgetStatusExceeded'),
-        Icons.error_outline,
+        AppIcons.error,
       ),
     };
 

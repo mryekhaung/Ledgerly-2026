@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -32,7 +33,7 @@ class RecurringPendingBanner extends ConsumerWidget {
       ),
       child: Row(
         children: <Widget>[
-          Icon(Icons.notifications_active, color: colors.warning, size: 28),
+          Icon(AppIcons.notification, color: colors.warning, size: 28),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(

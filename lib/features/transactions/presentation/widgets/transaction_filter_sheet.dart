@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -316,12 +317,12 @@ class _TransactionFilterSheetState
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, size: 18),
+                        icon: const Icon(AppIcons.close, size: 18),
                         onPressed: () => setState(() => _categoryId = null),
                       ),
                     ] else ...<Widget>[
                       Icon(
-                        Icons.category_outlined,
+                        AppIcons.category,
                         size: 20,
                         color: colors.textSecondary,
                       ),
@@ -334,7 +335,7 @@ class _TransactionFilterSheetState
                           ),
                         ),
                       ),
-                      const Icon(Icons.chevron_right, size: 20),
+                      const Icon(AppIcons.chevronRight, size: 20),
                     ],
                   ],
                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -131,7 +132,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
       body: accountsAsync.when(
         loading: () => const LoadingPlaceholder(),
         error: (_, _) => StatePlaceholder(
-          icon: Icons.error_outline,
+          icon: AppIcons.error,
           title: strings('stateErrorTitle'),
           body: strings('stateErrorBody'),
         ),
@@ -193,7 +194,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                   child: Row(
                     children: <Widget>[
                       Icon(
-                        Icons.error_outline,
+                        AppIcons.error,
                         color: colors.warning,
                         size: 20,
                       ),
@@ -226,7 +227,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                     Row(
                       children: <Widget>[
                         Icon(
-                          Icons.arrow_upward,
+                          AppIcons.increase,
                           size: 20,
                           color: colors.moneyOut,
                         ),
@@ -278,7 +279,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                     // Swap Button
                     Center(
                       child: IconButton.filledTonal(
-                        icon: const Icon(Icons.swap_vert, size: 20),
+                        icon: const Icon(AppIcons.sort, size: 20),
                         tooltip: 'Swap accounts',
                         onPressed: _swapAccounts,
                       ),
@@ -290,7 +291,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                     Row(
                       children: <Widget>[
                         Icon(
-                          Icons.arrow_downward,
+                          AppIcons.decrease,
                           size: 20,
                           color: colors.moneyIn,
                         ),
@@ -382,7 +383,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                 borderRadius: AppRadius.borderMd,
                 child: InputDecorator(
                   decoration: const InputDecoration(
-                    suffixIcon: Icon(Icons.calendar_today_outlined, size: 18),
+                    suffixIcon: Icon(AppIcons.calendar, size: 18),
                   ),
                   child: Text(
                     '${formState.date.year}-${formState.date.month.toString().padLeft(2, '0')}-${formState.date.day.toString().padLeft(2, '0')}',

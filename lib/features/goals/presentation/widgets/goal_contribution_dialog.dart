@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -239,12 +240,12 @@ class _GoalContributionDialogState
               ButtonSegment(
                 value: GoalContributionMode.deposit,
                 label: Text(strings('depositAction')),
-                icon: const Icon(Icons.arrow_downward, size: 18),
+                icon: const Icon(AppIcons.decrease, size: 18),
               ),
               ButtonSegment(
                 value: GoalContributionMode.withdraw,
                 label: Text(strings('withdrawAction')),
-                icon: const Icon(Icons.arrow_upward, size: 18),
+                icon: const Icon(AppIcons.increase, size: 18),
               ),
             ],
             selected: {_mode},

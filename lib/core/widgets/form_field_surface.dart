@@ -1,3 +1,4 @@
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart';
@@ -139,7 +140,7 @@ class FormFieldChevron extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     return Icon(
-      Icons.chevron_right,
+      AppIcons.chevronRight,
       size: 20,
       color: colors.textTertiary,
       textDirection: Directionality.of(context),

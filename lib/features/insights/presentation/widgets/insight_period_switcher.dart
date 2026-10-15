@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
@@ -39,7 +40,7 @@ class InsightPeriodSwitcher extends StatelessWidget {
       children: <Widget>[
         IconButton(
           onPressed: onPrevious,
-          icon: const Icon(Icons.chevron_left),
+          icon: const Icon(AppIcons.chevronLeft),
           tooltip: strings('insightsPreviousPeriod'),
         ),
         Expanded(
@@ -75,7 +76,7 @@ class InsightPeriodSwitcher extends StatelessWidget {
         ),
         IconButton(
           onPressed: onNext,
-          icon: const Icon(Icons.chevron_right),
+          icon: const Icon(AppIcons.chevronRight),
           tooltip: strings('insightsNextPeriod'),
         ),
       ],

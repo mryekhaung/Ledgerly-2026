@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
@@ -52,7 +53,7 @@ class BudgetPeriodSelector extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           IconButton(
-            icon: const Icon(Icons.chevron_left, size: 22),
+            icon: const Icon(AppIcons.chevronLeft, size: 22),
             onPressed: onPrevious,
             visualDensity: VisualDensity.compact,
           ),
@@ -67,7 +68,7 @@ class BudgetPeriodSelector extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.chevron_right, size: 22),
+            icon: const Icon(AppIcons.chevronRight, size: 22),
             onPressed: onNext,
             visualDensity: VisualDensity.compact,
           ),

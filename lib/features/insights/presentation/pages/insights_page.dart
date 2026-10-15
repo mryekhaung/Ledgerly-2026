@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
@@ -69,7 +70,7 @@ class InsightsPage extends ConsumerWidget {
                 data: (insights) {
                   if (insights.isEmpty) {
                     return StatePlaceholder(
-                      icon: Icons.pie_chart_outline,
+                      icon: AppIcons.insights,
                       title: strings('insightsNoDataTitle'),
                       body: strings('insightsNoDataBody'),
                     );

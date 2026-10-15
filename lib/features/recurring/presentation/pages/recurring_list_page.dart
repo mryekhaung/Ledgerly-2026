@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -49,7 +50,7 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
           )
         else
           IconButton(
-            icon: const Icon(Icons.sync),
+            icon: const Icon(AppIcons.sync),
             tooltip: strings('recurringProcessNow'),
             onPressed: () async {
               final result = await ref
@@ -71,7 +72,7 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
       floatingActionButton: displayedItems.isNotEmpty
           ? FloatingActionButton.extended(
               onPressed: () => context.push(AppRoutes.recurringNew),
-              icon: const Icon(Icons.add),
+              icon: const Icon(AppIcons.add),
               label: Text(strings('recurringNew')),
               backgroundColor: colors.brandPrimary,
               foregroundColor: colors.textOnBrand,
@@ -95,12 +96,12 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
                 ButtonSegment<int>(
                   value: 0,
                   label: Text('Active (${activeItems.length})'),
-                  icon: const Icon(Icons.check_circle_outline, size: 16),
+                  icon: const Icon(AppIcons.success, size: 16),
                 ),
                 ButtonSegment<int>(
                   value: 1,
                   label: Text('Paused (${pausedItems.length})'),
-                  icon: const Icon(Icons.pause_circle_outline, size: 16),
+                  icon: const Icon(AppIcons.pauseCircle, size: 16),
                 ),
               ],
               selected: {_selectedTabIndex},
@@ -117,12 +118,12 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
           if (displayedItems.isEmpty) ...<Widget>[
             const SizedBox(height: AppSpacing.lg),
             StatePlaceholder(
-              icon: Icons.event_repeat,
+              icon: AppIcons.recurring,
               title: strings('recurringEmptyTitle'),
               body: strings('recurringEmptyBody'),
               action: FilledButton.tonalIcon(
                 onPressed: () => context.push(AppRoutes.recurringNew),
-                icon: const Icon(Icons.add),
+                icon: const Icon(AppIcons.add),
                 label: Text(strings('recurringNew')),
               ),
             ),

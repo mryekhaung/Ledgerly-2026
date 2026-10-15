@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -105,7 +106,7 @@ class CalendarPage extends ConsumerWidget {
       title: strings('navigationCalendar'),
       actions: <Widget>[
         IconButton(
-          icon: const Icon(Icons.search),
+          icon: const Icon(AppIcons.search),
           tooltip: strings('transactionsTitle'),
           onPressed: () => context.push(AppRoutes.transactions),
         ),
@@ -132,7 +133,7 @@ class CalendarPage extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () =>
             unawaited(_openTransactionForm(context, state.selectedDay)),
-        child: const Icon(Icons.add),
+        child: const Icon(AppIcons.add),
       ),
     );
   }
@@ -341,7 +342,7 @@ class _MonthSwitcher extends StatelessWidget {
       children: <Widget>[
         IconButton(
           onPressed: onPrevious,
-          icon: const Icon(Icons.chevron_left),
+          icon: const Icon(AppIcons.chevronLeft),
           tooltip: strings('calendarPreviousMonth'),
         ),
         Expanded(
@@ -380,7 +381,7 @@ class _MonthSwitcher extends StatelessWidget {
                               // The caret is the affordance; without it the label reads
                               // as a heading, not a control.
                               Icon(
-                                Icons.arrow_drop_down,
+                                AppIcons.dropdown,
                                 size: 20,
                                 color: colors.textSecondary,
                               ),
@@ -407,7 +408,7 @@ class _MonthSwitcher extends StatelessWidget {
         ),
         IconButton(
           onPressed: onNext,
-          icon: const Icon(Icons.chevron_right),
+          icon: const Icon(AppIcons.chevronRight),
           tooltip: strings('calendarNextMonth'),
         ),
       ],
@@ -925,7 +926,7 @@ class _DayListState extends ConsumerState<_DayList> {
 
         return visible.isEmpty
             ? StatePlaceholder(
-                icon: Icons.inbox_outlined,
+                icon: AppIcons.inbox,
                 title: strings('calendarEmptyDay'),
                 body: strings('stateEmptyBody'),
               )
@@ -1038,14 +1039,14 @@ class _TransactionRow extends ConsumerWidget {
       },
       background: _SwipeAffordance(
         alignStart: true,
-        icon: Icons.edit_outlined,
+        icon: AppIcons.edit,
         label: strings('transactionEdit'),
         color: colors.brandSubtle,
         iconColor: colors.brandPrimary,
       ),
       secondaryBackground: _SwipeAffordance(
         alignStart: false,
-        icon: Icons.delete_outline,
+        icon: AppIcons.destructive,
         label: strings('actionDelete'),
         color: colors.moneyOutSubtle,
         iconColor: colors.moneyOut,
@@ -1097,7 +1098,7 @@ class _TransactionRow extends ConsumerWidget {
             ),
             const SizedBox(width: AppSpacing.xs),
             PopupMenuButton<_TransactionAction>(
-              icon: Icon(Icons.more_horiz, color: colors.textSecondary),
+              icon: Icon(AppIcons.moreHorizontal, color: colors.textSecondary),
               onSelected: (action) => switch (action) {
                 _TransactionAction.edit => unawaited(
                   _editTransaction(context, transaction),

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -54,7 +55,7 @@ class ProfilePage extends ConsumerWidget {
               _TappableRow(
                 onTap: () => context.pushNamed(AppRoutes.accountName),
                 leading: Icon(
-                  Icons.manage_accounts_outlined,
+                  AppIcons.manageAccount,
                   size: 24,
                   color: AppThemeColors.of(context).textTertiary,
                 ),
@@ -228,7 +229,7 @@ class _NameRow extends ConsumerWidget {
 
     return _TappableRow(
       onTap: () => _rename(context, ref),
-      leading: Icon(Icons.badge_outlined, size: 24, color: colors.textTertiary),
+      leading: Icon(AppIcons.badge, size: 24, color: colors.textTertiary),
       label: strings('profileNameLabel'),
       value: profile.hasName
           ? profile.displayName
@@ -401,7 +402,7 @@ class _TappableRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.xs),
-              Icon(Icons.chevron_right, size: 20, color: colors.textTertiary),
+              Icon(AppIcons.chevronRight, size: 20, color: colors.textTertiary),
             ],
           ),
         ),

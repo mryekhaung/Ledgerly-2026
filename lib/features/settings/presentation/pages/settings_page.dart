@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
@@ -177,28 +178,28 @@ class SettingsPage extends ConsumerWidget {
                 _NavRow(
                   label: strings('accountsTitle'),
                   subtitle: strings('accountsSubtitle'),
-                  leading: const Icon(Icons.account_balance_wallet_outlined),
+                  leading: const Icon(AppIcons.wallet),
                   onTap: () => context.pushNamed(AppRoutes.accountsName),
                 ),
                 const _GroupDivider(),
                 _NavRow(
                   label: strings('budgetsTitle'),
                   subtitle: strings('budgetsTotal'),
-                  leading: const Icon(Icons.pie_chart_outline),
+                  leading: const Icon(AppIcons.insights),
                   onTap: () => context.pushNamed(AppRoutes.budgetsName),
                 ),
                 const _GroupDivider(),
                 _NavRow(
                   label: strings('recurringTitle'),
                   subtitle: strings('recurringSubtitle'),
-                  leading: const Icon(Icons.update_rounded),
+                  leading: const Icon(AppIcons.pending),
                   onTap: () => context.pushNamed(AppRoutes.recurringName),
                 ),
                 const _GroupDivider(),
                 _NavRow(
                   label: strings('settingsSavingsGoals'),
                   subtitle: strings('settingsSavingsGoalsSubtitle'),
-                  leading: const Icon(Icons.savings_outlined),
+                  leading: const Icon(AppIcons.goal),
                   onTap: () => context.pushNamed(AppRoutes.goalsName),
                 ),
               ],
@@ -214,7 +215,7 @@ class SettingsPage extends ConsumerWidget {
                       ? strings('accountGuestBadge')
                       : (ref.watch(currentUserProvider)?.email ??
                             strings('accountLinkedBadge')),
-                  leading: const Icon(Icons.manage_accounts_outlined),
+                  leading: const Icon(AppIcons.manageAccount),
                   onTap: () => context.pushNamed(AppRoutes.accountName),
                 ),
                 const _GroupDivider(),
@@ -230,7 +231,7 @@ class SettingsPage extends ConsumerWidget {
                 _NavRow(
                   label: strings('settingsDataTransfer'),
                   subtitle: strings('settingsDataTransferSubtitle'),
-                  leading: const Icon(Icons.sync_alt_rounded),
+                  leading: const Icon(AppIcons.syncAlt),
                   onTap: () => context.pushNamed(AppRoutes.dataTransferName),
                 ),
                 const _GroupDivider(),
@@ -483,7 +484,7 @@ class _ChoiceRow<T> extends StatelessWidget {
                     ?.copyWith(color: colors.textSecondary),
               ),
               const SizedBox(width: AppSpacing.xs),
-              Icon(Icons.chevron_right, size: 20, color: colors.textTertiary),
+              Icon(AppIcons.chevronRight, size: 20, color: colors.textTertiary),
             ],
           ),
         ),
@@ -558,7 +559,7 @@ class _ChoiceRow<T> extends StatelessWidget {
                     ListTile(
                       title: Text(option.label),
                       trailing: option.value == selected?.value
-                          ? Icon(Icons.check, color: colors.brandPrimary)
+                          ? Icon(AppIcons.check, color: colors.brandPrimary)
                           : null,
                       onTap: () {
                         Navigator.of(sheetContext).pop();
@@ -659,7 +660,7 @@ class _NavRow extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(width: AppSpacing.xs),
-                Icon(Icons.chevron_right, size: 20, color: colors.textTertiary),
+                Icon(AppIcons.chevronRight, size: 20, color: colors.textTertiary),
               ],
             ),
           ),

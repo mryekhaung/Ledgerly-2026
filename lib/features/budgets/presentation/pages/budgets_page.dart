@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -77,7 +78,7 @@ class BudgetsPage extends ConsumerWidget {
       floatingActionButton: hasAnyBudget
           ? FloatingActionButton.extended(
               onPressed: () => context.push(AppRoutes.budgetNew),
-              icon: const Icon(Icons.add),
+              icon: const Icon(AppIcons.add),
               label: Text(strings('budgetsNew')),
               backgroundColor: colors.brandPrimary,
               foregroundColor: colors.textOnBrand,
@@ -100,12 +101,12 @@ class BudgetsPage extends ConsumerWidget {
           if (!hasAnyBudget) ...<Widget>[
             const SizedBox(height: AppSpacing.xl),
             StatePlaceholder(
-              icon: Icons.pie_chart_outline,
+              icon: AppIcons.insights,
               title: strings('budgetsEmptyTitle'),
               body: strings('budgetsEmptyBody'),
               action: FilledButton.icon(
                 onPressed: () => context.push(AppRoutes.budgetNew),
-                icon: const Icon(Icons.add),
+                icon: const Icon(AppIcons.add),
                 label: Text(strings('budgetsNew')),
                 style: FilledButton.styleFrom(
                   backgroundColor: colors.brandPrimary,

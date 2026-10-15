@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -193,7 +194,7 @@ class GoalCard extends ConsumerWidget {
                   // Quick Deposit Button
                   IconButton(
                     icon: Icon(
-                      Icons.add_circle,
+                      AppIcons.addCircle,
                       color: colors.moneyIn,
                       size: 28,
                     ),
@@ -207,7 +208,7 @@ class GoalCard extends ConsumerWidget {
 
                   // Popup Menu
                   PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert),
+                    icon: const Icon(AppIcons.more),
                     onSelected: (action) {
                       switch (action) {
                         case 'deposit':
@@ -240,7 +241,7 @@ class GoalCard extends ConsumerWidget {
                         child: Row(
                           children: [
                             Icon(
-                              Icons.arrow_downward,
+                              AppIcons.decrease,
                               color: colors.moneyIn,
                               size: 18,
                             ),
@@ -254,7 +255,7 @@ class GoalCard extends ConsumerWidget {
                         child: Row(
                           children: [
                             Icon(
-                              Icons.arrow_upward,
+                              AppIcons.increase,
                               color: colors.moneyOut,
                               size: 18,
                             ),
@@ -268,7 +269,7 @@ class GoalCard extends ConsumerWidget {
                         value: 'edit',
                         child: Row(
                           children: [
-                            const Icon(Icons.edit_outlined, size: 18),
+                            const Icon(AppIcons.edit, size: 18),
                             const SizedBox(width: 8),
                             Text(strings('editGoal')),
                           ],
@@ -280,8 +281,8 @@ class GoalCard extends ConsumerWidget {
                           children: [
                             Icon(
                               goal.isArchived
-                                  ? Icons.unarchive_outlined
-                                  : Icons.archive_outlined,
+                                  ? AppIcons.unarchive
+                                  : AppIcons.archive,
                               size: 18,
                             ),
                             const SizedBox(width: 8),
@@ -298,7 +299,7 @@ class GoalCard extends ConsumerWidget {
                         child: Row(
                           children: [
                             Icon(
-                              Icons.delete_outline,
+                              AppIcons.destructive,
                               color: colors.moneyOut,
                               size: 18,
                             ),

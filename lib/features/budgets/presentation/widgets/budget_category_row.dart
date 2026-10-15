@@ -1,3 +1,4 @@
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -108,7 +109,7 @@ class BudgetCategoryRow extends StatelessWidget {
                 if (onDelete != null)
                   PopupMenuButton<String>(
                     icon: Icon(
-                      Icons.more_vert,
+                      AppIcons.more,
                       size: 18,
                       color: colors.textSecondary,
                     ),
@@ -124,7 +125,7 @@ class BudgetCategoryRow extends StatelessWidget {
                         value: 'edit',
                         child: Row(
                           children: <Widget>[
-                            const Icon(Icons.edit_outlined, size: 18),
+                            const Icon(AppIcons.edit, size: 18),
                             const SizedBox(width: AppSpacing.sm),
                             Text(strings('budgetsEdit')),
                           ],
@@ -135,7 +136,7 @@ class BudgetCategoryRow extends StatelessWidget {
                         child: Row(
                           children: <Widget>[
                             Icon(
-                              Icons.delete_outline,
+                              AppIcons.destructive,
                               size: 18,
                               color: colors.moneyOut,
                             ),

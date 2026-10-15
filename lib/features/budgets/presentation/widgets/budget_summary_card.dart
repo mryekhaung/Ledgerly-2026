@@ -1,3 +1,4 @@
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
@@ -51,7 +52,7 @@ class BudgetSummaryCard extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  Icons.pie_chart_outline,
+                  AppIcons.insights,
                   color: colors.brandPrimary,
                   size: 20,
                 ),
@@ -78,7 +79,7 @@ class BudgetSummaryCard extends StatelessWidget {
               ),
               TextButton.icon(
                 onPressed: onTapSetTotal,
-                icon: const Icon(Icons.add, size: 16),
+                icon: const Icon(AppIcons.add, size: 16),
                 label: Text(strings('budgetsNew')),
                 style: TextButton.styleFrom(
                   foregroundColor: colors.brandPrimary,
@@ -217,7 +218,7 @@ class BudgetSummaryCard extends StatelessWidget {
                 child: Row(
                   children: <Widget>[
                     Icon(
-                      Icons.calendar_today,
+                      AppIcons.calendar,
                       size: 14,
                       color: colors.brandPrimary,
                     ),

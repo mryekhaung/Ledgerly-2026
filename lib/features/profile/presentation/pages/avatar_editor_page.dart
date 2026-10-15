@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -150,7 +151,7 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
       child: AppScaffold(
         title: strings('avatarEditorTitle'),
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
+          icon: const Icon(AppIcons.close),
           onPressed: _saving ? null : () => unawaited(_onCancel()),
           tooltip: strings('actionCancel'),
         ),
@@ -284,7 +285,7 @@ class _PreviewSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           OutlinedButton.icon(
             onPressed: saving ? null : onShuffle,
-            icon: const Icon(Icons.shuffle_rounded, size: 18),
+            icon: const Icon(AppIcons.shuffle, size: 18),
             label: Text(strings('avatarEditorRandom')),
           ),
         ],
@@ -688,7 +689,7 @@ class _ItemTab extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Icon(
-                  Icons.auto_awesome_rounded,
+                  AppIcons.sparkle,
                   size: 48,
                   color: colors.textSecondary.withValues(alpha: 0.6),
                 ),
@@ -981,7 +982,7 @@ class _NoneTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Icon(
-                Icons.block_rounded,
+                AppIcons.blocked,
                 color: isSelected ? colors.brandPrimary : colors.textSecondary,
                 size: 28,
               ),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -123,7 +124,7 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
           icon: Stack(
             clipBehavior: Clip.none,
             children: <Widget>[
-              const Icon(Icons.tune),
+              const Icon(AppIcons.tune),
               if (state.filter.isActive)
                 Positioned(
                   top: -2,
@@ -158,10 +159,10 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
                   onChanged: _onSearchChanged,
                   decoration: InputDecoration(
                     hintText: strings('transactionsSearchHint'),
-                    prefixIcon: const Icon(Icons.search, size: 22),
+                    prefixIcon: const Icon(AppIcons.search, size: 22),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, size: 20),
+                            icon: const Icon(AppIcons.close, size: 20),
                             onPressed: () {
                               _searchController.clear();
                               notifier.search('');
@@ -241,7 +242,7 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
           children: <Widget>[
             SizedBox(height: MediaQuery.sizeOf(context).height * 0.2),
             StatePlaceholder(
-              icon: Icons.search_off,
+              icon: AppIcons.searchOff,
               title: strings('transactionsNoResultsTitle'),
               body: strings('transactionsNoResultsBody'),
             ),
@@ -394,7 +395,7 @@ class _FilterChipsBar extends ConsumerWidget {
             ),
           ] else ...<Widget>[
             ActionChip(
-              avatar: const Icon(Icons.category_outlined, size: 16),
+              avatar: const Icon(AppIcons.category, size: 16),
               label: Text(strings('filterCategory')),
               onPressed: onPickCategory,
             ),
@@ -403,7 +404,7 @@ class _FilterChipsBar extends ConsumerWidget {
 
           // Date Range Chip
           ActionChip(
-            avatar: const Icon(Icons.calendar_today_outlined, size: 16),
+            avatar: const Icon(AppIcons.calendar, size: 16),
             label: Text(
               filter.startDate != null || filter.endDate != null
                   ? '${filter.startDate?.toString() ?? '...'} ~ ${filter.endDate?.toString() ?? '...'}'
@@ -421,7 +422,7 @@ class _FilterChipsBar extends ConsumerWidget {
           if (filter.minAmountMinor != null ||
               filter.maxAmountMinor != null) ...<Widget>[
             ActionChip(
-              avatar: const Icon(Icons.attach_money, size: 16),
+              avatar: const Icon(AppIcons.money, size: 16),
               label: Text(
                 '${filter.minAmountMinor ?? 0} ~ ${filter.maxAmountMinor ?? '∞'}',
               ),
@@ -434,7 +435,7 @@ class _FilterChipsBar extends ConsumerWidget {
           // Clear all button if any filter active
           if (filter.isActive) ...<Widget>[
             ActionChip(
-              avatar: const Icon(Icons.close, size: 16),
+              avatar: const Icon(AppIcons.close, size: 16),
               label: Text(strings('filterClearAll')),
               onPressed: onClearAll,
             ),
@@ -481,13 +482,13 @@ class _TransactionRow extends ConsumerWidget {
         color: colors.brandSubtle,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Icon(Icons.edit, color: colors.brandPrimary),
+        child: Icon(AppIcons.edit, color: colors.brandPrimary),
       ),
       secondaryBackground: Container(
         color: colors.moneyOutSubtle,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Icon(Icons.delete_outline, color: colors.moneyOut),
+        child: Icon(AppIcons.destructive, color: colors.moneyOut),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
@@ -547,7 +548,7 @@ class _TransactionRow extends ConsumerWidget {
               ),
             ),
             PopupMenuButton<_TransactionMenuAction>(
-              icon: Icon(Icons.more_horiz, color: colors.textSecondary),
+              icon: Icon(AppIcons.moreHorizontal, color: colors.textSecondary),
               onSelected: (action) => switch (action) {
                 _TransactionMenuAction.edit => _editTransaction(context),
                 _TransactionMenuAction.delete => onDelete(),

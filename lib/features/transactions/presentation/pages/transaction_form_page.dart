@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -305,12 +306,12 @@ class _DirectionToggle extends StatelessWidget {
         ButtonSegment<TransactionDirection>(
           value: TransactionDirection.expense,
           label: Text(strings('transactionDirectionExpense')),
-          icon: const Icon(Icons.arrow_upward),
+          icon: const Icon(AppIcons.increase),
         ),
         ButtonSegment<TransactionDirection>(
           value: TransactionDirection.income,
           label: Text(strings('transactionDirectionIncome')),
-          icon: const Icon(Icons.arrow_downward),
+          icon: const Icon(AppIcons.decrease),
         ),
       ],
       selected: <TransactionDirection>{direction},

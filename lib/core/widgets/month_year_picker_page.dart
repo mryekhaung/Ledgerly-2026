@@ -1,3 +1,4 @@
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -160,7 +161,7 @@ class _YearSwitcher extends StatelessWidget {
           // Null disables the button, which is the honest state at the range
           // edge — the alternative is a tap that silently does nothing.
           onPressed: canGoBack ? onPrevious : null,
-          icon: const Icon(Icons.chevron_left),
+          icon: const Icon(AppIcons.chevronLeft),
           tooltip: strings('calendarPreviousYear'),
         ),
         Expanded(
@@ -172,7 +173,7 @@ class _YearSwitcher extends StatelessWidget {
         ),
         IconButton(
           onPressed: canGoForward ? onNext : null,
-          icon: const Icon(Icons.chevron_right),
+          icon: const Icon(AppIcons.chevronRight),
           tooltip: strings('calendarNextYear'),
         ),
       ],

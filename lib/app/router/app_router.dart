@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/router/app_shell.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -270,7 +271,7 @@ class _TransactionEditLoader extends ConsumerWidget {
           onErr: (failure) => Scaffold(
             appBar: AppBar(),
             body: StatePlaceholder(
-              icon: Icons.search_off,
+              icon: AppIcons.searchOff,
               title: strings('stateEmptyTitle'),
               body: strings(
                 AppLocalization.failureKeyFor(failure.runtimeType.toString()),

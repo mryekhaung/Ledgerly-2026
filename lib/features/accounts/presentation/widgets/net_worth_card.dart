@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -43,7 +44,7 @@ class NetWorthCard extends ConsumerWidget {
               Row(
                 children: <Widget>[
                   Icon(
-                    Icons.account_balance,
+                    AppIcons.budget,
                     size: 18,
                     color: colors.brandPrimary,
                   ),
@@ -87,7 +88,7 @@ class NetWorthCard extends ConsumerWidget {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: onTransfer,
-                  icon: const Icon(Icons.swap_horiz, size: 18),
+                  icon: const Icon(AppIcons.transfer, size: 18),
                   label: Text(strings('accountsTransferButton')),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: colors.textPrimary,
@@ -102,7 +103,7 @@ class NetWorthCard extends ConsumerWidget {
               Expanded(
                 child: FilledButton.icon(
                   onPressed: onAddAccount,
-                  icon: const Icon(Icons.add, size: 18),
+                  icon: const Icon(AppIcons.add, size: 18),
                   label: Text(strings('accountsAddButton')),
                   style: FilledButton.styleFrom(
                     backgroundColor: colors.brandPrimary,

@@ -1,3 +1,4 @@
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
@@ -135,7 +136,7 @@ class _ComparisonBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Icon(
-            isIncrease ? Icons.arrow_upward : Icons.arrow_downward,
+            isIncrease ? AppIcons.increase : AppIcons.decrease,
             size: 12,
             color: badgeColor,
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -158,7 +159,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                           controller: _nameController,
                           decoration: InputDecoration(
                             labelText: strings('displayNameLabel'),
-                            prefixIcon: const Icon(Icons.person_outline),
+                            prefixIcon: const Icon(AppIcons.person),
                             border: const OutlineInputBorder(),
                           ),
                           textCapitalization: TextCapitalization.words,
@@ -170,7 +171,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                         controller: _emailController,
                         decoration: InputDecoration(
                           labelText: strings('emailLabel'),
-                          prefixIcon: const Icon(Icons.email_outlined),
+                          prefixIcon: const Icon(AppIcons.email),
                           border: const OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.emailAddress,
@@ -192,12 +193,12 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           labelText: strings('passwordLabel'),
-                          prefixIcon: const Icon(Icons.lock_outline),
+                          prefixIcon: const Icon(AppIcons.lock),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
+                                  ? AppIcons.reveal
+                                  : AppIcons.conceal,
                             ),
                             onPressed: () => setState(() {
                               _obscurePassword = !_obscurePassword;

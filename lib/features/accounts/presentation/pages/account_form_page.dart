@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -137,7 +138,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
         loading: () => const AppScaffold(body: LoadingPlaceholder()),
         error: (err, _) => AppScaffold(
           body: StatePlaceholder(
-            icon: Icons.error_outline,
+            icon: AppIcons.error,
             title: strings('stateErrorTitle'),
             body: strings('stateErrorBody'),
           ),
@@ -185,7 +186,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
       actions: <Widget>[
         if (formState.isEditing)
           IconButton(
-            icon: Icon(Icons.delete_outline, color: colors.warning),
+            icon: Icon(AppIcons.destructive, color: colors.warning),
             tooltip: strings('accountsDelete'),
             onPressed: _handleDelete,
           ),
@@ -505,7 +506,7 @@ class _ColorSwatch extends StatelessWidget {
         ),
         child: isSelected
             ? Center(
-                child: Icon(Icons.check, size: 20, color: colors.textOnBrand),
+                child: Icon(AppIcons.check, size: 20, color: colors.textOnBrand),
               )
             : null,
       ),

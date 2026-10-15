@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -234,12 +235,12 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
                 children: [
                   if (formState.targetDate != null)
                     IconButton(
-                      icon: const Icon(Icons.clear, size: 20),
+                      icon: const Icon(AppIcons.close, size: 20),
                       onPressed: () => ref
                           .read(goalFormProvider.notifier)
                           .setTargetDate(null),
                     ),
-                  const Icon(Icons.calendar_today_outlined),
+                  const Icon(AppIcons.calendar),
                 ],
               ),
               onTap: _pickDate,

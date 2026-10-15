@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
@@ -78,7 +79,7 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
         selectedId: _paneEditing ? _paneCategory?.id : null,
       ),
       AsyncError() => StatePlaceholder(
-        icon: Icons.error_outline,
+        icon: AppIcons.error,
         title: strings('stateErrorTitle'),
         body: strings('stateErrorBody'),
         action: FilledButton(
@@ -96,7 +97,7 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
         title: strings('categoriesTitle'),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: _openForm,
-          icon: const Icon(Icons.add),
+          icon: const Icon(AppIcons.add),
           label: Text(strings('categoriesNew')),
         ),
         body: Row(
@@ -124,7 +125,7 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
       title: strings('categoriesTitle'),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openForm,
-        icon: const Icon(Icons.add),
+        icon: const Icon(AppIcons.add),
         label: Text(strings('categoriesNew')),
       ),
       body: body,
@@ -257,7 +258,7 @@ class _DetailPane extends ConsumerWidget {
 
     if (!editing) {
       return StatePlaceholder(
-        icon: Icons.edit_outlined,
+        icon: AppIcons.edit,
         title: strings('categoriesTitle'),
         body: strings('categoriesSelectHint'),
       );
@@ -332,7 +333,7 @@ class _CategoryListBody extends StatelessWidget {
 
     if (state.isEmpty) {
       return StatePlaceholder(
-        icon: Icons.category_outlined,
+        icon: AppIcons.category,
         title: strings('categoriesEmptyTitle'),
         body: strings('categoriesEmptyBody'),
       );
@@ -455,7 +456,7 @@ class _CategoryRow extends StatelessWidget {
                 ),
               ),
               PopupMenuButton<_CategoryAction>(
-                icon: Icon(Icons.more_horiz, color: colors.textSecondary),
+                icon: Icon(AppIcons.moreHorizontal, color: colors.textSecondary),
                 onSelected: (action) => switch (action) {
                   _CategoryAction.edit => onEdit(category),
                   _CategoryAction.toggleArchive => onToggleArchive(category),

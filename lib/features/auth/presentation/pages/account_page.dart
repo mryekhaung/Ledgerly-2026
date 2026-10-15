@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -185,8 +186,8 @@ class AccountPage extends ConsumerWidget {
                       children: <Widget>[
                         Icon(
                           isGuest
-                              ? Icons.person_outline_rounded
-                              : Icons.check_circle_rounded,
+                              ? AppIcons.person
+                              : AppIcons.success,
                           size: 14,
                           color: isGuest
                               ? colors.textSecondary
@@ -227,7 +228,7 @@ class AccountPage extends ConsumerWidget {
                     Row(
                       children: <Widget>[
                         Icon(
-                          Icons.cloud_sync_rounded,
+                          AppIcons.cloudSync,
                           size: 24,
                           color: colors.brandPrimary,
                         ),
@@ -305,7 +306,7 @@ class AccountPage extends ConsumerWidget {
                 children: <Widget>[
                   ListTile(
                     leading: Icon(
-                      Icons.logout_rounded,
+                      AppIcons.signOut,
                       color: colors.textPrimary,
                     ),
                     title: Text(
@@ -314,7 +315,7 @@ class AccountPage extends ConsumerWidget {
                         color: colors.textPrimary,
                       ),
                     ),
-                    trailing: const Icon(Icons.chevron_right_rounded),
+                    trailing: const Icon(AppIcons.chevronRight),
                     onTap: authState.isLoading
                         ? null
                         : () => _signOut(context, ref),
@@ -322,7 +323,7 @@ class AccountPage extends ConsumerWidget {
                   Divider(height: 1, color: colors.border),
                   ListTile(
                     leading: Icon(
-                      Icons.delete_forever_rounded,
+                      AppIcons.destructive,
                       color: colors.moneyOut,
                     ),
                     title: Text(
@@ -333,7 +334,7 @@ class AccountPage extends ConsumerWidget {
                       ),
                     ),
                     trailing: Icon(
-                      Icons.chevron_right_rounded,
+                      AppIcons.chevronRight,
                       color: colors.moneyOut,
                     ),
                     onTap: authState.isLoading

@@ -1,3 +1,4 @@
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/widgets/app_skeleton.dart';
@@ -145,7 +146,7 @@ class ErrorBanner extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Icon(Icons.error_outline, color: colors.warning, size: 20),
+          Icon(AppIcons.error, color: colors.warning, size: 20),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Text(

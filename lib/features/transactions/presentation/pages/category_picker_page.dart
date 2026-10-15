@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -54,13 +55,13 @@ class CategoryPickerPage extends ConsumerWidget {
           return result.fold(
             onSuccess: (categories) => categories.isEmpty
                 ? StatePlaceholder(
-                    icon: Icons.category_outlined,
+                    icon: AppIcons.category,
                     title: strings('categoriesEmptyTitle'),
                     body: strings('categoriesEmptyBody'),
                   )
                 : _CategoryList(categories: categories, selectedId: selectedId),
             onErr: (failure) => StatePlaceholder(
-              icon: Icons.error_outline,
+              icon: AppIcons.error,
               title: strings('stateErrorTitle'),
               body: strings(
                 AppLocalization.failureKeyFor(failure.runtimeType.toString()),
@@ -111,7 +112,7 @@ class _PickerRow extends StatelessWidget {
       ),
       title: Text(category.name),
       trailing: isSelected
-          ? Icon(Icons.check, color: colors.brandPrimary)
+          ? Icon(AppIcons.check, color: colors.brandPrimary)
           : null,
       selected: isSelected,
     );

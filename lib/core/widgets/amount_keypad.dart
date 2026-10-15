@@ -1,3 +1,4 @@
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
@@ -296,7 +297,7 @@ class _KeypadKey extends StatelessWidget {
           child: Center(
             child: isBackspace
                 ? Icon(
-                    Icons.backspace_outlined,
+                    AppIcons.backspace,
                     size: 22,
                     color: colors.textPrimary,
                   )

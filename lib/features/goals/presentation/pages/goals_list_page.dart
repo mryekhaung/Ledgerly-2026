@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -87,7 +88,7 @@ class _GoalsListPageState extends ConsumerState<GoalsListPage>
                 onPressed: () => context.push(AppRoutes.goalsNew),
                 backgroundColor: colors.moneyIn,
                 foregroundColor: colors.textOnBrand,
-                icon: const Icon(Icons.add),
+                icon: const Icon(AppIcons.add),
                 label: Text(strings('newGoal')),
               )
             : null,
@@ -125,7 +126,7 @@ class _GoalsTab extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.savings_outlined,
+                    AppIcons.goal,
                     size: 64,
                     color: colors.textSecondary.withValues(alpha: 0.5),
                   ),
@@ -149,7 +150,7 @@ class _GoalsTab extends StatelessWidget {
                     const SizedBox(height: AppSpacing.lg),
                     FilledButton.icon(
                       onPressed: () => context.push(AppRoutes.goalsNew),
-                      icon: const Icon(Icons.add),
+                      icon: const Icon(AppIcons.add),
                       label: Text(strings('newGoal')),
                       style: FilledButton.styleFrom(
                         backgroundColor: colors.moneyIn,
