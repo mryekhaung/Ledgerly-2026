@@ -64,7 +64,9 @@ class ListTransactionRow extends ConsumerWidget {
         color: colors.brandSubtle,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Icon(AppIcons.edit, color: colors.brandPrimary),
+        // `onBrandSubtle`, not `brandPrimary`: the affordance is filled
+        // `brandSubtle`, where `brandPrimary` measured 3.90:1 light (§K.1-2).
+        child: Icon(AppIcons.edit, color: colors.onBrandSubtle),
       ),
       secondaryBackground: Container(
         color: colors.moneyOutSubtle,

@@ -73,7 +73,9 @@ class NetWorthCard extends ConsumerWidget {
                 child: Text(
                   currency.name.toUpperCase(),
                   style: AppTypography.overline.copyWith(
-                    color: colors.brandPrimary,
+                    // `onBrandSubtle` on the `brandSubtle` chip — `brandPrimary`
+                    // on that fill fails AA at 3.90:1 light (Roadmap §K.1-2).
+                    color: colors.onBrandSubtle,
                   ),
                 ),
               ),

@@ -79,7 +79,9 @@ class TransactionRow extends ConsumerWidget {
         icon: AppIcons.edit,
         label: strings('transactionEdit'),
         color: colors.brandSubtle,
-        iconColor: colors.brandPrimary,
+        // `onBrandSubtle`, not `brandPrimary`: the affordance is filled
+        // `brandSubtle`, where `brandPrimary` measured 3.90:1 light (§K.1-2).
+        iconColor: colors.onBrandSubtle,
       ),
       secondaryBackground: _SwipeAffordance(
         alignStart: false,

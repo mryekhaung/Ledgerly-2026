@@ -169,7 +169,10 @@ void main() {
       expect(find.text('Income'), findsOneWidget);
 
       final expenseText = tester.widget<Text>(find.text('Expense'));
-      expect(expenseText.style?.color, const AppColorsLight().brandPrimary);
+      // `onBrandSubtle`, not `brandPrimary`: the selected segment is filled
+      // `brandSubtle`, and `brandPrimary` on that fill measured 3.90:1 light —
+      // below AA for a 13 px label (docs/Roadmap.md §K.1-2).
+      expect(expenseText.style?.color, const AppColorsLight().onBrandSubtle);
 
       final incomeText = tester.widget<Text>(find.text('Income'));
       expect(incomeText.style?.color, const AppColorsLight().textSecondary);

@@ -5,7 +5,7 @@ Legend: ☐ todo · ◐ in progress · ☑ done. Each task = one small PR follow
 **Where we are (16 Oct 2026):** Phases 0–3.5 are **done** — the app is a working
 local-first budget manager with calendar, transactions, categories, settings,
 accounts, budgets, recurring, goals, insights, import/export, full backup and
-a local-only auth simulator. `flutter test` is **1429 green** and `flutter analyze` is clean,
+a local-only auth simulator. `flutter test` is **1438 green** and `flutter analyze` is clean,
 **locally as well as on CI** (`docs/Versions.md` — the proxy fix). **Phase 4
 (Sync & Polish) is the only unstarted phase**, and its blocker is now cleared:
 **`docs/Backend.md` has been written** (options, criteria and a recommendation
@@ -875,6 +875,279 @@ providers and is left as a gap rather than half-done here.
   the title is cramped there. Raising the floor is a breakpoint change (it would
   move the calendar's split from a ~864 px window upward) and a design decision,
   so it is left as measured and recorded rather than changed unilaterally.
+
+### K. The colour & mode-parity defects (owner report, 16 Oct 2026) — FIXED
+
+The owner sent two **dark-mode** Calendar screenshots and asked, in Burmese, why
+the colours are wrong, why the selected/filled state is **invisible in dark**, why
+a ¥200,000 **salary** shows up in **"Today Spent" as `+200k`**, and why the
+light↔dark difference is so extreme that the app does not read as *unique, compact,
+premium, luxury* on Android/iOS/Web. Direction: **overhaul the whole app (all
+screens, widgets — buttons, text, FAB …) first, then Phase 4 (Backend).**
+
+This section records the **diagnosis** (§K.1–§K.4), which is kept because it is
+the evidence for every token value chosen in the fix (§K.5). Every number below is
+measured (`tool/audit_contrast.py`, WCAG 2.1 relative luminance), and every
+claim is tied to `file:line`. Two of the six complaints turned out to be
+**defects in `docs/Design.md` itself**, not only in the code.
+
+#### K.1 The four questions, answered with evidence
+
+**(1) "Why is a salary showing in *Spent today* as `+200k`?" — a label/data
+contradiction, and `Design.md` §6.3 mandates it.**
+
+`CalendarSummaryCard` renders the *net* under a *spend* label
+(`lib/features/transactions/presentation/widgets/calendar/summary_card.dart:44,49`):
+
+```dart
+Text(strings('calendarSpentToday'), ...),          // "Spent today"
+AmountText(netMoney, style: AmountStyle.large, signed: true),
+```
+
+`netMoney` is `Money.minor(total.netMinor, currency)` and
+`netMinor = incomeMinor - expenseMinor`
+(`lib/features/transactions/domain/entities/transaction_totals.dart`). On an
+income-only day the net is **positive**, so `AmountText` with `signed: true`
+prepends `+` and paints it `moneyIn` green
+(`lib/core/widgets/amount_text.dart` → `_resolveColor`). The result is a green
+`+¥200,000` sitting under the words "Spent today".
+
+`Design.md` §6.3 is the *origin*: *"Eyebrow: `overline`, `textSecondary` — 'SPENT
+TODAY'… Hero: `displayAmount`, `signed: true`."* The spec asks for a signed net
+under a spend label, so the code is faithfully implementing a **spec bug**. §6.1's
+ASCII mock even shows `Spent today  −12,500 Ks`, i.e. the author assumed the net is
+always negative — which is false the moment a day has income and no expense.
+The footer below it is *correct* (`signed: false` + explicit `moneyIn`/`moneyOut`,
+`summary_card.dart:99`), so the card contradicts itself.
+
+**(2) "The selected/filled state is invisible in dark." — the fill is a token that
+was never designed to be a state, and it is invisible in *both* modes.**
+
+The selected day fills with `brandSubtle` and paints its digit `brandPrimary`
+(`day_cell.dart:112–118`, `159–161`). Measured against the surface:
+
+| Selected-day pair | Light | Dark |
+|---|---|---|
+| **fill** `brandSubtle` vs `surface` | **1.20:1** ❌ | **1.29:1** ❌ |
+| digit `brandPrimary` on that fill | 4.27:1 (fails AA small) | 5.90:1 ✅ |
+
+The **fill** is nowhere near the 3:1 that WCAG requires of a non-text UI mark, in
+*either* mode — so "which day is selected" is not perceivable as a filled state.
+The pixel probe of the shipped golden (`tool/tmp_png_probe.py`) confirms the code
+reading exactly: `#0F2E28` is **3686 px** in `calendar_dark.png` and `#D6F0E8` is
+**3685 px** in `calendar_light.png` — i.e. the same shape, painted the same token.
+
+The reason dark *feels* worse than light is that the two modes are **not
+perceptually matched**: `brandSubtle` is a *pale mint highlight* on white but a
+*near-black green smudge* on `#0E1218`. `Design.md` §6.2 mandates exactly this
+fill ("**Selected**: `brandSubtle` fill behind the whole cell") and §5.5 reuses the
+same pair for `SegmentedTabs` ("Selected: `brandSubtle` fill + `brandPrimary`
+label") — so it is a **systematic pattern, not a calendar quirk**: every selected
+state in the app inherits an invisible fill, and the light-mode digit additionally
+misses AA for small text at 4.27:1.
+
+**(3) "The capsule renders as a black bar." — step 1 of the ramp is invisible by
+construction.**
+
+`_Capsule` lerps `subtle → full` across steps 1–4 (`day_cell.dart:214–215`).
+Measured against the surface:
+
+| Ramp | step 1 | step 2 | step 3 | step 4 |
+|---|---|---|---|---|
+| light expense | **1.18** ❌ | **1.90** ❌ | 3.18 | 5.10 |
+| light income | **1.13** ❌ | **1.77** ❌ | **2.99** ❌ | 5.35 |
+| dark expense | **1.16** ❌ | **2.08** ❌ | 3.92 | 6.78 |
+| dark income | **1.25** ❌ | **2.52** ❌ | 4.91 | 8.71 |
+
+Step 1 *is* the `*Subtle` token (`#122C1C` income / `#33191B` expense in dark —
+both ~1.2:1), so the lowest-intensity day draws a bar that cannot be seen: the
+"black bar" under day 11. §6.2 specifies "`moneyOutSubtle` at 25/50/75/100%
+**alpha**", but the implementation lerps toward the *full* colour instead — so the
+**spec and the code already disagree** about what the ramp is, and neither keeps
+step 1 visible.
+
+**(4) "The weekday header is too dim." — `textTertiary` fails AA in *both* modes,
+and §6.2 says only weekends should use it.**
+
+`WeekdayHeader` paints **every** column `textTertiary`
+(`weekday_header.dart:36`). Measured: **2.58:1** light, **3.21:1** dark — both fail
+the 4.5:1 AA floor for 11 px text. And `Design.md` §2.2 reserves that token for
+*"Placeholders, disabled"*, while §6.2 says *"Weekend column headers get
+`textTertiary`"* — implying the other five columns should be `textSecondary`
+(5.85/7.27:1). The header therefore both misuses the token and ignores its own spec.
+
+**(5) The FAB is the wrong colour — and it is the same missing-spec problem as (2).**
+
+`Design.md` §2.2 defines `brandPrimary` as *"FAB, selected tab, primary button"*.
+But `app_theme.dart` never sets a `floatingActionButtonTheme`, so M3 falls back to
+`colorScheme.primaryContainer` → `brandSubtle` (`app_theme.dart:244`). The probe
+confirms it: the dark FAB is `#0F2E28` — the *same* pixel count bucket as the
+selected day — and the light FAB is the pale-mint `#D6F0E8` circle visible in
+`calendar_light.png`. The **glyph** contrast is fine (`textPrimary` on that fill is
+15.03:1 light / 13.57:1 dark), so this is a **hue** defect, not a legibility one:
+the app's primary action renders pale-mint/dark-forest instead of brand jade. The
+same missing theme means all **six** FAB call sites drift together
+(`calendar_page.dart:174`, `budgets_page.dart:79`, `accounts_page.dart:243`,
+`category_list_page.dart:99,130`, `recurring_list_page.dart:74`,
+`goals_list_page.dart:87`).
+
+#### K.2 The mode-parity measurement ("the difference is too extreme")
+
+Same role, contrast against **its own** surface — a role that reads 5.85 in light
+and 7.27 in dark is a 24 % jump, and that asymmetry is the measurable form of the
+owner's complaint:
+
+| Role | light | dark | Δ | verdict |
+|---|---|---|---|---|
+| `textPrimary` | 18.05 | 17.50 | −3 % | matched |
+| `textSecondary` | 5.85 | 7.27 | **+24 %** | drifts |
+| `textTertiary` | 2.58 | 3.21 | **+24 %** | drifts |
+| `brandPrimary` | 5.13 | 7.61 | **+48 %** | mismatched |
+| `moneyOut` | 5.10 | 6.78 | **+33 %** | drifts |
+| `moneyIn` | 5.35 | 8.71 | **+63 %** | mismatched |
+| `border` | 1.23 | 1.42 | +16 % | drifts |
+| `*Subtle` fills | 1.13–1.20 | 1.16–1.29 | +2…+11 % | matched *(both invisible)* |
+
+Surface lightness (CIE L\*): light spans **100.0 → 94.7 (5.3 pts)**; dark spans
+**5.3 → 11.9 (8.0 pts)**. So dark mode is not merely "light mode inverted" — the
+brand and money hues are *lightened* for contrast (correct, and documented in
+§2.3) but the fills are *darkened* to near-invisibility, and the text ramp is
+swapped between `ink300`/`ink500` without being symmetric. The two modes do not
+share a design; they are two designs that happen to use the same names.
+
+#### K.3 What the spec gets right (so the overhaul does not break it)
+
+The base palette is **sound** and the doc's own claims verify exactly:
+`moneyOut #CC3438` on white = **5.10:1** (doc says 5.1), `moneyIn #1E7A45` =
+**5.35:1** (doc says 5.35), dark `moneyOut` 6.78 and `moneyIn` 8.71 (both as
+documented). `textPrimary` passes comfortably (18.05 / 17.50). The problem is
+concentrated in three places the spec never specified:
+
+1. **fills** (`brandSubtle`, `*Subtle`) — no contrast requirement exists for them;
+2. **the selected-state foreground-on-fill pair** — never defined, hence the
+   light-mode 4.27:1;
+3. **mode parity** — §2.3 only guarantees each token passes *individually*; it
+   never requires light and dark to be perceptually equivalent.
+
+`test/app/theme/design_tokens_test.dart` mirrors that blind spot: it asserts
+`textPrimary`, `moneyOut`, `moneyIn` and dark `brandPrimary` on `surface` — and
+**nothing** about `textSecondary`, `textTertiary`, any fill, the selected state,
+the FAB, the capsule ramp, or parity. That is why every defect above shipped green.
+
+#### K.4 The fix set proposed (token-level, not per-widget)
+
+Because (2) and (5) are the same missing-spec problem, the fix belongs in the token
+layer and the theme, not in `day_cell.dart`:
+
+- **`textTertiary` → AA.** Re-point it at a value ≥4.5:1 on both surfaces (light
+  needs ≈`ink500` or darker; dark needs ≈`ink300`), and keep it reserved for
+  placeholder/disabled per §2.2 — the weekday header moves to `textSecondary`.
+- **A real selected-state token pair.** Either a dedicated `selectedFill` /
+  `onSelectedFill` (recommended — it makes the pair unbypassable), or a `brandSubtle`
+  that genuinely reaches 3:1 *and* a digit that reaches 4.5:1 on it in both modes.
+  Applies to `DayCell`, `SegmentedTabs` (§5.5), `ChoiceRow`, `CategoryRow`,
+  `TabChipsRow` and `AdaptiveNav`'s indicator.
+- **Capsule ramps that keep step 1 visible.** Replace the `subtle → full` lerp with
+  a ramp whose *first* step already clears ~2.5–3:1, in both modes and both families.
+- **A `floatingActionButtonTheme`** (`brandPrimary` / `textOnBrand`), so all six
+  FABs match §2.2 instead of `primaryContainer`.
+- **Mode parity as a test, not an aspiration.** Add a `design_tokens_test.dart`
+  group that asserts each role's light and dark ratios are within a tolerance, so
+  "too extreme" becomes a failing test rather than an opinion.
+- **`summary_card.dart` / §6.3**: the hero must not be a `signed: true` net under
+  a "Spent today" label. Either show the spend magnitude (unsigned, `moneyOut`) or
+  relabel the figure to a net. **This needs the owner's call** — see §K.5.
+
+#### K.5 Decisions, and what changed — FIXED (16 Oct 2026)
+
+Both open questions were put to the owner and answered:
+
+1. **"Spent today" semantics** → **show the spend only.** The hero is now the
+   expense magnitude, unsigned, in `moneyOut`, so the figure always agrees with
+   its label.
+2. **Aesthetic direction** → **keep the hues, lift the craft.** No palette re-hue;
+   the jade/coral/sage brand is unchanged. The work is contrast, fills, selected
+   states, the FAB and mode parity.
+
+`flutter test`: **1438 green** (was 1429); `flutter analyze`: 0 issues;
+`dart format --set-exit-if-changed`: clean.
+
+**Token layer (`app_colors.dart`)** — every value chosen against a measured
+ratio, none by eye:
+
+| Token | Was | Now | Why |
+|---|---|---|---|
+| `textTertiary` | `ink300` `#98A2B0` | `ink400` `#6B7480` | 2.58:1 → **4.74:1** light |
+| `textTertiary` (dark) | `ink500` `#5A6675` | `ink350` `#7E8896` | 3.21:1 → **5.23:1** |
+| `brandSubtle` (light) | `#D6F0E8` | `#A3DBC8` | 1.20:1 → **1.45:1** on `surfaceSubtle` |
+| `brandSubtle` (dark) | `#0F2E28` | `#1A4C40` | 1.29:1 → **1.79:1** |
+| `warning` (light) | `#C98A0B` | `#9C6606` | **2.95:1 → 4.86:1** |
+| `borderStrong` (light) | `#98A2B0` | `#7E8896` | 2.58:1 → **3.89:1** (a focus ring is a UI mark) |
+| `border` | `ink100` / `ink700` | `ink200` / `ink600` | hairline lifted to 1.31 / 1.57 |
+| `moneyOut` (dark) | `#FF6B6F` | `#E85D66` | 6.78 → **5.53**, parity 33% → **8%** |
+| `moneyIn` (dark) | `#4CC777` | `#3FAD64` | 8.71 → **6.59**, parity 63% → **23%** |
+| `brandPrimary` (dark) | `#2BB99A` | `#22A287` | 7.61 → **5.89**, parity 48% → **15%** |
+
+**New tokens (§2.6 — "a state is not a tint"):** `selectedFill` / `onSelectedFill`
+(solid `brandPrimary` / `textOnBrand`) and `onBrandSubtle` (the on-colour for the
+tint). `selectedFill` clears 5.13:1 light / 5.89:1 dark against `surface`, and its
+digit 5.13:1 / 5.20:1 on the fill — where the old `brandPrimary`-on-`brandSubtle`
+pair measured **4.27:1** light and failed AA.
+
+**Theme (`app_theme.dart`)** — a `floatingActionButtonTheme` finally exists, so all
+**six** FAB call sites render `brandPrimary` per §2.2 instead of M3's
+`primaryContainer` = `brandSubtle`. `onPrimaryContainer` / `onSecondaryContainer`
+and the chip `secondaryLabelStyle` now use `onBrandSubtle`.
+
+**Calendar (`day_cell.dart`)** — the selected day is a **solid** circle at
+`radius.full` with an `onSelectedFill` digit; the today ring switches to
+`onSelectedFill` on a selected cell (a `brandPrimary` ring on a `brandPrimary`
+fill would vanish). The capsule ramp now starts at **60 %** toward the full
+colour rather than at the invisible `*Subtle` tint: step 1 goes from 1.13–1.25:1
+to 2.66–3.52:1, and the four steps stay ordered.
+
+**`summary_card.dart`** — the hero is `total.expenseMinor`, `signed: false`,
+`moneyOut`. The footer was already correct.
+
+**`weekday_header.dart`** — only the weekend columns are `textTertiary` now; the
+working week is `textSecondary` (§6.2 was already right, the code was not).
+
+**Every `brandPrimary`-on-`brandSubtle` foreground moved to `onBrandSubtle`:**
+`SegmentedTabs`, `ChoiceRow`-style day grid, `MonthYearPicker`, `AdaptiveNav`
+(rail + sidebar item), `TabChipsRow`, `NetWorthCard`, the two `IdentityCard`
+badges, `HeroHeader`, `CategoryGem` (no-colour case) and both swipe affordances.
+`CategoryGem` previously painted `textOnBrand` on the tint — **1.48:1**, an
+invisible glyph.
+
+**Tests** — `design_tokens_test.dart` gained a `contrast coverage for every role`
+group of **9** tests closing the blind spot: every text token on `surface` *and*
+`surfaceRaised`; every accent on all three surfaces; `warning`; the focus ring at
+3:1; the selected fill at 3:1 with a 4.5:1 digit; tinted fills with a distinct
+on-colour; the FAB theme; the capsule ramp visible and ordered; and **light/dark
+parity within 30 %**. **Verified to bite by mutation**: reverting `textTertiary`
+to `ink300` fails 4 of them (`light textTertiary on ffffffff must clear AA`,
+`drifts 102.5%`), and deleting the FAB theme fails the FAB assertion.
+
+**Goldens** — **30 of 36 regenerated** knowingly (a deliberate visual change). The
+6 unchanged are the avatar set and `AppCard`, which use neither the changed
+tokens. The pixel probe confirms the fix and the parity: light and dark now
+produce **identical pixel counts** for every token family — `moneyOut` 9533/9533,
+`moneyIn` 4632/4632, `selectedFill` 4446/4451, `border` 326/326.
+
+**Two assertions pinned the old behaviour and were rewritten** rather than
+worked around: `should_wrap_the_selected_cell_in_a_radius_md_fill_not_a_circle`
+→ `should_fill_the_selected_cell_solidly_at_radius_full`, and the `SegmentedTabs`
+selected-label colour.
+
+**Still open (unchanged from §J, owner's call):** R4 (`Platform.md` §5 promises
+Settings/Categories master–detail layouts that were never built);
+`TransactionFormPage` has no page test; the day pane's 260 px floor is tight at
+the narrowest split.
+
+**Deliberately not changed:** `Design.md` §6.3's hero is still `AmountStyle.large`
+(28 px) rather than the documented `displayAmount` (40 px). At 40 px a
+¥1,234,567 amount overflows a 360 px card at 2× text scale (§8), so the size
+divergence stays and is recorded here rather than "fixed" into an overflow.
 
 ### C. Judgment items — done
 

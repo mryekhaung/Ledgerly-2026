@@ -154,6 +154,17 @@ abstract final class AppTheme {
         hintStyle: AppTypography.body.copyWith(color: colors.textTertiary),
       ),
 
+      // The FAB is the app's one primary action, and §2.2 names `brandPrimary`
+      // as its colour. Without this theme M3 falls back to
+      // `colorScheme.primaryContainer` — i.e. `brandSubtle` — so every FAB in the
+      // app rendered pale-mint in light and dark-forest in dark, never the brand
+      // (docs/Roadmap.md §K.1-5). Shape per §4.2 (`radius.xl`).
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colors.selectedFill,
+        foregroundColor: colors.onSelectedFill,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderXl),
+      ),
+
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colors.surfaceRaised,
         indicatorColor: colors.brandSubtle,
@@ -201,6 +212,11 @@ abstract final class AppTheme {
         side: BorderSide.none,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderFull),
         labelStyle: AppTypography.label.copyWith(color: colors.textPrimary),
+        // The selected chip sits on `brandSubtle`, so its label is the on-colour
+        // for that fill — `brandPrimary` on it measured 3.90:1 light (§K.1-2).
+        secondaryLabelStyle: AppTypography.label.copyWith(
+          color: colors.onBrandSubtle,
+        ),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.xs,
@@ -242,11 +258,13 @@ abstract final class AppTheme {
       primary: colors.brandPrimary,
       onPrimary: colors.textOnBrand,
       primaryContainer: colors.brandSubtle,
-      onPrimaryContainer: colors.textPrimary,
+      // Both containers are `brandSubtle`, so their foreground is `onBrandSubtle`
+      // rather than `textPrimary`: a tint needs its own on-colour (§2.6).
+      onPrimaryContainer: colors.onBrandSubtle,
       secondary: colors.brandPrimary,
       onSecondary: colors.textOnBrand,
       secondaryContainer: colors.brandSubtle,
-      onSecondaryContainer: colors.textPrimary,
+      onSecondaryContainer: colors.onBrandSubtle,
       tertiary: colors.brandPrimary,
       onTertiary: colors.textOnBrand,
       error: colors.warning,

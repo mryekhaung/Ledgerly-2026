@@ -107,23 +107,34 @@ class DayCell extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[
-                    // §6.2 selected: `brandSubtle` fill behind the whole cell at
-                    // `radius.md`.
+                    // §6.2 selected: a **solid** `selectedFill` circle behind the
+                    // whole cell, with the day number in `onSelectedFill` — the
+                    // Google Calendar / Apple Calendar convention.
+                    //
+                    // This used to be a `brandSubtle` wash at `radius.md`, which
+                    // measured 1.20:1 on white and 1.29:1 on dark — a selected
+                    // state that could not be seen in *either* mode, and a
+                    // near-black square in dark (docs/Roadmap.md §K.1-2). A tint
+                    // is not a state; `selectedFill` is (docs/Design.md §2.6).
                     if (isSelected)
                       DecoratedBox(
                         decoration: BoxDecoration(
-                          color: colors.brandSubtle,
-                          borderRadius: AppRadius.borderMd,
+                          color: colors.selectedFill,
+                          borderRadius: AppRadius.borderFull,
                         ),
                       ),
-                    // §6.2 today: a `brandPrimary` 1.5 px ring at `radius.full`,
-                    // drawn *over* the selected fill so the two can coexist.
+                    // §6.2 today: a 1.5 px ring at `radius.full`, drawn *over*
+                    // the selected fill so the two can coexist. On a selected
+                    // cell the ring switches to `onSelectedFill`, because a
+                    // `brandPrimary` ring on a `brandPrimary` fill would vanish.
                     if (isToday)
                       DecoratedBox(
                         decoration: BoxDecoration(
                           borderRadius: AppRadius.borderFull,
                           border: Border.all(
-                            color: colors.brandPrimary,
+                            color: isSelected
+                                ? colors.onSelectedFill
+                                : colors.brandPrimary,
                             width: 1.5,
                           ),
                         ),
@@ -145,7 +156,7 @@ class DayCell extends StatelessWidget {
                               // under it.
                               style: AppTypography.overline.copyWith(
                                 color: isSelected
-                                    ? colors.brandPrimary
+                                    ? colors.onSelectedFill
                                     : colors.textSecondary,
                               ),
                             ),
@@ -157,7 +168,7 @@ class DayCell extends StatelessWidget {
                                 style: AppTypography.body.copyWith(
                                   fontSize: showMonthLabel ? 12 : null,
                                   color: isSelected
-                                      ? colors.brandPrimary
+                                      ? colors.onSelectedFill
                                       : colors.textPrimary,
                                   fontWeight: isSelected
                                       ? FontWeight.w600
@@ -211,7 +222,15 @@ class _Capsule extends StatelessWidget {
     // *lightest* of the five, so steps must interpolate from it toward the full
     // `moneyOut` — the previous `step * 64` alpha instead faded the subtle tint
     // out, making a busy day the palest capsule on the grid.
-    final t = (intensity.step - 1) / 3;
+    //
+    // The ramp starts at **60 %** of the way to the full colour rather than at
+    // the subtle tint itself. `*Subtle` measures 1.13–1.25:1 on its surface, so a
+    // step-1 day drew a bar that was simply not there — the "black bar" in the
+    // owner's dark-mode screenshot (docs/Roadmap.md §K.1-3). From 60 % the four
+    // steps land at 2.66/3.34/4.19/5.35 (light income) through 3.52/4.43/5.43/
+    // 6.59 (dark income), i.e. every step is visible and every step differs.
+    // Asserted in `test/features/transactions/.../day_cell_test.dart`.
+    final t = 0.60 + 0.40 * (intensity.step - 1) / 3;
     final color = Color.lerp(subtle, full, t)!;
 
     return Container(

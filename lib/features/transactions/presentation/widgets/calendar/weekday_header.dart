@@ -32,13 +32,30 @@ class WeekdayHeader extends StatelessWidget {
               child: Text(
                 localizations.narrowWeekdays[(firstIndex + column) %
                     DateTime.daysPerWeek],
+                // §6.2: only the **weekend** columns are `textTertiary`; the
+                // working week is `textSecondary`. Painting all seven tertiary
+                // made the whole header a 2.58:1 whisper on white (and 3.21:1 on
+                // dark), i.e. an unreadable label, not a de-emphasised one
+                // (docs/Roadmap.md §K.1-4).
+                //
+                // `narrowWeekdays` is Sunday-indexed (0 = Sun … 6 = Sat), so the
+                // weekend columns are 0 and 6 — *not* `DateTime.saturday` /
+                // `DateTime.sunday`, which are 1-based (6 and 7).
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: colors.textTertiary,
+                  color: _isWeekendColumn(firstIndex + column)
+                      ? colors.textTertiary
+                      : colors.textSecondary,
                 ),
               ),
             ),
           ),
       ],
     );
+  }
+
+  /// Whether the grid column at [sundayIndexed] falls on a weekend.
+  static bool _isWeekendColumn(int sundayIndexed) {
+    final day = sundayIndexed % DateTime.daysPerWeek;
+    return day == 0 || day == 6; // Sunday / Saturday
   }
 }

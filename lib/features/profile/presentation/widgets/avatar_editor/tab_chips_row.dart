@@ -106,7 +106,9 @@ class _TabChip extends StatelessWidget {
           child: Text(
             label,
             style: AppTypography.label.copyWith(
-              color: isSelected ? colors.brandPrimary : colors.textSecondary,
+              // `onBrandSubtle` on the `brandSubtle` chip — `brandPrimary` on
+              // that fill fails AA at 3.90:1 light (Roadmap §K.1-2).
+              color: isSelected ? colors.onBrandSubtle : colors.textSecondary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             ),
           ),

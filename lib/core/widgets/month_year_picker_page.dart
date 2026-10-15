@@ -211,12 +211,12 @@ class _MonthCell extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodyMedium?.copyWith(
-              // `brandPrimary` on a `brandSubtle` tile: the same pairing the
-              // nav rail uses for its selected label, and it is the one pair
-              // that keeps its contrast in *both* themes (the light and dark
-              // `brandSubtle` values are far apart in luminance, so a fixed
-              // `textPrimary` would fail in one of them).
-              color: isSelected ? colors.brandPrimary : colors.textPrimary,
+              // `onBrandSubtle`, not `brandPrimary`: the selected tile is filled
+              // `brandSubtle`, and `brandPrimary` on that fill measured 3.90:1
+              // light / 3.43:1 dark — below AA (Roadmap §K.1-2). The old comment
+              // here claimed this was "the one pair that keeps its contrast in
+              // both themes", which the §K audit disproved.
+              color: isSelected ? colors.onBrandSubtle : colors.textPrimary,
               fontWeight: isSelected ? FontWeight.w600 : null,
             ),
           ),

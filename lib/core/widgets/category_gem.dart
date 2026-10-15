@@ -85,7 +85,12 @@ class CategoryGem extends StatelessWidget {
           // The gem sits on a saturated category swatch, so this is an
           // on-colour: `textOnBrand` is the token for exactly that (white in
           // light, deep jade in dark) rather than a hardcoded `Colors.white`.
-          color: colors.textOnBrand,
+          //
+          // A category **without** a swatch falls back to the `brandSubtle`
+          // tint, which is not saturated — so its glyph uses `onBrandSubtle`
+          // instead. `textOnBrand` on that fill measured 1.48:1 in light, i.e.
+          // an invisible glyph (Roadmap §K.1-2).
+          color: hasColor ? colors.textOnBrand : colors.onBrandSubtle,
         ),
       ),
     );

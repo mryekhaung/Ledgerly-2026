@@ -261,10 +261,16 @@ class _NavRail extends StatelessWidget {
       data: NavigationRailThemeData(
         backgroundColor: colors.surfaceRaised,
         indicatorColor: colors.brandSubtle,
-        selectedIconTheme: IconThemeData(color: colors.brandPrimary),
+        // `onBrandSubtle`, not `brandPrimary`: the indicator is a `brandSubtle`
+        // fill, and `brandPrimary` on it measured 3.90:1 light / 3.43:1 dark —
+        // below AA for a 13 px label (Roadmap §K.1-2).
+        selectedIconTheme: IconThemeData(color: colors.onBrandSubtle),
         unselectedIconTheme: IconThemeData(color: colors.textSecondary),
         selectedLabelTextStyle: Theme.of(context).textTheme.labelMedium
-            ?.copyWith(color: colors.brandPrimary, fontWeight: FontWeight.w600),
+            ?.copyWith(
+              color: colors.onBrandSubtle,
+              fontWeight: FontWeight.w600,
+            ),
         unselectedLabelTextStyle: Theme.of(context).textTheme.labelMedium
             ?.copyWith(color: colors.textSecondary),
       ),
@@ -404,7 +410,7 @@ class _SidebarItem extends StatelessWidget {
                     selected ? destination.selectedIcon : destination.icon,
                     size: 22,
                     color: selected
-                        ? colors.brandPrimary
+                        ? colors.onBrandSubtle
                         : colors.textSecondary,
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -415,7 +421,7 @@ class _SidebarItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: selected
-                            ? colors.brandPrimary
+                            ? colors.onBrandSubtle
                             : colors.textPrimary,
                         fontWeight: selected ? FontWeight.w600 : null,
                       ),

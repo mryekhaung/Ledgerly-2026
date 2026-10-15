@@ -33,7 +33,14 @@ class CalendarSummaryCard extends ConsumerWidget {
     final totalAsync = ref.watch(selectedDayTotalProvider);
     final total = totalAsync.value ?? DailyTotal.empty(day, currency);
 
-    final netMoney = Money.minor(total.netMinor, currency);
+    // §6.3: the hero is the day's **spend** — the expense magnitude, unsigned, in
+    // `moneyOut` — so the figure can never contradict the "Spent today" label.
+    //
+    // It used to be the signed *net* (`incomeMinor - expenseMinor`), which meant
+    // an income-only day rendered a green `+¥200,000` directly under the words
+    // "Spent today": a salary reported as spending (docs/Roadmap.md §K.1-1). The
+    // footer below already reports Income and Expense separately and correctly.
+    final spentMoney = Money.minor(total.expenseMinor, currency);
 
     // Design.md §6.3: the summary card directly under the grid IS an AppCard.
     return AppCard(
@@ -46,7 +53,12 @@ class CalendarSummaryCard extends ConsumerWidget {
                 ?.copyWith(color: colors.textSecondary),
           ),
           const SizedBox(height: AppSpacing.sm),
-          AmountText(netMoney, style: AmountStyle.large, signed: true),
+          AmountText(
+            spentMoney,
+            style: AmountStyle.large,
+            signed: false,
+            color: colors.moneyOut,
+          ),
           const SizedBox(height: AppSpacing.md),
           Divider(color: colors.border, height: 1),
           const SizedBox(height: AppSpacing.md),

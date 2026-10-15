@@ -78,7 +78,9 @@ class GuestBadge extends StatelessWidget {
       child: Text(
         strings('profileGuestBadge'),
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: colors.brandPrimary,
+          // `onBrandSubtle` on the `brandSubtle` badge — `brandPrimary` on that
+          // fill fails AA at 3.90:1 light (Roadmap §K.1-2).
+          color: colors.onBrandSubtle,
           letterSpacing: 0.8,
           fontWeight: FontWeight.w600,
         ),

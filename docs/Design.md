@@ -44,18 +44,23 @@ are exported. Widgets never reference the raw palette.
 |---|---|---|
 | `ink900` | `#0F1720` | Neutral darkest |
 | `ink700` | `#26313D` | Neutral dark |
+| `ink600` | `#2C3844` | Neutral dark-mid — dark hairline |
 | `ink500` | `#5A6675` | Neutral mid |
+| `ink400` | `#6B7480` | Neutral mid-light — light `textTertiary` (4.74:1 on white) |
+| `ink350` | `#7E8896` | Neutral light — dark `textTertiary`, light focus ring |
 | `ink300` | `#98A2B0` | Neutral light |
+| `ink200` | `#DCE1E9` | Neutral lighter — light hairline |
 | `ink100` | `#E4E8EE` | Neutral lighter |
 | `ink50` | `#F5F7FA` | Neutral lightest |
 | `jade600` | `#0E7C66` | **Brand primary** |
 | `jade500` | `#12987C` | Brand primary hover/pressed |
-| `jade100` | `#D6F0E8` | Brand tint |
-| `coral500` | `#CC3438` | **Expense / negative** — AA on white (5.1:1). See §2.4 |
+| `jade100` | `#A3DBC8` | Brand tint — `brandSubtle` (light) |
+| `jadeOnTintLight` | `#0A5A4A` | Text/icon on the light brand tint |
+| `coral500` | `#CC3438` | **Expense / negative** — AA on white (5.10:1). See §2.4 |
 | `coral100` | `#FDE7E7` | Expense tint |
 | `sage500` | `#1E7A45` | **Income / positive** — AA on white (5.35:1). See §2.4 |
 | `sage100` | `#E3F6E9` | Income tint |
-| `amber500` | `#C98A0B` | Warning / budget at risk |
+| `amber500` | `#9C6606` | Warning / budget at risk — 4.86:1 on white |
 | `amber100` | `#FCF0D8` | Warning tint |
 | `violet500` | `#6B5BD2` | Category accent slot 5 |
 
@@ -67,23 +72,31 @@ are exported. Widgets never reference the raw palette.
 | `surfaceRaised` | `#FFFFFF` | Cards/rows that need to lift off `surfaceSubtle` |
 | `surfaceSubtle` | `#F5F7FA` | Grouped sections, calendar backdrop |
 | `surfaceSunken` | `#EDF0F5` | Keypad tray, inset wells |
-| `border` | `#E4E8EE` | Hairlines — **only** separators, never box outlines |
-| `borderStrong` | `#98A2B0` | Focus rings, selected outlines |
+| `border` | `#DCE1E9` | Hairlines — **only** separators, never box outlines |
+| `borderStrong` | `#7E8896` | Focus rings, selected outlines — 3.89:1, clears the 3:1 UI-mark floor |
 | `textPrimary` | `#0F1720` | Amounts, titles |
 | `textSecondary` | `#5A6675` | Labels, metadata |
-| `textTertiary` | `#98A2B0` | Placeholders, disabled |
+| `textTertiary` | `#6B7480` | Placeholders, disabled, weekend headers — 4.74:1 |
 | `textOnBrand` | `#FFFFFF` | Text on `brandPrimary` |
-| `brandPrimary` | `#0E7C66` | FAB, selected tab, primary button |
-| `brandSubtle` | `#D6F0E8` | Selected chip background, today ring |
-| `moneyOut` | `#CC3438` | Expense amounts — 5.1:1 on `surface` |
+| `brandPrimary` | `#0E7C66` | FAB, selected tab, primary button, **selected fill** |
+| `brandSubtle` | `#A3DBC8` | Tinted fill: selected chip background, nav indicator, today ring's tint |
+| `onBrandSubtle` | `#0A5A4A` | Text/icon **on** `brandSubtle` — 5.25:1 |
+| `selectedFill` | `#0E7C66` | **Solid** selected state (day cell, chosen option) — see §2.6 |
+| `onSelectedFill` | `#FFFFFF` | Text/icon on `selectedFill` |
+| `moneyOut` | `#CC3438` | Expense amounts — 5.10:1 on `surface` |
 | `moneyOutSubtle` | `#FDE7E7` | Expense capsule fill |
 | `moneyIn` | `#1E7A45` | Income amounts — 5.35:1 on `surface` |
 | `moneyInSubtle` | `#E3F6E9` | Income capsule fill |
-| `warning` | `#C98A0B` | Budget near limit |
+| `warning` | `#9C6606` | Budget near limit — 4.86:1 on white |
 | `warningSubtle` | `#FCF0D8` | Warning capsule fill |
 | `overlay` | `#0F1720` @ 32% | Scrims |
 | `glassTint` | `#FFFFFF` @ 62% | Glass surface fill (see §2.5) |
 | `glassStroke` | `#FFFFFF` @ 45% | Glass hairline highlight |
+
+> **`textTertiary` is not decorative.** It used to be `#98A2B0` at **2.58:1** on
+> white — the weekday header was an unreadable label rather than a de-emphasised
+> one (`docs/Roadmap.md` §K.1-4). It is reserved for placeholder/disabled copy
+> and the weekend columns per §6.2; never for a live label.
 
 ### 2.3 Semantic tokens — dark
 
@@ -93,22 +106,54 @@ are exported. Widgets never reference the raw palette.
 | `surfaceRaised` | `#182029` | Cards/rows |
 | `surfaceSubtle` | `#141A21` | Grouped sections |
 | `surfaceSunken` | `#0A0E13` | Keypad tray |
-| `border` | `#26313D` | Hairlines |
+| `border` | `#2C3844` | Hairlines |
 | `borderStrong` | `#98A2B0` | Focus |
 | `textPrimary` | `#F5F7FA` | |
 | `textSecondary` | `#98A2B0` | |
-| `textTertiary` | `#5A6675` | |
-| `brandPrimary` | `#2BB99A` | **Lightened** — `jade600` fails 4.5:1 on dark |
-| `brandSubtle` | `#0F2E28` | |
-| `moneyOut` | `#FF6B6F` | Lightened for dark contrast |
+| `textTertiary` | `#7E8896` | |
+| `brandPrimary` | `#22A287` | **Lightened** — `jade600` fails 4.5:1 on dark |
+| `brandSubtle` | `#1A4C40` | |
+| `onBrandSubtle` | `#7FD8C0` | Text/icon on `brandSubtle` |
+| `selectedFill` | `#22A287` | Solid selected state — see §2.6 |
+| `onSelectedFill` | `#06231D` | |
+| `moneyOut` | `#E85D66` | Lightened for dark contrast |
 | `moneyOutSubtle` | `#33191B` | |
-| `moneyIn` | `#4CC777` | |
+| `moneyIn` | `#3FAD64` | |
 | `moneyInSubtle` | `#122C1C` | |
 | `warning` | `#E0A63C` | |
 | `warningSubtle` | `#33280F` | |
 | `overlay` | `#000000` @ 55% | |
 | `glassTint` | `#182029` @ 58% | |
 | `glassStroke` | `#FFFFFF` @ 12% | |
+
+> **The dark accents are lightened only as far as AA requires.** They used to run
+> far brighter than their light twins — `moneyIn` was **+63 %** and `brandPrimary`
+> **+48 %** in contrast — which is the measurable form of "the two modes look like
+> different apps" (`docs/Roadmap.md` §K.2). Every role now sits within **30 %** of
+> its light counterpart, asserted in `test/app/theme/design_tokens_test.dart`.
+
+### 2.6 Selection tokens (a state is not a tint)
+
+Before these existed the *only* "selected" token was `brandSubtle`, a wash that
+measured **1.20:1 on white and 1.29:1 on dark** — below the 3:1 WCAG floor for a
+non-text UI mark. Every selected control in the app was therefore effectively
+invisible, and in dark mode it read as a near-black square (`docs/Roadmap.md`
+§K.1-2). Two pairs replace it, and the distinction is the point:
+
+| Pair | Fill | Foreground | Where |
+|---|---|---|---|
+| `selectedFill` / `onSelectedFill` | **solid** `brandPrimary` | `textOnBrand` | Day cell, chosen option, month-picker tile, day-grid chip |
+| `brandSubtle` / `onBrandSubtle` | **tinted** | `onBrandSubtle` | Segmented tabs, nav indicator, filter chips, swipe affordances |
+
+Rules:
+
+1. **A fill must clear 3:1 against the surface it sits on.** A tint (`brandSubtle`)
+   is exempt only where the state is *also* carried by something else — a filled
+   icon, a weight change, a border.
+2. **A tint carries its own on-colour.** Painting `brandPrimary` on `brandSubtle`
+   measured 3.90:1 light / 3.43:1 dark, both below AA — so `onBrandSubtle` exists
+   and `brandPrimary` must never be painted on `brandSubtle`.
+3. **Light and dark are the same design.** Same role, same contrast, within 30 %.
 
 ### 2.4 Money color rule (do not deviate)
 
@@ -134,8 +179,18 @@ Amounts are the most important content on screen, so both money colors **must re
 | `moneyOut` `#CC3438` on `#F5F7FA` | 4.75 | ✅ AA |
 | `moneyIn` `#1E7A45` on `#FFFFFF` | 5.35 | ✅ AA |
 | `moneyIn` `#1E7A45` on `#F5F7FA` | 4.99 | ✅ AA |
-| dark `moneyOut` `#FF6B6F` on `#0E1218` | 6.78 | ✅ AA |
-| dark `moneyIn` `#4CC777` on `#0E1218` | 8.71 | ✅ AA |
+| dark `moneyOut` `#E85D66` on `#0E1218` | 5.53 | ✅ AA |
+| dark `moneyIn` `#3FAD64` on `#0E1218` | 6.59 | ✅ AA |
+
+The dark values were **lowered** from `#FF6B6F` (6.78) and `#4CC777` (8.71) —
+over-brightening the accents is what made the two modes read as different apps
+(§K.2). They are now within 8 % and 23 % of their light twins instead of 33 % and 63 %.
+
+> **This table only ever covered the money colours.** Every other role — the text
+> ramp, `brandPrimary`, `warning`, the focus ring, all fills, the selected state,
+> the FAB and the capsule ramp — was unmeasured, which is exactly why §K found an
+> invisible selected day and an invisible capsule shipping green. §2.6 and the
+> `§K` group in `design_tokens_test.dart` close that gap.
 
 > Historical note: the first draft used `#E5484D` / `#2E9E5B`, which only reached 3.91 and 3.41 on
 > white — **too low for text**. They were kept as-is nowhere: the palette above is the corrected
@@ -302,7 +357,8 @@ Renders a `Money`. The only widget allowed to format money.
 
 - iOS: glass segmented control. Android: M3 `SegmentedButton`. Web: M3.
 - Pill shape (`radius.full`), height 32, label `label` token.
-- Selected: `brandSubtle` fill + `brandPrimary` label. Unselected: `textSecondary`, no fill.
+- Selected: `brandSubtle` fill + `onBrandSubtle` label. Unselected: `textSecondary`, no fill.
+  The on-colour matters — `brandPrimary` on `brandSubtle` fails AA (§2.6).
 - Sliding indicator animates with `short`. Max **3** segments; more becomes a scrollable chip row.
 
 ### 5.6 `ListRow`
@@ -400,10 +456,18 @@ that day's net spend magnitude.
   95th-percentile absolute net of the visible period. Quantize into **5 steps** (`0, .25, .5, .75, 1`)
   so the grid reads as texture, not noise.
   - Step 0 (no transactions): no capsule at all.
-  - Steps 1–4: `moneyOutSubtle` at 25/50/75/100% alpha — **or** `moneyInSubtle` for net-positive days.
+  - Steps 1–4: a **lerp from 60 % toward the full colour** — `moneyOut` /
+    `moneyInSubtle` → `moneyOut` / `moneyIn` — so every step is visible. The
+    `*Subtle` tints measure 1.13–1.25:1 on their surface, so starting the ramp
+    *at* them made step 1 a bar nobody could see ("the black bar", §K.1-3). The
+    four steps land at 2.66 / 3.34 / 4.19 / 5.35 (light income) through
+    3.52 / 4.43 / 5.43 / 6.59 (dark income); asserted in `design_tokens_test.dart`.
 - **Today**: `brandPrimary` 1.5 px ring around the cell, `radius.full`.
-- **Selected**: `brandSubtle` fill behind the whole cell, `radius.md`; day number goes
-  `brandPrimary` w600. Selection and today can coexist (ring drawn over fill).
+- **Selected**: a **solid** `selectedFill` circle (`radius.full`) behind the whole
+  cell, with the day number in `onSelectedFill` w600 — the Google Calendar /
+  Apple Calendar convention. A tint is not a state (§2.6). Selection and today
+  can coexist: on a selected cell the today ring switches to `onSelectedFill`,
+  because a `brandPrimary` ring on a `brandPrimary` fill would vanish.
 - **Outside the visible period** (padding days that complete the first/last week): `textTertiary`, capsule at 40% alpha, still tappable (navigates to the neighbouring period).
 - Weekend column headers get `textTertiary`; no other special-casing.
 - Densities: compact shows capsule + number. Expanded shows capsule + number + tiny amount
@@ -419,7 +483,10 @@ Horizontal swipe on the grid changes month; the swipe must not fight the day-lis
 An `AppCard` directly under the grid.
 
 - Eyebrow: `overline`, `textSecondary` — "SPENT TODAY" / localized.
-- Hero: `displayAmount`, `signed: true`, animated on day change (`short`).
+- Hero: `displayAmount`, **unsigned and in `moneyOut`** — the day's *spend*, so the
+  figure can never contradict the eyebrow. It used to be the signed net, which
+  rendered a salary as a green `+¥200,000` under the words "SPENT TODAY"
+  (§K.1-1). Animated on day change (`short`).
 - Divider: full-bleed hairline `border`.
 - Footer: two columns — `Income +45,000` (`moneyIn`) and `Expense −57,500` (`moneyOut`), both
   `amountLarge`. Equal flex, left-aligned, labels in `label`/`textSecondary`.
@@ -502,6 +569,16 @@ as a calendar month; anything else switches the screen to pay-cycle mode.
 - [ ] All controllers/timers/subscriptions disposed (`Conventions.md` §3)
 - [ ] Amounts use tabular figures and `AmountText` only
 - [ ] Money colors follow §2.4 exactly
+- [ ] Every text token ≥4.5:1 and every accent ≥4.5:1 on **all three** surfaces
+      (`surface`, `surfaceRaised`, `surfaceSubtle`)
+- [ ] Every selected fill ≥3:1; **no `brandPrimary` painted on `brandSubtle`** (§2.6.2)
+- [ ] Light and dark agree within **30 %** on every text and accent role (§2.6.3)
 - [ ] `RepaintBoundary` around the calendar grid and any chart
 - [ ] Golden tests per platform × light/dark for design-system components
 - [ ] Screenshot reviewed in `--profile` on a low-end device, no jank while scrolling the grid
+
+The four contrast bullets are **asserted, not reviewed** — they are the tests
+`test/app/theme/design_tokens_test.dart` runs. They exist because the §K audit
+found every one of them shipping green: the old suite checked only
+`textPrimary`, `moneyOut`, `moneyIn` and dark `brandPrimary`, each on `surface`
+alone.

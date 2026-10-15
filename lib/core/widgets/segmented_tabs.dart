@@ -31,7 +31,8 @@ class SegmentedTab<T> {
 ///
 /// * Pill shape (`radius.full`), fixed height 32 px.
 /// * Label uses `AppTypography.label` token.
-/// * Selected: `brandSubtle` fill + `brandPrimary` label.
+/// * Selected: `brandSubtle` fill + `onBrandSubtle` label. The on-colour matters
+///   — `brandPrimary` on that fill fails AA (§2.6, Roadmap §K.1-2).
 /// * Unselected: `textSecondary`, transparent fill.
 /// * Sliding indicator animates with `AppMotion.short` (180 ms).
 /// * Max **3** segments supported; more must use a chip row (docs/Design.md §5.5).
@@ -142,7 +143,10 @@ class _SegmentItem<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final textColor = isSelected ? colors.brandPrimary : colors.textSecondary;
+    // The selected segment sits on the `brandSubtle` pill, so its label and
+    // icon use `onBrandSubtle`: `brandPrimary` on that fill measured 3.90:1
+    // light and 3.43:1 dark, both below AA for 13 px text (§K.1-2).
+    final textColor = isSelected ? colors.onBrandSubtle : colors.textSecondary;
 
     return Semantics(
       label: tab.semanticsLabel ?? tab.label,

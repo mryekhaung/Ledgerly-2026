@@ -806,30 +806,45 @@ void main() {
       expect(capsuleOf(expected), findsWidgets);
     });
 
-    testWidgets(
-      'should_wrap_the_selected_cell_in_a_radius_md_fill_not_a_circle',
-      (tester) async {
-        await host(tester, TestWidths.phone);
-        await tester.pumpAndSettle();
+    testWidgets('should_fill_the_selected_cell_solidly_at_radius_full', (
+      tester,
+    ) async {
+      await host(tester, TestWidths.phone);
+      await tester.pumpAndSettle();
 
-        // The selected day is Oct 3. Find the DecoratedBox carrying the
-        // selection fill and assert its corner shape. The light-theme
-        // `brandSubtle` is `AppPalette.jade100`; the host renders light.
-        final selectionFill = find.byWidgetPredicate((w) {
-          if (w is! DecoratedBox) return false;
-          final d = w.decoration;
-          return d is BoxDecoration &&
-              d.color == AppPalette.jade100 &&
-              d.borderRadius == AppRadius.borderMd;
-        });
+      // §6.2 selected: a **solid** `selectedFill` circle with the day number
+      // in `onSelectedFill` — the Google Calendar / Apple Calendar convention.
+      //
+      // It used to be a `brandSubtle` wash at `radius.md`, which measured
+      // 1.20:1 on white and 1.29:1 on dark: a selected state nobody could see
+      // in either mode, and the near-black square in the owner's dark-mode
+      // screenshot (docs/Roadmap.md §K.1-2). A tint is not a state.
+      const light = AppColorsLight();
+      final selectionFill = find.byWidgetPredicate((w) {
+        if (w is! DecoratedBox) return false;
+        final d = w.decoration;
+        return d is BoxDecoration &&
+            d.color == light.selectedFill &&
+            d.borderRadius == AppRadius.borderFull;
+      });
 
-        expect(
-          selectionFill,
-          findsWidgets,
-          reason: '§6.2 selected cell is brandSubtle at radius.md',
-        );
-      },
-    );
+      expect(
+        selectionFill,
+        findsWidgets,
+        reason: '§6.2 selected cell is selectedFill at radius.full',
+      );
+
+      // The digit is the on-colour for that fill. `brandPrimary` on a
+      // `brandSubtle` tint measured 4.27:1 light — below AA (§K.1-2).
+      final onFillDigit = find.byWidgetPredicate(
+        (w) => w is Text && w.style?.color == light.onSelectedFill,
+      );
+      expect(
+        onFillDigit,
+        findsWidgets,
+        reason: 'the selected day number must use onSelectedFill',
+      );
+    });
   });
 }
 

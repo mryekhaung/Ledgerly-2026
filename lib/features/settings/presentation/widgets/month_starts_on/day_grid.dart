@@ -94,7 +94,10 @@ class _DayChip extends StatelessWidget {
             child: Text(
               '$day',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isSelected ? colors.brandPrimary : colors.textPrimary,
+                // `onBrandSubtle`, not `brandPrimary`: the selected tile is
+                // filled `brandSubtle`, and `brandPrimary` on that fill measured
+                // 3.90:1 light / 3.43:1 dark — below AA (Roadmap §K.1-2).
+                color: isSelected ? colors.onBrandSubtle : colors.textPrimary,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),

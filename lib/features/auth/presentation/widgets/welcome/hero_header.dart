@@ -28,7 +28,13 @@ class HeroHeader extends StatelessWidget {
               borderRadius: AppRadius.borderLg,
               border: Border.all(color: colors.brandPrimary.withAlpha(50)),
             ),
-            child: Icon(AppIcons.wallet, size: 40, color: colors.brandPrimary),
+            child: Icon(
+              AppIcons.wallet,
+              size: 40,
+              // `onBrandSubtle`: the icon sits on a `brandSubtle` tile, where
+              // `brandPrimary` measured 3.90:1 light (Roadmap §K.1-2).
+              color: colors.onBrandSubtle,
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.lg),

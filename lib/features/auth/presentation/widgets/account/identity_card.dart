@@ -85,7 +85,10 @@ class AccountIdentityCard extends StatelessWidget {
                 Icon(
                   isGuest ? AppIcons.person : AppIcons.success,
                   size: 14,
-                  color: isGuest ? colors.textSecondary : colors.brandPrimary,
+                  // The linked badge is filled `brandSubtle`, so its icon and
+                  // label use `onBrandSubtle` — `brandPrimary` on that fill
+                  // measured 3.90:1 light (Roadmap §K.1-2).
+                  color: isGuest ? colors.textSecondary : colors.onBrandSubtle,
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 // "Synced Account" at 2× type (`docs/Design.md` §8) is wider
@@ -101,7 +104,7 @@ class AccountIdentityCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color: isGuest
                           ? colors.textSecondary
-                          : colors.brandPrimary,
+                          : colors.onBrandSubtle,
                     ),
                   ),
                 ),
