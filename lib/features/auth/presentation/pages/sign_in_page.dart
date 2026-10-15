@@ -1,20 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
-import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
-import 'package:ledgerly/core/widgets/app_skeleton.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
+import 'package:ledgerly/features/auth/presentation/widgets/sign_in/email_form.dart';
+import 'package:ledgerly/features/auth/presentation/widgets/sign_in/header.dart';
+import 'package:ledgerly/features/auth/presentation/widgets/sign_in/provider_buttons.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Sign In and Sign Up page for email and social authentication.
+/// Email + provider sign-in page.
+///
+/// Composition root only: header, form and provider buttons live in
+/// `widgets/sign_in/` (`docs/Conventions.md` §1).
 class SignInPage extends ConsumerStatefulWidget {
+  /// Creates the page.
   const SignInPage({super.key});
 
   @override
@@ -22,29 +25,9 @@ class SignInPage extends ConsumerStatefulWidget {
 }
 
 class _SignInPageState extends ConsumerState<SignInPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _nameController = TextEditingController();
-
   bool _isSignUp = false;
-  bool _obscurePassword = true;
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-    final name = _nameController.text.trim();
-
+  Future<void> _submitEmail(String email, String password, String name) async {
     final notifier = ref.read(authNotifierProvider.notifier);
     final success = _isSignUp
         ? await notifier.signUpWithEmail(
@@ -57,15 +40,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
     if (!mounted) return;
 
     if (success) {
-      if (GoRouter.maybeOf(context) != null) {
-        if (context.canPop()) {
-          context.pop();
-        } else {
-          context.go(AppRoutes.calendar);
-        }
-      } else if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
+      _goHome();
     } else {
       final failure = ref.read(authNotifierProvider).failure;
       AppFeedback.failure(
@@ -76,22 +51,24 @@ class _SignInPageState extends ConsumerState<SignInPage> {
     }
   }
 
+  void _goHome() {
+    if (GoRouter.maybeOf(context) != null) {
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.go(AppRoutes.calendar);
+      }
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+  }
+
   Future<void> _signInWithGoogle() async {
     final success = await ref
         .read(authNotifierProvider.notifier)
         .signInWithGoogle();
     if (!mounted) return;
-    if (success) {
-      if (GoRouter.maybeOf(context) != null) {
-        if (context.canPop()) {
-          context.pop();
-        } else {
-          context.go(AppRoutes.calendar);
-        }
-      } else if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
-    }
+    if (success) _goHome();
   }
 
   Future<void> _signInWithApple() async {
@@ -99,23 +76,11 @@ class _SignInPageState extends ConsumerState<SignInPage> {
         .read(authNotifierProvider.notifier)
         .signInWithApple();
     if (!mounted) return;
-    if (success) {
-      if (GoRouter.maybeOf(context) != null) {
-        if (context.canPop()) {
-          context.pop();
-        } else {
-          context.go(AppRoutes.calendar);
-        }
-      } else if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
-    }
+    if (success) _goHome();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
     final authState = ref.watch(authNotifierProvider);
 
@@ -134,179 +99,21 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                 vertical: AppSpacing.lg,
               ),
               children: <Widget>[
-                Text(
-                  _isSignUp ? strings('signUpTitle') : strings('signInTitle'),
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colors.textPrimary,
-                  ),
+                SignInHeader(isSignUp: _isSignUp),
+                SignInEmailForm(
+                  isSignUp: _isSignUp,
+                  isLoading: authState.isLoading,
+                  onSubmit: _submitEmail,
+                  onToggleMode: () {
+                    setState(() {
+                      _isSignUp = !_isSignUp;
+                    });
+                  },
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  strings('welcomeSubtitle'),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xl),
-
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      if (_isSignUp) ...<Widget>[
-                        TextFormField(
-                          controller: _nameController,
-                          decoration: InputDecoration(
-                            labelText: strings('displayNameLabel'),
-                            prefixIcon: const Icon(AppIcons.person),
-                            border: const OutlineInputBorder(),
-                          ),
-                          textCapitalization: TextCapitalization.words,
-                          textInputAction: TextInputAction.next,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                      ],
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          labelText: strings('emailLabel'),
-                          prefixIcon: const Icon(AppIcons.email),
-                          border: const OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        autocorrect: false,
-                        textInputAction: TextInputAction.next,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return strings('failureValidation');
-                          }
-                          if (!value.contains('@')) {
-                            return strings('failureValidation');
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: _obscurePassword,
-                        decoration: InputDecoration(
-                          labelText: strings('passwordLabel'),
-                          prefixIcon: const Icon(AppIcons.lock),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? AppIcons.reveal
-                                  : AppIcons.conceal,
-                            ),
-                            onPressed: () => setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            }),
-                          ),
-                          border: const OutlineInputBorder(),
-                        ),
-                        textInputAction: TextInputAction.done,
-                        onFieldSubmitted: (_) => _submit(),
-                        validator: (value) {
-                          if (value == null || value.length < 6) {
-                            return strings('failureValidation');
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-
-                      if (authState.isLoading)
-                        // A skeleton the size of the button it replaces, so the
-                        // page does not jump when auth resolves
-                        // (docs/Design.md §5.11).
-                        const AppSkeleton(height: 50, radius: AppRadius.md)
-                      else ...<Widget>[
-                        FilledButton(
-                          onPressed: _submit,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: colors.brandPrimary,
-                            foregroundColor: colors.textOnBrand,
-                            minimumSize: const Size.fromHeight(50),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: AppRadius.borderMd,
-                            ),
-                          ),
-                          child: Text(
-                            _isSignUp
-                                ? strings('signUpTitle')
-                                : strings('signInTitle'),
-                            style: AppTypography.body.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _isSignUp = !_isSignUp;
-                            });
-                          },
-                          child: Text(
-                            _isSignUp
-                                ? strings('haveAccountPrompt')
-                                : strings('noAccountPrompt'),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: AppSpacing.xl),
-                Row(
-                  children: <Widget>[
-                    Expanded(child: Divider(color: colors.border)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                      ),
-                      child: Text(
-                        strings('signInOrDivider'),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colors.textSecondary,
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: colors.border)),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.lg),
-
-                OutlinedButton.icon(
-                  onPressed: authState.isLoading ? null : _signInWithGoogle,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: colors.textPrimary,
-                    side: BorderSide(color: colors.borderStrong),
-                    minimumSize: const Size.fromHeight(48),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: AppRadius.borderMd,
-                    ),
-                  ),
-                  icon: const Icon(Icons.g_mobiledata_rounded, size: 26),
-                  label: Text(strings('signInWithGoogle')),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                OutlinedButton.icon(
-                  onPressed: authState.isLoading ? null : _signInWithApple,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: colors.textPrimary,
-                    side: BorderSide(color: colors.borderStrong),
-                    minimumSize: const Size.fromHeight(48),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: AppRadius.borderMd,
-                    ),
-                  ),
-                  icon: const Icon(Icons.apple_rounded, size: 22),
-                  label: Text(strings('signInWithApple')),
+                ProviderButtons(
+                  isLoading: authState.isLoading,
+                  onGoogle: _signInWithGoogle,
+                  onApple: _signInWithApple,
                 ),
               ],
             ),
