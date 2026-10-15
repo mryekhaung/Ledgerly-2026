@@ -7,6 +7,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
+import 'package:ledgerly/core/widgets/list_row.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
 import 'package:ledgerly/features/profile/presentation/widgets/avatar.dart';
@@ -556,7 +557,7 @@ class _ChoiceRow<T> extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 children: <Widget>[
                   for (final option in options)
-                    ListTile(
+                    ListRow(
                       title: Text(option.label),
                       trailing: option.value == selected?.value
                           ? Icon(AppIcons.check, color: colors.brandPrimary)

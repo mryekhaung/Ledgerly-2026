@@ -651,6 +651,75 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
+  // Rule 9 — list rows use ListRow
+  // ---------------------------------------------------------------------------
+
+  group('design rule: list rows use ListRow (docs/Design.md §5.6)', () {
+    /// Files allowed to keep a raw `ListTile`.
+    ///
+    /// §5.6 calls `ListRow` "the atomic list unit" and says it replaces any
+    /// table — which is a statement about **list** rows. The rule targets that
+    /// role, not the widget: these five are a different component each time.
+    ///
+    /// * `goal_form_page` / `recurring_form_page` — a **date-picker field**.
+    ///   These are styled as bordered, filled tiles in a form (they carry a
+    ///   `tileColor` and a `shape` with a border), i.e. the §5.8 field
+    ///   treatment, not a row in a list. `ListRow` has no field affordance.
+    /// * `calendar_page` / `transactions_list_page` — a transaction row whose
+    ///   trailing slot holds an `AmountText` **plus** a `PopupMenuButton`, and
+    ///   whose subtitle is a multi-child column. `ListRow` exposes one
+    ///   `trailing` widget and a single-line subtitle, so adopting it would
+    ///   silently drop the overflow menu.
+    ///
+    /// Each is re-asserted below to still contain a `ListTile`, so the list
+    /// cannot rot into a permanent allowlist for files that no longer need it.
+    const fieldAndRichRowPaths = <String>[
+      'lib/features/goals/presentation/pages/goal_form_page.dart',
+      'lib/features/recurring/presentation/pages/recurring_form_page.dart',
+      'lib/features/transactions/presentation/pages/calendar_page.dart',
+      'lib/features/transactions/presentation/pages/transactions_list_page.dart',
+    ];
+
+    test('should_not_build_a_raw_list_tile_in_a_plain_list', () {
+      final sites = scan(
+        const <String>['lib/features', 'lib/core'],
+        // The lookbehind keeps `SwitchListTile` out: a toggle row is its own
+        // component and `ListRow` has no switch slot.
+        RegExp(r'(?<![A-Za-z])ListTile\('),
+        include: (path) => !fieldAndRichRowPaths.contains(path),
+      );
+
+      expectWithinBudget(
+        'raw ListTile',
+        'docs/Design.md §5.6 — "the atomic list unit, replaces any table" '
+            'says ListRow owns the 64/76 px height, the 72 px separator inset '
+            'and the press wash, so a raw ListTile drifts on all three',
+        sites,
+        // Burned to zero for plain lists. The picker row and the settings
+        // option list were genuine list rows and moved to ListRow; the rest
+        // are the dated-field and rich-trailing cases exempted above.
+        const <String, int>{},
+      );
+    });
+
+    test('should_keep_the_exempted_field_and_rich_rows', () {
+      // Re-asserts the exemption: a file listed above is exempt because it uses
+      // a `ListTile` for a *non-list* role, so it must still contain one.
+      for (final path in fieldAndRichRowPaths) {
+        final source = File(path).readAsStringSync();
+        expect(
+          RegExp(r'(?<![A-Za-z])ListTile\(').hasMatch(source),
+          isTrue,
+          reason:
+              '$path is exempted from the ListRow rule because its ListTile is '
+              'a field or a rich row, not a list row; if that is no longer '
+              'true, remove it from fieldAndRichRowPaths.',
+        );
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Scanner self-check — a rule that cannot detect is worse than no rule
   // ---------------------------------------------------------------------------
 

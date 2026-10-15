@@ -6,6 +6,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
+import 'package:ledgerly/core/widgets/list_row.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -93,6 +94,9 @@ class _CategoryList extends StatelessWidget {
 }
 
 /// One selectable category.
+///
+/// Uses [ListRow] rather than a `ListTile` so the picker shares the app's row
+/// height, separator inset and press treatment (docs/Design.md §5.6).
 class _PickerRow extends StatelessWidget {
   const _PickerRow({required this.category, required this.isSelected});
 
@@ -103,7 +107,7 @@ class _PickerRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
 
-    return ListTile(
+    return ListRow(
       onTap: () => Navigator.of(context).pop(category),
       leading: CategoryGem(
         colorValue: category.colorValue,
@@ -114,7 +118,7 @@ class _PickerRow extends StatelessWidget {
       trailing: isSelected
           ? Icon(AppIcons.check, color: colors.brandPrimary)
           : null,
-      selected: isSelected,
+      semanticsLabel: category.name,
     );
   }
 }

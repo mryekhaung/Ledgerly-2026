@@ -7,6 +7,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
+import 'package:ledgerly/core/widgets/list_row.dart';
 import 'package:ledgerly/features/auth/domain/entities/auth_provider_type.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
@@ -299,12 +300,14 @@ class AccountPage extends ConsumerWidget {
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                // `AppRadius.borderMd` rather than a bare `circular(12)`, so the
+                // value and the token cannot drift apart (docs/Design.md §4.2).
+                borderRadius: AppRadius.borderMd,
                 side: BorderSide(color: colors.border),
               ),
               child: Column(
                 children: <Widget>[
-                  ListTile(
+                  ListRow(
                     leading: Icon(
                       AppIcons.signOut,
                       color: colors.textPrimary,
@@ -319,9 +322,10 @@ class AccountPage extends ConsumerWidget {
                     onTap: authState.isLoading
                         ? null
                         : () => _signOut(context, ref),
+                    semanticsLabel: strings('accountSignOut'),
                   ),
                   Divider(height: 1, color: colors.border),
-                  ListTile(
+                  ListRow(
                     leading: Icon(
                       AppIcons.destructive,
                       color: colors.moneyOut,
@@ -340,6 +344,7 @@ class AccountPage extends ConsumerWidget {
                     onTap: authState.isLoading
                         ? null
                         : () => _deleteAccount(context, ref),
+                    semanticsLabel: strings('accountDeleteTitle'),
                   ),
                 ],
               ),
