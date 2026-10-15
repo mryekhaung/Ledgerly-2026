@@ -8,6 +8,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
@@ -133,8 +134,8 @@ class TransactionRow extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.xs),
-            PopupMenuButton<TransactionAction>(
-              icon: Icon(AppIcons.moreHorizontal, color: colors.textSecondary),
+            AppOverflowMenu<TransactionAction>(
+              cancelLabel: strings('actionCancel'),
               onSelected: (action) => switch (action) {
                 TransactionAction.edit => unawaited(
                   _editTransaction(context, transaction),
@@ -143,14 +144,15 @@ class TransactionRow extends ConsumerWidget {
                   _deleteTransaction(context, ref, transaction),
                 ),
               },
-              itemBuilder: (context) => <PopupMenuEntry<TransactionAction>>[
-                PopupMenuItem<TransactionAction>(
+              items: <OverflowMenuItem<TransactionAction>>[
+                OverflowMenuItem<TransactionAction>(
                   value: TransactionAction.edit,
-                  child: Text(strings('transactionEdit')),
+                  label: strings('transactionEdit'),
                 ),
-                PopupMenuItem<TransactionAction>(
+                OverflowMenuItem<TransactionAction>(
                   value: TransactionAction.delete,
-                  child: Text(strings('actionDelete')),
+                  label: strings('actionDelete'),
+                  destructive: true,
                 ),
               ],
             ),

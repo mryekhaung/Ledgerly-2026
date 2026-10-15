@@ -47,7 +47,7 @@ class BudgetStatusPill extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Icon(icon, size: 13, color: color),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.xs),
           Text(label, style: AppTypography.overline.copyWith(color: color)),
         ],
       ),

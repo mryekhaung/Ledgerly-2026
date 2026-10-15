@@ -9,6 +9,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
+import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/domain/usecases/delete_savings_goal.dart';
@@ -138,7 +139,7 @@ class GoalCard extends ConsumerWidget {
                           ),
                         ),
                         if (isCompleted) ...[
-                          const SizedBox(width: 6),
+                          const SizedBox(width: AppSpacing.xs),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
@@ -158,7 +159,7 @@ class GoalCard extends ConsumerWidget {
                         ],
                       ],
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppSpacing.xxs),
                     // Deadline / Days info
                     if (goal.targetDate != null)
                       Text(
@@ -196,8 +197,9 @@ class GoalCard extends ConsumerWidget {
               ),
 
               // Popup Menu
-              PopupMenuButton<String>(
-                icon: const Icon(AppIcons.more),
+              AppOverflowMenu<String>(
+                icon: AppIcons.more,
+                cancelLabel: strings('actionCancel'),
                 onSelected: (action) {
                   switch (action) {
                     case 'deposit':
@@ -224,83 +226,36 @@ class GoalCard extends ConsumerWidget {
                       unawaited(_handleDelete(context, ref));
                   }
                 },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
+                items: <OverflowMenuItem<String>>[
+                  OverflowMenuItem<String>(
                     value: 'deposit',
-                    child: Row(
-                      children: [
-                        Icon(
-                          AppIcons.decrease,
-                          color: colors.moneyIn,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(strings('depositTitle')),
-                      ],
-                    ),
+                    label: strings('depositTitle'),
+                    icon: AppIcons.decrease,
                   ),
-                  PopupMenuItem(
+                  OverflowMenuItem<String>(
                     value: 'withdraw',
-                    child: Row(
-                      children: [
-                        Icon(
-                          AppIcons.increase,
-                          color: colors.moneyOut,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(strings('withdrawTitle')),
-                      ],
-                    ),
+                    label: strings('withdrawTitle'),
+                    icon: AppIcons.increase,
                   ),
-                  const PopupMenuDivider(),
-                  PopupMenuItem(
+                  OverflowMenuItem<String>(
                     value: 'edit',
-                    child: Row(
-                      children: [
-                        const Icon(AppIcons.edit, size: 18),
-                        const SizedBox(width: 8),
-                        Text(strings('editGoal')),
-                      ],
-                    ),
+                    label: strings('editGoal'),
+                    icon: AppIcons.edit,
                   ),
-                  PopupMenuItem(
+                  OverflowMenuItem<String>(
                     value: 'archive',
-                    child: Row(
-                      children: [
-                        Icon(
-                          goal.isArchived
-                              ? AppIcons.unarchive
-                              : AppIcons.archive,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          goal.isArchived
-                              ? strings('unarchiveGoal')
-                              : strings('archiveGoal'),
-                        ),
-                      ],
-                    ),
+                    label: goal.isArchived
+                        ? strings('unarchiveGoal')
+                        : strings('archiveGoal'),
+                    icon: goal.isArchived
+                        ? AppIcons.unarchive
+                        : AppIcons.archive,
                   ),
-                  PopupMenuItem(
+                  OverflowMenuItem<String>(
                     value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(
-                          AppIcons.destructive,
-                          color: colors.moneyOut,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          strings('deleteGoal'),
-                          style: AppTypography.body.copyWith(
-                            color: colors.moneyOut,
-                          ),
-                        ),
-                      ],
-                    ),
+                    label: strings('deleteGoal'),
+                    icon: AppIcons.destructive,
+                    destructive: true,
                   ),
                 ],
               ),
@@ -362,13 +317,13 @@ class GoalCard extends ConsumerWidget {
 
           // Remaining hint or Completed badge
           if (isCompleted) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               strings('goalCompleted'),
               style: AppTypography.label.copyWith(color: colors.moneyIn),
             ),
           ] else ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               AppStrings.fill(context, 'goalRemaining', {
                 'amount': '${goal.remainingAmount.amountMinor}',

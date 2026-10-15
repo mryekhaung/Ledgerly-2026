@@ -396,6 +396,33 @@ phase with per-extraction goldens; replacing the Material outlined glyph set
 with custom 2026 line-art — an art commission, not a code violation (Rule 8
 already pins one glyph per concept).
 
+### E. Whole-app Design.md + 2026 UX audit — COMPLETE (1390 green)
+
+All three open items from the Categories review, plus a full-lib sweep:
+
+- ☑ **Screen goldens** — `categories`, `settings`, `transactions_list`,
+  `calendar` × light/dark (8 PNGs, 2% tolerant comparator). Component goldens
+  already covered `AppCard`/`ListRow`/`SegmentedTabs`.
+- ☑ **§5.6 separators** — category rows set `ListRow(showDivider: true)`
+  (1 px hairline, 72 px inset). Other `ListRow` sites stay divider-free,
+  matching their pre-existing airy treatment.
+- ☑ **`AppOverflowMenu`** (`core/widgets/`) — popup on Material, Cupertino
+  action sheet on iOS (`Platform.md` §2); destructive red on both. All seven
+  row/card menus migrated; **Rule 12** bans raw `PopupMenuButton`. The shared
+  `moreHorizontal` trigger keeps every existing icon-finder test green.
+  Caught while building: popup-route children sit above `MaterialApp`, so
+  `AppThemeColors.of` throws inside `itemBuilder` — colors resolve in the
+  parent and pass down. Covered by Material + iOS widget tests (3).
+- ☑ **Spacing literals** — `vertical: 14` → `md`, `all(3)` → `xs`,
+  `left: 28` → `20 + sm` (aligns under the 20 px icon + gap it sits beside),
+  `circular`-adjacent `horizontal: 8` → `sm`, `vertical: 4` → `xs`,
+  `top: 2` → `xxs`, stray `6`s → `xs`. Left as documented exceptions: FAB
+  clearances (80/88) and 48 px grid geometry (== `xxxl` by value, layout, not
+  spacing).
+- Sweep confirms: zero `BoxShadow` outside `AppElevation`, zero `TextStyle(`
+  outside token definitions, zero `print(`, all copy ARB-backed (incl. the
+  `Swap accounts` tooltip and ISO-date subtitles found on the way).
+
 ### C. Judgment items — done
 
 The first four items turned out to be *mechanically* expressible after all, so

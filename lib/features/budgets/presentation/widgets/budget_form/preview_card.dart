@@ -107,7 +107,7 @@ class BudgetPreviewCard extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation<Color>(colors.warning),
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 AppStrings.fill(
                   context,
@@ -121,7 +121,8 @@ class BudgetPreviewCard extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 40),
+        // End-of-form breathing room before the save bar.
+        const SizedBox(height: AppSpacing.xxxl),
       ],
     );
   }

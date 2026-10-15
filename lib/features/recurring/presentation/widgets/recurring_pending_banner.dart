@@ -46,7 +46,7 @@ class RecurringPendingBanner extends ConsumerWidget {
                     color: colors.warning,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppSpacing.xxs),
                 Text(
                   '${pendingItems.length} items awaiting confirmation',
                   style: theme.textTheme.bodySmall?.copyWith(

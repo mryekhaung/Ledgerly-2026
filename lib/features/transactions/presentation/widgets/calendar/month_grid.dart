@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/utils/month_grid_layout.dart';
@@ -111,7 +112,7 @@ class MonthGrid extends StatelessWidget {
                       Expanded(
                         child: switch (cells[row * MonthGridLayout.daysPerWeek +
                             column]) {
-                          null => const SizedBox(height: 48),
+                          null => const SizedBox(height: AppSpacing.xxxl),
                           final day => DayCell(
                             day: day,
                             cellWidth:

@@ -811,6 +811,37 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
+  // Rule 12 — overflow menus use AppOverflowMenu
+  // ---------------------------------------------------------------------------
+
+  group('design rule: menus use AppOverflowMenu (docs/Platform.md §2)', () {
+    test('should_not_build_a_raw_material_popup_menu', () {
+      // A raw `PopupMenuButton` puts a Material menu on iOS. `AppOverflowMenu`
+      // owns the platform branch (popup on Material, action sheet on iOS) plus
+      // the destructive treatment, so every row/card menu routes through it.
+      // The component itself is the only place allowed to build one.
+      //
+      // Call sites are generic (`PopupMenuButton<String>(`), so the pattern
+      // allows an optional type-argument list between the name and the paren.
+      final sites = scan(
+        const <String>['lib/features', 'lib/core'],
+        RegExp(r'(?<![A-Za-z])PopupMenuButton\s*(<[^>\n]*>)?\('),
+        include: (path) => path != 'lib/core/widgets/app_overflow_menu.dart',
+      );
+
+      expectWithinBudget(
+        'raw PopupMenuButton',
+        'docs/Platform.md §2 — only core/widgets branches on platform; a raw '
+            'PopupMenuButton skips the iOS action sheet',
+        sites,
+        // Burned to zero: all seven row/card menus route through
+        // AppOverflowMenu (the component holds the single sanctioned use).
+        const <String, int>{},
+      );
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Scanner self-check — a rule that cannot detect is worse than no rule
   // ---------------------------------------------------------------------------
 
@@ -885,6 +916,14 @@ void main() {
 
       expect(pattern.hasMatch('return Card('), isTrue);
       expect(pattern.hasMatch('return AppCard('), isFalse);
+    });
+
+    test('should_flag_a_raw_popup_menu_but_pass_the_component', () {
+      final pattern = RegExp(r'(?<![A-Za-z])PopupMenuButton\s*(<[^>\n]*>)?\(');
+
+      expect(pattern.hasMatch('return PopupMenuButton<String>('), isTrue);
+      expect(pattern.hasMatch('return PopupMenuButton('), isTrue);
+      expect(pattern.hasMatch('return AppOverflowMenu<String>('), isFalse);
     });
 
     test('should_flag_a_raw_segmented_button_but_pass_segmented_tabs', () {

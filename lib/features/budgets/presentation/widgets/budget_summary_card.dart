@@ -178,7 +178,7 @@ class BudgetSummaryCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
                   AmountText(
                     remainingMoney,
                     style: AmountStyle.row,

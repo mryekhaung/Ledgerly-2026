@@ -217,7 +217,7 @@ class _Capsule extends StatelessWidget {
     return Container(
       width: cellWidth * 0.6,
       height: 4,
-      margin: const EdgeInsets.only(top: 2),
+      margin: const EdgeInsets.only(top: AppSpacing.xxs),
       decoration: BoxDecoration(color: color, borderRadius: AppRadius.borderSm),
     );
   }

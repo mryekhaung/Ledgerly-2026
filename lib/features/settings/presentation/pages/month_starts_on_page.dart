@@ -261,7 +261,8 @@ class _PreviewCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Padding(
-            padding: const EdgeInsets.only(left: 28),
+            // Aligns under the current-period text: 20 px icon + an `sm` gap.
+            padding: const EdgeInsets.only(left: 20 + AppSpacing.sm),
             child: Text(
               previousLabel,
               style: theme.textTheme.bodySmall?.copyWith(

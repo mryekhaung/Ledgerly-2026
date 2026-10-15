@@ -84,7 +84,7 @@ class TopCategoriesCard extends StatelessWidget {
                       AmountText(money, style: AmountStyle.row, signed: false),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppSpacing.xs),
                   ClipRRect(
                     borderRadius: AppRadius.borderSm,
                     child: LinearProgressIndicator(

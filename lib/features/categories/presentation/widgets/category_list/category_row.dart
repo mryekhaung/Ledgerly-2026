@@ -1,6 +1,6 @@
-import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/list_row.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
@@ -58,29 +58,30 @@ class CategoryRow extends StatelessWidget {
         subtitle: category.isArchived
             ? Text(strings('categoriesArchived'))
             : null,
-        trailing: PopupMenuButton<CategoryAction>(
-          icon: Icon(AppIcons.moreHorizontal, color: colors.textSecondary),
+        // §5.6 separator: 1 px hairline inset from the text column.
+        showDivider: true,
+        trailing: AppOverflowMenu<CategoryAction>(
+          cancelLabel: strings('actionCancel'),
           onSelected: (action) => switch (action) {
             CategoryAction.edit => onEdit(category),
             CategoryAction.toggleArchive => onToggleArchive(category),
             CategoryAction.delete => onDelete(category),
           },
-          itemBuilder: (context) => <PopupMenuEntry<CategoryAction>>[
-            PopupMenuItem<CategoryAction>(
+          items: <OverflowMenuItem<CategoryAction>>[
+            OverflowMenuItem<CategoryAction>(
               value: CategoryAction.edit,
-              child: Text(strings('categoriesEdit')),
+              label: strings('categoriesEdit'),
             ),
-            PopupMenuItem<CategoryAction>(
+            OverflowMenuItem<CategoryAction>(
               value: CategoryAction.toggleArchive,
-              child: Text(
-                category.isArchived
-                    ? strings('categoriesUnarchive')
-                    : strings('categoriesArchive'),
-              ),
+              label: category.isArchived
+                  ? strings('categoriesUnarchive')
+                  : strings('categoriesArchive'),
             ),
-            PopupMenuItem<CategoryAction>(
+            OverflowMenuItem<CategoryAction>(
               value: CategoryAction.delete,
-              child: Text(strings('categoriesDelete')),
+              label: strings('categoriesDelete'),
+              destructive: true,
             ),
           ],
         ),

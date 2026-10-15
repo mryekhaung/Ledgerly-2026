@@ -11,6 +11,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
+import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/recurring/domain/entities/recurring_frequency.dart';
@@ -82,7 +83,7 @@ class RecurringItemCard extends ConsumerWidget {
                     ),
                     if (item.note != null &&
                         item.note!.trim().isNotEmpty) ...<Widget>[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppSpacing.xxs),
                       Text(
                         item.note!,
                         style: theme.textTheme.bodySmall?.copyWith(
@@ -103,128 +104,34 @@ class RecurringItemCard extends ConsumerWidget {
                     ? colors.moneyIn
                     : colors.moneyOut,
               ),
-              PopupMenuButton<String>(
-                icon: Icon(
-                  AppIcons.more,
-                  size: 20,
-                  color: colors.textSecondary,
-                ),
-                onSelected: (value) async {
-                  final scheduler = ref.read(
-                    recurringSchedulerNotifierProvider.notifier,
-                  );
-                  switch (value) {
-                    case 'skip':
-                      await scheduler.skipOccurrence(item.id);
-                      if (context.mounted) {
-                        AppFeedback.confirm(
-                          context,
-                          message: strings('recurringSkippedSuccess'),
-                        );
-                      }
-                      break;
-                    case 'pause':
-                      await scheduler.setArchived(item.id, !item.isArchived);
-                      break;
-                    case 'edit':
-                      if (context.mounted) {
-                        unawaited(
-                          context.pushNamed(
-                            AppRoutes.recurringEditName,
-                            pathParameters: {'id': item.id},
-                          ),
-                        );
-                      }
-                      break;
-                    case 'delete':
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: Text(strings('recurringConfirmDelete')),
-                          content: Text(
-                            strings('recurringConfirmDeleteMessage'),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => Navigator.of(ctx).pop(false),
-                              child: Text(strings('actionCancel')),
-                            ),
-                            FilledButton(
-                              onPressed: () => Navigator.of(ctx).pop(true),
-                              child: Text(strings('actionDelete')),
-                            ),
-                          ],
-                        ),
-                      );
-                      if (confirm == true) {
-                        await scheduler.delete(item.id);
-                        if (context.mounted) {
-                          AppFeedback.confirm(
-                            context,
-                            message: strings('recurringDeletedSuccess'),
-                          );
-                        }
-                      }
-                      break;
-                  }
-                },
-                itemBuilder: (ctx) => <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
+              AppOverflowMenu<String>(
+                icon: AppIcons.more,
+                cancelLabel: strings('actionCancel'),
+                onSelected: (value) =>
+                    unawaited(_handleMenuAction(context, ref, value)),
+                items: <OverflowMenuItem<String>>[
+                  OverflowMenuItem<String>(
                     value: 'skip',
-                    child: Row(
-                      children: <Widget>[
-                        const Icon(AppIcons.skipNext, size: 18),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(strings('recurringActionSkip')),
-                      ],
-                    ),
+                    label: strings('recurringActionSkip'),
+                    icon: AppIcons.skipNext,
                   ),
-                  PopupMenuItem<String>(
+                  OverflowMenuItem<String>(
                     value: 'pause',
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          item.isArchived ? AppIcons.play : AppIcons.pause,
-                          size: 18,
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(
-                          item.isArchived
-                              ? strings('recurringActionResume')
-                              : strings('recurringActionPause'),
-                        ),
-                      ],
-                    ),
+                    label: item.isArchived
+                        ? strings('recurringActionResume')
+                        : strings('recurringActionPause'),
+                    icon: item.isArchived ? AppIcons.play : AppIcons.pause,
                   ),
-                  PopupMenuItem<String>(
+                  OverflowMenuItem<String>(
                     value: 'edit',
-                    child: Row(
-                      children: <Widget>[
-                        const Icon(AppIcons.edit, size: 18),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(strings('budgetsEdit')),
-                      ],
-                    ),
+                    label: strings('budgetsEdit'),
+                    icon: AppIcons.edit,
                   ),
-                  const PopupMenuDivider(),
-                  PopupMenuItem<String>(
+                  OverflowMenuItem<String>(
                     value: 'delete',
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          AppIcons.destructive,
-                          size: 18,
-                          color: colors.moneyOut,
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(
-                          strings('recurringActionDelete'),
-                          style: AppTypography.body.copyWith(
-                            color: colors.moneyOut,
-                          ),
-                        ),
-                      ],
-                    ),
+                    label: strings('recurringActionDelete'),
+                    icon: AppIcons.destructive,
+                    destructive: true,
                   ),
                 ],
               ),
@@ -310,5 +217,62 @@ class RecurringItemCard extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _handleMenuAction(
+    BuildContext context,
+    WidgetRef ref,
+    String value,
+  ) async {
+    final strings = AppStrings.of(context);
+    final scheduler = ref.read(recurringSchedulerNotifierProvider.notifier);
+    switch (value) {
+      case 'skip':
+        await scheduler.skipOccurrence(item.id);
+        if (context.mounted) {
+          AppFeedback.confirm(
+            context,
+            message: strings('recurringSkippedSuccess'),
+          );
+        }
+      case 'pause':
+        await scheduler.setArchived(item.id, !item.isArchived);
+      case 'edit':
+        if (context.mounted) {
+          unawaited(
+            context.pushNamed(
+              AppRoutes.recurringEditName,
+              pathParameters: {'id': item.id},
+            ),
+          );
+        }
+      case 'delete':
+        final confirm = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(strings('recurringConfirmDelete')),
+            content: Text(strings('recurringConfirmDeleteMessage')),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(strings('actionCancel')),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: Text(strings('actionDelete')),
+              ),
+            ],
+          ),
+        );
+        if (confirm == true) {
+          await scheduler.delete(item.id);
+          if (context.mounted) {
+            AppFeedback.confirm(
+              context,
+              message: strings('recurringDeletedSuccess'),
+            );
+          }
+        }
+    }
   }
 }

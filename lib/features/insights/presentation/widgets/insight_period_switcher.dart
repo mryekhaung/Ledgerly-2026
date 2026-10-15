@@ -59,7 +59,7 @@ class InsightPeriodSwitcher extends StatelessWidget {
                       style: theme.textTheme.titleMedium,
                     ),
                     if (isPayCycle) ...<Widget>[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppSpacing.xxs),
                       Text(
                         strings('calendarPayCycle'),
                         style: theme.textTheme.labelSmall?.copyWith(

@@ -7,6 +7,7 @@ import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
+import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/account_catalog.dart';
 import 'package:material_ui/material_ui.dart';
@@ -105,7 +106,7 @@ class AccountCard extends ConsumerWidget {
                     ],
                   ],
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppSpacing.xxs),
                 Row(
                   children: <Widget>[
                     Text(
@@ -142,11 +143,9 @@ class AccountCard extends ConsumerWidget {
           ),
 
           // Overflow Menu
-          PopupMenuButton<String>(
-            icon: Icon(AppIcons.more, color: colors.textTertiary, size: 20),
-            shape: const RoundedRectangleBorder(
-              borderRadius: AppRadius.borderMd,
-            ),
+          AppOverflowMenu<String>(
+            icon: AppIcons.more,
+            cancelLabel: strings('actionCancel'),
             onSelected: (value) {
               switch (value) {
                 case 'edit':
@@ -159,59 +158,31 @@ class AccountCard extends ConsumerWidget {
                   onDelete?.call();
               }
             },
-            itemBuilder: (context) => <PopupMenuEntry<String>>[
-              PopupMenuItem(
+            items: <OverflowMenuItem<String>>[
+              OverflowMenuItem<String>(
                 value: 'transfer',
-                child: Row(
-                  children: <Widget>[
-                    const Icon(AppIcons.transfer, size: 18),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(strings('accountsTransferButton')),
-                  ],
-                ),
+                label: strings('accountsTransferButton'),
+                icon: AppIcons.transfer,
               ),
-              PopupMenuItem(
+              OverflowMenuItem<String>(
                 value: 'edit',
-                child: Row(
-                  children: <Widget>[
-                    const Icon(AppIcons.edit, size: 18),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(strings('accountsEditTitle')),
-                  ],
-                ),
+                label: strings('accountsEditTitle'),
+                icon: AppIcons.edit,
               ),
-              PopupMenuItem(
+              OverflowMenuItem<String>(
                 value: 'archive',
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      account.isArchived
-                          ? AppIcons.unarchive
-                          : AppIcons.archive,
-                      size: 18,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      account.isArchived
-                          ? strings('accountUnarchiveSuccess')
-                          : strings('accountArchiveSuccess'),
-                    ),
-                  ],
-                ),
+                label: account.isArchived
+                    ? strings('accountUnarchiveSuccess')
+                    : strings('accountArchiveSuccess'),
+                icon: account.isArchived
+                    ? AppIcons.unarchive
+                    : AppIcons.archive,
               ),
-              const PopupMenuDivider(),
-              PopupMenuItem(
+              OverflowMenuItem<String>(
                 value: 'delete',
-                child: Row(
-                  children: <Widget>[
-                    Icon(AppIcons.destructive, size: 18, color: colors.warning),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      strings('accountsDelete'),
-                      style: AppTypography.body.copyWith(color: colors.warning),
-                    ),
-                  ],
-                ),
+                label: strings('accountsDelete'),
+                icon: AppIcons.destructive,
+                destructive: true,
               ),
             ],
           ),

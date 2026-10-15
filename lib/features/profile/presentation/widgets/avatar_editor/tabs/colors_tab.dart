@@ -179,7 +179,7 @@ class _ColorSwatch extends StatelessWidget {
         child: Container(
           width: 44,
           height: 44,
-          padding: const EdgeInsets.all(3),
+          padding: const EdgeInsets.all(AppSpacing.xs),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(

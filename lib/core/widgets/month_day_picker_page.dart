@@ -201,7 +201,7 @@ class _MonthGrid extends StatelessWidget {
                       column]) {
                     // A blank keeps the grid's rhythm without offering a target
                     // the user could tap.
-                    null => const SizedBox(height: 48),
+                    null => const SizedBox(height: AppSpacing.xxxl),
                     final day => _DayCell(
                       day: day,
                       isSelected: day.value == selected.value,

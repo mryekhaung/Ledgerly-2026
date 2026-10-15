@@ -1,10 +1,10 @@
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/budgets/domain/entities/budget_progress.dart';
 import 'package:ledgerly/features/budgets/domain/entities/budget_status.dart';
@@ -80,7 +80,7 @@ class BudgetCategoryRow extends StatelessWidget {
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppSpacing.xxs),
                       Row(
                         children: <Widget>[
                           AmountText(
@@ -107,12 +107,9 @@ class BudgetCategoryRow extends StatelessWidget {
                 ),
                 BudgetStatusPill(status: p.status),
                 if (onDelete != null)
-                  PopupMenuButton<String>(
-                    icon: Icon(
-                      AppIcons.more,
-                      size: 18,
-                      color: colors.textSecondary,
-                    ),
+                  AppOverflowMenu<String>(
+                    icon: AppIcons.more,
+                    cancelLabel: strings('actionCancel'),
                     onSelected: (value) {
                       if (value == 'edit') {
                         onTap();
@@ -120,35 +117,17 @@ class BudgetCategoryRow extends StatelessWidget {
                         onDelete?.call();
                       }
                     },
-                    itemBuilder: (context) => <PopupMenuEntry<String>>[
-                      PopupMenuItem<String>(
+                    items: <OverflowMenuItem<String>>[
+                      OverflowMenuItem<String>(
                         value: 'edit',
-                        child: Row(
-                          children: <Widget>[
-                            const Icon(AppIcons.edit, size: 18),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(strings('budgetsEdit')),
-                          ],
-                        ),
+                        label: strings('budgetsEdit'),
+                        icon: AppIcons.edit,
                       ),
-                      PopupMenuItem<String>(
+                      OverflowMenuItem<String>(
                         value: 'delete',
-                        child: Row(
-                          children: <Widget>[
-                            Icon(
-                              AppIcons.destructive,
-                              size: 18,
-                              color: colors.moneyOut,
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(
-                              strings('budgetsDelete'),
-                              style: AppTypography.body.copyWith(
-                                color: colors.moneyOut,
-                              ),
-                            ),
-                          ],
-                        ),
+                        label: strings('budgetsDelete'),
+                        icon: AppIcons.destructive,
+                        destructive: true,
                       ),
                     ],
                   ),
@@ -164,7 +143,7 @@ class BudgetCategoryRow extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(statusColor),
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: AppSpacing.xs),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -187,7 +166,7 @@ class BudgetCategoryRow extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     AmountText(
                       remainingMoney,
                       style: AmountStyle.row,

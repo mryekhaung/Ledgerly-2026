@@ -203,7 +203,7 @@ class _GoalContributionDialogState
                         color: colors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppSpacing.xxs),
                     Text(
                       widget.goal.name,
                       style: AppTypography.label.copyWith(
@@ -322,7 +322,7 @@ class _GoalContributionDialogState
               backgroundColor: _mode == GoalContributionMode.deposit
                   ? colors.moneyIn
                   : colors.moneyOut,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             ),
             child: _isSubmitting
                 ? const SizedBox(

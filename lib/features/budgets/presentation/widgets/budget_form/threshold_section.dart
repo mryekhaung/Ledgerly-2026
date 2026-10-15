@@ -59,7 +59,7 @@ class BudgetThresholdSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Slider(
           value: threshold,
           min: 0.5,

@@ -365,7 +365,7 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
               onPressed: formState.isSubmitting ? null : _handleSubmit,
               style: FilledButton.styleFrom(
                 backgroundColor: colors.moneyIn,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
               ),
               child: formState.isSubmitting
                   ? const SizedBox(

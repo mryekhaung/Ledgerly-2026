@@ -10,6 +10,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
@@ -128,20 +129,21 @@ class ListTransactionRow extends ConsumerWidget {
                     : colors.moneyOut,
               ),
             ),
-            PopupMenuButton<TransactionMenuAction>(
-              icon: Icon(AppIcons.moreHorizontal, color: colors.textSecondary),
+            AppOverflowMenu<TransactionMenuAction>(
+              cancelLabel: strings('actionCancel'),
               onSelected: (action) => switch (action) {
                 TransactionMenuAction.edit => _editTransaction(context),
                 TransactionMenuAction.delete => onDelete(),
               },
-              itemBuilder: (context) => <PopupMenuEntry<TransactionMenuAction>>[
-                PopupMenuItem<TransactionMenuAction>(
+              items: <OverflowMenuItem<TransactionMenuAction>>[
+                OverflowMenuItem<TransactionMenuAction>(
                   value: TransactionMenuAction.edit,
-                  child: Text(strings('transactionEdit')),
+                  label: strings('transactionEdit'),
                 ),
-                PopupMenuItem<TransactionMenuAction>(
+                OverflowMenuItem<TransactionMenuAction>(
                   value: TransactionMenuAction.delete,
-                  child: Text(strings('actionDelete')),
+                  label: strings('actionDelete'),
+                  destructive: true,
                 ),
               ],
             ),

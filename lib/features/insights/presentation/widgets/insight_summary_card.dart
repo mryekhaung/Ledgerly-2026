@@ -125,7 +125,10 @@ class _ComparisonBadge extends StatelessWidget {
     final formattedPct = '$prefix${deltaPct.toStringAsFixed(1)}%';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: badgeBg,
         borderRadius: AppRadius.borderSm,
@@ -138,7 +141,7 @@ class _ComparisonBadge extends StatelessWidget {
             size: 12,
             color: badgeColor,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.xs),
           Flexible(
             child: Text(
               '$formattedPct ${strings('insightsVsPreviousPeriod')}',

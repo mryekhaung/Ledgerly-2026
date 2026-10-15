@@ -73,7 +73,7 @@ class DonutChartCard extends StatelessWidget {
                               color: colors.textSecondary,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: AppSpacing.xxs),
                           AmountText(
                             totalMoney,
                             style: AmountStyle.row,
@@ -94,7 +94,10 @@ class DonutChartCard extends StatelessWidget {
             children: breakdowns.take(6).map((item) {
               final pct = (item.percentage * 100).toStringAsFixed(0);
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
                 decoration: BoxDecoration(
                   color: colors.surface,
                   borderRadius: AppRadius.borderSm,
@@ -108,9 +111,9 @@ class DonutChartCard extends StatelessWidget {
                       iconKey: item.category.iconKey,
                       size: CategoryGemSize.sm,
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(item.category.name, style: theme.textTheme.bodySmall),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       '$pct%',
                       style: theme.textTheme.labelSmall?.copyWith(
