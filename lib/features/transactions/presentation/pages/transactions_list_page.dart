@@ -1,21 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
-import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/app_skeleton.dart';
-import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
-import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
@@ -26,12 +19,16 @@ import 'package:ledgerly/features/transactions/presentation/pages/category_picke
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transactions_list_notifier.dart';
 import 'package:ledgerly/features/transactions/presentation/widgets/transaction_filter_sheet.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/transactions_list/filter_chips_bar.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/transactions_list/list_transaction_row.dart';
 import 'package:material_ui/material_ui.dart';
 
-enum _TransactionMenuAction { edit, delete }
-
 /// Searchable and filterable transactions list with infinite scroll.
+///
+/// Composition root only: chips and rows live in `widgets/transactions_list/`
+/// (`docs/Conventions.md` §1).
 class TransactionsListPage extends ConsumerStatefulWidget {
+  /// Creates the page.
   const TransactionsListPage({super.key});
 
   @override
@@ -189,7 +186,7 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
               ),
 
               // Filter chips bar
-              _FilterChipsBar(
+              FilterChipsBar(
                 filter: state.filter,
                 onDirectionSelected: (direction) {
                   notifier.applyFilter(
@@ -271,7 +268,7 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
           }
 
           final transaction = state.items[index];
-          return _TransactionRow(
+          return ListTransactionRow(
             key: ValueKey(transaction.id),
             transaction: transaction,
             onDelete: () => _deleteTransaction(transaction),
@@ -314,269 +311,6 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
           AppFeedback.failure(context, message: strings('stateErrorBody'));
         }
       },
-    );
-  }
-}
-
-/// Horizontal scrollable bar with active filter chips.
-class _FilterChipsBar extends ConsumerWidget {
-  const _FilterChipsBar({
-    required this.filter,
-    required this.onDirectionSelected,
-    required this.onPickCategory,
-    required this.onClearCategory,
-    required this.onOpenFilterSheet,
-    required this.onClearAll,
-  });
-
-  final TransactionFilter filter;
-  final ValueChanged<TransactionDirection?> onDirectionSelected;
-  final VoidCallback onPickCategory;
-  final VoidCallback onClearCategory;
-  final VoidCallback onOpenFilterSheet;
-  final VoidCallback onClearAll;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final strings = AppStrings.of(context);
-    final colors = AppThemeColors.of(context);
-
-    Category? selectedCategory;
-    if (filter.categoryId case final id?) {
-      selectedCategory = ref.watch(categoryByIdProvider(id)).value;
-    }
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: ResponsiveInsets.pageHorizontal(context)
-          .copyWith(top: AppSpacing.xs, bottom: AppSpacing.sm),
-      child: Row(
-        children: <Widget>[
-          // Direction Chips
-          FilterChip(
-            label: Text(strings('filterAll')),
-            selected: filter.direction == null,
-            onSelected: (_) => onDirectionSelected(null),
-          ),
-          const SizedBox(width: AppSpacing.xs),
-          FilterChip(
-            label: Text(strings('filterExpense')),
-            selected: filter.direction == TransactionDirection.expense,
-            onSelected: (selected) {
-              onDirectionSelected(
-                selected ? TransactionDirection.expense : null,
-              );
-            },
-          ),
-          const SizedBox(width: AppSpacing.xs),
-          FilterChip(
-            label: Text(strings('filterIncome')),
-            selected: filter.direction == TransactionDirection.income,
-            onSelected: (selected) {
-              onDirectionSelected(
-                selected ? TransactionDirection.income : null,
-              );
-            },
-          ),
-          const SizedBox(width: AppSpacing.xs),
-
-          // Category Chip
-          if (selectedCategory case final cat?) ...<Widget>[
-            InputChip(
-              avatar: CategoryGem(
-                colorValue: cat.colorValue,
-                iconKey: cat.iconKey,
-                size: CategoryGemSize.sm,
-              ),
-              label: Text(cat.name),
-              selected: true,
-              onDeleted: onClearCategory,
-              onPressed: onPickCategory,
-            ),
-          ] else ...<Widget>[
-            ActionChip(
-              avatar: const Icon(AppIcons.category, size: 16),
-              label: Text(strings('filterCategory')),
-              onPressed: onPickCategory,
-            ),
-          ],
-          const SizedBox(width: AppSpacing.xs),
-
-          // Date Range Chip
-          ActionChip(
-            avatar: const Icon(AppIcons.calendar, size: 16),
-            label: Text(
-              filter.startDate != null || filter.endDate != null
-                  ? '${filter.startDate?.toString() ?? '...'} ~ ${filter.endDate?.toString() ?? '...'}'
-                  : strings('filterDateRange'),
-            ),
-            backgroundColor:
-                (filter.startDate != null || filter.endDate != null)
-                ? colors.brandSubtle
-                : null,
-            onPressed: onOpenFilterSheet,
-          ),
-          const SizedBox(width: AppSpacing.xs),
-
-          // Amount Chip
-          if (filter.minAmountMinor != null ||
-              filter.maxAmountMinor != null) ...<Widget>[
-            ActionChip(
-              avatar: const Icon(AppIcons.money, size: 16),
-              label: Text(
-                '${filter.minAmountMinor ?? 0} ~ ${filter.maxAmountMinor ?? '∞'}',
-              ),
-              backgroundColor: colors.brandSubtle,
-              onPressed: onOpenFilterSheet,
-            ),
-            const SizedBox(width: AppSpacing.xs),
-          ],
-
-          // Clear all button if any filter active
-          if (filter.isActive) ...<Widget>[
-            ActionChip(
-              avatar: const Icon(AppIcons.close, size: 16),
-              label: Text(strings('filterClearAll')),
-              onPressed: onClearAll,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-/// A dismissible and actionable row for a single transaction.
-class _TransactionRow extends ConsumerWidget {
-  const _TransactionRow({
-    required this.transaction,
-    required this.onDelete,
-    super.key,
-  });
-
-  final Transaction transaction;
-  final VoidCallback onDelete;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = AppThemeColors.of(context);
-    final strings = AppStrings.of(context);
-    final locale = Localizations.localeOf(context).toLanguageTag();
-    final dateFormat = DateFormat.yMMMd(locale);
-    final category = ref
-        .watch(categoryByIdProvider(transaction.categoryId))
-        .value;
-
-    return Dismissible(
-      key: ValueKey(transaction.id),
-      direction: DismissDirection.horizontal,
-      confirmDismiss: (direction) async {
-        if (direction == DismissDirection.startToEnd) {
-          _editTransaction(context);
-          return false;
-        }
-        return true;
-      },
-      onDismissed: (_) => onDelete(),
-      background: Container(
-        color: colors.brandSubtle,
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Icon(AppIcons.edit, color: colors.brandPrimary),
-      ),
-      secondaryBackground: Container(
-        color: colors.moneyOutSubtle,
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Icon(AppIcons.destructive, color: colors.moneyOut),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
-        onTap: () => _editTransaction(context),
-        leading: category == null
-            ? const SizedBox.square(dimension: 36)
-            : CategoryGem(
-                colorValue: category.colorValue,
-                iconKey: category.iconKey,
-                size: CategoryGemSize.md,
-              ),
-        title: Text(
-          category?.name ?? transaction.categoryId,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: AppTypography.body.copyWith(
-            color: colors.textPrimary,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (transaction.note case final note?) ...<Widget>[
-              Text(
-                note,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTypography.body.copyWith(color: colors.textSecondary),
-              ),
-            ],
-            Text(
-              dateFormat.format(transaction.date.toDateTime()),
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: colors.textSecondary),
-            ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.sizeOf(context).width * 0.35,
-              ),
-              child: AmountText(
-                transaction.amount,
-                style: AmountStyle.row,
-                signed: true,
-                color: transaction.direction == TransactionDirection.income
-                    ? colors.moneyIn
-                    : colors.moneyOut,
-              ),
-            ),
-            PopupMenuButton<_TransactionMenuAction>(
-              icon: Icon(AppIcons.moreHorizontal, color: colors.textSecondary),
-              onSelected: (action) => switch (action) {
-                _TransactionMenuAction.edit => _editTransaction(context),
-                _TransactionMenuAction.delete => onDelete(),
-              },
-              itemBuilder: (context) =>
-                  <PopupMenuEntry<_TransactionMenuAction>>[
-                    PopupMenuItem<_TransactionMenuAction>(
-                      value: _TransactionMenuAction.edit,
-                      child: Text(strings('transactionEdit')),
-                    ),
-                    PopupMenuItem<_TransactionMenuAction>(
-                      value: _TransactionMenuAction.delete,
-                      child: Text(strings('actionDelete')),
-                    ),
-                  ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _editTransaction(BuildContext context) {
-    unawaited(
-      context.pushNamed(
-        AppRoutes.transactionEditName,
-        pathParameters: <String, String>{'id': transaction.id},
-      ),
     );
   }
 }
