@@ -864,6 +864,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accountFieldName => '口座名';
 
   @override
+  String get accountNameHint => '例：KBZ Bank、Wallet、Cash';
+
+  @override
   String get accountFieldType => '口座タイプ';
 
   @override

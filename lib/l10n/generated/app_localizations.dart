@@ -1780,6 +1780,12 @@ abstract class AppLocalizations {
   /// **'Account Name'**
   String get accountFieldName;
 
+  /// Hint for account name field.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. KBZ Bank, Wallet, Cash'**
+  String get accountNameHint;
+
   /// Label for account type field.
   ///
   /// In en, this message translates to:

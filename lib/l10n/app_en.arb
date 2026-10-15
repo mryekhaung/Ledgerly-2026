@@ -1160,6 +1160,10 @@
   "@accountFieldName": {
     "description": "Label for account name field."
   },
+  "accountNameHint": "e.g. KBZ Bank, Wallet, Cash",
+  "@accountNameHint": {
+    "description": "Hint for account name field."
+  },
   "accountFieldType": "Account Type",
   "@accountFieldType": {
     "description": "Label for account type field."

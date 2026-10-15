@@ -902,6 +902,9 @@ class AppLocalizationsMy extends AppLocalizations {
   String get accountFieldName => 'အကောင့်အမည်';
 
   @override
+  String get accountNameHint => 'ဥပမာ။ KBZ Bank၊ Wallet၊ Cash';
+
+  @override
   String get accountFieldType => 'အကောင့်အမျိုးအစား';
 
   @override

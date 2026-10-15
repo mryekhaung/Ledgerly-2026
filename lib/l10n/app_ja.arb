@@ -281,6 +281,7 @@
   "accountsTransferSubmit": "振替を実行",
   "accountsTransferSuccess": "振替が完了しました",
   "accountFieldName": "口座名",
+  "accountNameHint": "例：KBZ Bank、Wallet、Cash",
   "accountFieldType": "口座タイプ",
   "accountFieldCurrency": "通貨",
   "accountFieldOpeningBalance": "開始残高",

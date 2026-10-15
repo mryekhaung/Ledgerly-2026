@@ -5,24 +5,31 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
-import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
-import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account_type.dart';
 import 'package:ledgerly/features/accounts/presentation/account_catalog.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
+import 'package:ledgerly/features/accounts/presentation/widgets/account_form/account_color_swatch.dart';
+import 'package:ledgerly/features/accounts/presentation/widgets/account_form/account_preview_card.dart';
+import 'package:ledgerly/features/accounts/presentation/widgets/account_form/field_label.dart';
+import 'package:ledgerly/features/accounts/presentation/widgets/account_form/selectable_cell.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Page for creating or editing an account.
+/// Page for adding or editing an account.
+///
+/// Composition root only: preview, labels and picker cells live in
+/// `widgets/account_form/` (`docs/Conventions.md` §1).
 class AccountFormPage extends ConsumerStatefulWidget {
+  /// Creates the page.
   const AccountFormPage({this.accountId, super.key});
 
+  /// The account being edited, or null when creating.
   final String? accountId;
 
   @override
@@ -195,69 +202,18 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: <Widget>[
           // Preview Card
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              color: colors.surfaceRaised,
-              borderRadius: AppRadius.borderLg,
-              border: Border.all(color: colors.border),
-            ),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Color(formState.colorValue).withValues(alpha: 0.16),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Icon(
-                      AccountIcons.iconFor(formState.iconKey),
-                      color: Color(formState.colorValue),
-                      size: 24,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        formState.name.trim().isEmpty
-                            ? '—'
-                            : formState.name.trim(),
-                        style: AppTypography.textTheme(colors).titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        typeLabel,
-                        style: AppTypography.label.copyWith(
-                          color: colors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                AmountText(
-                  Money.minor(
-                    formState.openingBalanceMinor,
-                    formState.currency,
-                  ),
-                  style: AmountStyle.large,
-                  signed: formState.openingBalanceMinor < 0,
-                ),
-              ],
-            ),
+          AccountPreviewCard(
+            name: formState.name,
+            typeLabel: typeLabel,
+            openingBalanceMinor: formState.openingBalanceMinor,
+            currency: formState.currency,
+            colorValue: formState.colorValue,
+            iconKey: formState.iconKey,
           ),
           const SizedBox(height: AppSpacing.xl),
 
           // Account Name
-          _FieldLabel(label: strings('accountFieldName')),
+          FieldLabel(label: strings('accountFieldName')),
           const SizedBox(height: AppSpacing.xs),
           TextField(
             controller: _nameController,
@@ -265,7 +221,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
             textInputAction: TextInputAction.next,
             onChanged: notifier.setName,
             decoration: InputDecoration(
-              hintText: 'e.g. KBZ Bank, Wallet, Cash',
+              hintText: strings('accountNameHint'),
               errorText: nameErrorText,
               counterText: '',
             ),
@@ -273,7 +229,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
           const SizedBox(height: AppSpacing.lg),
 
           // Account Type
-          _FieldLabel(label: strings('accountFieldType')),
+          FieldLabel(label: strings('accountFieldType')),
           const SizedBox(height: AppSpacing.xs),
           DropdownButtonFormField<AccountType>(
             initialValue: formState.type,
@@ -299,7 +255,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
           const SizedBox(height: AppSpacing.lg),
 
           // Currency
-          _FieldLabel(label: strings('accountFieldCurrency')),
+          FieldLabel(label: strings('accountFieldCurrency')),
           const SizedBox(height: AppSpacing.xs),
           DropdownButtonFormField<CurrencyCode>(
             initialValue: formState.currency,
@@ -322,7 +278,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
           const SizedBox(height: AppSpacing.lg),
 
           // Opening Balance
-          _FieldLabel(label: strings('accountFieldOpeningBalance')),
+          FieldLabel(label: strings('accountFieldOpeningBalance')),
           const SizedBox(height: AppSpacing.xs),
           TextField(
             controller: _balanceController,
@@ -351,14 +307,14 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
           const SizedBox(height: AppSpacing.lg),
 
           // Icon Picker
-          _FieldLabel(label: strings('accountFieldIcon')),
+          FieldLabel(label: strings('accountFieldIcon')),
           const SizedBox(height: AppSpacing.sm),
           Wrap(
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
             children: <Widget>[
               for (final key in AccountIcons.keys)
-                _SelectableCell(
+                SelectableCell(
                   isSelected: key == formState.iconKey,
                   onTap: () => notifier.setIcon(key),
                   child: Icon(
@@ -374,14 +330,14 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
           const SizedBox(height: AppSpacing.lg),
 
           // Color Picker
-          _FieldLabel(label: strings('accountFieldColor')),
+          FieldLabel(label: strings('accountFieldColor')),
           const SizedBox(height: AppSpacing.sm),
           Wrap(
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
             children: <Widget>[
               for (final colorVal in AccountPalette.colors)
-                _ColorSwatch(
+                AccountColorSwatch(
                   color: Color(colorVal),
                   isSelected: colorVal == formState.colorValue,
                   onTap: () => notifier.setColor(colorVal),
@@ -413,99 +369,6 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
                 : Text(strings('save')),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _FieldLabel extends StatelessWidget {
-  const _FieldLabel({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label.toUpperCase(),
-      style: AppTypography.overline.copyWith(
-        color: AppThemeColors.of(context).textTertiary,
-      ),
-    );
-  }
-}
-
-class _SelectableCell extends StatelessWidget {
-  const _SelectableCell({
-    required this.isSelected,
-    required this.onTap,
-    required this.child,
-  });
-
-  final bool isSelected;
-  final VoidCallback onTap;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-    return InkWell(
-      onTap: onTap,
-      borderRadius: AppRadius.borderMd,
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: isSelected ? colors.brandPrimary : colors.surfaceSubtle,
-          borderRadius: AppRadius.borderMd,
-          border: Border.all(
-            color: isSelected ? colors.brandPrimary : colors.border,
-          ),
-        ),
-        child: Center(child: child),
-      ),
-    );
-  }
-}
-
-class _ColorSwatch extends StatelessWidget {
-  const _ColorSwatch({
-    required this.color,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final Color color;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: AppRadius.borderFull,
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          // Selection is the 3 px ring alone: §4.3 allows only flat/raised/
-          // floating elevation, and a bespoke glow is a fourth level.
-          border: isSelected
-              ? Border.all(color: colors.textOnBrand, width: 3)
-              : null,
-        ),
-        child: isSelected
-            ? Center(
-                child: Icon(
-                  AppIcons.check,
-                  size: 20,
-                  color: colors.textOnBrand,
-                ),
-              )
-            : null,
       ),
     );
   }

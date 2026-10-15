@@ -281,6 +281,7 @@
   "accountsTransferSubmit": "ငွေလွှဲပြောင်းမှု ပြုလုပ်မည်",
   "accountsTransferSuccess": "ငွေလွှဲပြောင်းမှု အောင်မြင်ပါသည်",
   "accountFieldName": "အကောင့်အမည်",
+  "accountNameHint": "ဥပမာ။ KBZ Bank၊ Wallet၊ Cash",
   "accountFieldType": "အကောင့်အမျိုးအစား",
   "accountFieldCurrency": "ငွေကြေး",
   "accountFieldOpeningBalance": "စတင်လက်ကျန်ငွေ",

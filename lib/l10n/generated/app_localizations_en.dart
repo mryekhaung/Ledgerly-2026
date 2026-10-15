@@ -892,6 +892,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountFieldName => 'Account Name';
 
   @override
+  String get accountNameHint => 'e.g. KBZ Bank, Wallet, Cash';
+
+  @override
   String get accountFieldType => 'Account Type';
 
   @override
