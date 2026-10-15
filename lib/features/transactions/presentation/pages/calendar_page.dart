@@ -529,28 +529,37 @@ class _MonthGrid extends StatelessWidget {
     return Column(
       children: <Widget>[
         for (var row = 0; row < rowCount; row++)
-          Row(
-            children: <Widget>[
-              for (
-                var column = 0;
-                column < MonthGridLayout.daysPerWeek;
-                column++
-              )
-                Expanded(
-                  child: switch (cells[row * MonthGridLayout.daysPerWeek +
-                      column]) {
-                    null => const SizedBox(height: 48),
-                    final day => _DayCell(
-                      day: day,
-                      showMonthLabel: isPayCycle && day.day == 1,
-                      isSelected: day.value == selectedDay.value,
-                      isToday: day.value == today.value,
-                      intensity: intensities[day.value],
-                      onTap: () => onSelectDay(day),
-                    ),
-                  },
+          LayoutBuilder(
+            builder: (context, constraints) =>
+                // Cell width drives the capsule's 60 % width (§6.2). Every cell
+                // in a row shares one width because they are `Expanded`, so one
+                // measurement per row is enough.
+                Row(
+                  children: <Widget>[
+                    for (
+                      var column = 0;
+                      column < MonthGridLayout.daysPerWeek;
+                      column++
+                    )
+                      Expanded(
+                        child: switch (cells[row * MonthGridLayout.daysPerWeek +
+                            column]) {
+                          null => const SizedBox(height: 48),
+                          final day => _DayCell(
+                            day: day,
+                            cellWidth:
+                                constraints.maxWidth /
+                                MonthGridLayout.daysPerWeek,
+                            showMonthLabel: isPayCycle && day.day == 1,
+                            isSelected: day.value == selectedDay.value,
+                            isToday: day.value == today.value,
+                            intensity: intensities[day.value],
+                            onTap: () => onSelectDay(day),
+                          ),
+                        },
+                      ),
+                  ],
                 ),
-            ],
           ),
       ],
     );
@@ -618,6 +627,7 @@ final class _Intensity {
 class _DayCell extends StatelessWidget {
   const _DayCell({
     required this.day,
+    required this.cellWidth,
     this.showMonthLabel = false,
     required this.isSelected,
     required this.isToday,
@@ -626,6 +636,11 @@ class _DayCell extends StatelessWidget {
   });
 
   final LocalDate day;
+
+  /// The measured width of one grid cell, used to size the capsule at 60 %
+  /// (`docs/Design.md` §6.2).
+  final double cellWidth;
+
   final bool showMonthLabel;
   final bool isSelected;
   final bool isToday;
@@ -634,7 +649,6 @@ class _DayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
     final locale = Localizations.localeOf(context);
@@ -662,52 +676,76 @@ class _DayCell extends StatelessWidget {
             onTap: onTap,
             customBorder: const CircleBorder(),
             child: Center(
-              child: Container(
+              child: SizedBox(
                 width: 40,
                 height: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isSelected ? colors.brandSubtle : null,
-                  shape: BoxShape.circle,
-                  border: isToday
-                      ? Border.all(color: colors.brandPrimary, width: 1.5)
-                      : null,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                child: Stack(
+                  fit: StackFit.expand,
                   children: <Widget>[
-                    if (showMonthLabel)
-                      Text(
-                        DateFormat.MMM(
-                          Localizations.localeOf(context).toLanguageTag(),
-                        ).format(day.toDateTime()),
-                        // docs/Design.md §6.6: the tiny month label on the 1st
-                        // of each calendar month is `overline`. It used to be an
-                        // 8 px literal, which is below the `caption` floor §3
-                        // sets ("never go below caption (11)") — Burmese and
-                        // Japanese lose legibility under it.
-                        style: AppTypography.overline.copyWith(
-                          color: isSelected
-                              ? colors.brandPrimary
-                              : colors.textSecondary,
+                    // §6.2 selected: `brandSubtle` fill behind the whole cell at
+                    // `radius.md`.
+                    if (isSelected)
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: colors.brandSubtle,
+                          borderRadius: AppRadius.borderMd,
                         ),
                       ),
-                    SizedBox(
-                      height: showMonthLabel ? 14 : 20,
-                      child: Center(
-                        child: Text(
-                          '${day.day}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: showMonthLabel ? 12 : null,
-                            color: isSelected
-                                ? colors.brandPrimary
-                                : colors.textPrimary,
-                            fontWeight: isSelected ? FontWeight.w600 : null,
+                    // §6.2 today: a `brandPrimary` 1.5 px ring at `radius.full`,
+                    // drawn *over* the selected fill so the two can coexist.
+                    if (isToday)
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: AppRadius.borderFull,
+                          border: Border.all(
+                            color: colors.brandPrimary,
+                            width: 1.5,
                           ),
                         ),
                       ),
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          if (showMonthLabel)
+                            Text(
+                              DateFormat.MMM(
+                                Localizations.localeOf(context).toLanguageTag(),
+                              ).format(day.toDateTime()),
+                              // docs/Design.md §6.6: the tiny month label on the
+                              // 1st of each calendar month is `overline`. It used
+                              // to be an 8 px literal, which is below the
+                              // `caption` floor §3 sets ("never go below caption
+                              // (11)") — Burmese and Japanese lose legibility
+                              // under it.
+                              style: AppTypography.overline.copyWith(
+                                color: isSelected
+                                    ? colors.brandPrimary
+                                    : colors.textSecondary,
+                              ),
+                            ),
+                          SizedBox(
+                            height: showMonthLabel ? 14 : 20,
+                            child: Center(
+                              child: Text(
+                                '${day.day}',
+                                style: AppTypography.body.copyWith(
+                                  fontSize: showMonthLabel ? 12 : null,
+                                  color: isSelected
+                                      ? colors.brandPrimary
+                                      : colors.textPrimary,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : null,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (intensity case final i?)
+                            _Capsule(intensity: i, cellWidth: cellWidth),
+                        ],
+                      ),
                     ),
-                    if (intensity case final i?) _Capsule(intensity: i),
                   ],
                 ),
               ),
@@ -720,10 +758,15 @@ class _DayCell extends StatelessWidget {
 }
 
 /// The 4 px rounded bar under a day number.
+///
+/// Width is **60 % of the cell** (`docs/Design.md` §6.2), not a fixed 24 px, so
+/// the capsule keeps its proportion when the grid stretches on tablet and
+/// desktop. [cellWidth] is measured by the grid's `LayoutBuilder`.
 class _Capsule extends StatelessWidget {
-  const _Capsule({required this.intensity});
+  const _Capsule({required this.intensity, required this.cellWidth});
 
   final _Intensity intensity;
+  final double cellWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -732,21 +775,26 @@ class _Capsule extends StatelessWidget {
     // colour: v0.1 cannot create one (`docs/Roadmap.md`), and inventing a colour
     // for an unreachable state would be untested design. The case is spelled out
     // anyway so the switch stays exhaustive when `transfer` ships in v0.3.
-    final baseColor = switch (intensity.direction) {
-      TransactionDirection.income => colors.moneyInSubtle,
+    final (subtle, full) = switch (intensity.direction) {
+      TransactionDirection.income => (colors.moneyInSubtle, colors.moneyIn),
       TransactionDirection.expense ||
       TransactionDirection.transfer ||
-      null => colors.moneyOutSubtle,
+      null => (colors.moneyOutSubtle, colors.moneyOut),
     };
-    // Alpha maps step 1→64, 2→128, 3→192, 4→255 (0x40, 0x80, 0xC0, 0xFF).
-    final alpha = intensity.step * 64;
+
+    // §6.2 steps 1–4 read as increasing depth. `moneyOutSubtle` is already the
+    // *lightest* of the five, so steps must interpolate from it toward the full
+    // `moneyOut` — the previous `step * 64` alpha instead faded the subtle tint
+    // out, making a busy day the palest capsule on the grid.
+    final t = (intensity.step - 1) / 3;
+    final color = Color.lerp(subtle, full, t)!;
 
     return Container(
-      width: 24,
+      width: cellWidth * 0.6,
       height: 4,
       margin: const EdgeInsets.only(top: 2),
       decoration: BoxDecoration(
-        color: baseColor.withAlpha(alpha.clamp(0, 255)),
+        color: color,
         borderRadius: const BorderRadius.all(AppRadius.radiusSm),
       ),
     );

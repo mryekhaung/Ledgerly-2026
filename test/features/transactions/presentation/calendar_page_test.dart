@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
+import 'package:ledgerly/app/theme/app_colors.dart';
+import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -649,6 +651,77 @@ void main() {
 
         // In period Sep 10 – Oct 9 containing day (Oct 3), Oct 1 appears with label 'Oct'.
         expect(find.text('Oct'), findsOneWidget);
+      },
+    );
+  });
+
+  group('Day Capsule spec (docs/Design.md §6.2)', () {
+    /// The capsule is the 4 px bar under a day number. It is found by its
+    /// `Container` decoration rather than a type, since `_Capsule` is private.
+    Finder capsuleOf(double expectedWidth) => find.byWidgetPredicate((w) {
+      if (w is! Container) return false;
+      final d = w.decoration;
+      if (d is! BoxDecoration) return false;
+      return w.constraints?.maxHeight == 4 &&
+          w.constraints?.maxWidth == expectedWidth;
+    });
+
+    testWidgets(
+      'should_size_the_capsule_to_60_percent_of_its_cell',
+      (tester) async {
+        await host(tester, TestWidths.phone);
+        await tester.pumpAndSettle();
+
+        // 390 px wide, 7 columns → 55.71 px per cell, times 0.6.
+        const expected = 390 / 7 * 0.6;
+        expect(
+          capsuleOf(expected),
+          findsWidgets,
+          reason: 'capsule width must be 60% of the cell, not a fixed 24 px',
+        );
+      },
+    );
+
+    testWidgets(
+      'should_widen_the_capsule_when_the_grid_stretches',
+      (tester) async {
+        // A tablet cell is far wider than a phone's, so a fixed-width capsule
+        // would keep its absolute size instead of its proportion.
+        await host(tester, TestWidths.tablet);
+        await tester.pumpAndSettle();
+
+        const expected = TestWidths.tablet / 7 * 0.6;
+        expect(capsuleOf(expected), findsWidgets);
+        expect(
+          capsuleOf(TestWidths.phone / 7 * 0.6),
+          findsNothing,
+          reason: 'the phone-width capsule must not leak into the wide layout',
+        );
+      },
+    );
+
+    testWidgets(
+      'should_wrap_the_selected_cell_in_a_radius_md_fill_not_a_circle',
+      (tester) async {
+        await host(tester, TestWidths.phone);
+        await tester.pumpAndSettle();
+
+        // The selected day is Oct 3. Find the DecoratedBox carrying the
+        // selection fill and assert its corner shape. The light-theme
+        // `brandSubtle` is `AppPalette.jade100`; the host renders light.
+        final selectionFill = find.byWidgetPredicate((w) {
+          if (w is! DecoratedBox) return false;
+          final d = w.decoration;
+          return d is BoxDecoration &&
+              d.color == AppPalette.jade100 &&
+              d.borderRadius == AppRadius.borderMd;
+        });
+
+        expect(
+          selectionFill,
+          findsWidgets,
+          reason: '§6.2 selected cell is brandSubtle at radius.md',
+        );
       },
     );
   });
