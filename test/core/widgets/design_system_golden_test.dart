@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -10,29 +9,7 @@ import 'package:ledgerly/core/widgets/list_row.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Tolerant comparator allowing minor rasterizer differences across OSes.
-///
-/// Same treatment as `avatar_golden_test.dart`: goldens are generated on one
-/// machine and asserted on CI's Linux runner, so pixel-exact equality is a
-/// trap. A diff above 2% is a real regression.
-class _TolerantGoldenComparator extends LocalFileComparator {
-  _TolerantGoldenComparator(super.testFile, {this.tolerance = 0.02});
-
-  final double tolerance;
-
-  @override
-  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
-    final result = await GoldenFileComparator.compareLists(
-      imageBytes,
-      await getGoldenBytes(golden),
-    );
-    if (!result.passed && result.diffPercent > tolerance) {
-      final error = await generateFailureOutput(result, golden, basedir);
-      throw FlutterError(error);
-    }
-    return result.passed || result.diffPercent <= tolerance;
-  }
-}
+import '../../support/tolerant_golden.dart';
 
 /// Design-system component goldens (docs/Design.md §8, docs/Conventions.md §6).
 ///
@@ -44,13 +21,7 @@ class _TolerantGoldenComparator extends LocalFileComparator {
 /// First run: `flutter test test/core/widgets/design_system_golden_test.dart
 /// --update-goldens`, then commit the PNGs under `goldens/`.
 void main() {
-  setUpAll(() {
-    final current = goldenFileComparator as LocalFileComparator;
-    goldenFileComparator = _TolerantGoldenComparator(
-      Uri.parse('${current.basedir}design_system_golden_test.dart'),
-      tolerance: 0.02,
-    );
-  });
+  setUpAll(() => useTolerantGoldens('design_system_golden_test.dart'));
 
   Widget host({required bool isDark, required Widget child}) {
     final themeColors = isDark ? const AppColorsDark() : const AppColorsLight();

@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -6,34 +5,10 @@ import 'package:ledgerly/features/profile/domain/entities/avatar_config.dart';
 import 'package:ledgerly/features/profile/presentation/widgets/avatar.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Tolerant comparator allowing minor rasterizer difference across OSes (docs/Conventions.md §6).
-class _TolerantGoldenComparator extends LocalFileComparator {
-  _TolerantGoldenComparator(super.testFile, {this.tolerance = 0.02});
-
-  final double tolerance;
-
-  @override
-  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
-    final result = await GoldenFileComparator.compareLists(
-      imageBytes,
-      await getGoldenBytes(golden),
-    );
-    if (!result.passed && result.diffPercent > tolerance) {
-      final error = await generateFailureOutput(result, golden, basedir);
-      throw FlutterError(error);
-    }
-    return result.passed || result.diffPercent <= tolerance;
-  }
-}
+import '../../../support/tolerant_golden.dart';
 
 void main() {
-  setUpAll(() {
-    final current = goldenFileComparator as LocalFileComparator;
-    goldenFileComparator = _TolerantGoldenComparator(
-      Uri.parse('${current.basedir}avatar_golden_test.dart'),
-      tolerance: 0.02,
-    );
-  });
+  setUpAll(() => useTolerantGoldens('avatar_golden_test.dart'));
 
   Widget host({
     required AvatarShape shape,
