@@ -1,6 +1,7 @@
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
+import 'package:ledgerly/core/money/money_formatter.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
@@ -58,28 +59,36 @@ class GoalProgressSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                AmountText(
-                  goal.currentAmount,
-                  style: AmountStyle.row,
-                  signed: false,
-                  color: isCompleted ? colors.moneyIn : colors.textPrimary,
-                ),
-                Text(
-                  ' / ',
-                  style: AppTypography.label.copyWith(
-                    color: colors.textSecondary,
+            Flexible(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: AmountText(
+                      goal.currentAmount,
+                      style: AmountStyle.row,
+                      signed: false,
+                      color: isCompleted ? colors.moneyIn : colors.textPrimary,
+                    ),
                   ),
-                ),
-                AmountText(
-                  goal.targetAmount,
-                  style: AmountStyle.row,
-                  signed: false,
-                  color: colors.textSecondary,
-                ),
-              ],
+                  Text(
+                    ' / ',
+                    style: AppTypography.label.copyWith(
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                  Flexible(
+                    child: AmountText(
+                      goal.targetAmount,
+                      style: AmountStyle.row,
+                      signed: false,
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(width: AppSpacing.sm),
             Text(
               '$percent%',
               style: AppTypography.label.copyWith(
@@ -101,7 +110,12 @@ class GoalProgressSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             AppStrings.fill(context, 'goalRemaining', {
-              'amount': '${goal.remainingAmount.amountMinor}',
+              // `goalRemaining` takes a *formatted* amount: raw minor units
+              // render "2000000 remaining" instead of "2,000,000 Ks remaining",
+              // and drop the currency entirely (docs/Design.md §5.4).
+              'amount': MoneyFormatter(
+                locale: Localizations.localeOf(context).toLanguageTag(),
+              ).format(goal.remainingAmount),
             }),
             style: AppTypography.label.copyWith(color: colors.textSecondary),
           ),
