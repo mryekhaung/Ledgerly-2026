@@ -1,14 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
-import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
-import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -16,17 +12,28 @@ import 'package:ledgerly/features/settings/presentation/providers/settings_provi
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_filter.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/category_picker_page.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/filter_sheet/amount_range_section.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/filter_sheet/category_section.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/filter_sheet/date_range_section.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/filter_sheet/direction_section.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Modal bottom sheet allowing users to configure detailed search/filter options.
+///
+/// Composition root only: sections live in `widgets/filter_sheet/`
+/// (`docs/Conventions.md` §1).
 class TransactionFilterSheet extends ConsumerStatefulWidget {
+  /// Creates the sheet.
   const TransactionFilterSheet({
     required this.initialFilter,
     required this.onApply,
     super.key,
   });
 
+  /// The filter to start from.
   final TransactionFilter initialFilter;
+
+  /// Called with the applied filter.
   final ValueChanged<TransactionFilter> onApply;
 
   /// Shows the filter sheet modal.
@@ -251,236 +258,35 @@ class _TransactionFilterSheetState
             ),
             const SizedBox(height: AppSpacing.md),
 
-            // Direction / Type
-            Text(
-              strings('categoriesKindLabel'),
-              style: Theme.of(context).textTheme.labelMedium
-                  ?.copyWith(color: colors.textSecondary),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            SegmentedTabs<TransactionDirection?>(
-              tabs: <SegmentedTab<TransactionDirection?>>[
-                SegmentedTab<TransactionDirection?>(
-                  value: null,
-                  label: strings('filterAll'),
-                ),
-                SegmentedTab<TransactionDirection?>(
-                  value: TransactionDirection.expense,
-                  label: strings('filterExpense'),
-                ),
-                SegmentedTab<TransactionDirection?>(
-                  value: TransactionDirection.income,
-                  label: strings('filterIncome'),
-                ),
-              ],
-              selected: _direction,
+            FilterDirectionSection(
+              direction: _direction,
               onChanged: (direction) {
                 setState(() => _direction = direction);
               },
             ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Category Picker Row
-            Text(
-              strings('filterCategory'),
-              style: Theme.of(context).textTheme.labelMedium
-                  ?.copyWith(color: colors.textSecondary),
+            FilterCategorySection(
+              selectedCategory: selectedCategory,
+              onPick: _pickCategory,
+              onClear: () => setState(() => _categoryId = null),
             ),
-            const SizedBox(height: AppSpacing.xs),
-            InkWell(
-              onTap: _pickCategory,
-              borderRadius: AppRadius.borderMd,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-                decoration: BoxDecoration(
-                  color: colors.surfaceSubtle,
-                  borderRadius: AppRadius.borderMd,
-                  border: Border.all(color: colors.border),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    if (selectedCategory case final cat?) ...<Widget>[
-                      CategoryGem(
-                        colorValue: cat.colorValue,
-                        iconKey: cat.iconKey,
-                        size: CategoryGemSize.sm,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Text(
-                          cat.name,
-                          style: AppTypography.body.copyWith(
-                            color: colors.textPrimary,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(AppIcons.close, size: 18),
-                        onPressed: () => setState(() => _categoryId = null),
-                      ),
-                    ] else ...<Widget>[
-                      Icon(
-                        AppIcons.category,
-                        size: 20,
-                        color: colors.textSecondary,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Text(
-                          strings('transactionCategoryChoose'),
-                          style: AppTypography.body.copyWith(
-                            color: colors.textSecondary,
-                          ),
-                        ),
-                      ),
-                      const Icon(AppIcons.chevronRight, size: 20),
-                    ],
-                  ],
-                ),
-              ),
+            FilterDateRangeSection(
+              startDate: _startDate,
+              endDate: _endDate,
+              dateFormat: dateFormat,
+              onPickStart: _pickStartDate,
+              onPickEnd: _pickEndDate,
+              onClear: () {
+                setState(() {
+                  _startDate = null;
+                  _endDate = null;
+                });
+              },
             ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Date Range
-            Text(
-              strings('filterDateRange'),
-              style: Theme.of(context).textTheme.labelMedium
-                  ?.copyWith(color: colors.textSecondary),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _pickStartDate,
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.md,
-                      ),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: AppRadius.borderMd,
-                      ),
-                    ),
-                    child: Text(
-                      _startDate == null
-                          ? strings('filterStartDate')
-                          : dateFormat.format(_startDate!.toDateTime()),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                  child: Text('~'),
-                ),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _pickEndDate,
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.md,
-                      ),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: AppRadius.borderMd,
-                      ),
-                    ),
-                    child: Text(
-                      _endDate == null
-                          ? strings('filterEndDate')
-                          : dateFormat.format(_endDate!.toDateTime()),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            if (_startDate != null || _endDate != null) ...<Widget>[
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _startDate = null;
-                      _endDate = null;
-                    });
-                  },
-                  child: Text(strings('filterClearAll')),
-                ),
-              ),
-            ] else ...<Widget>[const SizedBox(height: AppSpacing.lg)],
-
-            // Amount Range
-            Text(
-              '${strings('filterAmount')} (${currency.code.toUpperCase()})',
-              style: Theme.of(context).textTheme.labelMedium
-                  ?.copyWith(color: colors.textSecondary),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: _minAmountController,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: strings('filterMinAmount'),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.sm,
-                      ),
-                      border: const OutlineInputBorder(
-                        borderRadius: AppRadius.borderMd,
-                      ),
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                  child: Text('~'),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _maxAmountController,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: strings('filterMaxAmount'),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.sm,
-                      ),
-                      border: const OutlineInputBorder(
-                        borderRadius: AppRadius.borderMd,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xl),
-
-            // Action button
-            FilledButton(
-              onPressed: _apply,
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: AppRadius.borderMd,
-                ),
-              ),
-              child: Text(strings('filterApply')),
+            FilterAmountRangeSection(
+              minController: _minAmountController,
+              maxController: _maxAmountController,
+              currency: currency,
+              onApply: _apply,
             ),
           ],
         ),
