@@ -1,30 +1,36 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
-import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
-import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
-import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/domain/usecases/delete_savings_goal.dart';
 import 'package:ledgerly/features/goals/domain/usecases/set_goal_archived.dart';
 import 'package:ledgerly/features/goals/presentation/providers/goals_providers.dart';
+import 'package:ledgerly/features/goals/presentation/widgets/goal_card/header.dart';
+import 'package:ledgerly/features/goals/presentation/widgets/goal_card/progress.dart';
 import 'package:ledgerly/features/goals/presentation/widgets/goal_contribution_dialog.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Card displaying a savings goal with visual progress and management actions.
+///
+/// Composition root only: header and progress live in `widgets/goal_card/`
+/// (`docs/Conventions.md` §1).
 class GoalCard extends ConsumerWidget {
+  /// Creates the card.
   const GoalCard({required this.goal, this.onTap, this.onEdit, super.key});
 
+  /// The goal to render.
   final SavingsGoal goal;
+
+  /// Called on tap (defaults to the contribution dialog).
   final VoidCallback? onTap;
+
+  /// Called to edit.
   final VoidCallback? onEdit;
 
   Future<void> _handleDelete(BuildContext context, WidgetRef ref) async {
@@ -84,18 +90,21 @@ class GoalCard extends ConsumerWidget {
     }
   }
 
+  void _showContribution(BuildContext context, GoalContributionMode mode) {
+    unawaited(
+      GoalContributionDialog.show(context, goal: goal, initialMode: mode),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = AppThemeColors.of(context);
-    final strings = AppStrings.of(context);
     final now = DateTime.now();
     final today = LocalDate(now.year, now.month, now.day);
     final isCompleted = goal.isCompleted;
     final isOverdue = goal.isOverdue(today);
     final daysRemaining = goal.daysRemaining(today);
     final percent = (goal.progress * 100).toInt();
-
-    final goalColor = Color(goal.colorValue);
 
     return AppCard(
       margin: const EdgeInsets.symmetric(
@@ -109,228 +118,31 @@ class GoalCard extends ConsumerWidget {
             : colors.border,
         width: isCompleted ? 1.5 : 1,
       ),
-      onTap: onTap ?? () => GoalContributionDialog.show(context, goal: goal),
+      onTap:
+          onTap ??
+          () => _showContribution(context, GoalContributionMode.deposit),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top row: Gem + Title + Menu
-          Row(
-            children: [
-              CategoryGem(
-                colorValue: goal.colorValue,
-                iconKey: goal.iconKey,
-                size: CategoryGemSize.lg,
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            goal.name,
-                            style: AppTypography.title.copyWith(
-                              color: colors.textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (isCompleted) ...[
-                          const SizedBox(width: AppSpacing.xs),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colors.moneyIn.withValues(alpha: 0.15),
-                              borderRadius: AppRadius.borderSm,
-                            ),
-                            child: Text(
-                              '100%',
-                              style: AppTypography.caption.copyWith(
-                                color: colors.moneyIn,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xxs),
-                    // Deadline / Days info
-                    if (goal.targetDate != null)
-                      Text(
-                        isOverdue
-                            ? AppStrings.fill(context, 'goalDaysOverdue', {
-                                'days': daysRemaining?.abs() ?? 0,
-                              })
-                            : daysRemaining != null && daysRemaining >= 0
-                            ? AppStrings.fill(context, 'goalDaysLeft', {
-                                'days': daysRemaining,
-                              })
-                            : '',
-                        style: AppTypography.label.copyWith(
-                          color: isOverdue
-                              ? colors.moneyOut
-                              : colors.textSecondary,
-                          fontWeight: isOverdue
-                              ? FontWeight.w600
-                              : FontWeight.w500,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-
-              // Quick Deposit Button
-              IconButton(
-                icon: Icon(AppIcons.addCircle, color: colors.moneyIn, size: 28),
-                tooltip: strings('depositAction'),
-                onPressed: () => GoalContributionDialog.show(
-                  context,
-                  goal: goal,
-                  initialMode: GoalContributionMode.deposit,
-                ),
-              ),
-
-              // Popup Menu
-              AppOverflowMenu<String>(
-                icon: AppIcons.more,
-                cancelLabel: strings('actionCancel'),
-                onSelected: (action) {
-                  switch (action) {
-                    case 'deposit':
-                      unawaited(
-                        GoalContributionDialog.show(
-                          context,
-                          goal: goal,
-                          initialMode: GoalContributionMode.deposit,
-                        ),
-                      );
-                    case 'withdraw':
-                      unawaited(
-                        GoalContributionDialog.show(
-                          context,
-                          goal: goal,
-                          initialMode: GoalContributionMode.withdraw,
-                        ),
-                      );
-                    case 'edit':
-                      onEdit?.call();
-                    case 'archive':
-                      unawaited(_handleToggleArchive(context, ref));
-                    case 'delete':
-                      unawaited(_handleDelete(context, ref));
-                  }
-                },
-                items: <OverflowMenuItem<String>>[
-                  OverflowMenuItem<String>(
-                    value: 'deposit',
-                    label: strings('depositTitle'),
-                    icon: AppIcons.decrease,
-                  ),
-                  OverflowMenuItem<String>(
-                    value: 'withdraw',
-                    label: strings('withdrawTitle'),
-                    icon: AppIcons.increase,
-                  ),
-                  OverflowMenuItem<String>(
-                    value: 'edit',
-                    label: strings('editGoal'),
-                    icon: AppIcons.edit,
-                  ),
-                  OverflowMenuItem<String>(
-                    value: 'archive',
-                    label: goal.isArchived
-                        ? strings('unarchiveGoal')
-                        : strings('archiveGoal'),
-                    icon: goal.isArchived
-                        ? AppIcons.unarchive
-                        : AppIcons.archive,
-                  ),
-                  OverflowMenuItem<String>(
-                    value: 'delete',
-                    label: strings('deleteGoal'),
-                    icon: AppIcons.destructive,
-                    destructive: true,
-                  ),
-                ],
-              ),
-            ],
+          GoalCardHeader(
+            goal: goal,
+            isCompleted: isCompleted,
+            isOverdue: isOverdue,
+            daysRemaining: daysRemaining,
+            onDeposit: () =>
+                _showContribution(context, GoalContributionMode.deposit),
+            onWithdraw: () =>
+                _showContribution(context, GoalContributionMode.withdraw),
+            onEdit: onEdit,
+            onToggleArchive: () =>
+                unawaited(_handleToggleArchive(context, ref)),
+            onDelete: () => unawaited(_handleDelete(context, ref)),
           ),
-
-          const SizedBox(height: AppSpacing.md),
-
-          // Progress Bar
-          ClipRRect(
-            borderRadius: AppRadius.borderSm,
-            child: LinearProgressIndicator(
-              value: goal.progress,
-              minHeight: 8,
-              backgroundColor: colors.border,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                isCompleted ? colors.moneyIn : goalColor,
-              ),
-            ),
+          GoalProgressSection(
+            goal: goal,
+            isCompleted: isCompleted,
+            percent: percent,
           ),
-
-          const SizedBox(height: AppSpacing.sm),
-
-          // Bottom amounts row: Current / Target + Percentage
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  AmountText(
-                    goal.currentAmount,
-                    style: AmountStyle.row,
-                    signed: false,
-                    color: isCompleted ? colors.moneyIn : colors.textPrimary,
-                  ),
-                  Text(
-                    ' / ',
-                    style: AppTypography.label.copyWith(
-                      color: colors.textSecondary,
-                    ),
-                  ),
-                  AmountText(
-                    goal.targetAmount,
-                    style: AmountStyle.row,
-                    signed: false,
-                    color: colors.textSecondary,
-                  ),
-                ],
-              ),
-              Text(
-                '$percent%',
-                style: AppTypography.label.copyWith(
-                  color: isCompleted ? colors.moneyIn : colors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-
-          // Remaining hint or Completed badge
-          if (isCompleted) ...[
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              strings('goalCompleted'),
-              style: AppTypography.label.copyWith(color: colors.moneyIn),
-            ),
-          ] else ...[
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              AppStrings.fill(context, 'goalRemaining', {
-                'amount': '${goal.remainingAmount.amountMinor}',
-              }),
-              style: AppTypography.label.copyWith(color: colors.textSecondary),
-            ),
-          ],
         ],
       ),
     );
