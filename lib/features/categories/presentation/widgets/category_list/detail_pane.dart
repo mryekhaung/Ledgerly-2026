@@ -3,8 +3,8 @@ import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
-import 'package:ledgerly/features/categories/presentation/pages/category_form_page.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_form_notifier.dart';
+import 'package:ledgerly/features/categories/presentation/widgets/category_form/form_body.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:material_ui/material_ui.dart';
 

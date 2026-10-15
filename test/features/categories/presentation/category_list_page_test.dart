@@ -5,9 +5,9 @@ import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/widgets/list_row.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/category_list_state.dart';
-import 'package:ledgerly/features/categories/presentation/pages/category_form_page.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_list_notifier.dart';
+import 'package:ledgerly/features/categories/presentation/widgets/category_form/form_body.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
