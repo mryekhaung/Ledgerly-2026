@@ -13,6 +13,22 @@
 # before collecting a single test. This is an environment problem, not a code
 # problem — CI (ubuntu-latest) is unaffected and remains the authoritative oracle.
 #
+# FIRST, TRY THE PROXY FIX (16 Oct 2026)
+# --------------------------------------
+# `flutter test` also fails with
+#
+#     WebSocketException: Invalid WebSocket upgrade request
+#
+# for every file when the shell exports http_proxy/https_proxy/HTTP_PROXY/
+# HTTPS_PROXY. The tool talks to `flutter_tester` over a **localhost** WebSocket,
+# and the Dart HTTP client routes that through the proxy. Unsetting the four
+# variables for the tool process fixes it completely:
+#
+#     env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY flutter test
+#
+# That runs the WHOLE suite, goldens included — which this script cannot do. See
+# `docs/Versions.md`. Use this script only when the pipe problem is the blocker.
+#
 # This script sidesteps the limit by doing the two steps by hand:
 #   1. compile the test to a debug kernel with `gen_kernel`, then
 #   2. execute that kernel with `flutter_tester.exe`.

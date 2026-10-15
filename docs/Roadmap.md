@@ -2,7 +2,15 @@
 
 Legend: ☐ todo · ◐ in progress · ☑ done. Each task = one small PR following `Agent.md` §5.
 
-**Where we are:** Phase 0 is ~80% done and is the only phase started. **Phases 1–5 are not started** — the `lib/features/*` folders exist but contain only `.gitkeep` scaffolds, and there is no `lib/data/` or `lib/domain/` yet. The app currently has no screens beyond the scaffold placeholder and no persistence (Drift is not a dependency yet).
+**Where we are (16 Oct 2026):** Phases 0–3.5 are **done** — the app is a working
+local-first budget manager with calendar, transactions, categories, settings,
+accounts, budgets, recurring, goals, insights, import/export, full backup and
+Firebase Auth. `flutter test` is **1413 green** and `flutter analyze` is clean,
+**locally as well as on CI** (`docs/Versions.md` — the proxy fix). **Phase 4
+(Sync & Polish) is the only unstarted phase**, and it is blocked on a backend
+decision that has no written home yet: `docs/Backend.md` is referenced by
+`Agent.md` and the doc index but has never been written (see §G.1). Phase 5
+(Release) is unstarted.
 
 
 ## Phase 0 — Foundation
@@ -486,8 +494,17 @@ Eleven refactor commits, each green on its own tests before pushing:
 
 1. **Phase 4 Sync (v0.4)** — still NOT STARTED: outbox + `RemoteStore`
    contract tests + Firebase adapter, sync status UI, merge-on-first-login,
-   app lock, widget, web release, Supabase proof. Needs backend credentials
-   decisions before code (Agent.md §3.14).
+   app lock, widget, web release, Supabase proof. Blocked on a backend
+   decision, and the decision has no written home: **`docs/Backend.md` is
+   listed in `Agent.md`'s doc map and `docs/README.md` but does not exist**, and
+   the "§3.14" this item used to point at is not a rule in `Agent.md` (rule 14
+   is about packages). The relevant constraint that *is* recorded is
+   `Agent.md` §3.2 — "backend is a plug-in": UI/domain only see repository
+   interfaces and remote providers live behind `RemoteDataSource` in `data/`.
+   Note also that `firebase_auth` already ships (§Phase 2 Auth), so "Firebase
+   vs Supabase vs custom" is not a green-field choice: Firebase is the only one
+   with code in the tree. Writing `Backend.md` — options, criteria and a
+   recommendation for the owner to ratify — is the unblocking step.
 2. **Remaining splits — DONE.** All pages now ≤ 348 lines:
   `transfer_page` 407→244, `profile_page` 412→76, `transaction_form_page`
   397→262, `goal_form_page` 384→206, `category_form_page` 395→49,
@@ -504,20 +521,89 @@ Eleven refactor commits, each green on its own tests before pushing:
   `money`/`money_formatter`, DAOs/datasources/providers (cohesive data
   layer), `app_theme`/`app_router`/`adaptive_nav`/`amount_keypad`/
   `avatar_painter` (cohesive components), `avatar_catalog` (data table).
-3. **Screen goldens for the rest** — pinned: categories, settings,
-   transactions_list, calendar (+ AppCard/ListRow/SegmentedTabs components).
-   Unpinned: accounts, budgets, goals, recurring, auth, profile, insights,
-   data_transfer.
+3. **Screen goldens for the rest — DONE** (see §H). Every screen is now pinned
+   at `TestWidths.phone × 900`, light + dark: the four in §E plus accounts,
+   budgets, goals, recurring, insights, data_transfer, welcome, sign-in and
+   account. The only thing deliberately unpinned is `AppScaffold`
+   (viewport-dependent). Seven of the nine new files were **not actually
+   testing what they claimed** — see §H.
 4. **Custom 2026 icon set** — art commission (see §D note). Code is ready:
    one glyph per concept (Rule 8), keys are semantic so the set swaps without
    a data migration.
 5. **Design.md verdict today** — tokens, radius, type, cards, segments,
    rows+separators, splash, skeleton, copy, calendar spec: enforced by Rules
-   1–12, suite 1394 green. Known accepted deviations: menu-row height 72 vs
+   1–12, suite **1413 green** (and green *locally*, not only on CI — §H.1).
+   Known accepted deviations: menu-row height 72 vs
    64 (§5.7 wins), `TabBar` page tabs + `FilterChip` multi-filters +
    `SwitchListTile` kept as distinct components, 3 AppScaffold-exempt frame
    files (guarded), FAB clearances + 48 px grid geometry as documented
    non-token values, `AppScaffold` excluded from goldens (viewport-dependent).
+
+### H. Screen goldens completed + five real bugs the work exposed (16 Oct 2026)
+
+The nine remaining screen goldens were "done" but three separate defects meant
+most of them were asserting the wrong thing. Fixing that turned up five genuine
+product bugs. `flutter test`: **1413 green**; `flutter analyze`: 0 issues.
+
+1. **The local toolchain was never broken — the shell proxy was.** `flutter
+   test` died on *every* file with `WebSocketException: Invalid WebSocket
+   upgrade request`, which read like a Flutter/tooling bug. It was
+   `http_proxy`/`https_proxy`: the tool talks to `flutter_tester` over a
+   localhost WebSocket and the Dart HTTP client routed it through the proxy.
+   `env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY flutter test`
+   runs the whole suite — **goldens included**, which `tool/run_test.sh` cannot
+   drive. The golden suite had therefore never run locally before this. Recorded
+   in `docs/Versions.md`.
+2. **Seven of the nine new goldens pinned the wrong screen.** `goals`,
+   `recurring`, `insights`, `data_transfer`, `welcome`, `sign-in` and `account`
+   all passed `overrides: <Override>[]`, so each page resolved against
+   unregistered DI and painted its **error banner** — `goals_light.png` was
+   95 % `warningSubtle`. They also passed no `size` (so 800×600, not the phone
+   width) and no `brightness`, so **every "dark" PNG was byte-identical to its
+   light twin** (verified by hash). All seven now seed real fixtures and render
+   light *and* dark; every light/dark pair now differs.
+3. **Real overflow bugs, found only because the goldens finally rendered real
+   data at phone width.** All were `RenderFlex overflowed` at 390 px:
+   - `goal_card/progress.dart` — 126 px. Fixed with `Flexible` + ellipsis.
+   - `budget_summary_card.dart` — 34 px (header row) and **296 px**
+     (`spent / limit`). The 296 is structural: MMK/JPY are zero-decimal, so
+     both sides are 7-digit numbers, and a 28 px hero plus a 17 px secondary
+     cannot share 326 px. Both sides now flex.
+   - `budget_category_row.dart` — **351 px** (the `spent / limit` column, already
+     narrowed by the gem, status pill and overflow menu) and its bottom row.
+   The budgets fixture was also unrealistic (100,000,000 Ks ≈ USD 48,000 for a
+   *monthly* budget); it now uses 1,500,000 Ks / 400,000 Ks so the golden shows
+   what a user actually sees.
+4. **`goalRemaining` was fed raw minor units.** `progress.dart` passed
+   `'${goal.remainingAmount.amountMinor}'` into an ARB message that expects a
+   *formatted* amount, so a goal needing 2,000,000 Ks rendered
+   `2000000 remaining` — no grouping, no currency. Now goes through
+   `MoneyFormatter`, the same fix §D applied to the transfer page.
+5. **The tolerant golden comparator was copy-pasted 15 times** (two naming
+   variants, private and public). Extracted to
+   `test/support/tolerant_golden.dart` + `useTolerantGoldens()`; every golden
+   installs it from `setUpAll`, so a new golden file cannot silently opt into
+   exact matching and fail on CI's Linux rasterizer.
+
+**Also recorded, not fixed (judgment calls for the owner):**
+
+- **`AvatarPainter` is dead code.** Nothing in `lib/` references it — the
+  Open Peeps SVG composer replaced it (§"Avatar v2"). Only
+  `avatar_painter_test.dart` keeps it alive, so 12 passing tests assert
+  constants of a renderer that no longer ships. Either delete both or say it is
+  the v2.1 reference.
+- **The avatar goldens' light/dark split is vacuous.** `avatar_circle_light.png`
+  and `avatar_circle_dark.png` are byte-identical, and legitimately so: Open
+  Peeps colours come from `AvatarConfig.colors` (user data), not the theme, and
+  `AvatarSvgComposer.compose` takes no `Brightness`. The test's real coverage is
+  circle vs squircle; the theme axis asserts nothing.
+- **Seven screens have no responsive width walk.** Only `categories`,
+  `settings`, `calendar` and the shared layout walk
+  360/390/430/768/1024/1440 × text scale 1.0/2.0 and assert `takeException()`
+  is null. `accounts`, `budgets`, `goals`, `recurring`, `insights`,
+  `data_transfer` and `auth` do not — which is exactly why the §H.3 overflows
+  survived. Adding those walks is the natural next increment and would have
+  caught all of them at build time.
 
 ### C. Judgment items — done
 

@@ -4,6 +4,38 @@
 
 > ## ⚠️ Toolchain status — READ THIS FIRST
 >
+> ### Update (16 Oct 2026): the toolchain runs locally — the blocker was the proxy, not pipes
+>
+> `flutter analyze`, `flutter test` and `flutter gen-l10n` **all work on this box now**. The
+> failure was never the pipe ceiling: the shell exports `http_proxy` / `https_proxy` /
+> `HTTP_PROXY` / `HTTPS_PROXY`, and `flutter test` talks to each `flutter_tester` over a
+> **localhost WebSocket**. The Dart HTTP client honours those variables, so the upgrade request
+> went to the proxy instead of the test isolate and *every* file died identically with
+> `WebSocketException: Invalid WebSocket upgrade request` — which reads like a Flutter bug and is
+> not one. (`flutter analyze` and `gen-l10n` were failing for the same reason; they also open
+> localhost connections.)
+>
+> ```sh
+> # what works — unset the proxy for the tool process only
+> env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY flutter test
+> env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY flutter analyze
+> env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY flutter gen-l10n
+> ```
+>
+> This matters because **golden tests can only be driven through `flutter test`** —
+> `tool/run_test.sh` compiles a single file to a kernel and cannot do golden comparison, so
+> before this the golden suite had never actually run locally. It has now: 1413 tests green on
+> Windows, goldens included.
+>
+> `tool/run_test.sh` and `tool/typecheck.sh` are still the fallback if the pipe problem below
+> reappears; they are no longer the *only* way to run anything. **CI is no longer the only
+> oracle** — treat the local run as the first check and CI as the cross-platform confirmation.
+>
+> ---
+>
+> The pipe analysis below is still accurate for `Process.start` in general, and still explains why
+> `build_runner` cannot run here.
+>
 > **The toolchain is correct. `pub get` succeeds.** The one thing that does not work in the
 > agent's sandbox is *spawning child processes* (`dart:io` `Process.start` cannot create pipes).
 >
