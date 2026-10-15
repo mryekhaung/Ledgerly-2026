@@ -59,6 +59,33 @@ void main() {
       },
     );
 
+    test('ImportNotifier switches format when setFormat is called', () async {
+      final container = ProviderContainer(
+        overrides: [
+          importNotifierProvider.overrideWith(
+            () => ImportNotifier(
+              parseUseCase: ParseImportData(repository),
+              executeUseCase: ExecuteImport(repository),
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(importNotifierProvider.notifier);
+      expect(
+        container.read(importNotifierProvider).format,
+        equals(ImportFormat.csv),
+      );
+
+      notifier.setFormat(ImportFormat.json);
+
+      expect(
+        container.read(importNotifierProvider).format,
+        equals(ImportFormat.json),
+      );
+    });
+
     test('ImportNotifier parses content and executes import', () async {
       final container = ProviderContainer(
         overrides: [

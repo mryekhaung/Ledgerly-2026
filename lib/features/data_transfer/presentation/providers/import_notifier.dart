@@ -116,6 +116,13 @@ class ImportNotifier extends Notifier<ImportState> {
     state = state.copyWith(options: options);
   }
 
+  /// Switches the parse format (CSV/JSON). The format is read at parse time,
+  /// so changing it must update state — re-applying the current options (as
+  /// the old call site did) silently ignores the tap.
+  void setFormat(ImportFormat format) {
+    state = state.copyWith(format: format);
+  }
+
   Future<void> executeImport() async {
     final useCase = executeUseCase;
     final preview = state.preview;

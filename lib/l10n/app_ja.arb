@@ -252,6 +252,8 @@
   "backupActionCreate": "完全バックアップを作成",
   "backupCreatedSuccess": "バックアップを作成しコピーしました",
   "restoreTitle": "バックアップから復元",
+  "backupMetadataSummary":
+      "バックアップ内容：カテゴリ{categories}件、取引{transactions}件",
   "restorePasteHint": "LedgerlyバックアップJSONをここに貼り付けてください...",
   "restoreActionParse": "バックアップを読み込み",
   "restoreActionExecute": "データを復元",

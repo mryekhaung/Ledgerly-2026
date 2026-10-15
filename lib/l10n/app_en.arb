@@ -1039,6 +1039,19 @@
   "@restoreTitle": {
     "description": "Title for restore section."
   },
+  "backupMetadataSummary":
+      "Backup Metadata: {categories} categories, {transactions} transactions",
+  "@backupMetadataSummary": {
+    "description": "Loaded backup payload summary with record counts.",
+    "placeholders": {
+      "categories": {
+        "type": "int"
+      },
+      "transactions": {
+        "type": "int"
+      }
+    }
+  },
   "restorePasteHint": "Paste Ledgerly backup JSON archive here...",
   "@restorePasteHint": {
     "description": "Placeholder for restore JSON input."

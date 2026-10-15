@@ -1612,6 +1612,12 @@ abstract class AppLocalizations {
   /// **'Restore from Backup'**
   String get restoreTitle;
 
+  /// Loaded backup payload summary with record counts.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Metadata: {categories} categories, {transactions} transactions'**
+  String backupMetadataSummary(int categories, int transactions);
+
   /// Placeholder for restore JSON input.
   ///
   /// In en, this message translates to:

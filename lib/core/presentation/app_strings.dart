@@ -84,6 +84,10 @@ abstract final class AppStrings {
       'recurringPausedTab' => l10n.recurringPausedTab(
         _require(values, 'count') as int,
       ),
+      'backupMetadataSummary' => l10n.backupMetadataSummary(
+        _require(values, 'categories') as int,
+        _require(values, 'transactions') as int,
+      ),
       _ => throw FlutterError(
         'AppStrings.fill() has no case for "$key". Add one in '
         'lib/core/presentation/app_strings.dart.',

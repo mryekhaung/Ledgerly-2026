@@ -252,6 +252,8 @@
   "backupActionCreate": "အရန်သိမ်း ဖိုင်ထုတ်မည်",
   "backupCreatedSuccess": "အရန်သိမ်းဒေတာ ထုတ်ယူပြီး clipboard သို့ ကူးယူပြီးပါပြီ",
   "restoreTitle": "အရန်သိမ်းဒေတာ ပြန်လည်ရယူရန်",
+  "backupMetadataSummary":
+      "အရန်သိမ်းအချက်အလက်: အမျိုးအစား {categories} ခု၊ စာရင်း {transactions} ခု",
   "restorePasteHint": "Ledgerly အရန်သိမ်း JSON archive ကို ဤနေရာတွင် ထည့်ပါ...",
   "restoreActionParse": "အရန်သိမ်းဒေတာ ဖွင့်မည်",
   "restoreActionExecute": "ဒေတာများ ပြန်လည်ရယူမည်",

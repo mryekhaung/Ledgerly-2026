@@ -803,6 +803,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restoreTitle => 'Restore from Backup';
 
   @override
+  String backupMetadataSummary(int categories, int transactions) {
+    return 'Backup Metadata: $categories categories, $transactions transactions';
+  }
+
+  @override
   String get restorePasteHint => 'Paste Ledgerly backup JSON archive here...';
 
   @override

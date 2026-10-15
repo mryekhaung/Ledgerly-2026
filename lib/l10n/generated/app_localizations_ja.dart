@@ -778,6 +778,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restoreTitle => 'バックアップから復元';
 
   @override
+  String backupMetadataSummary(int categories, int transactions) {
+    return 'バックアップ内容：カテゴリ$categories件、取引$transactions件';
+  }
+
+  @override
   String get restorePasteHint => 'LedgerlyバックアップJSONをここに貼り付けてください...';
 
   @override

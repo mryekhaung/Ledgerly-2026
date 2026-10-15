@@ -812,6 +812,11 @@ class AppLocalizationsMy extends AppLocalizations {
   String get restoreTitle => 'အရန်သိမ်းဒေတာ ပြန်လည်ရယူရန်';
 
   @override
+  String backupMetadataSummary(int categories, int transactions) {
+    return 'အရန်သိမ်းအချက်အလက်: အမျိုးအစား $categories ခု၊ စာရင်း $transactions ခု';
+  }
+
+  @override
   String get restorePasteHint =>
       'Ledgerly အရန်သိမ်း JSON archive ကို ဤနေရာတွင် ထည့်ပါ...';
 
