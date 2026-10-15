@@ -115,21 +115,36 @@ class BudgetSummaryCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text(
-                strings('budgetOverallSummary'),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+              Flexible(
+                child: Text(
+                  strings('budgetOverallSummary'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
+              const SizedBox(width: AppSpacing.sm),
               BudgetStatusPill(status: p.status),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
+          // `spent / limit` is two amounts on one line. With a zero-decimal
+          // currency (MMK, JPY — the app's primary markets) both sides are
+          // 7-digit numbers, which does not fit at 360 px, so each side flexes
+          // and ellipsizes instead of overflowing (docs/Design.md §8).
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: <Widget>[
-              AmountText(spentMoney, style: AmountStyle.large, signed: false),
+              Flexible(
+                child: AmountText(
+                  spentMoney,
+                  style: AmountStyle.large,
+                  signed: false,
+                ),
+              ),
               const SizedBox(width: AppSpacing.xs),
               Text(
                 ' / ',
@@ -137,11 +152,13 @@ class BudgetSummaryCard extends StatelessWidget {
                   color: colors.textSecondary,
                 ),
               ),
-              AmountText(
-                limitMoney,
-                style: AmountStyle.row,
-                signed: false,
-                color: colors.textSecondary,
+              Flexible(
+                child: AmountText(
+                  limitMoney,
+                  style: AmountStyle.row,
+                  signed: false,
+                  color: colors.textSecondary,
+                ),
               ),
             ],
           ),
@@ -159,33 +176,45 @@ class BudgetSummaryCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text(
-                '${p.spentPercentage.toStringAsFixed(1)}% ${strings('budgetSpent').toLowerCase()}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colors.textSecondary,
-                  fontWeight: FontWeight.w500,
+              Flexible(
+                child: Text(
+                  '${p.spentPercentage.toStringAsFixed(1)}% ${strings('budgetSpent').toLowerCase()}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    p.isOverBudget
-                        ? strings('budgetStatusExceeded')
-                        : strings('budgetRemaining'),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: statusColor,
-                      fontWeight: FontWeight.w600,
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Flexible(
+                      child: Text(
+                        p.isOverBudget
+                            ? strings('budgetStatusExceeded')
+                            : strings('budgetRemaining'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: statusColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  AmountText(
-                    remainingMoney,
-                    style: AmountStyle.row,
-                    signed: false,
-                    color: statusColor,
-                  ),
-                ],
+                    const SizedBox(width: AppSpacing.xs),
+                    Flexible(
+                      child: AmountText(
+                        remainingMoney,
+                        style: AmountStyle.row,
+                        signed: false,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -206,23 +235,34 @@ class BudgetSummaryCard extends StatelessWidget {
                 children: <Widget>[
                   Icon(AppIcons.calendar, size: 14, color: colors.brandPrimary),
                   const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    '${strings('budgetDailyRemaining')}: ',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colors.brandPrimary,
-                      fontWeight: FontWeight.w600,
+                  Flexible(
+                    child: Text(
+                      '${strings('budgetDailyRemaining')}: ',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.brandPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                  AmountText(
-                    Money.minor(dailySpendMinor, p.budget.currency),
-                    style: AmountStyle.row,
-                    signed: false,
-                    color: colors.brandPrimary,
-                  ),
-                  Text(
-                    ' / day ($daysRemaining days)',
-                    style: theme.textTheme.bodySmall?.copyWith(
+                  Flexible(
+                    child: AmountText(
+                      Money.minor(dailySpendMinor, p.budget.currency),
+                      style: AmountStyle.row,
+                      signed: false,
                       color: colors.brandPrimary,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Flexible(
+                    child: Text(
+                      AppStrings.fill(context, 'budgetPerDayCount', {
+                        'count': daysRemaining,
+                      }),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.brandPrimary,
+                      ),
                     ),
                   ),
                 ],

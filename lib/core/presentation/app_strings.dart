@@ -71,6 +71,9 @@ abstract final class AppStrings {
       'budgetThresholdLive' => l10n.budgetThresholdLive(
         _require(values, 'percent') as int,
       ),
+      'budgetPerDayCount' => l10n.budgetPerDayCount(
+        _require(values, 'count') as int,
+      ),
       'goalRemaining' => l10n.goalRemaining(
         _require(values, 'amount') as String,
       ),

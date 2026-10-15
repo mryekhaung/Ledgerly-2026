@@ -1367,6 +1367,15 @@
   "@budgetDailyRemaining": {
     "description": "Label for daily remaining spending capacity."
   },
+  "budgetPerDayCount": "/ day ({count, plural, =1{1 day} other{{count} days}})",
+  "@budgetPerDayCount": {
+    "description": "Suffix after the daily safe spend amount, e.g. 12,500 Ks / day (5 days).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "budgetStatusSafe": "On Track",
   "@budgetStatusSafe": {
     "description": "Status text for safe budget level."

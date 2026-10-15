@@ -1043,6 +1043,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get budgetDailyRemaining => 'Daily Safe Spend';
 
   @override
+  String budgetPerDayCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '/ day ($_temp0)';
+  }
+
+  @override
   String get budgetStatusSafe => 'On Track';
 
   @override

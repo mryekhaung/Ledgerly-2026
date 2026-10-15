@@ -1012,6 +1012,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get budgetDailyRemaining => '1日あたりの使用可能額';
 
   @override
+  String budgetPerDayCount(int count) {
+    return '/ 日（$count日）';
+  }
+
+  @override
   String get budgetStatusSafe => '順調';
 
   @override

@@ -2062,6 +2062,12 @@ abstract class AppLocalizations {
   /// **'Daily Safe Spend'**
   String get budgetDailyRemaining;
 
+  /// Suffix after the daily safe spend amount, e.g. 12,500 Ks / day (5 days).
+  ///
+  /// In en, this message translates to:
+  /// **'/ day ({count, plural, =1{1 day} other{{count} days}})'**
+  String budgetPerDayCount(int count);
+
   /// Status text for safe budget level.
   ///
   /// In en, this message translates to:

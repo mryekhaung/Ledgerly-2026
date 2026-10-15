@@ -329,6 +329,7 @@
   "budgetSpent": "支出額",
   "budgetRemaining": "残額",
   "budgetDailyRemaining": "1日あたりの使用可能額",
+  "budgetPerDayCount": "/ 日（{count}日）",
   "budgetStatusSafe": "順調",
   "budgetStatusWarning": "限度額目前",
   "budgetStatusExceeded": "予算超過",

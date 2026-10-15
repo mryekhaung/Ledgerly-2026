@@ -329,6 +329,7 @@
   "budgetSpent": "သုံးစွဲပြီးငွေ",
   "budgetRemaining": "ကျန်ရှိငွေ",
   "budgetDailyRemaining": "နေ့စဥ် သုံးစွဲရန် ကျန်ငွေ",
+  "budgetPerDayCount": "/ ရက် ({count} ရက်)",
   "budgetStatusSafe": "ပုံမှန် အခြေအနေ",
   "budgetStatusWarning": "ကန့်သတ်ငွေ နီးကပ်နေပြီ",
   "budgetStatusExceeded": "ဘတ်ဂျက် ကျော်လွန်သွားပါပြီ",

@@ -1058,6 +1058,11 @@ class AppLocalizationsMy extends AppLocalizations {
   String get budgetDailyRemaining => 'နေ့စဥ် သုံးစွဲရန် ကျန်ငွေ';
 
   @override
+  String budgetPerDayCount(int count) {
+    return '/ ရက် ($count ရက်)';
+  }
+
+  @override
   String get budgetStatusSafe => 'ပုံမှန် အခြေအနေ';
 
   @override

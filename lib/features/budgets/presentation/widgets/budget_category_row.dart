@@ -81,12 +81,17 @@ class BudgetCategoryRow extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: AppSpacing.xxs),
+                      // Two amounts in a column already narrowed by the gem,
+                      // the status pill and the overflow menu, so both sides
+                      // must flex (docs/Design.md §8).
                       Row(
                         children: <Widget>[
-                          AmountText(
-                            spentMoney,
-                            style: AmountStyle.row,
-                            signed: false,
+                          Flexible(
+                            child: AmountText(
+                              spentMoney,
+                              style: AmountStyle.row,
+                              signed: false,
+                            ),
                           ),
                           Text(
                             ' / ',
@@ -94,11 +99,13 @@ class BudgetCategoryRow extends StatelessWidget {
                               color: colors.textSecondary,
                             ),
                           ),
-                          AmountText(
-                            limitMoney,
-                            style: AmountStyle.row,
-                            signed: false,
-                            color: colors.textSecondary,
+                          Flexible(
+                            child: AmountText(
+                              limitMoney,
+                              style: AmountStyle.row,
+                              signed: false,
+                              color: colors.textSecondary,
+                            ),
                           ),
                         ],
                       ),
@@ -154,26 +161,35 @@ class BudgetCategoryRow extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      p.isOverBudget
-                          ? strings('budgetStatusExceeded')
-                          : strings('budgetRemaining'),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: statusColor,
-                        fontWeight: FontWeight.w600,
+                const SizedBox(width: AppSpacing.sm),
+                Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Flexible(
+                        child: Text(
+                          p.isOverBudget
+                              ? strings('budgetStatusExceeded')
+                              : strings('budgetRemaining'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: statusColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    AmountText(
-                      remainingMoney,
-                      style: AmountStyle.row,
-                      signed: false,
-                      color: statusColor,
-                    ),
-                  ],
+                      const SizedBox(width: AppSpacing.xs),
+                      Flexible(
+                        child: AmountText(
+                          remainingMoney,
+                          style: AmountStyle.row,
+                          signed: false,
+                          color: statusColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
