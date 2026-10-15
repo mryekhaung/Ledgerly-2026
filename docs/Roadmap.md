@@ -1144,10 +1144,16 @@ Settings/Categories master–detail layouts that were never built);
 `TransactionFormPage` has no page test; the day pane's 260 px floor is tight at
 the narrowest split.
 
-**Deliberately not changed:** `Design.md` §6.3's hero is still `AmountStyle.large`
-(28 px) rather than the documented `displayAmount` (40 px). At 40 px a
-¥1,234,567 amount overflows a 360 px card at 2× text scale (§8), so the size
-divergence stays and is recorded here rather than "fixed" into an overflow.
+**Deliberately not changed:** ~~§6.3's hero is still `AmountStyle.large` (28 px)
+rather than the documented `displayAmount` (40 px). At 40 px a ¥1,234,567 amount
+overflows a 360 px card at 2× text scale (§8), so the size divergence stays and
+is recorded here rather than "fixed" into an overflow.~~ — **Superseded by
+§L.6.** The hero now renders at `displayAmount` inside a
+`FittedBox(BoxFit.scaleDown)`, so it takes the size §3 always specified and
+shrinks only when the formatted amount genuinely does not fit. The original
+reason was not wrong so much as incomplete: the real risk was never an
+overflow, it was `AmountText`'s `TextOverflow.ellipsis` silently dropping
+digits, which the width-walk tests could not see.
 
 ---
 
@@ -1279,6 +1285,38 @@ compensate for sitting on a greyer page (1.22:1 is still a legible hairline and
 §2.2 scopes it to separators); and the light `raised` shadow is unchanged, so
 light mode now separates a card **twice** — by surface *and* by shadow — which is
 the point.
+
+#### L.6 The hero finally takes the size the spec always specified
+
+`Design.md` §3 reserves `displayAmount` (40 px) for *"hero amount (summary card,
+keypad)"* and §1.3 makes the number the loudest thing on screen. The calendar
+hero had been pinned to `amountLarge` (28 px) since §K, on the recorded grounds
+that a fixed 40 px overflowed a 360 px card at 2× text scale.
+
+That reasoning was **incomplete in a way worth recording**. The hero is not at
+risk of overflowing — `AmountText` sets `overflow: TextOverflow.ellipsis`, so a
+too-wide hero **ellipsizes**. A truncated amount is a *wrong* amount, and no
+layout test can catch it: `Text` keeps its `data` intact while the *render*
+clips, so the width-walk tests at 360 / 768 / 1440 px and 2× text scale all pass
+with digits missing. The recorded reason described the safer of the two failure
+modes and treated it as the only one.
+
+The fix removes the trade-off rather than choosing a side: the hero is wrapped
+in `FittedBox(fit: BoxFit.scaleDown)`, so it renders at `displayAmount` whenever
+that fits and shrinks only when it does not. A ¥1,234,567 at 2× text scale on a
+360 px card now renders *smaller* instead of *wrong*.
+
+Evidence: the hero's `moneyOut` pixels in `calendar_light.png` went from **9,533
+to 15,241** (+60 %), and all 29 calendar tests pass — including
+`should_lay_out_without_overflowing_at_any_width` and
+`should_lay_out_without_overflowing_at_text_scale_2`, which is what proves the
+`FittedBox` actually absorbs the long-amount case rather than merely hiding it.
+
+Two tests were added: `should_use_the_display_amount_size_for_the_spend_hero`
+(pins the size and colour against §3/§2.4) and
+`should_scale_the_hero_down_instead_of_dropping_digits` (asserts the
+`FittedBox` guard is present, since nothing else in the suite can detect an
+ellipsized amount).
 
 ### C. Judgment items — done
 

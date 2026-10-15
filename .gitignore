@@ -52,3 +52,7 @@ flutter_*.log
 
 # Agent working memory — local scratch, not part of the product
 .workbuddy-ai/
+
+# Golden-test diff artifacts written by the flutter_test golden comparator
+# on a mismatch. Never source; regenerate with --update-goldens instead.
+test/**/failures/

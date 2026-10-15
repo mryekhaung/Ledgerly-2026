@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +7,7 @@ import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -843,6 +846,57 @@ void main() {
         onFillDigit,
         findsWidgets,
         reason: 'the selected day number must use onSelectedFill',
+      );
+    });
+  });
+
+  group('summary card hero (docs/Design.md §6.3, §1.3)', () {
+    testWidgets('should_use_the_display_amount_size_for_the_spend_hero', (
+      tester,
+    ) async {
+      await host(tester, TestWidths.smallPhone);
+      await tester.pumpAndSettle();
+
+      // §1.3 makes the number the loudest thing on screen and §3 reserves
+      // `displayAmount` (40 px) for exactly this — "hero amount (summary card,
+      // keypad)". It had been pinned to `amountLarge` (28 px) because a fixed
+      // 40 px overflowed a long amount at 2x text scale; the `FittedBox` in
+      // `summary_card.dart` removed that trade-off (§L.6).
+      final hero = find.byWidgetPredicate(
+        (w) =>
+            w is Text &&
+            w.style?.fontSize == AppTypography.displayAmount.fontSize &&
+            w.style?.color == const AppColorsLight().moneyOut,
+      );
+      expect(
+        hero,
+        findsOneWidget,
+        reason:
+            'the spend hero must render at displayAmount in moneyOut, not the '
+            'row or large amount style',
+      );
+    });
+
+    testWidgets('should_scale_the_hero_down_instead_of_dropping_digits', (
+      tester,
+    ) async {
+      // `AmountText` sets `overflow: TextOverflow.ellipsis`, so a hero that is
+      // too wide **ellipsizes** rather than overflowing. That means the
+      // width-walk tests pass while the money on screen is truncated — the
+      // `Text` widget keeps its `data` intact while the *render* clips. The
+      // hero is therefore wrapped in a `FittedBox(BoxFit.scaleDown)`, and this
+      // asserts the guard is still there.
+      final source = File(
+        'lib/features/transactions/presentation/widgets/calendar/'
+        'summary_card.dart',
+      ).readAsStringSync();
+
+      expect(
+        RegExp(r'FittedBox\(\s*fit:\s*BoxFit\.scaleDown').hasMatch(source),
+        isTrue,
+        reason:
+            'the spend hero must scale down to fit — an ellipsized amount is a '
+            'wrong amount, and no layout test can catch it',
       );
     });
   });

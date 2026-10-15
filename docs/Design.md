@@ -561,10 +561,18 @@ Horizontal swipe on the grid changes month; the swipe must not fight the day-lis
 An `AppCard` directly under the grid.
 
 - Eyebrow: `overline`, `textSecondary` — "SPENT TODAY" / localized.
-- Hero: `displayAmount`, **unsigned and in `moneyOut`** — the day's *spend*, so the
+- Hero: `displayAmount` (40 px), **unsigned and in `moneyOut`** — the day's *spend*, so the
   figure can never contradict the eyebrow. It used to be the signed net, which
   rendered a salary as a green `+¥200,000` under the words "SPENT TODAY"
   (§K.1-1). Animated on day change (`short`).
+  The hero is wrapped in `FittedBox(fit: BoxFit.scaleDown)` because
+  `AmountText` sets `overflow: TextOverflow.ellipsis`: a hero that is too wide
+  would **drop digits** rather than overflow, and no layout test can catch that
+  — the `Text` widget keeps its `data` intact while the *render* clips. Scaling
+  down renders a smaller number; ellipsizing renders a **wrong** one. This is
+  what let the hero finally adopt the size §3 always specified; it had been
+  pinned to `amountLarge` (28 px) because a fixed 40 px overflowed a long
+  amount at 2× text scale (§L.6).
 - Divider: full-bleed hairline `border`.
 - Footer: two columns — `Income +45,000` (`moneyIn`) and `Expense −57,500` (`moneyOut`), both
   `amountLarge`. Equal flex, left-aligned, labels in `label`/`textSecondary`.
