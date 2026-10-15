@@ -1,16 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_keypad.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
-import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/form_field_surface.dart';
 import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
-import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -21,6 +17,11 @@ import 'package:ledgerly/features/transactions/domain/entities/transaction_direc
 import 'package:ledgerly/features/transactions/presentation/pages/category_picker_page.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_form_notifier.dart';
 import 'package:ledgerly/features/transactions/presentation/transaction_form_state.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/transaction_form/category_field.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/transaction_form/date_field.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/transaction_form/direction_toggle.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/transaction_form/field_group.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/transaction_form/note_field.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -37,6 +38,9 @@ import 'package:material_ui/material_ui.dart';
 /// The category row doubles as the keypad's header: it shows the chosen
 /// category's gem and name, which is exactly the context the user needs while
 /// typing a number, so it is not repeated twice on screen.
+///
+/// Composition root only: fields live in `widgets/transaction_form/`
+/// (`docs/Conventions.md` §1).
 class TransactionFormPage extends ConsumerStatefulWidget {
   /// Creates the form.
   const TransactionFormPage({this.existing, this.initialDate, super.key});
@@ -136,44 +140,30 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
                 child: ListView(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   children: <Widget>[
-                    _DirectionToggle(
+                    DirectionToggle(
                       direction: state.direction,
                       onChanged: notifier.setDirection,
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    _FieldGroup(
-                      label: strings('transactionCategoryLabel'),
+                    FieldGroup(
                       error: _errorFor(state, 'categoryId', strings),
-                      field: FormFieldSurface(
-                        label: strings('transactionCategoryLabel'),
-                        value: category?.name,
-                        leading: category == null
-                            ? null
-                            : CategoryGem(
-                                colorValue: category.colorValue,
-                                iconKey: category.iconKey,
-                                size: CategoryGemSize.md,
-                              ),
-                        trailing: const FormFieldChevron(),
+                      field: CategoryField(
+                        category: category,
                         isError: state.fieldErrors.containsKey('categoryId'),
                         onTap: () => _pickCategory(state.direction),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    _FieldGroup(
-                      label: strings('transactionDateLabel'),
-                      field: FormFieldSurface(
-                        label: strings('transactionDateLabel'),
-                        value: _formatDate(context, state.date),
-                        trailing: const FormFieldChevron(),
+                    FieldGroup(
+                      field: DateField(
+                        dateLabel: _formatDate(context, state.date),
                         onTap: () => _pickDate(state.date),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    _FieldGroup(
-                      label: strings('transactionNoteLabel'),
+                    FieldGroup(
                       error: _errorFor(state, 'note', strings),
-                      field: _NoteField(
+                      field: NoteField(
                         controller: _noteController,
                         hint: strings('transactionNoteHint'),
                         onChanged: notifier.setNote,
@@ -289,109 +279,4 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
   static String _formatDate(BuildContext context, LocalDate date) =>
       MaterialLocalizations.of(context)
           .formatMediumDate(date.toUtcDateTime().toLocal());
-}
-
-/// The expense/income switch.
-class _DirectionToggle extends StatelessWidget {
-  const _DirectionToggle({required this.direction, required this.onChanged});
-
-  final TransactionDirection direction;
-  final ValueChanged<TransactionDirection> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final strings = AppStrings.of(context);
-
-    return SegmentedTabs<TransactionDirection>(
-      tabs: <SegmentedTab<TransactionDirection>>[
-        SegmentedTab<TransactionDirection>(
-          value: TransactionDirection.expense,
-          label: strings('transactionDirectionExpense'),
-          icon: AppIcons.increase,
-        ),
-        SegmentedTab<TransactionDirection>(
-          value: TransactionDirection.income,
-          label: strings('transactionDirectionIncome'),
-          icon: AppIcons.decrease,
-        ),
-      ],
-      selected: direction,
-      onChanged: onChanged,
-    );
-  }
-}
-
-/// A labelled field plus its inline error.
-class _FieldGroup extends StatelessWidget {
-  const _FieldGroup({required this.label, required this.field, this.error});
-
-  final String label;
-  final Widget field;
-  final String? error;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: <Widget>[
-      field,
-      if (error case final message?) FormFieldError(message: message),
-    ],
-  );
-}
-
-/// The free-text note field.
-///
-/// Owns its own [TextEditingController] rather than receiving one, so the
-/// controller's lifetime is exactly the widget's — see the note on
-/// [_TransactionFormPageState] for why that matters.
-class _NoteField extends StatefulWidget {
-  const _NoteField({
-    required this.controller,
-    required this.hint,
-    required this.onChanged,
-  });
-
-  final TextEditingController controller;
-  final String hint;
-  final ValueChanged<String> onChanged;
-
-  @override
-  State<_NoteField> createState() => _NoteFieldState();
-}
-
-class _NoteFieldState extends State<_NoteField> {
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = AppThemeColors.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: colors.surfaceSubtle,
-        borderRadius: AppRadius.borderMd,
-      ),
-      child: TextField(
-        controller: widget.controller,
-        onChanged: widget.onChanged,
-        maxLines: 2,
-        minLines: 1,
-        textCapitalization: TextCapitalization.sentences,
-        style: theme.textTheme.bodyLarge?.copyWith(color: colors.textPrimary),
-        cursorColor: colors.brandPrimary,
-        // `border: InputBorder.none` is the point of this widget: the fill and
-        // radius come from the container above, per `docs/Design.md` §5.8, which
-        // forbids outline boxes.
-        decoration: InputDecoration.collapsed(
-          hintText: widget.hint,
-          hintStyle: theme.textTheme.bodyLarge?.copyWith(
-            color: colors.textTertiary,
-          ),
-        ),
-      ),
-    );
-  }
 }
