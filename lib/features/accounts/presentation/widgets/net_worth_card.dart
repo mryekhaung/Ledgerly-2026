@@ -43,11 +43,7 @@ class NetWorthCard extends ConsumerWidget {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Icon(
-                    AppIcons.budget,
-                    size: 18,
-                    color: colors.brandPrimary,
-                  ),
+                  Icon(AppIcons.budget, size: 18, color: colors.brandPrimary),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
                     strings('accountsNetWorth'),

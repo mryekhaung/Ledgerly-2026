@@ -506,7 +506,11 @@ class _ColorSwatch extends StatelessWidget {
         ),
         child: isSelected
             ? Center(
-                child: Icon(AppIcons.check, size: 20, color: colors.textOnBrand),
+                child: Icon(
+                  AppIcons.check,
+                  size: 20,
+                  color: colors.textOnBrand,
+                ),
               )
             : null,
       ),

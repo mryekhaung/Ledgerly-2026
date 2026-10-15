@@ -666,39 +666,37 @@ void main() {
           w.constraints?.maxWidth == expectedWidth;
     });
 
-    testWidgets(
-      'should_size_the_capsule_to_60_percent_of_its_cell',
-      (tester) async {
-        await host(tester, TestWidths.phone);
-        await tester.pumpAndSettle();
+    testWidgets('should_size_the_capsule_to_60_percent_of_its_cell', (
+      tester,
+    ) async {
+      await host(tester, TestWidths.phone);
+      await tester.pumpAndSettle();
 
-        // 390 px wide, 7 columns → 55.71 px per cell, times 0.6.
-        const expected = 390 / 7 * 0.6;
-        expect(
-          capsuleOf(expected),
-          findsWidgets,
-          reason: 'capsule width must be 60% of the cell, not a fixed 24 px',
-        );
-      },
-    );
+      // 390 px wide, 7 columns → 55.71 px per cell, times 0.6.
+      const expected = 390 / 7 * 0.6;
+      expect(
+        capsuleOf(expected),
+        findsWidgets,
+        reason: 'capsule width must be 60% of the cell, not a fixed 24 px',
+      );
+    });
 
-    testWidgets(
-      'should_widen_the_capsule_when_the_grid_stretches',
-      (tester) async {
-        // A tablet cell is far wider than a phone's, so a fixed-width capsule
-        // would keep its absolute size instead of its proportion.
-        await host(tester, TestWidths.tablet);
-        await tester.pumpAndSettle();
+    testWidgets('should_widen_the_capsule_when_the_grid_stretches', (
+      tester,
+    ) async {
+      // A tablet cell is far wider than a phone's, so a fixed-width capsule
+      // would keep its absolute size instead of its proportion.
+      await host(tester, TestWidths.tablet);
+      await tester.pumpAndSettle();
 
-        const expected = TestWidths.tablet / 7 * 0.6;
-        expect(capsuleOf(expected), findsWidgets);
-        expect(
-          capsuleOf(TestWidths.phone / 7 * 0.6),
-          findsNothing,
-          reason: 'the phone-width capsule must not leak into the wide layout',
-        );
-      },
-    );
+      const expected = TestWidths.tablet / 7 * 0.6;
+      expect(capsuleOf(expected), findsWidgets);
+      expect(
+        capsuleOf(TestWidths.phone / 7 * 0.6),
+        findsNothing,
+        reason: 'the phone-width capsule must not leak into the wide layout',
+      );
+    });
 
     testWidgets(
       'should_wrap_the_selected_cell_in_a_radius_md_fill_not_a_circle',

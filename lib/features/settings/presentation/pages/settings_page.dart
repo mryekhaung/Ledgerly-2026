@@ -661,7 +661,11 @@ class _NavRow extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(width: AppSpacing.xs),
-                Icon(AppIcons.chevronRight, size: 20, color: colors.textTertiary),
+                Icon(
+                  AppIcons.chevronRight,
+                  size: 20,
+                  color: colors.textTertiary,
+                ),
               ],
             ),
           ),

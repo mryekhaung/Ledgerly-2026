@@ -456,7 +456,10 @@ class _CategoryRow extends StatelessWidget {
                 ),
               ),
               PopupMenuButton<_CategoryAction>(
-                icon: Icon(AppIcons.moreHorizontal, color: colors.textSecondary),
+                icon: Icon(
+                  AppIcons.moreHorizontal,
+                  color: colors.textSecondary,
+                ),
                 onSelected: (action) => switch (action) {
                   _CategoryAction.edit => onEdit(category),
                   _CategoryAction.toggleArchive => onToggleArchive(category),

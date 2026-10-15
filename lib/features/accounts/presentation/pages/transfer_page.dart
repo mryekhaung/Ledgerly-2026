@@ -193,11 +193,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                   ),
                   child: Row(
                     children: <Widget>[
-                      Icon(
-                        AppIcons.error,
-                        color: colors.warning,
-                        size: 20,
-                      ),
+                      Icon(AppIcons.error, color: colors.warning, size: 20),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: Text(

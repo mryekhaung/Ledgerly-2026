@@ -581,7 +581,7 @@ void main() {
         include: (path) => !cataloguePaths.contains(path),
         // Provider brand marks must render the real logo, so they keep the
         // literal glyph rather than a role name that would only obscure it.
-        dismiss: (line) => brandIconPattern.hasMatch(line),
+        dismiss: brandIconPattern.hasMatch,
       );
 
       expectWithinBudget(
@@ -602,9 +602,10 @@ void main() {
       // means the vocabulary grew a synonym instead of a concept. This is cheap
       // to assert and catches a copy-paste addition.
       final source = File('lib/app/theme/app_icons.dart').readAsStringSync();
-      final glyphs = RegExp(
-        r'static const IconData \w+ = (Icons\.\w+);',
-      ).allMatches(source).map((m) => m.group(1)!).toList();
+      final glyphs = RegExp(r'static const IconData \w+ = (Icons\.\w+);')
+          .allMatches(source)
+          .map((m) => m.group(1)!)
+          .toList();
 
       expect(glyphs, isNotEmpty, reason: 'the registry must declare icons');
       final duplicates = <String>{};

@@ -296,11 +296,7 @@ class _KeypadKey extends StatelessWidget {
           onTap: isInert ? null : onTap,
           child: Center(
             child: isBackspace
-                ? Icon(
-                    AppIcons.backspace,
-                    size: 22,
-                    color: colors.textPrimary,
-                  )
+                ? Icon(AppIcons.backspace, size: 22, color: colors.textPrimary)
                 : Text(
                     label,
                     style: theme.textTheme.headlineSmall?.copyWith(

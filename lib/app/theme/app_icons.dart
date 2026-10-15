@@ -27,8 +27,8 @@ import 'package:material_ui/material_ui.dart';
 /// * **Roles, not nouns, where the meaning is contextual.** [destructive] is
 ///   used for the delete action in menus and cards alike; if a future screen
 ///   needs a distinct trash glyph it gets a new *role*, not a new variant.
-/// * **Domain glyphs live in their own catalogues** — [CategoryIcons] and
-///   [AccountIcons] — because those are user-visible, DB-backed choices stored
+/// * **Domain glyphs live in their own catalogues** — `CategoryIcons` and
+///   `AccountIcons` — because those are user-visible, DB-backed choices stored
 ///   as stable string keys (`docs/DataModel.md`). This file is for *chrome*.
 ///
 /// A call site that genuinely needs a one-off glyph (a provider's brand mark,
@@ -239,7 +239,7 @@ abstract final class AppIcons {
 
   // --- Trends ----------------------------------------------------------
 
-  /// An upward trend. **Not a money sign** — see [AmountText] for those.
+  /// An upward trend. **Not a money sign** — `AmountText` owns those.
   static const IconData trendUp = Icons.trending_up_outlined;
 
   /// An increase.

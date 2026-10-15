@@ -186,9 +186,7 @@ class AccountPage extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         Icon(
-                          isGuest
-                              ? AppIcons.person
-                              : AppIcons.success,
+                          isGuest ? AppIcons.person : AppIcons.success,
                           size: 14,
                           color: isGuest
                               ? colors.textSecondary
@@ -308,10 +306,7 @@ class AccountPage extends ConsumerWidget {
               child: Column(
                 children: <Widget>[
                   ListRow(
-                    leading: Icon(
-                      AppIcons.signOut,
-                      color: colors.textPrimary,
-                    ),
+                    leading: Icon(AppIcons.signOut, color: colors.textPrimary),
                     title: Text(
                       strings('accountSignOut'),
                       style: AppTypography.body.copyWith(
@@ -326,10 +321,7 @@ class AccountPage extends ConsumerWidget {
                   ),
                   Divider(height: 1, color: colors.border),
                   ListRow(
-                    leading: Icon(
-                      AppIcons.destructive,
-                      color: colors.moneyOut,
-                    ),
+                    leading: Icon(AppIcons.destructive, color: colors.moneyOut),
                     title: Text(
                       strings('accountDeleteTitle'),
                       style: AppTypography.body.copyWith(

@@ -151,11 +151,7 @@ class AccountCard extends ConsumerWidget {
 
               // Overflow Menu
               PopupMenuButton<String>(
-                icon: Icon(
-                  AppIcons.more,
-                  color: colors.textTertiary,
-                  size: 20,
-                ),
+                icon: Icon(AppIcons.more, color: colors.textTertiary, size: 20),
                 shape: const RoundedRectangleBorder(
                   borderRadius: AppRadius.borderMd,
                 ),
