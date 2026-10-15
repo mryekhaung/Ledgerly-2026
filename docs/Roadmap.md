@@ -499,8 +499,16 @@ Eleven refactor commits, each green on its own tests before pushing:
    **The backend blocker is cleared — `docs/Backend.md` is written (16 Oct
    2026).** It carries an audit, the 11 constraints the backend must satisfy,
    the three options, a weighted decision matrix, a recommendation and the
-   backend-agnostic `RemoteStore`/outbox/cursor design, plus 5 open questions.
-   **Awaiting the owner's ratification of its §6 before any Phase 4 code.**
+   backend-agnostic `RemoteStore`/outbox/cursor design, plus 6 open questions.
+   **Recommendation: Supabase-first** (Postgres is the only option whose exit is
+   a real `pg_dump`, the schema maps 1:1 so the adapter is mechanical, and its
+   row/GB quota cannot punish the one bulk merge every new user hits). This
+   **reverses** the Firebase-first version written earlier the same day, because
+   the §2 audit removed Firebase's only real edge — there was never any Firebase
+   code. Firebase stays as the documented alternative and the second adapter.
+   §6.1 adds that **no provider is needed yet**: §8 steps 1–4 (the seam, the
+   outbox, the engine, the contract tests) are pure local work with
+   `NoopRemoteStore`, so nothing is blocked on the ratification.
    - ⚠ **This item previously contained a false claim, now corrected:** it said
      "`firebase_auth` already ships (§Phase 2 Auth), so Firebase is the only one
      with code in the tree." **It does not ship.** `pubspec.yaml` has no backend
@@ -579,6 +587,57 @@ Eleven refactor commits, each green on its own tests before pushing:
      assertion moved from `Color(0x` to `0xFF` to match. That guard is the only
      thing protecting the curated set, because a regex that cannot see a file
      cannot defend it.
+8. **The app is NOT fully responsive — the walk proves overflow, not layout.**
+   Reported by the owner from two screenshots (Calendar and Settings at ~894
+   logical px). Investigated 16 Oct 2026; four distinct defects, none of which
+   any existing test can see. **"1437 green" means nothing throws, and that is
+   all it means.**
+   - **R1 — the Calendar's month label ellipsizes inside a pane that is too
+     narrow for its own header.** `MonthSwitcher` spends **exactly 120 px**
+     (measured, constant at every pane width) on chrome: two 48 px `IconButton`
+     chevrons + a 4 px gap + a 20 px caret. The label gets whatever is left.
+     `calendar_page.dart` allocates the month pane as `Expanded(flex: 4)` of a
+     `flex: 6` sibling — its own `_WideBody`, **not** the shared
+     `TwoPaneLayout`. Measured label box (sidebar 240, page padding 24):
+     **840 → 86.4 px · 894 → 108.0 · 950 → 130.4 · 1024 → 160.0 · 1200 → 230.4**.
+     The screenshot is at ~894 (calibrated from the fixed 240 px sidebar), where
+     the label has 108.0 px and the shipped font needs *more than 108.0 and at
+     most 130.4* — so it truncates. That is the bug, and it is a **band**, not a
+     point: roughly **840–930 px**.
+   - **R1b — a 1-pixel cliff at the 840 breakpoint.** `_NavSidebar.width` is a
+     fixed **240** while the medium `NavigationRail` is ~80. Crossing 840 px
+     therefore *steals 160 px from the content in one step*: the label box falls
+     **150.0 px at 839 → 86.4 px at 840**, a 42 % collapse from +1 px of window.
+     A breakpoint is supposed to change the layout, not shrink the content.
+   - **R2 — the page title does not line up with the page content (8 pages).**
+     `AppScaffold`'s `AppBar` puts the title at `titleSpacing` = **16 px** from
+     the body's left edge, but `ConstrainedPane` **centres** a 560 px column
+     inside that body. At 894 px: (654 − 560) / 2 = 47, plus the inner
+     `ListView`'s 24 px padding = **71 px** — a **55 px** offset. The screenshot
+     measures 66 image px ÷ 1.208 scale = 55. Affects every `ConstrainedPane`
+     page: settings, account, sign-in, welcome, data transfer, month-starts-on,
+     transactions list, transaction form.
+   - **R3 — the shared primitive is bypassed.** `responsive_layout.dart` states
+     pages must go through it "so a page cannot quietly disagree with the shell
+     about when the layout splits", and `TwoPaneLayout` carries the
+     `masterMaxWidth: 420` cap that would have prevented R1. **It has exactly
+     one caller** (`avatar_editor_page`). `calendar_page` re-derives the split;
+     `category_list_page` reads `WindowSizeClass` directly. Nothing tests the
+     invariant.
+   - **R4 — `Platform.md` §5 promises layouts that were never built.** §5 says
+     "Settings: compact list; expanded master–detail" and "Categories: …
+     expanded → list (left) + form (right) master–detail". `settings_page.dart`
+     is a single centred `ConstrainedPane` at every width — no master–detail.
+     Either implement §5 or amend it; today the doc is wrong.
+   - **R5 — why none of this was caught.** `width_walk.dart`'s oracle is
+     `tester.takeException() == null`. `TextOverflow.ellipsis` **never throws**
+     — it silently clips — so R1 and R2 are structurally invisible to it, as is
+     R3 (a bypassed primitive is not an exception). Worse, the `flutter_test`
+     placeholder font advances every glyph by exactly `fontSize` (17 px/char at
+     `titleMedium`), roughly **2× wider than Inter**, so a truncation assertion
+     written with it does not reproduce the real-font case either. A regression
+     test must assert on the **available box width** (font-independent, and what
+     the probe above measured) rather than on rendered text width.
 
 ### H. Screen goldens completed + five real bugs the work exposed (16 Oct 2026)
 

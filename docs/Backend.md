@@ -99,13 +99,36 @@ is pure Dart over `http`/`web_socket_channel`, so it is Wasm-safe (C7). Exit is 
 - RLS policies must be written *and tested* — a missing policy is a data leak, not a bug.
 - Auth surface still has to be re-verified method-by-method against `AuthRemoteDataSource`.
 
-### 4.3 Custom API
+### 4.3 Custom API (our own backend)
 
-Full control, cheapest at scale, zero vendor lock. Rejected for now: it is not free-tier
-in engineering time, and it requires hosting, TLS, backups, rate limiting and an auth
-service that C8 obliges us to get right. `Agent.md` §1 sets the project as a prototype
-with an unknown user count; building a backend is premature. Revisit at Phase 5 if the
-free tiers genuinely bind.
+The owner asked directly whether writing our own backend is a sensible move. **It is the
+right destination and the wrong next step.** The reason is that "own backend" is not one
+task, it is this list — and every line is something Firebase and Supabase already do:
+
+| We would own | Why it is not optional |
+|---|---|
+| Hosting + TLS + a domain | Any HTTP endpoint at all |
+| Auth: password hashing, email verification, session/token refresh | C10, and the store requires real auth for a synced account |
+| Google OAuth + **Sign in with Apple** + **Apple token revocation on delete** | `Platform.md` §7 — Apple *rejects* apps that offer social login without Apple, and requires revocation on account deletion |
+| Postgres (or similar) + migrations + **tested** backups + restore drills | Losing a user's ledger is unrecoverable |
+| Per-user authorization on every endpoint | C8/§9 — a missing check is a data leak |
+| Rate limiting, abuse protection, monitoring, alerting, on-call | A public endpoint gets scanned within hours |
+| A staging environment and a deploy pipeline | Otherwise every change is a production change |
+
+Costs, concretely: a VPS is **not** free (~$5/mo), which conflicts with `Agent.md` §1
+("free-tier only"); serverless free tiers sleep and cold-start; and the ongoing cost is
+*attention*, which is the scarcest resource on a prototype.
+
+Against that, the one thing it buys is complete control and zero vendor lock — which §6.1
+shows we can get **for free** by building the `RemoteStore` seam first. Once the seam
+exists, "own backend" becomes a later adapter, written against a contract that is already
+proven, at the moment the free tiers actually bind.
+
+**Verdict: do not build it now. Revisit at Phase 5**, or earlier if a free tier proves
+binding, or if a data-residency requirement appears. The hybrid the owner floated —
+Firebase Auth + our own Postgres — is strictly *more* work than Supabase, which supplies
+both halves in one product, so it is only worth it if Firebase Auth is wanted for its own
+sake.
 
 ## 5. Decision matrix
 
@@ -115,46 +138,76 @@ Weighted by the constraints in §3, not by feature checklists.
 |---|---|---|---|
 | Data-model fit to the Drift schema (high) | Fair — documents, no SQL | **Excellent** — 1:1 relational | Excellent |
 | Quota shape for a bulk first sync (high) | Poor — per-write billing | **Good** — row/GB | n/a |
+| Adapter cost — effort to first working sync (high) | Fair | **Good** — mechanical mapper | Poor |
+| Portability / real exit path (high) | Fair — export is awkward | **Good** — `pg_dump` → any Postgres | **Excellent** |
 | Free tier stays warm (medium) | **Good** — no pause | Poor — 7-day pause | n/a |
-| Auth continuity with existing docs (medium) | **Good** — already specified | Fair — needs re-verification | Poor |
-| Apple token revocation (medium) | **Built in** | Manual | Manual |
+| Auth continuity with existing docs (low) | **Good** — already specified | Fair — needs re-verification | Poor |
+| Apple token revocation (medium) | **Built in** | Manual (~20 lines) | Manual |
 | Wasm / web readiness (medium) | Fair — heavier bundle | **Good** — pure Dart | Good |
-| Vendor lock-in / exit cost (low) | Fair — contained by ADR #5 | **Good** — `pg_dump` | Excellent |
-| Engineering time to first sync (high) | **Good** — docs already written | Fair | Poor |
+| Ops burden on us (high) | **None** | **None** | Poor — we run it all |
 
 ## 6. Recommendation (for the owner to ratify)
 
-**Adopt Firebase as the first adapter; keep Supabase as the mandated swap proof.**
+**Adopt Supabase as the first adapter; keep Firebase as the documented alternative and the
+second adapter that proves the swap.**
+
+> **This reverses the recommendation first written in this file an hour earlier
+> (Firebase-first).** Two things changed it, and both are worth recording so the
+> reasoning is auditable:
+> 1. **The audit in §2 removed Firebase's strongest argument.** It was recommended on
+>    *code* continuity — "Firebase is the only one with code in the tree". There is no
+>    backend code in the tree at all. What remains is *documentation* continuity, and
+>    documentation is the cheapest thing here to change.
+> 2. **The owner stated the priority explicitly: this is a prototype, and it must be
+>    swappable to any backend.** That is a weight on portability and adapter cost, and
+>    Postgres wins both outright.
 
 Reasoning, in order of weight:
 
-1. **`Agent.md` §4 is a "fixed unless discussed" stack** and it already names Firebase for
-   auth. Adopting it means zero documentation churn and a store-compliance path
-   (Apple revocation, web popup/redirect) that is already reasoned about in `Platform.md`
-   §6–7. Choosing Supabase means rewriting both docs *and* hand-building Apple revocation.
-2. **Firebase's free tier does not pause.** For a prototype whose real user count is
-   unknown and whose usage is sporadic, a backend that is asleep when the first user opens
-   the app is the worst possible first impression. The Supabase keep-alive ping is a
-   workaround for a problem Firebase simply does not have.
-3. **The auth surface already matches.** `AuthRemoteDataSource` is 10 methods and
-   `NoopAuthRemoteDataSource` was written against Firebase's shape — `signInAnonymously`,
-   `linkAccount`, `deleteAccount` with token revocation. The Firebase adapter is a
-   translation, not a redesign.
-4. **Firestore's weaknesses are containable and are already contained.** Offline
-   persistence is switched off (Drift stays the only cache, C1 intact); the quota risk is
-   handled by batching + delta-only sync + an explicit resync affordance, all of which
-   Phase 4 needs anyway.
+1. **Postgres is the only option whose exit is real.** "Swappable" is a promise the
+   architecture makes (§3 C3, ADR #5); Supabase is the only one where it is also true at
+   the *data* level — `pg_dump` restores into any Postgres, including one we host later.
+   Firestore's export is a proprietary dump that only Firestore can read back, so
+   "swappable" there means re-writing the data, not moving it.
+2. **The mapper is mechanical, so the adapter is cheap.** Every Drift table is already
+   relational with the same column types — `TEXT` uuid, `INTEGER` minor units, `INTEGER`
+   packed `yyyyMMdd`, `INTEGER` epoch ms. `int8` holds MMK/JPY minor units exactly (C9).
+   Sync collapses to one batched `INSERT … ON CONFLICT (id) DO UPDATE`, which is also why
+   C5 (client-generated UUIDv4 keys) was chosen in the first place.
+3. **The quota shape cannot punish a bulk first sync.** Supabase bills rows/GB, not
+   operations. A first-login merge of 5,000 rows is one batched upsert. On Firestore the
+   same merge is 5,000 billed writes — a quarter of the daily free allowance — which is
+   exactly the wrong failure mode for the *one* moment every new user hits.
+4. **Auth is included, so we run nothing.** Supabase Auth covers anonymous sign-in
+   (C10), Google, Apple and identity linking — the same surface as
+   `AuthRemoteDataSource`. RLS expresses "this row belongs to this uid" declaratively and
+   is testable.
+5. **Firebase's remaining edges are real but small.** Apple token revocation is one call
+   there versus ~20 lines against Apple's REST API here, and Supabase's free tier pauses
+   after 7 days with no requests. Both are known, bounded, and listed in §10.
 
-**Honest caveat, stated plainly:** Supabase is the better fit on the two criteria that
-matter most to the *data* (schema mapping and quota shape). The recommendation above is a
-bet that documentation continuity, a warm free tier and a ready-made Apple-revocation path
-outweigh that. If the owner weighs data-model fit higher — or if Firestore's quota proves
-binding during Phase 4 — **Supabase is the right reversal, and switching costs one binding
-in `app/di/` plus one adapter.** That is precisely why Phase 4 lists "Supabase adapter
-(prove swap)" as a deliverable rather than a nice-to-have.
+**What would reverse this back to Firebase:** if the 7-day pause turns out to bite real
+users (a keep-alive cron is the fix, but it is a moving part), or if Firestore's realtime
+listeners become a product requirement, or if the owner simply prefers the Firebase console
+and the ecosystem. Any of those is a legitimate call, and it costs one binding in `app/di/`
+plus one adapter — which is the whole point of building the seam before the adapter.
 
-**If the owner prefers to decide on data-model fit alone, choose Supabase instead.** Both
-paths satisfy §3; only the adapter changes.
+## 6.1 Do we even need a backend for the prototype?
+
+Worth asking before choosing. The app is local-first and **fully usable offline** (C1) —
+sync is an enhancement, not a requirement, and it is invisible to a user with one device.
+
+So the cheapest correct sequencing is:
+
+1. Build the `RemoteStore` seam and the outbox **with `NoopRemoteStore` only**. That is
+   pure local work, needs no account, and is testable today.
+2. Fix the user-visible layout defects first (Roadmap §G.8) — those are on screen *now*;
+   sync is not.
+3. Add the real adapter when there is a second device to sync between, or when a beta
+   tester asks. At that point the choice is a binding, not a rewrite.
+
+Choosing a provider is therefore **not** urgent. Deferring it costs nothing, because §7's
+contract is provider-agnostic by construction.
 
 ## 7. The `RemoteStore` contract (backend-agnostic)
 
@@ -230,18 +283,20 @@ next drain is idempotent (`upsertAll` is by definition).
 
 ## 8. What Phase 4 must deliver
 
-Per `Roadmap.md` §Phase 4, with the backend now decided:
+Per `Roadmap.md` §Phase 4. **Steps 1–4 need no provider account at all** (§6.1), so they
+can start immediately and do not depend on the §6 decision being ratified.
 
 1. `RemoteStore` + `SyncRecord` in `features/sync/domain/` (pure Dart).
 2. `Outbox` Drift table + migration, and the transactional write in every repository.
 3. `SyncEngine` + cursor + LWW merge, with unit tests for the merge rules.
-4. **`RemoteStore` contract tests** — one suite, run against `NoopRemoteStore`,
-   `FirebaseRemoteStore` and later `SupabaseRemoteStore`. This is how "prove swap" is
-   satisfied: the same tests pass unchanged against a different provider.
-5. `FirebaseRemoteStore` (Auth + Firestore, offline persistence **disabled**).
+4. **`RemoteStore` contract tests** — one suite, run against `NoopRemoteStore`, then
+   `SupabaseRemoteStore` and `FirebaseRemoteStore`. This is how "prove swap" is satisfied:
+   the same tests pass unchanged against a different provider. Written in this order, the
+   contract is pinned by the no-op before any vendor is involved.
+5. `SupabaseRemoteStore` (Auth + Postgres + RLS).
 6. Sync status UI (idle / syncing / offline / error+retry) reading the outbox.
 7. Merge-on-first-login flow.
-8. `SupabaseRemoteStore` as the swap proof.
+8. `FirebaseRemoteStore` as the swap proof (Firestore offline persistence **disabled**).
 9. Account deletion → `purgeUser` + provider-side token revocation (C8).
 
 ## 9. Security & privacy
@@ -261,16 +316,20 @@ Per `Roadmap.md` §Phase 4, with the backend now decided:
 
 ## 10. Open questions for the owner
 
-1. **Ratify §6.** Firebase-first, or Supabase-first on data-model fit? Everything else in
-   Phase 4 is downstream of this one answer.
-2. **Guest data on first login:** push-then-pull (recommended, §7.3) or ask the user?
+1. **Ratify §6.** Supabase-first (recommended), Firebase-first, or neither-yet per §6.1?
+   Only the adapter is downstream of this answer — steps 1–4 in §8 are not.
+2. **Do we build a provider adapter at all before there is a second device to sync
+   between?** §6.1 argues for deferring, and for fixing the on-screen layout defects
+   (Roadmap §G.8) first. Sync is invisible to a one-device user; a truncated calendar
+   header is not.
+3. **Guest data on first login:** push-then-pull (recommended, §7.3) or ask the user?
    Push-then-pull is silent but could surprise someone who expected a clean account.
-3. **Sync scope:** all tables, or transactions + categories + accounts only in v0.4?
+4. **Sync scope:** all tables, or transactions + categories + accounts only in v0.4?
    `app_settings` is explicitly *not* synced (`DataModel.md` §7 — a device's theme choice
    must not travel).
-4. **Automatic vs manual resync** after the first full push. Automatic is friendlier;
+5. **Automatic vs manual resync** after the first full push. Automatic is friendlier;
    manual protects the free quota.
-5. Two doc-map entries point at files that do not exist: **`docs/Product.md`** and
+6. Two doc-map entries point at files that do not exist: **`docs/Product.md`** and
    **`docs/Auth.md`** are listed in `Agent.md` §2 and `docs/README.md` items 2 and 8, but
    were never written (the same defect this file was written to fix). Write them, or
    remove them from the index?
