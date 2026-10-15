@@ -5,12 +5,13 @@ Legend: ☐ todo · ◐ in progress · ☑ done. Each task = one small PR follow
 **Where we are (16 Oct 2026):** Phases 0–3.5 are **done** — the app is a working
 local-first budget manager with calendar, transactions, categories, settings,
 accounts, budgets, recurring, goals, insights, import/export, full backup and
-Firebase Auth. `flutter test` is **1413 green** and `flutter analyze` is clean,
+a local-only auth simulator. `flutter test` is **1437 green** and `flutter analyze` is clean,
 **locally as well as on CI** (`docs/Versions.md` — the proxy fix). **Phase 4
-(Sync & Polish) is the only unstarted phase**, and it is blocked on a backend
-decision that has no written home yet: `docs/Backend.md` is referenced by
-`Agent.md` and the doc index but has never been written (see §G.1). Phase 5
-(Release) is unstarted.
+(Sync & Polish) is the only unstarted phase**, and its blocker is now cleared:
+**`docs/Backend.md` has been written** (options, criteria and a recommendation
+for the owner to ratify — §G.1). No Phase 4 code exists yet: `lib/features/sync/`
+is 14 `.gitkeep` files and `pubspec.yaml` carries no backend package at all.
+Phase 5 (Release) is unstarted.
 
 
 ## Phase 0 — Foundation
@@ -494,17 +495,27 @@ Eleven refactor commits, each green on its own tests before pushing:
 
 1. **Phase 4 Sync (v0.4)** — still NOT STARTED: outbox + `RemoteStore`
    contract tests + Firebase adapter, sync status UI, merge-on-first-login,
-   app lock, widget, web release, Supabase proof. Blocked on a backend
-   decision, and the decision has no written home: **`docs/Backend.md` is
-   listed in `Agent.md`'s doc map and `docs/README.md` but does not exist**, and
-   the "§3.14" this item used to point at is not a rule in `Agent.md` (rule 14
-   is about packages). The relevant constraint that *is* recorded is
-   `Agent.md` §3.2 — "backend is a plug-in": UI/domain only see repository
-   interfaces and remote providers live behind `RemoteDataSource` in `data/`.
-   Note also that `firebase_auth` already ships (§Phase 2 Auth), so "Firebase
-   vs Supabase vs custom" is not a green-field choice: Firebase is the only one
-   with code in the tree. Writing `Backend.md` — options, criteria and a
-   recommendation for the owner to ratify — is the unblocking step.
+   app lock, widget, web release, Supabase proof.
+   **The backend blocker is cleared — `docs/Backend.md` is written (16 Oct
+   2026).** It carries an audit, the 11 constraints the backend must satisfy,
+   the three options, a weighted decision matrix, a recommendation and the
+   backend-agnostic `RemoteStore`/outbox/cursor design, plus 5 open questions.
+   **Awaiting the owner's ratification of its §6 before any Phase 4 code.**
+   - ⚠ **This item previously contained a false claim, now corrected:** it said
+     "`firebase_auth` already ships (§Phase 2 Auth), so Firebase is the only one
+     with code in the tree." **It does not ship.** `pubspec.yaml` has no backend
+     package whatsoever — no `firebase_core`, `firebase_auth`, `cloud_firestore`,
+     `supabase_flutter`, not even `dio`. `lib/core/network/` is a lone
+     `.gitkeep`, `lib/features/sync/` is 14 of them, and the only
+     `AuthRemoteDataSource` bound in DI is `NoopAuthRemoteDataSource` — a local
+     fake that fabricates users from `DateTime.now()` and never opens a socket.
+     The backend choice is therefore **genuinely green-field**; the case for
+     Firebase is *documentation* continuity (`Agent.md` §4, `Platform.md` §6),
+     not code continuity.
+   - The "§3.14" this item used to point at is not a rule in `Agent.md` (rule 14
+     is about packages). The constraint that *is* recorded is `Agent.md` §3.2 —
+     "backend is a plug-in": UI/domain only see repository interfaces, and remote
+     providers live behind `RemoteDataSource` in `data/`.
 2. **Remaining splits — DONE.** All pages now ≤ 348 lines:
   `transfer_page` 407→244, `profile_page` 412→76, `transaction_form_page`
   397→262, `goal_form_page` 384→206, `category_form_page` 395→49,
@@ -539,6 +550,17 @@ Eleven refactor commits, each green on its own tests before pushing:
    `SwitchListTile` kept as distinct components, 3 AppScaffold-exempt frame
    files (guarded), FAB clearances + 48 px grid geometry as documented
    non-token values, `AppScaffold` excluded from goldens (viewport-dependent).
+6. **Two more doc-map entries point at files that do not exist.** `Agent.md` §2
+   and `docs/README.md` items 2 and 8 list **`docs/Product.md`** and
+   **`docs/Auth.md`**, neither of which was ever written — the same defect
+   `docs/Backend.md` was written to fix (see §G.1). Decide per file: write it, or
+   drop it from the index. `Auth.md` matters more than it looks: Phase 4's
+   merge-on-first-login and account-deletion flows (and the store compliance in
+   `Platform.md` §7) currently have no written spec.
+7. **`AvatarPainter` is dead code.** Kept as the v2.1 reference, but nothing in
+   `lib/` constructs it, so it is only exercised by its own test. Either delete
+   the class and its test, or record the decision that it is the intended
+   renderer for a future avatar path. See `docs/Avatar.md`.
 
 ### H. Screen goldens completed + five real bugs the work exposed (16 Oct 2026)
 
