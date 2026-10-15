@@ -695,18 +695,18 @@ void main() {
     ///   These are styled as bordered, filled tiles in a form (they carry a
     ///   `tileColor` and a `shape` with a border), i.e. the §5.8 field
     ///   treatment, not a row in a list. `ListRow` has no field affordance.
-    /// * `calendar_page` / `transactions_list_page` — a transaction row whose
-    ///   trailing slot holds an `AmountText` **plus** a `PopupMenuButton`, and
-    ///   whose subtitle is a multi-child column. `ListRow` exposes one
-    ///   `trailing` widget and a single-line subtitle, so adopting it would
-    ///   silently drop the overflow menu.
+    /// * `transaction_row` (calendar day rows) / `transactions_list_page` — a
+    ///   transaction row whose trailing slot holds an `AmountText` **plus** a
+    ///   `PopupMenuButton`, and whose subtitle is a multi-child column.
+    ///   `ListRow` exposes one `trailing` widget and a single-line subtitle,
+    ///   so adopting it would silently drop the overflow menu.
     ///
     /// Each is re-asserted below to still contain a `ListTile`, so the list
     /// cannot rot into a permanent allowlist for files that no longer need it.
     const fieldAndRichRowPaths = <String>[
       'lib/features/goals/presentation/pages/goal_form_page.dart',
       'lib/features/recurring/presentation/pages/recurring_form_page.dart',
-      'lib/features/transactions/presentation/pages/calendar_page.dart',
+      'lib/features/transactions/presentation/widgets/calendar/transaction_row.dart',
       'lib/features/transactions/presentation/pages/transactions_list_page.dart',
     ];
 
