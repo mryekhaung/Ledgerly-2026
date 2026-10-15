@@ -99,7 +99,7 @@ class MonthGrid extends StatelessWidget {
         for (var row = 0; row < rowCount; row++)
           LayoutBuilder(
             builder: (context, constraints) =>
-                // Cell width drives the capsule's 60 % width (§6.2). Every cell
+                // Cell width drives the capsule's width (§6.2). Every cell
                 // in a row shares one width because they are `Expanded`, so one
                 // measurement per row is enough.
                 Row(
@@ -112,7 +112,15 @@ class MonthGrid extends StatelessWidget {
                       Expanded(
                         child: switch (cells[row * MonthGridLayout.daysPerWeek +
                             column]) {
-                          null => const SizedBox(height: AppSpacing.xxxl),
+                          // §6.2: the padding days that complete the first and
+                          // last week. Their height is the **same constant** the
+                          // real cells use — this used to be its own
+                          // `AppSpacing.xxxl`, the same 48 written a second time
+                          // in a file that cannot see the first, so the two
+                          // could drift apart silently (§M.1).
+                          null => const SizedBox(
+                            height: AppRowHeight.calendarCell,
+                          ),
                           final day => DayCell(
                             day: day,
                             cellWidth:

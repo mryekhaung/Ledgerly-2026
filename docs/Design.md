@@ -526,28 +526,76 @@ Roadmap Phase 1. Compact = single column; medium+ = two panes (`Platform.md` §5
 The signature component. A **period** grid (a calendar month by default; the pay-cycle days when `monthStartDay` ≠ 1 — §6.6) where each day cell carries a **capsule** whose fill encodes
 that day's net spend magnitude.
 
-- Cell: minimum **44×44**; grid is `7` columns, always.
-- Capsule: rounded bar (`radius.sm`, 4 px tall) under the day number, width = 60% of cell.
+Every number below is Material 3's own measurement for a mobile date picker, not a
+preference (`material.io/design/components/pickers.html`): **44 dp** cell, **36 × 36 dp**
+selected indicator, **1 dp** today ring. §M brought the code back to them (§M.1–3) after it
+had drifted to 48 / 40 × 40 / 1.5.
+
+- Cell: **44 × 44**. Grid is `7` columns, always. The whole cell is the touch target; the
+  36 px indicator is what is *drawn* inside it, not what is tapped.
+- Selected indicator: **36 × 36** (`_selectedIndicatorSize`). 40 px inside a 44 px cell
+  left 2 px of air and read heavy.
+- Today: a **1 dp** ring at `radius.full`, drawn over the selected fill so the two can
+  coexist. M3 specifies today as an outline with no fill precisely so it stays distinct
+  from the filled selected state; 1.5 px read as a second selection.
+- Capsule: **3 px** tall at `radius.full`, **36 %** of the cell wide (`capsuleWidthFraction`).
+  The width is a *fraction*, not a pixel count, so the capsule keeps its proportion when the
+  grid stretches on tablet and desktop. It was 60 % × 4 px, which the owner read as a
+  divider rather than a data mark — "divider width ကို နဲနဲလျှော့လိုက်ရင် ပိုလှသာမယ်ထင်တယ်"
+  (§M.4). A narrower bar is also the more honest encoding: the capsule's job is to say
+  *this day had activity and roughly how much*, and at 60 % it competed with the day
+  number instead of annotating it. `borderFull` rather than `borderSm`: a fully rounded
+  3 px dash reads as a deliberate mark, where an 8 px radius on a 3 px bar is
+  geometrically a rectangle with clipped corners.
 - **Intensity** maps to `intensity = clamp(net / p95MonthNet, 0, 1)` where `p95PeriodNet` is the
   95th-percentile absolute net of the visible period. Quantize into **5 steps** (`0, .25, .5, .75, 1`)
   so the grid reads as texture, not noise.
-  - Step 0 (no transactions): no capsule at all.
-  - Steps 1–4: a **lerp from 66 % toward the full colour** — `moneyOut` /
+  - **Step 0 is the palest capsule, not no capsule.** A day with *no* activity has a null
+    intensity and draws nothing; a step-0 day draws the faintest bar. The field's doc
+    comment used to claim "0 = no capsule" while `_Capsule` rendered for every non-null
+    intensity — the comment described the intent the ramp was built to avoid (§M.9).
+  - Steps 0–4: a **lerp from 66 % toward the full colour** — `moneyOutSubtle` /
     `moneyInSubtle` → `moneyOut` / `moneyIn` — so every step is visible. The
-    `*Subtle` tints measure 1.13–1.25:1 on their surface, so starting the ramp
-    *at* them made step 1 a bar nobody could see ("the black bar", §K.1-3). The
-    four steps land at 2.75/3.43/4.27/5.47 (light income) through 3.91/4.82/5.82/
-    6.59 (dark income); asserted in `design_tokens_test.dart`. **The start was
+    `*Subtle` tints measure 1.10–1.25:1 on their surface, so starting the ramp
+    *at* them made step 1 a bar nobody could see ("the black bar", §K.1-3).
+    Step 0 sits *below* the start (it is a fifth of the ramp, not a fourth) and is
+    **clamped at `capsuleRampFloor` = 0.60**, because the unclamped extrapolation
+    measured 2.46:1 / 2.38:1 in light — under the floor every other step clears
+    (§M.10). The five steps land at:
+
+    | | step 0 | step 1 | step 2 | step 3 | step 4 |
+    |---|---|---|---|---|---|
+    | light expense | 2.66 | 2.93 | 3.48 | 4.10 | 4.75 |
+    | light income | 2.61 | 2.88 | 3.54 | 4.39 | 5.47 |
+    | dark expense | 3.01 | 3.30 | 3.97 | 4.68 | 5.53 |
+    | dark income | 3.52 | 3.91 | 4.71 | 5.57 | 6.59 |
+
+    Asserted in `design_tokens_test.dart`
+    (`every_capsule_step_is_visible_and_ordered`, which imports the widget's own
+    `capsuleRampStart` / `capsuleRampFloor` rather than copying them) and, on the
+    rendered widget, in `calendar_page_test.dart`'s Day Capsule group. **The start was
     raised from 60 % to 66 % in §L** — lowering the page (§2.7) brought the light
     tints closer to it, dropping step 1 to 2.48:1, back under the floor.
-- **Today**: `brandPrimary` 1.5 px ring around the cell, `radius.full`.
+  - Inside a **selected** cell the capsule is repainted `onSelectedFill`. It used to stay
+    `moneyOut`, so a selected day drew a saturated red bar across a saturated teal disc —
+    two focal colours inside one 36 px circle, the clash visible on day 16 of the owner's
+    light-mode screenshot (§M.5). The selected day is the single focal state on the screen
+    (§1.2); everything inside it reads as one object. The capsule keeps its *length*, so
+    the day's magnitude is still legible, and gives up only its hue.
 - **Selected**: a **solid** `selectedFill` circle (`radius.full`) behind the whole
   cell, with the day number in `onSelectedFill` w600 — the Google Calendar /
   Apple Calendar convention. A tint is not a state (§2.6). Selection and today
   can coexist: on a selected cell the today ring switches to `onSelectedFill`,
   because a `brandPrimary` ring on a `brandPrimary` fill would vanish.
-- **Outside the visible period** (padding days that complete the first/last week): `textTertiary`, capsule at 40% alpha, still tappable (navigates to the neighbouring period).
-- Weekend column headers get `textTertiary`; no other special-casing.
+- **Outside the visible period** (padding days that complete the first/last week): a blank
+  `SizedBox` at `AppRowHeight.calendarCell` — no day number, no capsule, not tappable.
+  This doc used to promise `textTertiary` digits and a 40 %-alpha capsule that navigate to
+  the neighbouring period; the code has never drawn either, and a golden is the only thing
+  that would have caught it (§M.13). The height is the *same constant* the real cells use,
+  so the two cannot drift apart (§M.1).
+- Weekend column headers get `textTertiary`; no other special-casing. The header is
+  `AppTypography.overline` (§6.1's own mock specified it; the code had drifted to
+  `labelSmall` — §M.7).
 - Densities: compact shows capsule + number. Expanded shows capsule + number + tiny amount
   (`caption`, truncated) for cells wide enough (≥ 64 px).
 

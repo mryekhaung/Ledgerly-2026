@@ -1251,9 +1251,16 @@ dark-mode contrast to close a gap would trade away legibility to win a metric.
 Lowering the page also brought the light `*Subtle` tints closer to it, so
 **capsule step 1 fell to 2.48:1** and dropped back under the 2.5 visibility floor
 §K set. The ramp start in `day_cell.dart` was raised **60 % → 66 %**; the four
-steps now land at 2.75/3.43/4.27/5.47 (light income) and 3.91/4.82/5.82/6.59
+steps then landed at 2.75/3.43/4.27/5.47 (light income) and 3.91/4.82/5.82/6.59
 (dark income). This is the capsule ramp coupled to the surface ramp — neither can
 be changed alone.
+
+> Corrected in §M: the figures quoted above were **never run through the audit
+> script** — they were computed by hand, which is the mistake §L.5 itself records
+> the script catching once already. The current, script-verified ramp (all five
+> steps, both directions, both modes) is in `Design.md` §6.2. The step-1 figure
+> survives the correction: light income step 1 is still 2.88:1, still above the
+> 2.5 floor that the 60 % start had broken.
 
 #### L.5 Verification
 
@@ -1317,6 +1324,181 @@ Two tests were added: `should_use_the_display_amount_size_for_the_spend_hero`
 `should_scale_the_hero_down_instead_of_dropping_digits` (asserts the
 `FittedBox` guard is present, since nothing else in the suite can detect an
 ellipsized amount).
+
+---
+
+### M. The Calendar, rebuilt against Material 3's own measurements (16 Oct 2026)
+
+The owner, on two Calendar screenshots:
+
+> Calendar UI ကို Unique, Compact နဲ့ Premium ဖြစ်အောင် ပြန်လည်ပြင်ဆင်ပါ။ လက်ရှိဒီဇိုင်းကို လုံးဝ မကျေနပ်တာကြောင့့် … ငါ့အထင်တော့ divider width ကို နဲနဲလျှော့လိုက်ရင် ပိုလှသာမယ်ထင်တယ် ပုံထဲကို ကြည့်ပါ
+
+*Rebuild the Calendar as unique, compact and premium; I am completely
+unsatisfied with the current design; research `Design.md`'s UI/UX rules and the
+2026 UI/UX rules and modify the Calendar per those principles; and — the
+specific, actionable half — **I think if the divider width is gradually reduced
+it'll look better, look at the image**.*
+
+"Divider" is the day capsule. That reading was right, and §M.4 is the direct
+answer to it.
+
+#### M.1 Research first, because the code had drifted from the spec
+
+Two web searches returned noise. `material.io/design/components/pickers.html`
+returned hard numbers, and they did not match the code:
+
+| | Material 3 specifies | the code had |
+|---|---|---|
+| date bounding box | **40 dp** (44 with 4 dp gaps) | 48 |
+| selected indicator | **36 × 36 dp** | 40 × 40 |
+| today | **1 dp** outline | 1.5 px |
+| touch target | ≥ 32 × 32 dp | 48 (whole cell) |
+
+The spec in `docs/Design.md` §6.2 already said "minimum 44×44", so the drift was
+in the implementation, not the document. Every one of these is now measured from
+one named constant — `AppRowHeight.calendarCell` for the cell,
+`_selectedIndicatorSize` for the disc — so the spec, the widget and the test
+name one number each.
+
+#### M.2–M.3 Cell 48 → 44, indicator 40 → 36, ring 1.5 → 1
+
+A 48 px cell with a 40 px disc leaves 4 px of air on every side, which is what
+made the grid read heavy — and the *cell*, not the disc, is the touch target, so
+shrinking the disc costs nothing. 36 px inside 44 leaves the circle breathing.
+The today ring went to 1 dp because M3 specifies today as an outline with no
+fill precisely so it stays distinct from the filled selected state; at 1.5 px it
+read as a second selection.
+
+#### M.4 The capsule: 60 % × 4 px → 36 % × 3 px
+
+This is the owner's ask. `capsuleWidthFraction = 0.36` and `capsuleHeight = 3`,
+at `AppRadius.borderFull`.
+
+Two independent reasons it is the right change, not just a taste:
+
+1. **Encoding honesty.** The capsule's job is to say *this day had activity and
+   roughly how much*. At 60 % of the cell it competed with the day number for
+   attention instead of annotating it — which is exactly why it read as a
+   divider. The data mark should be subordinate to the label it annotates.
+2. **Proportion, not pixels.** The width is a *fraction* of the measured cell,
+   so the capsule keeps its proportion when the grid stretches to tablet and
+   desktop. `should_widen_the_capsule_when_the_grid_stretches` pins that at 768
+   px.
+
+`borderFull` rather than `borderSm`: a fully rounded 3 px dash reads as a
+deliberate mark, where an 8 px radius on a 3 px bar is geometrically a rectangle
+with clipped corners.
+
+#### M.5 The selected cell drew two focal colours inside one 36 px circle
+
+The capsule kept `moneyOut` on a selected cell, so a selected day put a
+saturated red bar across a saturated teal disc — the clash visible on day 16 of
+the owner's light-mode screenshot. The selected day is the single focal state on
+the screen (§1.2), so everything inside it should read as one object. The
+capsule now paints `onSelectedFill`, keeping its **length** (so the day's
+magnitude is still legible) and giving up only its hue.
+
+#### M.6 Weekday header: `labelSmall` → `overline`
+
+§6.1's own ASCII mock specifies `overline` for the weekday header. The code had
+drifted to `labelSmall`. Fixed, and the unused `Theme.of(context)` removed with
+it.
+
+#### M.7 Day numbers got tabular figures
+
+`1`–`31` were set in proportional figures, so the column did not align down the
+grid. `FontFeature.tabularFigures()` fixes it.
+
+#### M.8 The grid's signature texture had never been rendered in a golden
+
+This is the finding that matters most, and it is a **test-design** defect rather
+than a code one.
+
+Both calendar fixtures seeded **one** active day. So every Calendar screenshot
+the owner had ever reviewed showed a single capsule bar, and the grid read as a
+bare list of numbers. The 5-step ramp — the whole point of the component — had
+never once been rendered, and therefore had never once been judged.
+
+The fixture now lives in one place, `test/support/calendar_grid_fixture.dart`,
+shared by the golden test and the page test, and seeds **fourteen** active days
+chosen so `p95` lands on a known number (180,000) and all five steps appear:
+five step-0 days, three step-1, three step-2, one step-3, two step-4 — plus one
+mid-ramp **income** day, because every other active day is an expense and
+without it the green half of the ramp would only ever be drawn at step 4.
+
+The selected day is deliberately step 4: it is the one cell whose capsule is
+repainted (§M.5), so a fixture whose selected day had no capsule would make that
+rule untestable.
+
+Evidence, measured off the regenerated PNGs with `tool/png_colors.py`: all
+fourteen capsules paint **exactly** their computed ramp colour
+(`#E07C7E/#DD7174/#D75D60/#D2484C/#CC3438` light expense,
+`#A04248/#AA464C/#BF4E55/#D3555E/#E85D66` dark expense, `#499166` / `#359054`
+for the income day), the selected one paints `#FFFFFF` / `#06231D`, the disc
+measures 36 × 36, the row pitch 44, and the capsule 36 % of a 51 px cell.
+
+#### M.9 Step 0 is the palest capsule, not no capsule — and the doc said otherwise
+
+`DayIntensity.step`'s own doc comment read *"0 = no capsule, 1–4 = increasing
+fill"*, while `_Capsule` rendered for **any** non-null intensity and the ramp
+extrapolated below its start. So a step-0 day drew the faintest bar on the grid,
+not none. The comment described the intent the ramp was built to avoid.
+
+Fixed in both places: the comment now says what the code does, and
+`should_draw_one_capsule_per_active_day` pins 14 capsules for 14 active days.
+
+#### M.10 Step 0 was below the visibility floor
+
+Extending `tool/audit_contrast.py` from four steps to **five** — the change that
+M.9 made necessary — surfaced a real defect the four-step audit could not see:
+step 0's natural extrapolation put the palest bar at **2.46:1** (light expense)
+and **2.38:1** (light income), under the same 2.5:1 floor every other step
+clears. A capsule that cannot be seen does not say "there was activity here",
+which is the one thing step 0 exists to say.
+
+The ramp is now clamped at `capsuleRampFloor = 0.60`, lifting step 0 to
+**2.66:1 / 2.61:1** light and **3.01:1 / 3.52:1** dark, with the gap to step 1
+preserved. `design_tokens_test.dart` now imports `capsuleRampStart` and
+`capsuleRampFloor` from the widget instead of mirroring them — the mirror has
+already been wrong once, and a copy of a number is a number that can drift.
+
+#### M.11 Two empty padding cells carried a second copy of the 48
+
+`month_grid.dart` gave its leading/trailing padding cells
+`AppSpacing.xxxl` — the same 48, written a second time in a file that cannot see
+the first. Both now use `AppRowHeight.calendarCell`.
+
+#### M.12 Verification
+
+- `dart format` 0 changed, `flutter analyze` 0 issues.
+- Full suite **1449 tests, all passing**, including every width walk at 360 /
+  390 / 768 / 1024 / 1440 px and 2× text scale.
+- `tool/audit_contrast.py --fail` exits 0 with all five capsule steps OK in both
+  modes, and its Design.md §2.4 doc-claim check is clean (it had been reporting
+  `moneyIn on white` as stale — the script, not the doc, was wrong).
+- Mutation-checked the two new capsule tests: reverting `_Capsule` to skip step 0
+  fails `should_draw_one_capsule_per_active_day`; the ramp-colour test fails on
+  any step whose colour moves.
+
+#### M.13 A doc claim only a golden could have caught
+
+§6.2 promised that padding days outside the visible period render `textTertiary`
+digits and a 40 %-alpha capsule and stay tappable. The code renders a blank
+`SizedBox` — no digits, no capsule, no tap. There is no test that could have
+caught it, because nothing asserted the absence. Corrected in the doc, with the
+note that a golden is the only artefact in this repo that shows what a padding
+day actually looks like.
+
+#### M.14 Method note
+
+One thing worth recording about **method**: the first pixel analysis of the
+regenerated golden appeared to show the ramp fading with the step — a busy day
+drawing the *palest* capsule, i.e. the exact §K bug returning. It was not. The
+reader was sampling the leftmost pixel of each bar, which is the anti-aliased
+cap of the pill, and solving a linear blend against the page off an 8-bit value
+amplifies rounding into a large apparent error. Sampling the bar's centre column
+gave the exact ramp colour for all fourteen capsules. **A measurement that
+disagrees with the widget tree is a measurement to distrust first.**
 
 ### C. Judgment items — done
 

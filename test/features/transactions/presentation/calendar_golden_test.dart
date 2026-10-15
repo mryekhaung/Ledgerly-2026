@@ -3,12 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
-import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
-import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
 import 'package:ledgerly/features/transactions/domain/usecases/watch_transactions.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/calendar_notifier.dart';
@@ -16,8 +14,8 @@ import 'package:ledgerly/features/transactions/presentation/providers/transactio
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
+import '../../../support/calendar_grid_fixture.dart';
 import '../../../support/tolerant_golden.dart';
-import '../../categories/domain/fake_category_repository.dart';
 import '../domain/fake_transaction_repository.dart';
 
 /// The calendar screen, compact, light + dark (`docs/Design.md` §8).
@@ -27,30 +25,15 @@ import '../domain/fake_transaction_repository.dart';
 void main() {
   setUpAll(() => useTolerantGoldens('calendar_golden_test.dart'));
 
-  /// A month with a couple of days that have activity.
+  /// The month the seed is pinned to. The selected day keeps its original two
+  /// transactions, so the summary card and the day list below the grid are
+  /// unchanged from the one-active-day fixture — only the *grid* is richer.
   final day = LocalDate(2026, 10, 3);
 
-  List<Transaction> dayTransactions() => <Transaction>[
-    fakeTransaction(
-      id: 'txn-coffee',
-      categoryId: 'cat-food',
-      amountMinor: 4500,
-      date: day,
-      note: 'Morning coffee',
-    ),
-    fakeTransaction(
-      id: 'txn-pay',
-      categoryId: 'cat-salary',
-      amountMinor: 500000,
-      direction: TransactionDirection.income,
-      date: day,
-    ),
-  ];
+  List<Transaction> dayTransactions() =>
+      calendarGridTransactions(selectedDay: day);
 
-  final categories = <Category>[
-    fakeCategory(id: 'cat-food', name: 'Food'),
-    fakeCategory(id: 'cat-salary', name: 'Salary'),
-  ];
+  final categories = calendarGridCategories;
 
   Future<void> host(
     WidgetTester tester, {

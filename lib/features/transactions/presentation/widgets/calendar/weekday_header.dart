@@ -1,4 +1,5 @@
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/utils/month_grid_layout.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -14,7 +15,6 @@ class WeekdayHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
     final localizations = MaterialLocalizations.of(context);
 
@@ -32,6 +32,12 @@ class WeekdayHeader extends StatelessWidget {
               child: Text(
                 localizations.narrowWeekdays[(firstIndex + column) %
                     DateTime.daysPerWeek],
+                // §6.1's own mock specifies this row as `overline`, and the code
+                // had drifted to `labelSmall` — the same class of spec drift §K
+                // and §L kept finding. `overline` is 11 px / w600 with 0.6
+                // tracking, which is what makes a single letter read as a
+                // deliberate column label rather than a stray character (§M.6).
+                //
                 // §6.2: only the **weekend** columns are `textTertiary`; the
                 // working week is `textSecondary`. Painting all seven tertiary
                 // made the whole header a 2.58:1 whisper on white (and 3.21:1 on
@@ -41,7 +47,7 @@ class WeekdayHeader extends StatelessWidget {
                 // `narrowWeekdays` is Sunday-indexed (0 = Sun … 6 = Sat), so the
                 // weekend columns are 0 and 6 — *not* `DateTime.saturday` /
                 // `DateTime.sunday`, which are 1-based (6 and 7).
-                style: theme.textTheme.labelSmall?.copyWith(
+                style: AppTypography.overline.copyWith(
                   color: _isWeekendColumn(firstIndex + column)
                       ? colors.textTertiary
                       : colors.textSecondary,

@@ -22,11 +22,12 @@ import 'package:ledgerly/features/transactions/domain/usecases/watch_transaction
 import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/calendar_notifier.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/calendar/day_cell.dart';
 import 'package:ledgerly/features/transactions/presentation/widgets/calendar/month_switcher.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
-import '../../categories/domain/fake_category_repository.dart';
+import '../../../support/calendar_grid_fixture.dart';
 import '../domain/fake_transaction_repository.dart';
 
 /// The calendar page at each window size class.
@@ -60,10 +61,11 @@ void main() {
     ),
   ];
 
-  final categories = <Category>[
-    fakeCategory(id: 'cat-food', name: 'Food'),
-    fakeCategory(id: 'cat-salary', name: 'Salary'),
-  ];
+  /// Categories the day list can resolve. The grid-capsule group hosts a much
+  /// richer month (see below), so this is the **superset** rather than the two
+  /// categories the default fixture spends in — `categoryByIdProvider` resolves
+  /// through `firstWhere`, which throws on an unknown id.
+  final categories = <Category>[...calendarGridCategories];
 
   /// Hosts [CalendarPage] at a real surface [width] wide with a fixed month of
   /// data.
@@ -84,6 +86,7 @@ void main() {
     FakeTransactionRepository? repository,
     List<Override> extraOverrides = const <Override>[],
     GoRouter? router,
+    Brightness brightness = Brightness.light,
   }) {
     final fakes =
         repository ??
@@ -94,6 +97,7 @@ void main() {
       router: router,
       size: Size(width, 900),
       locale: locale ?? const Locale('en'),
+      brightness: brightness,
       textScaler: TextScaler.linear(textScale),
       overrides: <Override>[
         watchDayTransactionsProvider.overrideWithValue(
@@ -754,20 +758,21 @@ void main() {
   });
 
   group('Day Capsule spec (docs/Design.md §6.2)', () {
-    /// The capsule is the 4 px bar under a day number. It is found by its
-    /// `Container` decoration rather than a type, since `_Capsule` is private.
+    /// The capsule is the [capsuleHeight] px bar under a day number. It is found
+    /// by its `Container` decoration rather than a type, since `_Capsule` is
+    /// private.
     ///
-    /// The width is asserted as a *proportion of the rendered grid row* (60 %),
-    /// not an absolute pixel count: the row sits inside page padding, so an
-    /// absolute number would pin the padding rather than the spec invariant
-    /// and break every time the insets change.
+    /// The width is asserted as a *proportion of the rendered grid row*
+    /// ([capsuleWidthFraction]), not an absolute pixel count: the row sits inside
+    /// page padding, so an absolute number would pin the padding rather than the
+    /// spec invariant and break every time the insets change.
     Finder capsuleOf(double expectedWidth) => find.byWidgetPredicate((w) {
       if (w is! Container) return false;
       final d = w.decoration;
       if (d is! BoxDecoration) return false;
       final c = w.constraints;
       if (c == null) return false;
-      return (c.maxHeight - 4).abs() < 0.01 &&
+      return (c.maxHeight - capsuleHeight).abs() < 0.01 &&
           (c.maxWidth - expectedWidth).abs() < 0.5;
     });
 
@@ -783,17 +788,19 @@ void main() {
       return tester.getSize(rows.first).width;
     }
 
-    testWidgets('should_size_the_capsule_to_60_percent_of_its_cell', (
+    testWidgets('should_size_the_capsule_to_36_percent_of_its_cell', (
       tester,
     ) async {
       await host(tester, TestWidths.phone);
       await tester.pumpAndSettle();
 
-      final expected = gridRowWidth(tester) / 7 * 0.6;
+      final expected = gridRowWidth(tester) / 7 * capsuleWidthFraction;
       expect(
         capsuleOf(expected),
         findsWidgets,
-        reason: 'capsule width must be 60% of the cell, not a fixed 24 px',
+        reason:
+            'capsule width must be ${capsuleWidthFraction * 100}% of the cell, '
+            'not a fixed pixel count',
       );
     });
 
@@ -805,8 +812,175 @@ void main() {
       await host(tester, TestWidths.tablet);
       await tester.pumpAndSettle();
 
-      final expected = gridRowWidth(tester) / 7 * 0.6;
+      final expected = gridRowWidth(tester) / 7 * capsuleWidthFraction;
       expect(capsuleOf(expected), findsWidgets);
+    });
+
+    /// Hosts the calendar with the full five-step month, so the grid's capsule
+    /// texture is exercised here as well as in the goldens.
+    ///
+    /// The default fixture at the top of this file seeds one active day, which is
+    /// why the capsule group used to be the only place in the unit tests that
+    /// could not say how many capsules a busy month draws.
+    Future<void> hostGrid(
+      WidgetTester tester,
+      double width, {
+      Brightness brightness = Brightness.light,
+    }) => host(
+      tester,
+      width,
+      brightness: brightness,
+      transactions: calendarGridTransactions(selectedDay: day),
+    );
+
+    /// Every capsule on screen, found by height — the capsule is the only
+    /// [capsuleHeight]-tall decorated [Container] in a day cell.
+    Finder capsules() => find.byWidgetPredicate((w) {
+      if (w is! Container) return false;
+      final d = w.decoration;
+      if (d is! BoxDecoration) return false;
+      final c = w.constraints;
+      return c != null && (c.maxHeight - capsuleHeight).abs() < 0.01;
+    });
+
+    testWidgets('should_recolour_the_capsule_inside_a_selected_cell', (
+      tester,
+    ) async {
+      // §6.2: on a selected cell the capsule switches to `onSelectedFill`.
+      //
+      // It used to stay `moneyOut`, so a selected day drew a saturated red bar
+      // across a saturated teal disc — two focal colours inside one 36 px
+      // circle, which is the clash visible on day 16 of the owner's light-mode
+      // screenshot (§M.5). The selected day is the single focal state on the
+      // screen (§1.2), so everything inside it reads as one object.
+      //
+      // Both modes, because `onSelectedFill` is white in light and near-black
+      // green in dark — a fix that only worked on white would not be a fix.
+      for (final entry in <(String, Brightness, AppColors)>[
+        ('light', Brightness.light, const AppColorsLight()),
+        ('dark', Brightness.dark, const AppColorsDark()),
+      ]) {
+        final (label, brightness, colors) = entry;
+        await hostGrid(tester, TestWidths.phone, brightness: brightness);
+        await tester.pumpAndSettle();
+
+        final onFill = find.byWidgetPredicate((w) {
+          if (w is! Container) return false;
+          final d = w.decoration;
+          if (d is! BoxDecoration) return false;
+          final c = w.constraints;
+          return c != null &&
+              (c.maxHeight - capsuleHeight).abs() < 0.01 &&
+              d.color == colors.onSelectedFill;
+        });
+
+        // The selected day is step 4 in the shared grid fixture, so exactly one
+        // capsule is recoloured — and narrowing the bar must not have cost any
+        // of the other thirteen.
+        expect(
+          onFill,
+          findsOneWidget,
+          reason:
+              '$label: the selected day has activity, so its capsule must be '
+              'painted onSelectedFill rather than moneyOut on top of the fill',
+        );
+        expect(
+          tester.widgetList(capsules()).length,
+          14,
+          reason: '$label: the grid must draw one capsule per active day',
+        );
+      }
+    });
+
+    testWidgets('should_draw_one_capsule_per_active_day', (tester) async {
+      // The shared fixture spans all five steps (§M.8), so a regression that
+      // dropped a step — or that drew a capsule for an empty day — changes this
+      // count. Fourteen active days out of thirty-one, including a step-0 day:
+      // `DayIntensity.step` documents "0 = no capsule" but `_Capsule` renders for
+      // any non-null intensity and the ramp extrapolates below its start, so a
+      // step-0 day is the *palest* bar on the grid rather than an absent one.
+      // Pinned here so the doc comment and the render cannot drift apart.
+      await hostGrid(tester, TestWidths.phone);
+      await tester.pumpAndSettle();
+
+      expect(tester.widgetList(capsules()).length, 14);
+    });
+
+    testWidgets('should_paint_each_step_the_ramp_colour_for_that_step', (
+      tester,
+    ) async {
+      // §6.2 steps read as increasing depth, and §M narrowed the bar without
+      // touching the ramp. This asserts the *rendered* colour, not just the
+      // contrast of an interpolated token: `design_tokens_test.dart` mirrors the
+      // ramp in Dart maths and can only prove the numbers are ordered and
+      // visible, never that the widget actually paints them.
+      //
+      // The fixture is built so `p95` is a known number rather than something
+      // derived from the data: five active days whose nets are 5 %, 25 %, 50 %,
+      // 75 % and 100 % of 40,000. `_intensities` takes `p95Index =
+      // round((5 - 1) * 0.95) = 4`, so `p95` is the largest of the five — 40,000
+      // — and each day lands on exactly the step its fraction implies.
+      //
+      // The selected day (Oct 3) is deliberately left empty: a selected cell
+      // repaints its capsule `onSelectedFill` (§M.5), which would add a sixth
+      // colour to the set and make this assertion about the ramp ambiguous.
+      const p95 = 40000;
+      List<Transaction> ramp() => <Transaction>[
+        for (var step = 0; step <= 4; step++)
+          fakeTransaction(
+            id: 'txn-step-$step',
+            categoryId: 'cat-food',
+            amountMinor: (p95 * step / 4).round() == 0
+                ? 1
+                : (p95 * step / 4).round(),
+            date: LocalDate(2026, 10, <int>[1, 2, 4, 5, 6][step]),
+          ),
+      ];
+
+      for (final entry in <(String, Brightness, AppColors)>[
+        ('light', Brightness.light, const AppColorsLight()),
+        ('dark', Brightness.dark, const AppColorsDark()),
+      ]) {
+        final (label, brightness, colors) = entry;
+        await host(
+          tester,
+          TestWidths.phone,
+          brightness: brightness,
+          transactions: ramp(),
+        );
+        await tester.pumpAndSettle();
+
+        final painted = tester
+            .widgetList(capsules())
+            .map((w) => (w as Container).decoration as BoxDecoration)
+            .map((d) => d.color)
+            .toSet();
+
+        expect(
+          painted,
+          hasLength(5),
+          reason: '$label: five active days must paint five distinct capsules',
+        );
+
+        for (var step = 0; step <= 4; step++) {
+          final raw =
+              capsuleRampStart + (1 - capsuleRampStart) * (step - 1) / 3;
+          final expected = Color.lerp(
+            colors.moneyOutSubtle,
+            colors.moneyOut,
+            raw < capsuleRampFloor ? capsuleRampFloor : raw,
+          )!;
+          expect(
+            painted,
+            contains(expected),
+            reason:
+                '$label step $step: the capsule must be painted at '
+                '${(raw < capsuleRampFloor ? capsuleRampFloor : raw).toStringAsFixed(4)} of the way '
+                'from moneyOutSubtle (#${_hex(colors.moneyOutSubtle)}) to '
+                'moneyOut (#${_hex(colors.moneyOut)}), i.e. #${_hex(expected)}',
+          );
+        }
+      }
     });
 
     testWidgets('should_fill_the_selected_cell_solidly_at_radius_full', (
@@ -923,3 +1097,11 @@ class _SeededCalendarNotifier extends CalendarNotifier {
     );
   }
 }
+
+/// `#RRGGBB` for a [Color], for readable failure messages.
+String _hex(Color color) => color
+    .toARGB32()
+    .toRadixString(16)
+    .padLeft(8, '0')
+    .substring(2)
+    .toUpperCase();

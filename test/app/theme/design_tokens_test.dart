@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
+import 'package:ledgerly/features/transactions/presentation/widgets/calendar/day_cell.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// WCAG 2.1 relative luminance — `Color.r/.g/.b` are 0..1 channels.
@@ -23,13 +24,13 @@ double _contrast(Color a, Color b) {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-/// Where the day-cell capsule ramp starts, mirrored from
-/// `lib/features/transactions/presentation/widgets/calendar/day_cell.dart`.
-///
-/// Kept here so the assertion and the implementation name the same number; if
-/// the widget's ramp moves, this must move with it. Raised from 0.60 in §L,
-/// when the light page became #F5F7FA and step 1 lost separation from it.
-const double _capsuleRampStart = 0.66;
+/// The capsule ramp value for [step], using the same start and floor the widget
+/// uses (`day_cell.dart`), so a change to the ramp fails here instead of
+/// silently shipping.
+double _rampT(int step) {
+  final raw = capsuleRampStart + (1 - capsuleRampStart) * (step - 1) / 3;
+  return raw < capsuleRampFloor ? capsuleRampFloor : raw;
+}
 
 /// Token-level assertions.
 ///
@@ -568,10 +569,12 @@ void main() {
     });
 
     test('every_capsule_step_is_visible_and_ordered', () {
-      // Mirrors `_Capsule` in `day_cell.dart`. Step 1 used to *be* the
-      // `*Subtle` tint at 1.13–1.25:1 — the "black bar" the owner reported
-      // (§K.1-3). Every step now clears 2.5:1 and each is lighter than the last,
-      // so the grid still reads as a 5-step texture rather than noise.
+      // Mirrors `_Capsule` in `day_cell.dart`, using the exported
+      // [capsuleRampStart] and [capsuleRampFloor] rather than copies of them.
+      // Step 1 used to *be* the `*Subtle` tint at 1.13–1.25:1 — the "black bar"
+      // the owner reported (§K.1-3). Every step now clears 2.5:1 and each is
+      // lighter than the last, so the grid still reads as a 5-step texture
+      // rather than noise.
       for (final entry in <(String, AppColors)>[
         ('light', light),
         ('dark', dark),
@@ -583,20 +586,16 @@ void main() {
         ]) {
           final (family, subtle, full) = entry2;
           final ratios = <double>[
-            for (var step = 1; step <= 4; step++)
+            for (var step = 0; step <= 4; step++)
               _contrast(
-                Color.lerp(
-                  subtle,
-                  full,
-                  _capsuleRampStart + (1 - _capsuleRampStart) * (step - 1) / 3,
-                )!,
+                Color.lerp(subtle, full, _rampT(step))!,
                 colors.surface,
               ),
           ];
           expect(
             ratios.first,
             greaterThanOrEqualTo(2.5),
-            reason: '$label $family capsule step 1 must be visible',
+            reason: '$label $family capsule step 0 must be visible',
           );
           for (var i = 1; i < ratios.length; i++) {
             expect(

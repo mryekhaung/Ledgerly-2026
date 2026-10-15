@@ -98,7 +98,8 @@ def lerp(a: str, b: str, t: float) -> str:
     return '#%02X%02X%02X' % tuple(out)
 
 
-CAPSULE_START = 0.66  # day_cell.dart, mirrored in design_tokens_test.dart
+CAPSULE_START = 0.66  # day_cell.dart `capsuleRampStart`
+CAPSULE_FLOOR = 0.60  # day_cell.dart `capsuleRampFloor`, reached by step 0
 TEXT_PAIRS = ['textPrimary', 'textSecondary', 'textTertiary']
 MARK_PAIRS = ['brandSubtle', 'moneyOutSubtle', 'moneyInSubtle',
               'moneyOut', 'moneyIn', 'brandPrimary', 'border']
@@ -124,13 +125,20 @@ def report(name: str, t: dict) -> None:
     print('-- text on its own brand fill --')
     print(f'  textOnBrand on brandPrimary: '
           f'{ratio(t["textOnBrand"], t["brandPrimary"]):5.2f}:1')
-    print('-- capsule ramp: step 1..4 vs surface --')
+    print('-- capsule ramp: all five steps vs surface --')
+    # Step 0 is included because §M.9 settled that a step-0 day *does* draw a
+    # capsule — the palest one — so its visibility is a real requirement, not a
+    # hypothetical. It sits below CAPSULE_START and is clamped at CAPSULE_FLOOR
+    # (§M.10), which is why `t_` is a floor and not the raw extrapolation.
     for fam, subtle, full in (('expense', 'moneyOutSubtle', 'moneyOut'),
                               ('income', 'moneyInSubtle', 'moneyIn')):
-        for step in (1, 2, 3, 4):
-            t_ = CAPSULE_START + (1 - CAPSULE_START) * (step - 1) / 3
+        for step in (0, 1, 2, 3, 4):
+            raw = CAPSULE_START + (1 - CAPSULE_START) * (step - 1) / 3
+            t_ = CAPSULE_FLOOR if raw < CAPSULE_FLOOR else raw
             c = lerp(t[subtle], t[full], t_)
             r = ratio(c, t['surface'])
+            # 2.5 is the §K visibility floor for a non-text mark, and it applies
+            # to all five steps: step 0 is still a data mark, just the faintest.
             flag = 'INVISIBLE' if r < 2.5 else 'OK'
             print(f'  {fam:8} step {step}  {c}  {r:5.2f}:1  {flag}')
     print()
@@ -195,7 +203,7 @@ for k in ROLES:
 print()
 print('===== the doc\'s own claims (Design.md §2.4) =====')
 for claim, fg, bg, said in (('moneyOut on white', '#CC3438', '#FFFFFF', 5.10),
-                            ('moneyIn on white', '#1C7340', '#FFFFFF', 6.03)):
+                            ('moneyIn on white', '#1C7340', '#FFFFFF', 5.87)):
     actual = ratio(fg, bg)
     print(f'  {claim:18} claimed {said:.2f}:1  actual {actual:.2f}:1'
           f'{"   <-- DOC IS STALE" if abs(actual - said) > 0.05 else ""}')

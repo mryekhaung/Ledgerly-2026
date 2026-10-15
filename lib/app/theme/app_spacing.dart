@@ -185,11 +185,24 @@ abstract final class AppHitTarget {
   static const double comfortable = 48;
 }
 
-/// Row height contracts used by `ListRow` (docs/Design.md §5.6).
+/// Row height contracts used by `ListRow` (docs/Design.md §5.6) and the
+/// calendar day cell (§6.2).
 abstract final class AppRowHeight {
   const AppRowHeight._();
 
   static const double singleLine = 64;
   static const double twoLine = 76;
   static const double absoluteMinimum = 56;
+
+  /// Height of one calendar day cell (docs/Design.md §6.2).
+  ///
+  /// Material 3's date picker measures a **40 dp** date bounding box with
+  /// **4 dp** between dates, which is 44 — not the 48 this used before, where
+  /// every row carried 4 px of dead space and six rows wasted 24 px (§M.1).
+  ///
+  /// Shared with `month_grid.dart`, which draws the empty padding cells that
+  /// complete the first and last week. Those used to carry their own
+  /// `AppSpacing.xxxl` — the same 48 written a second time, in a file that
+  /// cannot see the first.
+  static const double calendarCell = 44;
 }
