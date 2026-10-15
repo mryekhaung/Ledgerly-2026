@@ -636,6 +636,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accountGuestBadge => 'ゲストアカウント';
 
   @override
+  String get accountGuestName => 'ゲストユーザー';
+
+  @override
+  String get accountUserFallback => 'ユーザー';
+
+  @override
   String get accountLinkedBadge => '連携済みアカウント';
 
   @override

@@ -1,18 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
-import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
-import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
-import 'package:ledgerly/core/widgets/list_row.dart';
 import 'package:ledgerly/features/auth/domain/entities/auth_provider_type.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
+import 'package:ledgerly/features/auth/presentation/widgets/account/actions_card.dart';
+import 'package:ledgerly/features/auth/presentation/widgets/account/identity_card.dart';
+import 'package:ledgerly/features/auth/presentation/widgets/account/linking_banner.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
-import 'package:ledgerly/features/profile/presentation/widgets/avatar.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
@@ -21,7 +19,11 @@ import 'package:material_ui/material_ui.dart';
 ///
 /// Surfaces identity status (Guest vs Synced), guest-to-account linking,
 /// sign out, and store-compliant account deletion.
+///
+/// Composition root only: card, banner and actions live in `widgets/account/`
+/// (`docs/Conventions.md` §1).
 class AccountPage extends ConsumerWidget {
+  /// Creates the page.
   const AccountPage({super.key});
 
   Future<void> _linkAccount(
@@ -124,8 +126,6 @@ class AccountPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
     final authState = ref.watch(authNotifierProvider);
     final user = authState.user;
@@ -145,202 +145,27 @@ class AccountPage extends ConsumerWidget {
           ),
           children: <Widget>[
             // Identity Card
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: colors.surfaceSubtle,
-                borderRadius: AppRadius.borderLg,
-                border: Border.all(color: colors.border),
-              ),
-              child: Column(
-                children: <Widget>[
-                  Avatar(config: avatarConfig, size: 72),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    user?.displayName ?? (isGuest ? 'Guest User' : 'User'),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: colors.textPrimary,
-                    ),
-                  ),
-                  if (user?.email != null) ...<Widget>[
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      user!.email!,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: AppSpacing.sm),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.xs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isGuest ? colors.surface : colors.brandSubtle,
-                      borderRadius: AppRadius.borderLg,
-                      border: Border.all(
-                        color: isGuest
-                            ? colors.border
-                            : colors.brandPrimary.withAlpha(60),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Icon(
-                          isGuest ? AppIcons.person : AppIcons.success,
-                          size: 14,
-                          color: isGuest
-                              ? colors.textSecondary
-                              : colors.brandPrimary,
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
-                        Text(
-                          isGuest
-                              ? strings('accountGuestBadge')
-                              : strings('accountLinkedBadge'),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: isGuest
-                                ? colors.textSecondary
-                                : colors.brandPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            AccountIdentityCard(
+              user: user,
+              isGuest: isGuest,
+              avatarConfig: avatarConfig,
             ),
             const SizedBox(height: AppSpacing.xl),
 
             // Guest-to-Account Linking Banner (Design.md §6.6 / Roadmap §Phase 2)
             if (isGuest) ...<Widget>[
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: colors.surfaceRaised,
-                  borderRadius: AppRadius.borderLg,
-                  border: Border.all(color: colors.brandPrimary.withAlpha(80)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Icon(
-                          AppIcons.cloudSync,
-                          size: 24,
-                          color: colors.brandPrimary,
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Text(
-                            strings('accountLinkBannerTitle'),
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: colors.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      strings('accountLinkBannerBody'),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    OutlinedButton.icon(
-                      onPressed: authState.isLoading
-                          ? null
-                          : () => _linkAccount(
-                              context,
-                              ref,
-                              AuthProviderType.google,
-                            ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: colors.textPrimary,
-                        minimumSize: const Size.fromHeight(44),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: AppRadius.borderMd,
-                        ),
-                      ),
-                      icon: const Icon(Icons.g_mobiledata_rounded, size: 26),
-                      label: Text(strings('accountLinkGoogle')),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    OutlinedButton.icon(
-                      onPressed: authState.isLoading
-                          ? null
-                          : () => _linkAccount(
-                              context,
-                              ref,
-                              AuthProviderType.apple,
-                            ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: colors.textPrimary,
-                        minimumSize: const Size.fromHeight(44),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: AppRadius.borderMd,
-                        ),
-                      ),
-                      icon: const Icon(Icons.apple_rounded, size: 22),
-                      label: Text(strings('accountLinkApple')),
-                    ),
-                  ],
-                ),
+              AccountLinkingBanner(
+                isLoading: authState.isLoading,
+                onLink: (provider) => _linkAccount(context, ref, provider),
               ),
               const SizedBox(height: AppSpacing.xl),
             ],
 
             // Account Actions
-            AppCard(
-              padding: EdgeInsets.zero,
-              borderRadius: AppRadius.borderMd,
-              border: Border.all(color: colors.border),
-              child: Column(
-                children: <Widget>[
-                  ListRow(
-                    leading: Icon(AppIcons.signOut, color: colors.textPrimary),
-                    title: Text(
-                      strings('accountSignOut'),
-                      style: AppTypography.body.copyWith(
-                        color: colors.textPrimary,
-                      ),
-                    ),
-                    trailing: const Icon(AppIcons.chevronRight),
-                    onTap: authState.isLoading
-                        ? null
-                        : () => _signOut(context, ref),
-                    semanticsLabel: strings('accountSignOut'),
-                  ),
-                  Divider(height: 1, color: colors.border),
-                  ListRow(
-                    leading: Icon(AppIcons.destructive, color: colors.moneyOut),
-                    title: Text(
-                      strings('accountDeleteTitle'),
-                      style: AppTypography.body.copyWith(
-                        color: colors.moneyOut,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    trailing: Icon(
-                      AppIcons.chevronRight,
-                      color: colors.moneyOut,
-                    ),
-                    onTap: authState.isLoading
-                        ? null
-                        : () => _deleteAccount(context, ref),
-                    semanticsLabel: strings('accountDeleteTitle'),
-                  ),
-                ],
-              ),
+            AccountActionsCard(
+              isLoading: authState.isLoading,
+              onSignOut: () => _signOut(context, ref),
+              onDeleteAccount: () => _deleteAccount(context, ref),
             ),
           ],
         ),

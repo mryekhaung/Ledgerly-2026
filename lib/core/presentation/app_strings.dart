@@ -559,6 +559,8 @@ abstract final class AppStringLookup {
     'authErrorSignInFailed' => l10n.authErrorSignInFailed,
     'accountLinkFailed' => l10n.accountLinkFailed,
     'accountLinkSuccess' => l10n.accountLinkSuccess,
+    'accountGuestName' => l10n.accountGuestName,
+    'accountUserFallback' => l10n.accountUserFallback,
     'signInOrDivider' => l10n.signInOrDivider,
     'goalNoAccountOption' => l10n.goalNoAccountOption,
     'goalNoDate' => l10n.goalNoDate,

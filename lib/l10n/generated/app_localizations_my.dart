@@ -661,6 +661,12 @@ class AppLocalizationsMy extends AppLocalizations {
   String get accountGuestBadge => 'ဧည့်သည် အကောင့်';
 
   @override
+  String get accountGuestName => 'ဧည့်သည်သုံးစွဲသူ';
+
+  @override
+  String get accountUserFallback => 'အသုံးပြုသူ';
+
+  @override
   String get accountLinkedBadge => 'ချိတ်ဆက်ပြီး အကောင့်';
 
   @override

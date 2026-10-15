@@ -656,6 +656,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountGuestBadge => 'Guest Account';
 
   @override
+  String get accountGuestName => 'Guest User';
+
+  @override
+  String get accountUserFallback => 'User';
+
+  @override
   String get accountLinkedBadge => 'Synced Account';
 
   @override

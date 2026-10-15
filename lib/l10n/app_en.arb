@@ -852,6 +852,14 @@
   "@accountGuestBadge": {
     "description": "Badge showing account is running in guest mode."
   },
+  "accountGuestName": "Guest User",
+  "@accountGuestName": {
+    "description": "Display name fallback for a guest with no name set."
+  },
+  "accountUserFallback": "User",
+  "@accountUserFallback": {
+    "description": "Display name fallback for a signed-in user with no name."
+  },
   "accountLinkedBadge": "Synced Account",
   "@accountLinkedBadge": {
     "description": "Badge showing account is linked to an identity provider."

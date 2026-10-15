@@ -1324,6 +1324,18 @@ abstract class AppLocalizations {
   /// **'Guest Account'**
   String get accountGuestBadge;
 
+  /// Display name fallback for a guest with no name set.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest User'**
+  String get accountGuestName;
+
+  /// Display name fallback for a signed-in user with no name.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get accountUserFallback;
+
   /// Badge showing account is linked to an identity provider.
   ///
   /// In en, this message translates to:

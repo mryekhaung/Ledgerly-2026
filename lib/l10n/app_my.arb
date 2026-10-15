@@ -204,6 +204,8 @@
   "haveAccountPrompt": "အကောင့်ရှိပြီးသားလား။ ဝင်ပါ",
   "accountTitle": "အကောင့်",
   "accountGuestBadge": "ဧည့်သည် အကောင့်",
+  "accountGuestName": "ဧည့်သည်သုံးစွဲသူ",
+  "accountUserFallback": "အသုံးပြုသူ",
   "accountLinkedBadge": "ချိတ်ဆက်ပြီး အကောင့်",
   "accountLinkBannerTitle": "သင့်စာရင်းများကို လုံခြုံစွာ သိမ်းဆည်းပါ",
   "accountLinkBannerBody": "ဖုန်းလဲသည့်အခါ စာရင်းများမပျောက်စေရန် အကောင့်ဖြင့် ချိတ်ဆက်ထားပါ။",

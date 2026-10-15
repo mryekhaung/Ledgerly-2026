@@ -204,6 +204,8 @@
   "haveAccountPrompt": "すでにアカウントをお持ちですか？ ログイン",
   "accountTitle": "アカウント",
   "accountGuestBadge": "ゲストアカウント",
+  "accountGuestName": "ゲストユーザー",
+  "accountUserFallback": "ユーザー",
   "accountLinkedBadge": "連携済みアカウント",
   "accountLinkBannerTitle": "データを安全に保護",
   "accountLinkBannerBody": "アカウントを連携すると、機種変更時でもデータを引き継げます。",
