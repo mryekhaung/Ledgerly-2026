@@ -10,6 +10,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
 import '../../../support/tolerant_golden.dart';
+import '../../../support/width_walk.dart';
 
 /// The accounts screen, compact, light + dark (`docs/Design.md` §8).
 ///
@@ -53,10 +54,13 @@ void main() {
   Future<void> host(
     WidgetTester tester, {
     Brightness brightness = Brightness.light,
+    double width = TestWidths.phone,
+    double textScale = 1,
   }) => pumpAppHost(
     tester,
-    size: const Size(TestWidths.phone, 900),
+    size: Size(width, 900),
     brightness: brightness,
+    textScaler: TextScaler.linear(textScale),
     overrides: <Override>[
       accountsStreamProvider.overrideWith(
         (ref) => Stream.value(const <Account>[account1, account2]),
@@ -68,6 +72,8 @@ void main() {
     ],
     home: const AccountsPage(),
   );
+
+  widthWalkGroup(pageName: 'AccountsPage', host: host);
 
   group('Accounts screen goldens', () {
     testWidgets('light theme', (tester) async {

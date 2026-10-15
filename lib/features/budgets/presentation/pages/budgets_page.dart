@@ -125,10 +125,16 @@ class BudgetsPage extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  strings('budgetsCategory'),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+                // "Category Budget" at 2× type (`docs/Design.md` §8) is wider
+                // than the whole row, so the heading yields to the count chip.
+                Flexible(
+                  child: Text(
+                    strings('budgetsCategory'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 if (categoryProgresses.isNotEmpty)

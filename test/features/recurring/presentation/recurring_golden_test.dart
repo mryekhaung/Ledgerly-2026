@@ -17,6 +17,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
 import '../../../support/tolerant_golden.dart';
+import '../../../support/width_walk.dart';
 
 /// The recurring list screen, compact, light + dark (`docs/Design.md` §8).
 ///
@@ -91,10 +92,13 @@ void main() {
   Future<void> host(
     WidgetTester tester, {
     Brightness brightness = Brightness.light,
+    double width = TestWidths.phone,
+    double textScale = 1,
   }) => pumpAppHost(
     tester,
-    size: const Size(TestWidths.phone, 900),
+    size: Size(width, 900),
     brightness: brightness,
+    textScaler: TextScaler.linear(textScale),
     overrides: <Override>[
       recurringListStreamProvider.overrideWith(
         (ref) =>
@@ -106,6 +110,8 @@ void main() {
     ],
     home: const RecurringListPage(),
   );
+
+  widthWalkGroup(pageName: 'RecurringListPage', host: host);
 
   group('Recurring screen goldens', () {
     testWidgets('light theme', (tester) async {

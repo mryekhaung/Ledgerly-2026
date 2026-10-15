@@ -88,13 +88,21 @@ class AccountIdentityCard extends StatelessWidget {
                   color: isGuest ? colors.textSecondary : colors.brandPrimary,
                 ),
                 const SizedBox(width: AppSpacing.xs),
-                Text(
-                  isGuest
-                      ? strings('accountGuestBadge')
-                      : strings('accountLinkedBadge'),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: isGuest ? colors.textSecondary : colors.brandPrimary,
+                // "Synced Account" at 2× type (`docs/Design.md` §8) is wider
+                // than the card, so the badge label has to yield.
+                Flexible(
+                  child: Text(
+                    isGuest
+                        ? strings('accountGuestBadge')
+                        : strings('accountLinkedBadge'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isGuest
+                          ? colors.textSecondary
+                          : colors.brandPrimary,
+                    ),
                   ),
                 ),
               ],

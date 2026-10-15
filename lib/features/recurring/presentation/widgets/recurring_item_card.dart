@@ -12,6 +12,7 @@ import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
+import 'package:ledgerly/core/widgets/capped_row.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/recurring/domain/entities/recurring_frequency.dart';
@@ -61,81 +62,90 @@ class RecurringItemCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              CategoryGem(
-                colorValue: category?.colorValue ?? 0xFF888888,
-                iconKey: category?.iconKey,
-                size: CategoryGemSize.md,
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      category?.name ?? strings('budgetsCategory'),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (item.note != null &&
-                        item.note!.trim().isNotEmpty) ...<Widget>[
-                      const SizedBox(height: AppSpacing.xxs),
+          CappedRow(
+            builder: (context, trailingMaxWidth) => Row(
+              children: <Widget>[
+                CategoryGem(
+                  colorValue: category?.colorValue ?? 0xFF888888,
+                  iconKey: category?.iconKey,
+                  size: CategoryGemSize.md,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
                       Text(
-                        item.note!,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colors.textSecondary,
+                        category?.name ?? strings('budgetsCategory'),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      if (item.note != null &&
+                          item.note!.trim().isNotEmpty) ...<Widget>[
+                        const SizedBox(height: AppSpacing.xxs),
+                        Text(
+                          item.note!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colors.textSecondary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ],
+                  ),
+                ),
+                // Capped rather than flexible: the amount would push the row over
+                // at 2× type (`docs/Design.md` §8), but a flex share would also
+                // bind at 1× and truncate it on a screen that has room. See
+                // `CappedRow`.
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: trailingMaxWidth),
+                  child: AmountText(
+                    item.amount,
+                    style: AmountStyle.row,
+                    signed: true,
+                    color: item.direction == TransactionDirection.income
+                        ? colors.moneyIn
+                        : colors.moneyOut,
+                  ),
+                ),
+                AppOverflowMenu<String>(
+                  icon: AppIcons.more,
+                  cancelLabel: strings('actionCancel'),
+                  onSelected: (value) =>
+                      unawaited(_handleMenuAction(context, ref, value)),
+                  items: <OverflowMenuItem<String>>[
+                    OverflowMenuItem<String>(
+                      value: 'skip',
+                      label: strings('recurringActionSkip'),
+                      icon: AppIcons.skipNext,
+                    ),
+                    OverflowMenuItem<String>(
+                      value: 'pause',
+                      label: item.isArchived
+                          ? strings('recurringActionResume')
+                          : strings('recurringActionPause'),
+                      icon: item.isArchived ? AppIcons.play : AppIcons.pause,
+                    ),
+                    OverflowMenuItem<String>(
+                      value: 'edit',
+                      label: strings('budgetsEdit'),
+                      icon: AppIcons.edit,
+                    ),
+                    OverflowMenuItem<String>(
+                      value: 'delete',
+                      label: strings('recurringActionDelete'),
+                      icon: AppIcons.destructive,
+                      destructive: true,
+                    ),
                   ],
                 ),
-              ),
-              AmountText(
-                item.amount,
-                style: AmountStyle.row,
-                signed: true,
-                color: item.direction == TransactionDirection.income
-                    ? colors.moneyIn
-                    : colors.moneyOut,
-              ),
-              AppOverflowMenu<String>(
-                icon: AppIcons.more,
-                cancelLabel: strings('actionCancel'),
-                onSelected: (value) =>
-                    unawaited(_handleMenuAction(context, ref, value)),
-                items: <OverflowMenuItem<String>>[
-                  OverflowMenuItem<String>(
-                    value: 'skip',
-                    label: strings('recurringActionSkip'),
-                    icon: AppIcons.skipNext,
-                  ),
-                  OverflowMenuItem<String>(
-                    value: 'pause',
-                    label: item.isArchived
-                        ? strings('recurringActionResume')
-                        : strings('recurringActionPause'),
-                    icon: item.isArchived ? AppIcons.play : AppIcons.pause,
-                  ),
-                  OverflowMenuItem<String>(
-                    value: 'edit',
-                    label: strings('budgetsEdit'),
-                    icon: AppIcons.edit,
-                  ),
-                  OverflowMenuItem<String>(
-                    value: 'delete',
-                    label: strings('recurringActionDelete'),
-                    icon: AppIcons.destructive,
-                    destructive: true,
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Wrap(

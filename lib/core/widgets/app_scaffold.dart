@@ -42,6 +42,13 @@ class AppScaffold extends StatelessWidget {
   final Widget? leading;
 
   /// Trailing action widgets in the top app bar.
+  ///
+  /// `AppBar` lays these out as direct children of a `Row(mainAxisSize: min)`,
+  /// which measures non-flex children with an **unbounded** main axis. A label
+  /// long enough to exceed the toolbar therefore overflows rather than
+  /// shrinking, and the toolbar is only 56 px tall so it cannot wrap either —
+  /// at 2× type (`docs/Design.md` §8) even a two-word action does it. Wrap the
+  /// action in `Flexible` and ellipsize its label if it can be long.
   final List<Widget>? actions;
 
   /// A widget below the top app bar — typically a `TabBar`.

@@ -16,6 +16,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
 import '../../../support/tolerant_golden.dart';
+import '../../../support/width_walk.dart';
 import '../../categories/domain/fake_category_repository.dart';
 
 /// The insights screen, compact, light + dark (`docs/Design.md` §8).
@@ -111,10 +112,13 @@ void main() {
   Future<void> host(
     WidgetTester tester, {
     Brightness brightness = Brightness.light,
+    double width = TestWidths.phone,
+    double textScale = 1,
   }) => pumpAppHost(
     tester,
-    size: const Size(TestWidths.phone, 900),
+    size: Size(width, 900),
     brightness: brightness,
+    textScaler: TextScaler.linear(textScale),
     overrides: <Override>[
       currencyProvider.overrideWith((ref) => CurrencyCode.mmk),
       monthStartDayProvider.overrideWith((ref) => 1),
@@ -123,6 +127,8 @@ void main() {
     ],
     home: const InsightsPage(),
   );
+
+  widthWalkGroup(pageName: 'InsightsPage', host: host);
 
   group('Insights screen goldens', () {
     testWidgets('light theme', (tester) async {

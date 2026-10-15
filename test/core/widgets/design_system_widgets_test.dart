@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
@@ -209,6 +210,46 @@ void main() {
       );
 
       expect(find.text('Disabled'), findsOneWidget);
+    });
+
+    // `AppButton` sizes its label with a `Flexible`, which is what lets a long
+    // label ellipsize at 2× type (`docs/Design.md` §8) instead of overflowing.
+    //
+    // The label must still render in full whenever the caller gives it room, and
+    // `AppButton` has two callers with opposite constraint shapes: most put it
+    // in a bounded column, but `data_transfer/widgets/import_tab.dart` uses it
+    // as a non-flex child of a `Row`, which measures it with an **unbounded**
+    // main axis. This pins the second shape — a `Flexible` must not truncate
+    // there (it does not: `RenderFlex` only allocates space to flexible children
+    // when the main axis is bounded).
+    testWidgets('should_keep_its_full_label_in_an_unbounded_row', (
+      tester,
+    ) async {
+      const label = 'Save';
+
+      await tester.pumpWidget(
+        host(
+          const Row(
+            children: <Widget>[
+              // Reference: the same string at the same size, unconstrained.
+              Text(label, style: AppTypography.title),
+              AppButton(label: label, onPressed: null),
+            ],
+          ),
+        ),
+      );
+
+      final reference = tester.getSize(find.text(label).first).width;
+      final inButton = tester.getSize(find.text(label).last).width;
+
+      expect(reference, greaterThan(0));
+      expect(
+        inButton,
+        reference,
+        reason:
+            'AppButton truncated its label inside an unbounded row — a '
+            '`Flexible` there collapses to zero width.',
+      );
     });
   });
 

@@ -63,14 +63,18 @@ class IncomeExpenseBarChartCard extends StatelessWidget {
                 strings('insightsIncomeVsExpense'),
                 style: theme.textTheme.titleMedium,
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
+              // A `Wrap` rather than a `Row`: at 2× type (`docs/Design.md` §8)
+              // the two legend dots cannot share a line with each other inside
+              // the outer wrap's remaining width, so let them break instead of
+              // overflowing. The labels are short, so each dot still fits.
+              Wrap(
+                spacing: AppSpacing.md,
+                runSpacing: AppSpacing.xs,
                 children: <Widget>[
                   _LegendDot(
                     color: colors.moneyIn,
                     label: strings('calendarIncome'),
                   ),
-                  const SizedBox(width: AppSpacing.md),
                   _LegendDot(
                     color: colors.moneyOut,
                     label: strings('calendarExpense'),

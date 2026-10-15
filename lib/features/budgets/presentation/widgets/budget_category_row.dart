@@ -5,6 +5,7 @@ import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
+import 'package:ledgerly/core/widgets/capped_row.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/budgets/domain/entities/budget_progress.dart';
 import 'package:ledgerly/features/budgets/domain/entities/budget_status.dart';
@@ -61,84 +62,101 @@ class BudgetCategoryRow extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                CategoryGem(
-                  colorValue: p.categoryColor ?? 0xFF12987C,
-                  iconKey: p.categoryIcon ?? 'tag',
-                  size: CategoryGemSize.md,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        p.categoryName ?? strings('budgetsCategory'),
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
+            CappedRow(
+              builder: (context, trailingMaxWidth) => Row(
+                children: <Widget>[
+                  CategoryGem(
+                    colorValue: p.categoryColor ?? 0xFF12987C,
+                    iconKey: p.categoryIcon ?? 'tag',
+                    size: CategoryGemSize.md,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          p.categoryName ?? strings('budgetsCategory'),
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: AppSpacing.xxs),
-                      // Two amounts in a column already narrowed by the gem,
-                      // the status pill and the overflow menu, so both sides
-                      // must flex (docs/Design.md §8).
-                      Row(
-                        children: <Widget>[
-                          Flexible(
-                            child: AmountText(
-                              spentMoney,
-                              style: AmountStyle.row,
-                              signed: false,
+                        const SizedBox(height: AppSpacing.xxs),
+                        // Two amounts in a column already narrowed by the gem,
+                        // the status pill and the overflow menu, so both sides
+                        // must flex (docs/Design.md §8).
+                        Row(
+                          children: <Widget>[
+                            Flexible(
+                              child: AmountText(
+                                spentMoney,
+                                style: AmountStyle.row,
+                                signed: false,
+                              ),
                             ),
-                          ),
-                          Text(
-                            ' / ',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colors.textSecondary,
+                            // The separator is decorative and must yield too: with
+                            // the column squeezed by 2× type (`docs/Design.md` §8)
+                            // the two amounts flex to nothing and this literal was
+                            // what actually overflowed.
+                            Flexible(
+                              child: Text(
+                                ' / ',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colors.textSecondary,
+                                ),
+                              ),
                             ),
-                          ),
-                          Flexible(
-                            child: AmountText(
-                              limitMoney,
-                              style: AmountStyle.row,
-                              signed: false,
-                              color: colors.textSecondary,
+                            Flexible(
+                              child: AmountText(
+                                limitMoney,
+                                style: AmountStyle.row,
+                                signed: false,
+                                color: colors.textSecondary,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                BudgetStatusPill(status: p.status),
-                if (onDelete != null)
-                  AppOverflowMenu<String>(
-                    icon: AppIcons.more,
-                    cancelLabel: strings('actionCancel'),
-                    onSelected: (value) {
-                      if (value == 'edit') {
-                        onTap();
-                      } else if (value == 'delete') {
-                        onDelete?.call();
-                      }
-                    },
-                    items: <OverflowMenuItem<String>>[
-                      OverflowMenuItem<String>(
-                        value: 'edit',
-                        label: strings('budgetsEdit'),
-                        icon: AppIcons.edit,
-                      ),
-                      OverflowMenuItem<String>(
-                        value: 'delete',
-                        label: strings('budgetsDelete'),
-                        icon: AppIcons.destructive,
-                        destructive: true,
-                      ),
-                    ],
+                  // Capped rather than flexible: the pill's label roughly doubles
+                  // at 2× type (`docs/Design.md` §8) and would push the row over,
+                  // but a flex share would also bind at 1× and truncate the label
+                  // on a screen that has room for it. See `CappedRow`.
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: trailingMaxWidth),
+                    child: BudgetStatusPill(status: p.status),
                   ),
-              ],
+                  if (onDelete != null)
+                    AppOverflowMenu<String>(
+                      icon: AppIcons.more,
+                      cancelLabel: strings('actionCancel'),
+                      onSelected: (value) {
+                        if (value == 'edit') {
+                          onTap();
+                        } else if (value == 'delete') {
+                          onDelete?.call();
+                        }
+                      },
+                      items: <OverflowMenuItem<String>>[
+                        OverflowMenuItem<String>(
+                          value: 'edit',
+                          label: strings('budgetsEdit'),
+                          icon: AppIcons.edit,
+                        ),
+                        OverflowMenuItem<String>(
+                          value: 'delete',
+                          label: strings('budgetsDelete'),
+                          icon: AppIcons.destructive,
+                          destructive: true,
+                        ),
+                      ],
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             ClipRRect(

@@ -137,12 +137,21 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
 
     return AppScaffold(
       actions: <Widget>[
-        TextButton(
-          onPressed: authState.isLoading ? null : _skip,
-          child: Text(
-            strings('welcomeSkip'),
-            style: AppTypography.body.copyWith(
-              color: AppThemeColors.of(context).textSecondary,
+        // `AppBar` puts actions straight into a `Row(mainAxisSize: min)`, and
+        // a non-flex child there is laid out with an unbounded main axis — so
+        // "Skip for now" at 2× type (`docs/Design.md` §8) is measured at its
+        // full ~384 px and overflows the 360 px toolbar. `Flexible` bounds it
+        // so the label ellipsizes instead.
+        Flexible(
+          child: TextButton(
+            onPressed: authState.isLoading ? null : _skip,
+            child: Text(
+              strings('welcomeSkip'),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.body.copyWith(
+                color: AppThemeColors.of(context).textSecondary,
+              ),
             ),
           ),
         ),

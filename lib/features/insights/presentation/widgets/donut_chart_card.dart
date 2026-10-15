@@ -112,7 +112,17 @@ class DonutChartCard extends StatelessWidget {
                       size: CategoryGemSize.sm,
                     ),
                     const SizedBox(width: AppSpacing.xs),
-                    Text(item.category.name, style: theme.textTheme.bodySmall),
+                    // The legend chip sits in a `Wrap`, so it can only be as
+                    // wide as the card. A long category name at 2× type
+                    // (`docs/Design.md` §8) has to give way.
+                    Flexible(
+                      child: Text(
+                        item.category.name,
+                        style: theme.textTheme.bodySmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       '$pct%',

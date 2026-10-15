@@ -48,7 +48,24 @@ class BudgetStatusPill extends StatelessWidget {
         children: <Widget>[
           Icon(icon, size: 13, color: color),
           const SizedBox(width: AppSpacing.xs),
-          Text(label, style: AppTypography.overline.copyWith(color: color)),
+          // The label roughly doubles at 2× type (`docs/Design.md` §8) and has
+          // to be able to give way, which is why `budget_category_row.dart`
+          // wraps this pill in a `Flexible` — that is what bounds the row.
+          //
+          // The other caller, `budget_summary_card.dart`, puts the pill straight
+          // into a `Row` as a non-flex child, so its main axis is unbounded.
+          // `RenderFlex` only allocates space to flexible children when the main
+          // axis is bounded and otherwise lays them out as if they were
+          // non-flex, so the label renders at its intrinsic width there instead
+          // of collapsing.
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.overline.copyWith(color: color),
+            ),
+          ),
         ],
       ),
     );

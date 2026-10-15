@@ -5,6 +5,7 @@ import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
+import 'package:ledgerly/core/widgets/capped_row.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/insights/domain/entities/category_breakdown.dart';
 import 'package:material_ui/material_ui.dart';
@@ -55,34 +56,72 @@ class TopCategoriesCard extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      CategoryGem(
-                        colorValue: item.category.colorValue,
-                        iconKey: item.category.iconKey,
-                        size: CategoryGemSize.sm,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Text(
-                          item.category.name,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
+                  // The row is [gem][name] … [pct][amount], and the trailing
+                  // pair is what has to give way at 2× type
+                  // (`docs/Design.md` §8): the amount alone is then wider than
+                  // the row.
+                  //
+                  // The pair needs ~198 px of the 304 px row at 1×, so its cap
+                  // has to be the looser 0.7 — at the `CappedRow` default of 0.6
+                  // the cap would bind at 1× and truncate the amount on a screen
+                  // that has room for it. See `CappedRow` for why a cap rather
+                  // than a flex share.
+                  CappedRow(
+                    fraction: 0.7,
+                    builder: (context, trailingMaxWidth) => Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Row(
+                            children: <Widget>[
+                              CategoryGem(
+                                colorValue: item.category.colorValue,
+                                iconKey: item.category.iconKey,
+                                size: CategoryGemSize.sm,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                child: Text(
+                                  item.category.name,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        '$pct%',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colors.textSecondary,
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(width: AppSpacing.sm),
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: trailingMaxWidth,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(
+                                '$pct%',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: colors.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Flexible(
+                                child: AmountText(
+                                  money,
+                                  style: AmountStyle.row,
+                                  signed: false,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      AmountText(money, style: AmountStyle.row, signed: false),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   ClipRRect(

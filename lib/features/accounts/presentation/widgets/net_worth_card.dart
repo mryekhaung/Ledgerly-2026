@@ -38,18 +38,28 @@ class NetWorthCard extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Icon(AppIcons.budget, size: 18, color: colors.brandPrimary),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    strings('accountsNetWorth'),
-                    style: AppTypography.textTheme(colors).labelLarge?.copyWith(
-                      color: colors.textSecondary,
-                      fontWeight: FontWeight.w600,
+              // `Expanded` so the currency chip keeps its place at the far
+              // right, with the label ellipsizing first when 2× type
+              // (`docs/Design.md` §8) leaves no room for both.
+              Expanded(
+                child: Row(
+                  children: <Widget>[
+                    Icon(AppIcons.budget, size: 18, color: colors.brandPrimary),
+                    const SizedBox(width: AppSpacing.sm),
+                    Flexible(
+                      child: Text(
+                        strings('accountsNetWorth'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.textTheme(colors).labelLarge
+                            ?.copyWith(
+                              color: colors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(

@@ -8,6 +8,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../support/app_test_host.dart';
 import '../../../support/tolerant_golden.dart';
+import '../../../support/width_walk.dart';
 import '../domain/fake_auth_repository.dart';
 import '../support/auth_overrides.dart';
 
@@ -30,16 +31,21 @@ void main() {
   Future<void> host(
     WidgetTester tester, {
     Brightness brightness = Brightness.light,
+    double width = TestWidths.phone,
+    double textScale = 1,
   }) => pumpAppHost(
     tester,
-    size: const Size(TestWidths.phone, 900),
+    size: Size(width, 900),
     brightness: brightness,
+    textScaler: TextScaler.linear(textScale),
     overrides: <Override>[
       ...authOverridesFor(repository),
       currentAvatarProvider.overrideWithValue(AvatarConfig.initial),
     ],
     home: const AccountPage(),
   );
+
+  widthWalkGroup(pageName: 'AccountPage', host: host);
 
   group('Account screen goldens', () {
     testWidgets('light theme', (tester) async {

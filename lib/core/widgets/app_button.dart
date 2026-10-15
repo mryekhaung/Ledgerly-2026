@@ -130,6 +130,17 @@ class _AppButtonState extends State<AppButton> {
               valueColor: AlwaysStoppedAnimation<Color>(foregroundColor),
             ),
           )
+        // A label long enough to exceed the button at 2× type
+        // (`docs/Design.md` §8) has to be allowed to take less than its
+        // intrinsic width. `Flexible` is loose, so a label that does fit still
+        // hugs its content under `MainAxisSize.min`.
+        //
+        // This is also safe where `AppButton` is a non-flex child of a `Row`
+        // (`data_transfer/widgets/import_tab.dart`), which measures it with an
+        // unbounded main axis: `RenderFlex` only allocates space to flexible
+        // children when the main axis is bounded, and otherwise lays them out
+        // exactly as if they were non-flex. So the label falls back to its
+        // intrinsic width rather than collapsing.
         : Row(
             mainAxisSize: widget.isExpanded
                 ? MainAxisSize.max
@@ -140,11 +151,13 @@ class _AppButtonState extends State<AppButton> {
                 Icon(widget.icon, size: 20, color: foregroundColor),
                 const SizedBox(width: AppSpacing.sm),
               ],
-              Text(
-                widget.label,
-                style: textStyle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              Flexible(
+                child: Text(
+                  widget.label,
+                  style: textStyle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           );

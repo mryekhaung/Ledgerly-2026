@@ -532,7 +532,8 @@ Eleven refactor commits, each green on its own tests before pushing:
    a data migration.
 5. **Design.md verdict today** — tokens, radius, type, cards, segments,
    rows+separators, splash, skeleton, copy, calendar spec: enforced by Rules
-   1–12, suite **1413 green** (and green *locally*, not only on CI — §H.1).
+   1–12, suite **1437 green** (and green *locally*, not only on CI — §H.1), with
+   every screen now walked at all six mandated widths × two text scales (§I).
    Known accepted deviations: menu-row height 72 vs
    64 (§5.7 wins), `TabBar` page tabs + `FilterChip` multi-filters +
    `SwitchListTile` kept as distinct components, 3 AppScaffold-exempt frame
@@ -543,7 +544,7 @@ Eleven refactor commits, each green on its own tests before pushing:
 
 The nine remaining screen goldens were "done" but three separate defects meant
 most of them were asserting the wrong thing. Fixing that turned up five genuine
-product bugs. `flutter test`: **1413 green**; `flutter analyze`: 0 issues.
+product bugs. `flutter test`: **1437 green**; `flutter analyze`: 0 issues.
 
 1. **The local toolchain was never broken — the shell proxy was.** `flutter
    test` died on *every* file with `WebSocketException: Invalid WebSocket
@@ -597,13 +598,100 @@ product bugs. `flutter test`: **1413 green**; `flutter analyze`: 0 issues.
   Peeps colours come from `AvatarConfig.colors` (user data), not the theme, and
   `AvatarSvgComposer.compose` takes no `Brightness`. The test's real coverage is
   circle vs squircle; the theme axis asserts nothing.
-- **Seven screens have no responsive width walk.** Only `categories`,
-  `settings`, `calendar` and the shared layout walk
+- **Seven screens had no responsive width walk — DONE, see §I.** Only
+  `categories`, `settings`, `calendar` and the shared layout walk
   360/390/430/768/1024/1440 × text scale 1.0/2.0 and assert `takeException()`
   is null. `accounts`, `budgets`, `goals`, `recurring`, `insights`,
-  `data_transfer` and `auth` do not — which is exactly why the §H.3 overflows
-  survived. Adding those walks is the natural next increment and would have
-  caught all of them at build time.
+  `data_transfer` and `auth` did not — which is exactly why the §H.3 overflows
+  survived. All nine now do, and the walks found eleven more overflows the
+  goldens could not see.
+
+### I. Responsive width walks for every screen — DONE (16 Oct 2026)
+
+`test/support/width_walk.dart` registers the `every mandated width` group for a
+page: it pumps the page at 360 / 390 / 430 / 768 / 1024 / 1440 px, at text scale
+1.0 **and** 2.0, checks three frames per width, and asserts `takeException()` is
+null. It generalises the inline walk `calendar_page_test.dart` already had, and is
+now wired into all nine screens that lacked one (`accounts`, `budgets`, `goals`,
+`recurring`, `insights`, `data_transfer`, `welcome`, `sign-in`, `account`).
+`flutter test`: **1437 green**; `flutter analyze`: 0 issues.
+
+**It found eleven overflow sites immediately**, every one of them at 360 px with
+text scale 2.0 — a configuration no golden covered:
+
+| Screen | Widget | Overflow |
+|---|---|---|
+| insights | `donut_chart_card` legend chip | up to 223 px |
+| insights | `top_categories_card` row | up to 144 px |
+| insights | `income_expense_bar_chart_card` legend | 0.5 px |
+| accounts | `net_worth_card` header | up to 147 px |
+| accounts | `account_card` balance | up to 109 px |
+| budgets | `budgets_page` section heading | up to 219 px |
+| budgets | `budget_category_row` amounts + ` / ` separator | 33 / 36 px |
+| budgets | `budget_status_pill` label | 21 px |
+| recurring | `recurring_item_card` amount | 21 px |
+| welcome | app bar `Skip for now` action | 27 px |
+| data_transfer | `AppButton` label | up to 127 px |
+
+The mechanism is the same everywhere: `flutter_test`'s placeholder font advances
+each glyph by exactly the font size, so at 2× every string doubles — `Category
+Budget` at `titleMedium` is 480 px on a 360 px screen. Each site now yields
+(`Flexible` / `Expanded` + `maxLines: 1` + ellipsis, tokens only), except where
+noted below.
+
+Two causes are worth keeping, because neither is obvious:
+
+1. **`AppBar` measures its actions with an unbounded main axis.** `actions` go
+   straight into a `Row(mainAxisSize: min)`, and a `Row` lays its non-flex
+   children out unbounded — so `Skip for now` is measured at its full ~384 px and
+   overflows the 360 px toolbar instead of ellipsizing. Flutter clamps the *title*
+   to 1.34× text scale but does not clamp actions. Fix: wrap the action in
+   `Flexible` and ellipsize its label. `AppScaffold.actions` now documents this.
+2. **A `Flexible` in an unbounded `Row` does not collapse.** `RenderFlex` only
+   allocates space to flexible children when the main axis is bounded (`canFlex`),
+   and otherwise lays them out exactly as if they were non-flex. This matters
+   because `AppButton` and `BudgetStatusPill` are both used as non-flex children
+   of a `Row` (`data_transfer/widgets/import_tab.dart`, `budget_summary_card.dart`)
+   — a first attempt at the fix assumed the label would be given `maxWidth: 0`
+   and silently vanish, and rewrote both as `Wrap`s. It would not have. Both keep
+   the simpler `Flexible`.
+
+**Two coverage limits, recorded because they are how these survived:**
+
+- **The walk sees only what gets laid out.** A page whose body is a lazy list
+  builds just the viewport, so a widget below the fold is never measured — and the
+  golden, which captures the viewport too, does not see it either.
+  `TopCategoriesCard` is exactly that case: its overflow only showed at the wider
+  configurations, where the card finally came into view. It now has a focused
+  widget test (`top_categories_card_test.dart`), as does `budget_status_pill`
+  (which had none at all). Scrolling each page to the bottom inside the walk would
+  close the gap.
+- **The 2 % golden tolerance is far too coarse for a small widget.** The tolerance
+  exists to absorb rasterizer differences on CI, but a four-glyph label
+  disappearing or being truncated changes ~0.3 % of a 360×900 capture — inside it.
+  Overflow is still caught (it throws); a *layout* regression of a small element is
+  not. Focused widget tests are the answer, not tighter goldens.
+
+**Four rows are capped, not flexed** — and this is the subtlest part of the work.
+Rows shaped `[icon][label] … [value][menu]` (`account_card`, `budget_category_row`,
+`recurring_item_card`, `top_categories_card`) put the *data* last, and the shipped
+design gives it the whole row while the label truncates to nothing. Wrapping the
+value in `Flexible` fixes the 2× overflow but is wrong twice over: a flex share is
+allocated at **every** width, so it also binds at 1× and truncates the amount on a
+screen that has room for it; and because the label is `Expanded` (tight) while
+`Flexible` is loose, whenever the value is narrower than its share the row is left
+with unused space and the value drifts off the right edge.
+
+`lib/core/widgets/capped_row.dart` holds the fix: `CappedRow` wraps the row in a
+`LayoutBuilder` (it must wrap the *row* — inside it, the builder would be a non-flex
+child measured with an unbounded main axis) and hands the builder the width its
+trailing value may take. The value goes in a `ConstrainedBox`, so the cap is **inert
+until the row genuinely cannot fit**, which is what keeps 1× and wide layouts
+byte-identical to what shipped. `kTrailingValueMaxFraction` (0.6) is a documented
+judgment call with its measured headroom, and `top_categories_card` passes 0.7
+because its trailing pair needs ~198 px of a 304 px row at 1×. Pinned by
+`should_not_truncate_the_amount_where_the_row_fits`; the other three rows are covered
+by their page goldens, though only for gross changes (see above).
 
 ### C. Judgment items — done
 

@@ -8,6 +8,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
+import 'package:ledgerly/core/widgets/capped_row.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/account_catalog.dart';
 import 'package:material_ui/material_ui.dart';
@@ -51,146 +52,156 @@ class AccountCard extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       border: Border.all(color: colors.border),
       onTap: onTap ?? onEdit,
-      child: Row(
-        children: <Widget>[
-          // Icon with colored circle
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: accountColor.withValues(alpha: 0.16),
-              shape: BoxShape.circle,
+      child: CappedRow(
+        builder: (context, trailingMaxWidth) => Row(
+          children: <Widget>[
+            // Icon with colored circle
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: accountColor.withValues(alpha: 0.16),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Icon(iconData, color: accountColor, size: 22),
+              ),
             ),
-            child: Center(child: Icon(iconData, color: accountColor, size: 22)),
-          ),
-          const SizedBox(width: AppSpacing.md),
+            const SizedBox(width: AppSpacing.md),
 
-          // Title and Type
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      child: Text(
-                        account.name,
-                        style: AppTypography.textTheme(colors).titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (account.isArchived) ...[
-                      const SizedBox(width: AppSpacing.xs),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colors.surfaceSubtle,
-                          borderRadius: AppRadius.borderSm,
-                        ),
+            // Title and Type
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Flexible(
                         child: Text(
-                          strings('accountsArchivedTab'),
-                          // `caption` (11) is the §3 floor; this badge used
-                          // to sit at 10. A dedicated `Badge` component
-                          // (docs/Roadmap.md Phase 3.5 C) would own this.
-                          style: AppTypography.caption.copyWith(
+                          account.name,
+                          style: AppTypography.textTheme(colors).titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (account.isArchived) ...[
+                        const SizedBox(width: AppSpacing.xs),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.surfaceSubtle,
+                            borderRadius: AppRadius.borderSm,
+                          ),
+                          child: Text(
+                            strings('accountsArchivedTab'),
+                            // `caption` (11) is the §3 floor; this badge used
+                            // to sit at 10. A dedicated `Badge` component
+                            // (docs/Roadmap.md Phase 3.5 C) would own this.
+                            style: AppTypography.caption.copyWith(
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xxs),
+                  Row(
+                    children: <Widget>[
+                      Flexible(
+                        child: Text(
+                          typeLabel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.label.copyWith(
                             color: colors.textSecondary,
                           ),
                         ),
                       ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.xxs),
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      child: Text(
-                        typeLabel,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.label.copyWith(
-                          color: colors.textSecondary,
+                      if (!account.includeInTotal) ...[
+                        const SizedBox(width: AppSpacing.xs),
+                        Icon(
+                          AppIcons.conceal,
+                          size: 13,
+                          color: colors.textTertiary,
                         ),
-                      ),
-                    ),
-                    if (!account.includeInTotal) ...[
-                      const SizedBox(width: AppSpacing.xs),
-                      Icon(
-                        AppIcons.conceal,
-                        size: 13,
-                        color: colors.textTertiary,
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Current Balance. Capped rather than flexible: at 2× type
+            // (`docs/Design.md` §8) a 7-digit balance would push the row over, but
+            // a flex share would also bind at 1× and truncate the balance on a
+            // screen that has room for it. See `CappedRow`.
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: trailingMaxWidth),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  AmountText(
+                    Money.minor(account.currentBalanceMinor, account.currency),
+                    style: AmountStyle.row,
+                    signed: account.currentBalanceMinor < 0,
+                  ),
+                ],
+              ),
+            ),
+
+            // Overflow Menu
+            AppOverflowMenu<String>(
+              icon: AppIcons.more,
+              cancelLabel: strings('actionCancel'),
+              onSelected: (value) {
+                switch (value) {
+                  case 'edit':
+                    onEdit?.call();
+                  case 'transfer':
+                    onTransfer?.call();
+                  case 'archive':
+                    onArchiveToggle?.call();
+                  case 'delete':
+                    onDelete?.call();
+                }
+              },
+              items: <OverflowMenuItem<String>>[
+                OverflowMenuItem<String>(
+                  value: 'transfer',
+                  label: strings('accountsTransferButton'),
+                  icon: AppIcons.transfer,
+                ),
+                OverflowMenuItem<String>(
+                  value: 'edit',
+                  label: strings('accountsEditTitle'),
+                  icon: AppIcons.edit,
+                ),
+                OverflowMenuItem<String>(
+                  value: 'archive',
+                  label: account.isArchived
+                      ? strings('accountUnarchiveSuccess')
+                      : strings('accountArchiveSuccess'),
+                  icon: account.isArchived
+                      ? AppIcons.unarchive
+                      : AppIcons.archive,
+                ),
+                OverflowMenuItem<String>(
+                  value: 'delete',
+                  label: strings('accountDeleteTitle'),
+                  icon: AppIcons.destructive,
+                  destructive: true,
                 ),
               ],
             ),
-          ),
-
-          // Current Balance
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              AmountText(
-                Money.minor(account.currentBalanceMinor, account.currency),
-                style: AmountStyle.row,
-                signed: account.currentBalanceMinor < 0,
-              ),
-            ],
-          ),
-
-          // Overflow Menu
-          AppOverflowMenu<String>(
-            icon: AppIcons.more,
-            cancelLabel: strings('actionCancel'),
-            onSelected: (value) {
-              switch (value) {
-                case 'edit':
-                  onEdit?.call();
-                case 'transfer':
-                  onTransfer?.call();
-                case 'archive':
-                  onArchiveToggle?.call();
-                case 'delete':
-                  onDelete?.call();
-              }
-            },
-            items: <OverflowMenuItem<String>>[
-              OverflowMenuItem<String>(
-                value: 'transfer',
-                label: strings('accountsTransferButton'),
-                icon: AppIcons.transfer,
-              ),
-              OverflowMenuItem<String>(
-                value: 'edit',
-                label: strings('accountsEditTitle'),
-                icon: AppIcons.edit,
-              ),
-              OverflowMenuItem<String>(
-                value: 'archive',
-                label: account.isArchived
-                    ? strings('accountUnarchiveSuccess')
-                    : strings('accountArchiveSuccess'),
-                icon: account.isArchived
-                    ? AppIcons.unarchive
-                    : AppIcons.archive,
-              ),
-              OverflowMenuItem<String>(
-                value: 'delete',
-                label: strings('accountDeleteTitle'),
-                icon: AppIcons.destructive,
-                destructive: true,
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
