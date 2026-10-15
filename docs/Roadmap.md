@@ -488,17 +488,22 @@ Eleven refactor commits, each green on its own tests before pushing:
    contract tests + Firebase adapter, sync status UI, merge-on-first-login,
    app lock, widget, web release, Supabase proof. Needs backend credentials
    decisions before code (Agent.md §3.14).
-2. **Remaining splits** — pages still over ~200 lines with splittable
-   structure: `transfer_page` (407), `profile_page` (371),
-   `transaction_form_page` (365), `goal_form_page` (354),
-   `category_form_page` (353), `account_page` (338), `sign_in_page` (300),
-   `insights_page` (269), `month_starts_on_page` (264), plus widgets
-   `goal_card` (322), `goal_contribution_dialog` (315),
-   `recurring_item_card` / `filter_sheet` (268). Deliberately excluded:
-   generated code, `app_strings` (registry), `money`/`money_formatter`,
-   DAOs/datasources/providers (cohesive data layer), `app_theme`/
-   `app_router`/`adaptive_nav`/`amount_keypad`/`avatar_painter` (cohesive
-   components), `avatar_catalog` (data table).
+2. **Remaining splits — DONE.** All pages now ≤ 348 lines:
+  `transfer_page` 407→244, `profile_page` 412→76, `transaction_form_page`
+  397→262, `goal_form_page` 384→206, `category_form_page` 395→49,
+  `account_page` (auth) 350→163, `sign_in_page` 318→115, `insights_page`
+  285→85, `month_starts_on_page` 286→114, `goal_card` 338→139,
+  `goal_contribution_dialog` 346→232. Longest survivor is `account_form_page`
+  (348) — a 7-field form whose fields *are* the page. Found on the way and
+  fixed: `Swap accounts` tooltip, `Guest User`/`User` names, auth fallbacks,
+  goal amount errors (`goalAmountRequired` + mode-correct invalid keys),
+  ISO-date subtitles → intl, raw-minor balances → `MoneyFormatter`, dead
+  `recurringNextDue` key removed, and an ARB↔lookup **coverage guard** so a
+  key without a case can never ship silently again. Deliberately excluded
+  (unchanged): generated code, `app_strings` (registry),
+  `money`/`money_formatter`, DAOs/datasources/providers (cohesive data
+  layer), `app_theme`/`app_router`/`adaptive_nav`/`amount_keypad`/
+  `avatar_painter` (cohesive components), `avatar_catalog` (data table).
 3. **Screen goldens for the rest** — pinned: categories, settings,
    transactions_list, calendar (+ AppCard/ListRow/SegmentedTabs components).
    Unpinned: accounts, budgets, goals, recurring, auth, profile, insights,
