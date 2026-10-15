@@ -857,6 +857,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get accountsTransferFrom => '振替元口座';
 
   @override
+  String get accountsTransferSwap => '口座を入れ替え';
+
+  @override
   String get accountsTransferTo => '振替先口座';
 
   @override
@@ -1116,11 +1119,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get recurringDueTomorrow => '明日が期日';
-
-  @override
-  String recurringNextDue(String date) {
-    return '次回: $date';
-  }
 
   @override
   String get recurringActionSkip => '今回をスキップ';

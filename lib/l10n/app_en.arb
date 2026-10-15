@@ -1153,6 +1153,10 @@
   "@accountsTransferFrom": {
     "description": "Source account selector label."
   },
+  "accountsTransferSwap": "Swap accounts",
+  "@accountsTransferSwap": {
+    "description": "Tooltip for swapping source and destination accounts."
+  },
   "accountsTransferTo": "To Account",
   "@accountsTransferTo": {
     "description": "Destination account selector label."
@@ -1512,15 +1516,6 @@
   "recurringDueTomorrow": "Due tomorrow",
   "@recurringDueTomorrow": {
     "description": "Badge when a recurring item is due tomorrow."
-  },
-  "recurringNextDue": "Next: {date}",
-  "@recurringNextDue": {
-    "description": "Label showing next occurrence date.",
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
   },
   "recurringActionSkip": "Skip occurrence",
   "@recurringActionSkip": {

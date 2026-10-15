@@ -896,6 +896,9 @@ class AppLocalizationsMy extends AppLocalizations {
   String get accountsTransferFrom => 'လွှဲပြောင်းမည့် အကောင့်';
 
   @override
+  String get accountsTransferSwap => 'အကောင့်များလဲလှယ်မည်';
+
+  @override
   String get accountsTransferTo => 'လက်ခံမည့် အကောင့်';
 
   @override
@@ -1171,11 +1174,6 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get recurringDueTomorrow => 'မနက်ဖြန် ကျသင့်ငွေ';
-
-  @override
-  String recurringNextDue(String date) {
-    return 'နောက်တစ်ကြိမ်: $date';
-  }
 
   @override
   String get recurringActionSkip => 'ဤတစ်ကြိမ် ကျော်မည်';

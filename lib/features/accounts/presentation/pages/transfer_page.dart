@@ -8,18 +8,26 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
-import 'package:ledgerly/features/accounts/presentation/account_catalog.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
+import 'package:ledgerly/features/accounts/presentation/widgets/transfer/accounts_section.dart';
+import 'package:ledgerly/features/accounts/presentation/widgets/transfer/details_section.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Page for executing an atomic fund transfer between two accounts.
+///
+/// Composition root only: selectors and fields live in `widgets/transfer/`
+/// (`docs/Conventions.md` §1).
 class TransferPage extends ConsumerStatefulWidget {
+  /// Creates the page.
   const TransferPage({this.initialFromId, this.initialToId, super.key});
 
+  /// The pre-selected source account.
   final String? initialFromId;
+
+  /// The pre-selected destination account.
   final String? initialToId;
 
   @override
@@ -210,205 +218,25 @@ class _TransferPageState extends ConsumerState<TransferPage> {
               ],
 
               // From & To Selectors with Swap button
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: colors.surfaceRaised,
-                  borderRadius: AppRadius.borderLg,
-                  border: Border.all(color: colors.border),
-                ),
-                child: Column(
-                  children: <Widget>[
-                    // From Account Dropdown
-                    Row(
-                      children: <Widget>[
-                        Icon(
-                          AppIcons.increase,
-                          size: 20,
-                          color: colors.moneyOut,
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(
-                          strings('accountsTransferFrom'),
-                          style: AppTypography.label.copyWith(
-                            color: colors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    DropdownButtonFormField<String>(
-                      initialValue: formState.fromAccountId.isEmpty
-                          ? null
-                          : formState.fromAccountId,
-                      decoration: const InputDecoration(),
-                      items: accounts.map((a) {
-                        return DropdownMenuItem<String>(
-                          value: a.id,
-                          child: Row(
-                            children: <Widget>[
-                              Icon(
-                                AccountIcons.iconFor(a.iconKey),
-                                size: 18,
-                                color: Color(a.colorValue),
-                              ),
-                              const SizedBox(width: AppSpacing.sm),
-                              Text(a.name),
-                              const SizedBox(width: AppSpacing.sm),
-                              Text(
-                                '(${a.currency.symbol}${a.currentBalanceMinor})',
-                                style: AppTypography.label.copyWith(
-                                  color: colors.textTertiary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        if (val != null) notifier.setFromAccount(val);
-                      },
-                    ),
-
-                    const SizedBox(height: AppSpacing.md),
-
-                    // Swap Button
-                    Center(
-                      child: IconButton.filledTonal(
-                        icon: const Icon(AppIcons.sort, size: 20),
-                        tooltip: 'Swap accounts',
-                        onPressed: _swapAccounts,
-                      ),
-                    ),
-
-                    const SizedBox(height: AppSpacing.md),
-
-                    // To Account Dropdown
-                    Row(
-                      children: <Widget>[
-                        Icon(
-                          AppIcons.decrease,
-                          size: 20,
-                          color: colors.moneyIn,
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(
-                          strings('accountsTransferTo'),
-                          style: AppTypography.label.copyWith(
-                            color: colors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    DropdownButtonFormField<String>(
-                      initialValue: formState.toAccountId.isEmpty
-                          ? null
-                          : formState.toAccountId,
-                      decoration: const InputDecoration(),
-                      items: accounts.map((a) {
-                        return DropdownMenuItem<String>(
-                          value: a.id,
-                          child: Row(
-                            children: <Widget>[
-                              Icon(
-                                AccountIcons.iconFor(a.iconKey),
-                                size: 18,
-                                color: Color(a.colorValue),
-                              ),
-                              const SizedBox(width: AppSpacing.sm),
-                              Text(a.name),
-                              const SizedBox(width: AppSpacing.sm),
-                              Text(
-                                '(${a.currency.symbol}${a.currentBalanceMinor})',
-                                style: AppTypography.label.copyWith(
-                                  color: colors.textTertiary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        if (val != null) notifier.setToAccount(val);
-                      },
-                    ),
-                  ],
-                ),
+              TransferAccountsSection(
+                accounts: accounts,
+                fromAccountId: formState.fromAccountId,
+                toAccountId: formState.toAccountId,
+                onFromChanged: notifier.setFromAccount,
+                onToChanged: notifier.setToAccount,
+                onSwap: _swapAccounts,
               ),
 
               const SizedBox(height: AppSpacing.xl),
 
-              // Amount
-              Text(
-                strings('accountsTransferAmount').toUpperCase(),
-                style: AppTypography.overline.copyWith(
-                  color: colors.textTertiary,
-                ),
+              TransferDetailsSection(
+                amountController: _amountController,
+                noteController: _noteController,
+                fromAccount: fromAccount,
+                date: formState.date,
+                onAmountChanged: (text) => _onAmountChanged(text, fromAccount),
+                onPickDate: () => _pickDate(formState.date),
               ),
-              const SizedBox(height: AppSpacing.xs),
-              TextField(
-                controller: _amountController,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                textInputAction: TextInputAction.next,
-                onChanged: (text) => _onAmountChanged(text, fromAccount),
-                style: AppTypography.textTheme(colors).titleLarge
-                    ?.copyWith(fontWeight: FontWeight.w600),
-                decoration: InputDecoration(
-                  prefixText: fromAccount != null
-                      ? '${fromAccount.currency.symbol} '
-                      : '',
-                  hintText: '0',
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.lg),
-
-              // Date Picker Field
-              Text(
-                strings('accountsTransferDate').toUpperCase(),
-                style: AppTypography.overline.copyWith(
-                  color: colors.textTertiary,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              InkWell(
-                onTap: () => _pickDate(formState.date),
-                borderRadius: AppRadius.borderMd,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    suffixIcon: Icon(AppIcons.calendar, size: 18),
-                  ),
-                  child: Text(
-                    '${formState.date.year}-${formState.date.month.toString().padLeft(2, '0')}-${formState.date.day.toString().padLeft(2, '0')}',
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.lg),
-
-              // Note Field
-              Text(
-                strings('accountsTransferNote').toUpperCase(),
-                style: AppTypography.overline.copyWith(
-                  color: colors.textTertiary,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              TextField(
-                controller: _noteController,
-                maxLength: 200,
-                textInputAction: TextInputAction.done,
-                onChanged: notifier.setNote,
-                decoration: InputDecoration(
-                  hintText: strings('accountsTransferNote'),
-                  counterText: '',
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.xxl),
             ],
           );
         },

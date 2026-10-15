@@ -1762,6 +1762,12 @@ abstract class AppLocalizations {
   /// **'From Account'**
   String get accountsTransferFrom;
 
+  /// Tooltip for swapping source and destination accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap accounts'**
+  String get accountsTransferSwap;
+
   /// Destination account selector label.
   ///
   /// In en, this message translates to:
@@ -2265,12 +2271,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Due tomorrow'**
   String get recurringDueTomorrow;
-
-  /// Label showing next occurrence date.
-  ///
-  /// In en, this message translates to:
-  /// **'Next: {date}'**
-  String recurringNextDue(String date);
 
   /// Menu action to skip the next due date.
   ///

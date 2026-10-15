@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
@@ -27,6 +29,30 @@ void main() {
       final lookup = AppStringLookup.of(en());
 
       expect(() => lookup('no_such_key_anywhere'), throwsFlutterError);
+    });
+
+    test('should_cover_every_arb_key', () {
+      // A key with no case renders as whatever the wildcard does — which is
+      // how half a dozen real keys once shipped as "Please check the
+      // highlighted fields." Reading the ARB keeps this test honest when keys
+      // are added: add the case in the same commit or this goes red.
+      final arb = File('lib/l10n/app_en.arb').readAsStringSync();
+      final keys = RegExp(
+        r'^  "([A-Za-z][A-Za-z0-9]*)":',
+        multiLine: true,
+      ).allMatches(arb).map((m) => m.group(1)!).toSet();
+      final source = File('lib/core/presentation/app_strings.dart')
+          .readAsStringSync();
+
+      expect(keys, isNotEmpty);
+      final uncovered = keys
+          .where((key) => !source.contains("'$key' =>"))
+          .toList();
+      expect(
+        uncovered,
+        isEmpty,
+        reason: 'ARB keys with no lookup case: $uncovered',
+      );
     });
   });
 

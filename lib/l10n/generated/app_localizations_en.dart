@@ -885,6 +885,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountsTransferFrom => 'From Account';
 
   @override
+  String get accountsTransferSwap => 'Swap accounts';
+
+  @override
   String get accountsTransferTo => 'To Account';
 
   @override
@@ -1155,11 +1158,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recurringDueTomorrow => 'Due tomorrow';
-
-  @override
-  String recurringNextDue(String date) {
-    return 'Next: $date';
-  }
 
   @override
   String get recurringActionSkip => 'Skip occurrence';
