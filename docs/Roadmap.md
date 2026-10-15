@@ -390,11 +390,10 @@ one PR-shaped commit:
   month preview, net worth. `surfaceSubtle` + `borderMd` treatments are gone;
   status borders ride the `AppCard.border` slot.
 
-Deliberately **not** done (judgment, recorded): splitting 500+ line pages
-(`calendar_page`, `avatar_editor_page`) — high-churn refactor, needs its own
-phase with per-extraction goldens; replacing the Material outlined glyph set
-with custom 2026 line-art — an art commission, not a code violation (Rule 8
-already pins one glyph per concept).
+Deliberately **not** done here (judgment, recorded): replacing the Material
+outlined glyph set with custom 2026 line-art — an art commission, not a code
+violation (Rule 8 already pins one glyph per concept). Page-splitting lived
+here too until §F did it.
 
 ### E. Whole-app Design.md + 2026 UX audit — COMPLETE (1390 green)
 
@@ -422,6 +421,87 @@ All three open items from the Categories review, plus a full-lib sweep:
 - Sweep confirms: zero `BoxShadow` outside `AppElevation`, zero `TextStyle(`
   outside token definitions, zero `print(`, all copy ARB-backed (incl. the
   `Swap accounts` tooltip and ISO-date subtitles found on the way).
+
+### F. Page splits + status bar + icon/copy correctness — COMPLETE (1394 green)
+
+Eleven refactor commits, each green on its own tests before pushing:
+
+- ☑ **Splits** (`Conventions.md` §1 — one public class per file, ~200 lines):
+  `calendar_page` 1129→210 (`widgets/calendar/`, 8 files),
+  `avatar_editor_page` 1005→212 (`widgets/avatar_editor/`, 11 files),
+  `settings_page` 712→125 (sections + rows + groups, 6 files),
+  `transactions_list_page` 582→290 (chips + row),
+  `data_transfer_page` 588→78 (export/import/backup tabs),
+  `account_form_page` 512→348 (preview + labels + pickers),
+  `transaction_filter_sheet` 490→267 (4 sections),
+  `welcome_page` 481→197 (hero + question + buttons),
+  `category_list_page` 496→227 (body + pane + row),
+  `budget_form_page` 449→243 (4 sections),
+  `recurring_form_page` 444→212 (3 sections).
+  Rule 9's exemption list moved with the rows (page → widget file). Still
+  over ~200 by nature, not by neglect: long forms whose fields *are* the page
+  (`account_form` 348, `transactions_list` 290) — splitting those further
+  would scatter one form's wiring for no readability gain.
+- ☑ **Status bar invisible in Light Mode** — no `SystemUiOverlayStyle` was set
+  anywhere, so edge-to-edge transparent bars showed white-on-white icons.
+  `AppTheme.systemOverlayStyle(brightness)` + `AppBarTheme.systemOverlayStyle`
+  + a declarative `AnnotatedRegion` in `LedgerlyApp.builder` (covers AppBar-less
+  pages too). Pinned by 3 tests in `design_tokens_test.dart`.
+- ☑ **Category gems all identical** — seeds used Material names (`restaurant`,
+  …) while the catalogue speaks semantic keys (`food`, …); 10/11 rows fell
+  back to the tag glyph. Seeds → canonical keys; `iconFor` heals the 10 legacy
+  Material names (existing installs + old backups, no migration); `seed_test`
+  asserts vocabulary membership + glyph distinctness, `category_catalog_test`
+  pins aliases + fallback (7 tests).
+- ☑ **CategoryRow → ListRow** (§5.6: 64/76 heights, lg/md padding, press wash;
+  measured 72/76 — the 72 is the 48 px menu button + padding, §5.7 wins over
+  the 64 figure, recorded) + `showDivider` separators.
+- ☑ **Silent-lookup wildcard killed** — `_resolve`'s `_ => failureValidation`
+  rendered "Please check the highlighted fields." for every key added without a
+  case (goal dropdown + date subtitle on first paint, among others). Unknown
+  keys now **throw** (matching `fill()` + the doc comment's own claim); the
+  throw immediately surfaced 4 more pre-existing gaps (`cancel`/`delete`/
+  `save`/`accountsDelete` → `action*`/`accountDeleteTitle`) plus 3 hardcoded
+  auth fallbacks (now ARB keys). New `app_strings_test.dart` (4 tests) pins
+  resolve + throw + fill.
+- ☑ **Goal form icons/colors** — `_kGoalIcons` had 6/8 non-vocabulary keys
+  (same tag-everywhere bug) → canonical 8; `_kGoalColors` hardcoded hex →
+  shared `CategoryPalette`; goal legacy aliases added (6).
+- ☑ **Import format switch was a no-op** — `onChanged` re-applied the current
+  options, ignoring the tapped format. `ImportNotifier.setFormat` + notifier
+  test.
+
+### G. Remaining work (honest list, ordered)
+
+1. **Phase 4 Sync (v0.4)** — still NOT STARTED: outbox + `RemoteStore`
+   contract tests + Firebase adapter, sync status UI, merge-on-first-login,
+   app lock, widget, web release, Supabase proof. Needs backend credentials
+   decisions before code (Agent.md §3.14).
+2. **Remaining splits** — pages still over ~200 lines with splittable
+   structure: `transfer_page` (407), `profile_page` (371),
+   `transaction_form_page` (365), `goal_form_page` (354),
+   `category_form_page` (353), `account_page` (338), `sign_in_page` (300),
+   `insights_page` (269), `month_starts_on_page` (264), plus widgets
+   `goal_card` (322), `goal_contribution_dialog` (315),
+   `recurring_item_card` / `filter_sheet` (268). Deliberately excluded:
+   generated code, `app_strings` (registry), `money`/`money_formatter`,
+   DAOs/datasources/providers (cohesive data layer), `app_theme`/
+   `app_router`/`adaptive_nav`/`amount_keypad`/`avatar_painter` (cohesive
+   components), `avatar_catalog` (data table).
+3. **Screen goldens for the rest** — pinned: categories, settings,
+   transactions_list, calendar (+ AppCard/ListRow/SegmentedTabs components).
+   Unpinned: accounts, budgets, goals, recurring, auth, profile, insights,
+   data_transfer.
+4. **Custom 2026 icon set** — art commission (see §D note). Code is ready:
+   one glyph per concept (Rule 8), keys are semantic so the set swaps without
+   a data migration.
+5. **Design.md verdict today** — tokens, radius, type, cards, segments,
+   rows+separators, splash, skeleton, copy, calendar spec: enforced by Rules
+   1–12, suite 1394 green. Known accepted deviations: menu-row height 72 vs
+   64 (§5.7 wins), `TabBar` page tabs + `FilterChip` multi-filters +
+   `SwitchListTile` kept as distinct components, 3 AppScaffold-exempt frame
+   files (guarded), FAB clearances + 48 px grid geometry as documented
+   non-token values, `AppScaffold` excluded from goldens (viewport-dependent).
 
 ### C. Judgment items — done
 
