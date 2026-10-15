@@ -421,6 +421,7 @@
   "goalTargetAmountInvalid": "目標金額は0より大きい必要があります",
   "goalCurrentAmountInvalid": "貯蓄額は負の値にできません",
   "goalContributionAmountInvalid": "入金額は0より大きい必要があります",
+  "goalAmountRequired": "金額を入力してください",
   "goalWithdrawAmountInvalid": "引き出し額は0より大きい必要があります",
   "goalWithdrawExceedsBalance": "引き出し額が現在の貯蓄残高を超えています",
   "goalNotesTooLong": "メモは500文字以内で入力してください",

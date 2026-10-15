@@ -421,6 +421,7 @@
   "goalTargetAmountInvalid": "ရည်မှန်းငွေပမာဏသည် သုညထက် ကြီးရပါမည်",
   "goalCurrentAmountInvalid": "စုဆောင်းငွေသည် အနှုတ် မဖြစ်ရပါ",
   "goalContributionAmountInvalid": "ထည့်ဝင်ငွေပမာဏသည် သုညထက် ကြီးရပါမည်",
+  "goalAmountRequired": "ပမာဏ ထည့်သွင်းပါ",
   "goalWithdrawAmountInvalid": "ထုတ်ယူငွေပမာဏသည် သုညထက် ကြီးရပါမည်",
   "goalWithdrawExceedsBalance": "ထုတ်ယူငွေသည် လက်ရှိစုငွေထက် မကျော်လွန်ရပါ",
   "goalNotesTooLong": "မှတ်ချက်သည် စာလုံးရေ ၅၀၀ ထက် မကျော်ရပါ",

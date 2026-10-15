@@ -564,6 +564,7 @@ abstract final class AppStringLookup {
     'signInOrDivider' => l10n.signInOrDivider,
     'goalNoAccountOption' => l10n.goalNoAccountOption,
     'goalNoDate' => l10n.goalNoDate,
+    'goalAmountRequired' => l10n.goalAmountRequired,
     // Unknown keys throw rather than rendering a misleading message: a
     // validator added ahead of its translation must surface in tests, not as
     // a wrong sentence in the UI (the silent `failureValidation` fallback hid

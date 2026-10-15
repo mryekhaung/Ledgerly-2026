@@ -1300,6 +1300,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get goalContributionAmountInvalid => '入金額は0より大きい必要があります';
 
   @override
+  String get goalAmountRequired => '金額を入力してください';
+
+  @override
   String get goalWithdrawAmountInvalid => '引き出し額は0より大きい必要があります';
 
   @override

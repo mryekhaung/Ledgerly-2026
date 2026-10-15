@@ -1,33 +1,41 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
-import 'package:ledgerly/core/widgets/amount_text.dart';
-import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/domain/usecases/add_goal_contribution.dart';
 import 'package:ledgerly/features/goals/domain/usecases/withdraw_from_goal.dart';
 import 'package:ledgerly/features/goals/presentation/providers/goals_providers.dart';
+import 'package:ledgerly/features/goals/presentation/widgets/contribution/form.dart';
+import 'package:ledgerly/features/goals/presentation/widgets/contribution/header.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:material_ui/material_ui.dart';
 
+/// Deposit or withdraw mode.
 enum GoalContributionMode { deposit, withdraw }
 
 /// Dialog or bottom sheet to deposit funds into or withdraw from a savings goal.
+///
+/// Composition root only: header and form live in `widgets/contribution/`
+/// (`docs/Conventions.md` §1).
 class GoalContributionDialog extends ConsumerStatefulWidget {
+  /// Creates the dialog.
   const GoalContributionDialog({
     required this.goal,
     this.initialMode = GoalContributionMode.deposit,
     super.key,
   });
 
+  /// The goal being adjusted.
   final SavingsGoal goal;
+
+  /// The starting mode.
   final GoalContributionMode initialMode;
 
+  /// Shows the dialog as a bottom sheet.
   static Future<void> show(
     BuildContext context, {
     required SavingsGoal goal,
@@ -72,21 +80,27 @@ class _GoalContributionDialogState
   }
 
   Future<void> _submit() async {
+    final strings = AppStrings.of(context);
     final rawText = _amountController.text.trim();
     if (rawText.isEmpty) {
-      setState(() => _error = 'Please enter an amount');
+      setState(() => _error = strings('goalAmountRequired'));
       return;
     }
 
     final parsed = Money.tryParse(rawText, widget.goal.targetAmount.currency);
     if (parsed == null || parsed.amountMinor <= 0) {
-      setState(() => _error = 'Amount must be greater than zero');
+      setState(
+        () => _error = strings(
+          _mode == GoalContributionMode.deposit
+              ? 'goalContributionAmountInvalid'
+              : 'goalWithdrawAmountInvalid',
+        ),
+      );
       return;
     }
 
     if (_mode == GoalContributionMode.withdraw &&
         parsed.amountMinor > widget.goal.currentAmount.amountMinor) {
-      final strings = AppStrings.of(context);
       setState(() => _error = strings('goalWithdrawExceedsBalance'));
       return;
     }
@@ -99,8 +113,6 @@ class _GoalContributionDialogState
     final note = _noteController.text.trim().isEmpty
         ? null
         : _noteController.text.trim();
-
-    final strings = AppStrings.of(context);
 
     if (_mode == GoalContributionMode.deposit) {
       final useCase = ref.read(addGoalContributionProvider);
@@ -188,132 +200,28 @@ class _GoalContributionDialogState
             ),
           ),
 
-          // Header
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _mode == GoalContributionMode.deposit
-                          ? strings('depositTitle')
-                          : strings('withdrawTitle'),
-                      style: AppTypography.title.copyWith(
-                        color: colors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xxs),
-                    Text(
-                      widget.goal.name,
-                      style: AppTypography.label.copyWith(
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Current saved amount
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    strings('goalCurrentAmountLabel'),
-                    style: AppTypography.label.copyWith(
-                      color: colors.textSecondary,
-                    ),
-                  ),
-                  AmountText(
-                    widget.goal.currentAmount,
-                    style: AmountStyle.row,
-                    signed: false,
-                  ),
-                ],
-              ),
-            ],
-          ),
+          ContributionHeader(mode: _mode, goal: widget.goal),
 
           const SizedBox(height: AppSpacing.md),
 
-          // Deposit / Withdraw segment toggle
-          SegmentedTabs<GoalContributionMode>(
-            tabs: [
-              SegmentedTab(
-                value: GoalContributionMode.deposit,
-                label: strings('depositAction'),
-                icon: AppIcons.decrease,
-              ),
-              SegmentedTab(
-                value: GoalContributionMode.withdraw,
-                label: strings('withdrawAction'),
-                icon: AppIcons.increase,
-              ),
-            ],
-            selected: _mode,
-            onChanged: (mode) {
+          ContributionForm(
+            mode: _mode,
+            onModeChanged: (mode) {
               setState(() {
                 _mode = mode;
                 _error = null;
               });
             },
+            amountController: _amountController,
+            amountError: _error,
+            amountLabel: strings('goalAmountLabel'),
+            currencyPrefix:
+                '${widget.goal.targetAmount.currency.name.toUpperCase()} ',
+            accounts: accountsAsync,
+            selectedAccountId: _selectedAccountId,
+            onAccountChanged: (val) => setState(() => _selectedAccountId = val),
+            noteController: _noteController,
           ),
-
-          const SizedBox(height: AppSpacing.md),
-
-          // Amount text field
-          TextField(
-            controller: _amountController,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            autofocus: true,
-            decoration: InputDecoration(
-              labelText: strings('goalAmountLabel'),
-              prefixText:
-                  '${widget.goal.targetAmount.currency.name.toUpperCase()} ',
-              border: const OutlineInputBorder(),
-              errorText: _error,
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.md),
-
-          // Optional Account selector
-          accountsAsync.when(
-            data: (accounts) {
-              if (accounts.isEmpty) return const SizedBox.shrink();
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: DropdownButtonFormField<String?>(
-                  initialValue: _selectedAccountId,
-                  decoration: InputDecoration(
-                    labelText: strings('goalAccountLabel'),
-                    border: const OutlineInputBorder(),
-                  ),
-                  items: [
-                    DropdownMenuItem(
-                      value: null,
-                      child: Text(strings('goalNoAccountOption')),
-                    ),
-                    for (final acc in accounts)
-                      DropdownMenuItem(value: acc.id, child: Text(acc.name)),
-                  ],
-                  onChanged: (val) => setState(() => _selectedAccountId = val),
-                ),
-              );
-            },
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-
-          // Optional Note text field
-          TextField(
-            controller: _noteController,
-            decoration: InputDecoration(
-              labelText: strings('goalNotesLabel'),
-              border: const OutlineInputBorder(),
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.lg),
 
           // Action button
           FilledButton(

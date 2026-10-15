@@ -1346,6 +1346,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Contribution amount must be greater than zero';
 
   @override
+  String get goalAmountRequired => 'Please enter an amount';
+
+  @override
   String get goalWithdrawAmountInvalid =>
       'Withdrawal amount must be greater than zero';
 

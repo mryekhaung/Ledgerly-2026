@@ -1367,6 +1367,9 @@ class AppLocalizationsMy extends AppLocalizations {
       'ထည့်ဝင်ငွေပမာဏသည် သုညထက် ကြီးရပါမည်';
 
   @override
+  String get goalAmountRequired => 'ပမာဏ ထည့်သွင်းပါ';
+
+  @override
   String get goalWithdrawAmountInvalid => 'ထုတ်ယူငွေပမာဏသည် သုညထက် ကြီးရပါမည်';
 
   @override

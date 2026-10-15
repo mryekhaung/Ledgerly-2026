@@ -2614,6 +2614,12 @@ abstract class AppLocalizations {
   /// **'Contribution amount must be greater than zero'**
   String get goalContributionAmountInvalid;
 
+  /// Validation error when the amount field is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an amount'**
+  String get goalAmountRequired;
+
   /// Validation error when withdrawal amount is not positive.
   ///
   /// In en, this message translates to:

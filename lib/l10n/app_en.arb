@@ -1765,6 +1765,10 @@
   "@goalContributionAmountInvalid": {
     "description": "Validation error when contribution amount is not positive."
   },
+  "goalAmountRequired": "Please enter an amount",
+  "@goalAmountRequired": {
+    "description": "Validation error when the amount field is empty."
+  },
   "goalWithdrawAmountInvalid": "Withdrawal amount must be greater than zero",
   "@goalWithdrawAmountInvalid": {
     "description": "Validation error when withdrawal amount is not positive."
