@@ -706,7 +706,7 @@ void main() {
     /// cannot rot into a permanent allowlist for files that no longer need it.
     const fieldAndRichRowPaths = <String>[
       'lib/features/goals/presentation/pages/goal_form_page.dart',
-      'lib/features/recurring/presentation/pages/recurring_form_page.dart',
+      'lib/features/recurring/presentation/widgets/recurring_form/schedule_section.dart',
       'lib/features/transactions/presentation/widgets/calendar/transaction_row.dart',
       'lib/features/transactions/presentation/widgets/transactions_list/list_transaction_row.dart',
     ];

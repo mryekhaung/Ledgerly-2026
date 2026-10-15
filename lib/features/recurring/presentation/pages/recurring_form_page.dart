@@ -1,29 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
-import 'package:ledgerly/core/widgets/category_gem.dart';
-import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
-import 'package:ledgerly/features/recurring/domain/entities/recurring_frequency.dart';
 import 'package:ledgerly/features/recurring/presentation/providers/recurring_providers.dart';
+import 'package:ledgerly/features/recurring/presentation/widgets/recurring_form/details_section.dart';
+import 'package:ledgerly/features/recurring/presentation/widgets/recurring_form/note_submit_section.dart';
+import 'package:ledgerly/features/recurring/presentation/widgets/recurring_form/schedule_section.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Page for creating or editing a recurring transaction rule.
+///
+/// Composition root only: sections live in `widgets/recurring_form/`
+/// (`docs/Conventions.md` §1).
 class RecurringFormPage extends ConsumerStatefulWidget {
+  /// Creates the page.
   const RecurringFormPage({this.recurringId, super.key});
 
+  /// The rule being edited, or null when creating.
   final String? recurringId;
 
   @override
@@ -84,13 +86,55 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
     }
   }
 
+  Future<void> _handleSave() async {
+    final strings = AppStrings.of(context);
+    final success = await ref
+        .read(recurringFormNotifierProvider.notifier)
+        .save();
+    if (success && mounted) {
+      AppFeedback.confirm(context, message: strings('recurringSavedSuccess'));
+      context.pop();
+    }
+  }
+
+  Future<void> _handleDelete(String ruleId) async {
+    final strings = AppStrings.of(context);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(strings('recurringConfirmDelete')),
+        content: Text(strings('recurringConfirmDeleteMessage')),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(strings('actionCancel')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(strings('actionDelete')),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true && mounted) {
+      await ref
+          .read(recurringSchedulerNotifierProvider.notifier)
+          .delete(ruleId);
+      if (mounted) {
+        AppFeedback.confirm(
+          context,
+          message: strings('recurringDeletedSuccess'),
+        );
+        context.pop();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
-
     final formState = ref.watch(recurringFormNotifierProvider);
+    final notifier = ref.read(recurringFormNotifierProvider.notifier);
     final categoryKind = formState.direction == TransactionDirection.expense
         ? CategoryKind.expense
         : CategoryKind.income;
@@ -107,25 +151,22 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: <Widget>[
-          // Direction selector (Expense / Income)
-          SegmentedTabs<TransactionDirection>(
-            tabs: <SegmentedTab<TransactionDirection>>[
-              SegmentedTab<TransactionDirection>(
-                value: TransactionDirection.expense,
-                label: strings('transactionDirectionExpense'),
-                icon: AppIcons.increase,
-              ),
-              SegmentedTab<TransactionDirection>(
-                value: TransactionDirection.income,
-                label: strings('transactionDirectionIncome'),
-                icon: AppIcons.decrease,
-              ),
-            ],
-            selected: formState.direction,
-            onChanged: (newDirection) {
-              ref
-                  .read(recurringFormNotifierProvider.notifier)
-                  .setDirection(newDirection);
+          RecurringDetailsSection(
+            direction: formState.direction,
+            amountController: _amountController,
+            currency: formState.currency,
+            amountError: formState.fieldErrors['amount'] != null
+                ? strings(formState.fieldErrors['amount']!)
+                : null,
+            categories: categories,
+            categoryId: formState.categoryId,
+            categoryError: formState.fieldErrors['category'] != null
+                ? strings(formState.fieldErrors['category']!)
+                : null,
+            accounts: accounts,
+            accountId: formState.accountId,
+            onDirectionChanged: (newDirection) {
+              notifier.setDirection(newDirection);
 
               final newKind = newDirection == TransactionDirection.expense
                   ? CategoryKind.expense
@@ -134,309 +175,47 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
                   ref.read(pickableCategoriesProvider(newKind)).value ??
                   const <Category>[];
               if (newCats.isNotEmpty) {
-                ref
-                    .read(recurringFormNotifierProvider.notifier)
-                    .setCategory(newCats.first.id);
+                notifier.setCategory(newCats.first.id);
               }
             },
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Amount input
-          TextField(
-            controller: _amountController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: strings('budgetFieldAmount'),
-              prefixText: '${formState.currency.code.toUpperCase()} ',
-              border: const OutlineInputBorder(
-                borderRadius: AppRadius.borderMd,
-              ),
-              errorText: formState.fieldErrors['amount'] != null
-                  ? strings(formState.fieldErrors['amount']!)
-                  : null,
-            ),
-            onChanged: (val) {
+            onAmountChanged: (val) {
               final parsed = int.tryParse(val) ?? 0;
-              ref
-                  .read(recurringFormNotifierProvider.notifier)
-                  .setAmountMinor(parsed);
+              notifier.setAmountMinor(parsed);
             },
+            onCategoryChanged: notifier.setCategory,
+            onAccountChanged: notifier.setAccount,
           ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Category dropdown
-          DropdownButtonFormField<String>(
-            initialValue: formState.categoryId.isNotEmpty
-                ? formState.categoryId
-                : (categories.isNotEmpty ? categories.first.id : null),
-            decoration: InputDecoration(
-              labelText: strings('budgetFieldCategory'),
-              border: const OutlineInputBorder(
-                borderRadius: AppRadius.borderMd,
-              ),
-              errorText: formState.fieldErrors['category'] != null
-                  ? strings(formState.fieldErrors['category']!)
-                  : null,
-            ),
-            items: categories.map((cat) {
-              return DropdownMenuItem<String>(
-                value: cat.id,
-                child: Row(
-                  children: <Widget>[
-                    CategoryGem(
-                      colorValue: cat.colorValue,
-                      iconKey: cat.iconKey,
-                      size: CategoryGemSize.sm,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(cat.name),
-                  ],
-                ),
-              );
-            }).toList(),
-            onChanged: (catId) {
-              if (catId != null) {
-                ref
-                    .read(recurringFormNotifierProvider.notifier)
-                    .setCategory(catId);
-              }
-            },
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Account selector (optional)
-          if (accounts.isNotEmpty) ...<Widget>[
-            DropdownButtonFormField<String?>(
-              initialValue: formState.accountId,
-              decoration: InputDecoration(
-                labelText: strings('recurringFieldAccountOptional'),
-                border: const OutlineInputBorder(
-                  borderRadius: AppRadius.borderMd,
-                ),
-              ),
-              items: <DropdownMenuItem<String?>>[
-                DropdownMenuItem<String?>(
-                  value: null,
-                  child: Text(strings('recurringAccountNone')),
-                ),
-                ...accounts.map(
-                  (acc) => DropdownMenuItem<String?>(
-                    value: acc.id,
-                    child: Text('${acc.name} (${acc.currency.code})'),
-                  ),
-                ),
-              ],
-              onChanged: (accId) {
-                ref
-                    .read(recurringFormNotifierProvider.notifier)
-                    .setAccount(accId);
-              },
-            ),
-            const SizedBox(height: AppSpacing.md),
-          ],
-
-          // Frequency dropdown
-          DropdownButtonFormField<RecurringFrequency>(
-            initialValue: formState.frequency,
-            decoration: InputDecoration(
-              labelText: strings('recurringFieldFrequency'),
-              border: const OutlineInputBorder(
-                borderRadius: AppRadius.borderMd,
-              ),
-            ),
-            items: RecurringFrequency.values.map((freq) {
-              final label = switch (freq) {
-                RecurringFrequency.daily => strings('recurringFrequencyDaily'),
-                RecurringFrequency.weekly => strings(
-                  'recurringFrequencyWeekly',
-                ),
-                RecurringFrequency.monthly => strings(
-                  'recurringFrequencyMonthly',
-                ),
-                RecurringFrequency.yearly => strings(
-                  'recurringFrequencyYearly',
-                ),
-              };
-              return DropdownMenuItem<RecurringFrequency>(
-                value: freq,
-                child: Text(label),
-              );
-            }).toList(),
-            onChanged: (freq) {
-              if (freq != null) {
-                ref
-                    .read(recurringFormNotifierProvider.notifier)
-                    .setFrequency(freq);
-              }
-            },
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Start Date row
-          ListTile(
-            tileColor: colors.surfaceRaised,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppRadius.borderMd,
-              side: BorderSide(color: colors.border.withValues(alpha: 0.5)),
-            ),
-            leading: Icon(AppIcons.calendar, color: colors.brandPrimary),
-            title: Text(strings('recurringFieldStartDate')),
-            // §7: dates render via intl for the active locale, never ISO.
-            subtitle: Text(
-              DateFormat.yMd(Localizations.localeOf(context).toLanguageTag())
-                  .format(formState.startDate.toDateTime()),
-            ),
-            trailing: const Icon(AppIcons.chevronForward, size: 14),
-            onTap: () => _pickDate(
+          RecurringScheduleSection(
+            frequency: formState.frequency,
+            startDate: formState.startDate,
+            endDate: formState.endDate,
+            hasEndDate: formState.hasEndDate,
+            autoAdd: formState.autoAdd,
+            onFrequencyChanged: notifier.setFrequency,
+            onPickStart: () => _pickDate(
               initialDate: formState.startDate,
-              onPicked: (d) => ref
-                  .read(recurringFormNotifierProvider.notifier)
-                  .setStartDate(d),
+              onPicked: notifier.setStartDate,
             ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-
-          // Has end date switch
-          SwitchListTile(
-            title: Text(strings('recurringFieldHasEndDate')),
-            value: formState.hasEndDate,
-            onChanged: (val) {
-              ref
-                  .read(recurringFormNotifierProvider.notifier)
-                  .setHasEndDate(val);
+            onPickEnd: () => _pickDate(
+              initialDate: formState.endDate ?? formState.startDate,
+              onPicked: notifier.setEndDate,
+            ),
+            onHasEndDateChanged: (val) {
+              notifier.setHasEndDate(val);
               if (val && formState.endDate == null) {
-                ref
-                    .read(recurringFormNotifierProvider.notifier)
-                    .setEndDate(formState.startDate.addMonths(12));
+                notifier.setEndDate(formState.startDate.addMonths(12));
               }
             },
+            onAutoAddChanged: notifier.setAutoAdd,
           ),
-
-          if (formState.hasEndDate && formState.endDate != null) ...<Widget>[
-            ListTile(
-              tileColor: colors.surfaceRaised,
-              shape: RoundedRectangleBorder(
-                borderRadius: AppRadius.borderMd,
-                side: BorderSide(color: colors.border.withValues(alpha: 0.5)),
-              ),
-              leading: Icon(AppIcons.event, color: colors.moneyOut),
-              title: Text(strings('recurringFieldEndDate')),
-              subtitle: Text(
-                DateFormat.yMd(Localizations.localeOf(context).toLanguageTag())
-                    .format(formState.endDate!.toDateTime()),
-              ),
-              trailing: const Icon(AppIcons.chevronForward, size: 14),
-              onTap: () => _pickDate(
-                initialDate: formState.endDate!,
-                onPicked: (d) => ref
-                    .read(recurringFormNotifierProvider.notifier)
-                    .setEndDate(d),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
-
-          const SizedBox(height: AppSpacing.sm),
-
-          // Auto-add switch
-          SwitchListTile(
-            title: Text(strings('recurringFieldAutoAdd')),
-            subtitle: Text(
-              strings('recurringFieldAutoAddDesc'),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colors.textSecondary,
-              ),
-            ),
-            value: formState.autoAdd,
-            onChanged: (val) {
-              ref.read(recurringFormNotifierProvider.notifier).setAutoAdd(val);
-            },
+          RecurringNoteSubmitSection(
+            noteController: _noteController,
+            onNoteChanged: notifier.setNote,
+            isSubmitting: formState.isSubmitting,
+            isEditing: isEditing,
+            onSubmit: _handleSave,
+            onDelete: () => _handleDelete(formState.id!),
           ),
-          const SizedBox(height: AppSpacing.sm),
-
-          // Note input
-          TextField(
-            controller: _noteController,
-            decoration: InputDecoration(
-              labelText: strings('transactionNoteLabel'),
-              hintText: strings('transactionNoteHint'),
-              border: const OutlineInputBorder(
-                borderRadius: AppRadius.borderMd,
-              ),
-            ),
-            onChanged: (val) {
-              ref.read(recurringFormNotifierProvider.notifier).setNote(val);
-            },
-          ),
-          const SizedBox(height: AppSpacing.xl),
-
-          // Submit button
-          FilledButton(
-            onPressed: formState.isSubmitting
-                ? null
-                : () async {
-                    final success = await ref
-                        .read(recurringFormNotifierProvider.notifier)
-                        .save();
-                    if (success && context.mounted) {
-                      AppFeedback.confirm(
-                        context,
-                        message: strings('recurringSavedSuccess'),
-                      );
-                      context.pop();
-                    }
-                  },
-            child: formState.isSubmitting
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(strings('transactionSave')),
-          ),
-
-          if (isEditing) ...<Widget>[
-            const SizedBox(height: AppSpacing.md),
-            OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: colors.moneyOut,
-                side: BorderSide(color: colors.moneyOut),
-              ),
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: Text(strings('recurringConfirmDelete')),
-                    content: Text(strings('recurringConfirmDeleteMessage')),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(false),
-                        child: Text(strings('actionCancel')),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.of(ctx).pop(true),
-                        child: Text(strings('actionDelete')),
-                      ),
-                    ],
-                  ),
-                );
-                if (confirm == true && context.mounted) {
-                  await ref
-                      .read(recurringSchedulerNotifierProvider.notifier)
-                      .delete(formState.id!);
-                  if (context.mounted) {
-                    AppFeedback.confirm(
-                      context,
-                      message: strings('recurringDeletedSuccess'),
-                    );
-                    context.pop();
-                  }
-                }
-              },
-              child: Text(strings('recurringActionDelete')),
-            ),
-          ],
         ],
       ),
     );
