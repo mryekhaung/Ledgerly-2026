@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -10,30 +8,22 @@ import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
-import 'package:ledgerly/features/categories/presentation/category_catalog.dart';
 import 'package:ledgerly/features/goals/presentation/providers/goals_providers.dart';
+import 'package:ledgerly/features/goals/presentation/widgets/goal_form/basics_section.dart';
+import 'package:ledgerly/features/goals/presentation/widgets/goal_form/date_account_section.dart';
+import 'package:ledgerly/features/goals/presentation/widgets/goal_form/icon_color_section.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// The goal icon picker: a curated subset of the category vocabulary.
-///
-/// Keys must be `CategoryIcons` vocabulary keys — anything else renders as the
-/// fallback glyph for every option (guarded by `category_catalog_test.dart`).
-const List<String> _kGoalIcons = <String>[
-  'savings',
-  'invest',
-  'travel',
-  'car',
-  'home',
-  'education',
-  'shopping',
-  'gift',
-];
-
 /// Page for creating or editing a savings goal.
+///
+/// Composition root only: sections live in `widgets/goal_form/`
+/// (`docs/Conventions.md` §1).
 class GoalFormPage extends ConsumerStatefulWidget {
+  /// Creates the page.
   const GoalFormPage({this.goalId, super.key});
 
+  /// The goal being edited, or null when creating.
   final String? goalId;
 
   @override
@@ -135,7 +125,13 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
     final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
     final formState = ref.watch(goalFormProvider);
+    final notifier = ref.read(goalFormProvider.notifier);
     final accountsAsync = ref.watch(accountsStreamProvider);
+
+    String? errorFor(String field) {
+      final key = formState.fieldErrors[field];
+      return key == null ? null : strings(key);
+    }
 
     return AppScaffold(
       title: formState.isEditMode ? strings('editGoal') : strings('newGoal'),
@@ -170,105 +166,24 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
                 ),
               ),
 
-            // Goal Name
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: strings('goalNameLabel'),
-                border: const OutlineInputBorder(),
-                errorText: formState.fieldErrors['name'] != null
-                    ? strings(formState.fieldErrors['name']!)
-                    : null,
-              ),
+            GoalBasicsSection(
+              nameController: _nameController,
+              targetAmountController: _targetAmountController,
+              currentAmountController: _currentAmountController,
+              currency: formState.currency,
+              nameError: errorFor('name'),
+              targetAmountError: errorFor('targetAmount'),
+              currentAmountError: errorFor('currentAmount'),
             ),
-            const SizedBox(height: AppSpacing.md),
-
-            // Target Amount
-            TextField(
-              controller: _targetAmountController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: strings('goalTargetAmountLabel'),
-                prefixText: '${formState.currency.name.toUpperCase()} ',
-                border: const OutlineInputBorder(),
-                errorText: formState.fieldErrors['targetAmount'] != null
-                    ? strings(formState.fieldErrors['targetAmount']!)
-                    : null,
-              ),
+            GoalDateAccountSection(
+              targetDate: formState.targetDate,
+              noDateLabel: strings('goalNoDate'),
+              onPickDate: _pickDate,
+              onClearDate: () => notifier.setTargetDate(null),
+              accounts: accountsAsync,
+              accountId: formState.accountId,
+              onAccountChanged: notifier.setAccountId,
             ),
-            const SizedBox(height: AppSpacing.md),
-
-            // Current Saved Amount
-            TextField(
-              controller: _currentAmountController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: strings('goalCurrentAmountLabel'),
-                prefixText: '${formState.currency.name.toUpperCase()} ',
-                border: const OutlineInputBorder(),
-                errorText: formState.fieldErrors['currentAmount'] != null
-                    ? strings(formState.fieldErrors['currentAmount']!)
-                    : null,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-
-            // Target Date picker tile
-            ListTile(
-              shape: RoundedRectangleBorder(
-                borderRadius: AppRadius.borderSm,
-                side: BorderSide(color: colors.border),
-              ),
-              title: Text(strings('goalTargetDateLabel')),
-              subtitle: Text(
-                // §7: dates render via intl for the active locale, never as a
-                // hand-built ISO fragment.
-                formState.targetDate != null
-                    ? DateFormat.yMd(
-                        Localizations.localeOf(context).toLanguageTag(),
-                      ).format(formState.targetDate!.toDateTime())
-                    : strings('goalNoDate'),
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (formState.targetDate != null)
-                    IconButton(
-                      icon: const Icon(AppIcons.close, size: 20),
-                      onPressed: () => ref
-                          .read(goalFormProvider.notifier)
-                          .setTargetDate(null),
-                    ),
-                  const Icon(AppIcons.calendar),
-                ],
-              ),
-              onTap: _pickDate,
-            ),
-            const SizedBox(height: AppSpacing.md),
-
-            // Account selection
-            accountsAsync.when(
-              data: (accounts) => DropdownButtonFormField<String?>(
-                initialValue: formState.accountId,
-                decoration: InputDecoration(
-                  labelText: strings('goalAccountLabel'),
-                  border: const OutlineInputBorder(),
-                ),
-                items: [
-                  DropdownMenuItem(
-                    value: null,
-                    child: Text(strings('goalNoAccountOption')),
-                  ),
-                  for (final acc in accounts)
-                    DropdownMenuItem(value: acc.id, child: Text(acc.name)),
-                ],
-                onChanged: (val) =>
-                    ref.read(goalFormProvider.notifier).setAccountId(val),
-              ),
-              loading: () => const SizedBox.shrink(),
-              error: (_, _) => const SizedBox.shrink(),
-            ),
-            const SizedBox(height: AppSpacing.md),
 
             // Notes
             TextField(
@@ -281,80 +196,12 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Icon Picker
-            Text(
-              strings('goalIconLabel'),
-              style: AppTypography.body.copyWith(color: colors.textPrimary),
+            GoalIconColorSection(
+              iconKey: formState.iconKey,
+              colorValue: formState.colorValue,
+              onIconChanged: notifier.setIconKey,
+              onColorChanged: notifier.setColorValue,
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: [
-                for (final iconKey in _kGoalIcons)
-                  GestureDetector(
-                    onTap: () =>
-                        ref.read(goalFormProvider.notifier).setIconKey(iconKey),
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: formState.iconKey == iconKey
-                            ? colors.moneyIn.withValues(alpha: 0.2)
-                            : colors.surfaceRaised,
-                        border: Border.all(
-                          color: formState.iconKey == iconKey
-                              ? colors.moneyIn
-                              : colors.border,
-                          width: formState.iconKey == iconKey ? 2 : 1,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: CategoryGem(
-                        colorValue: formState.colorValue,
-                        iconKey: iconKey,
-                        size: CategoryGemSize.md,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Color Picker
-            Text(
-              strings('goalColorLabel'),
-              style: AppTypography.body.copyWith(color: colors.textPrimary),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: [
-                // The shared category palette: goals render through
-                // `CategoryGem`, so they pick from the same family.
-                for (final colorVal in CategoryPalette.colors)
-                  GestureDetector(
-                    onTap: () => ref
-                        .read(goalFormProvider.notifier)
-                        .setColorValue(colorVal),
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: Color(colorVal),
-                        shape: BoxShape.circle,
-                        // Selection is the 3 px ring alone: §4.3 allows only
-                        // flat/raised/floating elevation, not a bespoke glow.
-                        border: formState.colorValue == colorVal
-                            ? Border.all(color: colors.textOnBrand, width: 3)
-                            : null,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xl),
 
             // Save Button
             FilledButton(

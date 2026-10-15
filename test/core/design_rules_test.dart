@@ -691,7 +691,8 @@ void main() {
     /// table — which is a statement about **list** rows. The rule targets that
     /// role, not the widget: these five are a different component each time.
     ///
-    /// * `goal_form_page` / `recurring_form_page` — a **date-picker field**.
+    /// * `date_account_section` (goal form) / `schedule_section` (recurring
+    ///   form) — a **date-picker field**.
     ///   These are styled as bordered, filled tiles in a form (they carry a
     ///   `tileColor` and a `shape` with a border), i.e. the §5.8 field
     ///   treatment, not a row in a list. `ListRow` has no field affordance.
@@ -705,7 +706,7 @@ void main() {
     /// Each is re-asserted below to still contain a `ListTile`, so the list
     /// cannot rot into a permanent allowlist for files that no longer need it.
     const fieldAndRichRowPaths = <String>[
-      'lib/features/goals/presentation/pages/goal_form_page.dart',
+      'lib/features/goals/presentation/widgets/goal_form/date_account_section.dart',
       'lib/features/recurring/presentation/widgets/recurring_form/schedule_section.dart',
       'lib/features/transactions/presentation/widgets/calendar/transaction_row.dart',
       'lib/features/transactions/presentation/widgets/transactions_list/list_transaction_row.dart',

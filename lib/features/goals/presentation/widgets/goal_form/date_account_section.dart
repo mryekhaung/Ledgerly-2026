@@ -1,0 +1,113 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
+import 'package:ledgerly/app/theme/app_spacing.dart';
+import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/features/accounts/domain/entities/account.dart';
+import 'package:material_ui/material_ui.dart';
+
+/// Target-date tile and linked-account dropdown.
+///
+/// Extracted from `goal_form_page.dart` (`docs/Conventions.md` §1).
+class GoalDateAccountSection extends StatelessWidget {
+  /// Creates a [GoalDateAccountSection].
+  const GoalDateAccountSection({
+    required this.targetDate,
+    required this.noDateLabel,
+    required this.onPickDate,
+    required this.onClearDate,
+    required this.accounts,
+    required this.accountId,
+    required this.onAccountChanged,
+    super.key,
+  });
+
+  /// The target date, if set.
+  final LocalDate? targetDate;
+
+  /// The placeholder when no date is set.
+  final String noDateLabel;
+
+  /// Called to open the date picker.
+  final VoidCallback onPickDate;
+
+  /// Called to clear the date.
+  final VoidCallback onClearDate;
+
+  /// The accounts for the dropdown (async: loading renders nothing).
+  final AsyncValue<List<Account>> accounts;
+
+  /// The linked account id, if any.
+  final String? accountId;
+
+  /// Called with the picked account id (null clears).
+  final ValueChanged<String?> onAccountChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final strings = AppStrings.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        // Target Date picker tile
+        ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: AppRadius.borderSm,
+            side: BorderSide(color: colors.border),
+          ),
+          title: Text(strings('goalTargetDateLabel')),
+          subtitle: Text(
+            // §7: dates render via intl for the active locale, never as a
+            // hand-built ISO fragment.
+            targetDate != null
+                ? DateFormat.yMd(
+                    Localizations.localeOf(context).toLanguageTag(),
+                  ).format(targetDate!.toDateTime())
+                : noDateLabel,
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (targetDate != null)
+                IconButton(
+                  icon: const Icon(AppIcons.close, size: 20),
+                  onPressed: onClearDate,
+                ),
+              const Icon(AppIcons.calendar),
+            ],
+          ),
+          onTap: onPickDate,
+        ),
+        const SizedBox(height: AppSpacing.md),
+
+        // Account selection
+        accounts.when(
+          data: (accounts) => DropdownButtonFormField<String?>(
+            initialValue: accountId,
+            decoration: InputDecoration(
+              labelText: strings('goalAccountLabel'),
+              border: const OutlineInputBorder(),
+            ),
+            items: [
+              DropdownMenuItem(
+                value: null,
+                child: Text(strings('goalNoAccountOption')),
+              ),
+              for (final acc in accounts)
+                DropdownMenuItem(value: acc.id, child: Text(acc.name)),
+            ],
+            onChanged: onAccountChanged,
+          ),
+          loading: () => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
+        ),
+        const SizedBox(height: AppSpacing.md),
+      ],
+    );
+  }
+}
