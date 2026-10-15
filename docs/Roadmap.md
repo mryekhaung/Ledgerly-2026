@@ -470,6 +470,17 @@ Eleven refactor commits, each green on its own tests before pushing:
 - ☑ **Import format switch was a no-op** — `onChanged` re-applied the current
   options, ignoring the tapped format. `ImportNotifier.setFormat` + notifier
   test.
+- ☑ **`transfer_page` 407→244** (`widgets/transfer/`: selectors + details;
+  also fixed `Swap accounts` tooltip, ISO date → intl, raw-minor balances →
+  `MoneyFormatter`) + **`accountsTransferSwap`** ARB key.
+- ☑ **Lookup coverage guard** — the wildcard kill exposed a systematic hole:
+  nothing asserted ARB↔lookup parity. New test reads `app_en.arb` and requires
+  every key to appear as a case in `app_strings.dart`; it immediately caught
+  2 more gaps (`accountLinkFailed/Success`). Pre-existing phantom keys
+  (`cancel`/`delete`/`save`/`accountsDelete`, never in any ARB) migrated to
+  `action*` keys; hardcoded auth fallbacks → ARB; dead `recurringNextDue` key
+  removed. Also fixed: missing `recurringProcessedSuccess` fill case (would
+  have thrown at runtime on scheduler runs).
 
 ### G. Remaining work (honest list, ordered)
 
