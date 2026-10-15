@@ -172,7 +172,12 @@ void main() {
 
         expect(find.text('Are you sure you want to sign out?'), findsNothing);
 
-        // Test Delete Account dialog cancellation
+        // Test Delete Account dialog cancellation. The action group sits
+        // below the fold on a 600 px test window, so reveal it first —
+        // tapping an off-screen offset silently misses (hit-test warning)
+        // and the dialog never opens.
+        await tester.scrollUntilVisible(find.text('Delete Account'), 200);
+        await tester.pumpAndSettle();
         await tester.tap(find.text('Delete Account'));
         await tester.pumpAndSettle();
 

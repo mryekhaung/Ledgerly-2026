@@ -98,7 +98,7 @@ class _GoalsListPageState extends ConsumerState<GoalsListPage>
   }
 }
 
-class _GoalsTab extends StatelessWidget {
+class _GoalsTab extends ConsumerWidget {
   const _GoalsTab({
     required this.goalsAsync,
     required this.emptyTitle,
@@ -112,7 +112,7 @@ class _GoalsTab extends StatelessWidget {
   final bool showCreateAction;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
 
@@ -176,7 +176,17 @@ class _GoalsTab extends StatelessWidget {
         );
       },
       loading: () => const LoadingPlaceholder(),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      // §5.11: inline banner with plain-language message + Retry —
+      // never a raw exception dump.
+      error: (_, _) => ErrorBanner(
+        message: strings('stateErrorBody'),
+        retryLabel: strings('stateErrorRetry'),
+        onRetry: () {
+          ref.invalidate(activeGoalsProvider);
+          ref.invalidate(completedGoalsProvider);
+          ref.invalidate(archivedGoalsProvider);
+        },
+      ),
     );
   }
 }

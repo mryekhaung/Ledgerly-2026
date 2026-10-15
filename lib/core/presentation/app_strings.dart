@@ -78,6 +78,12 @@ abstract final class AppStrings {
       'goalDaysOverdue' => l10n.goalDaysOverdue(
         _require(values, 'days') as int,
       ),
+      'recurringActiveTab' => l10n.recurringActiveTab(
+        _require(values, 'count') as int,
+      ),
+      'recurringPausedTab' => l10n.recurringPausedTab(
+        _require(values, 'count') as int,
+      ),
       _ => throw FlutterError(
         'AppStrings.fill() has no case for "$key". Add one in '
         'lib/core/presentation/app_strings.dart.',

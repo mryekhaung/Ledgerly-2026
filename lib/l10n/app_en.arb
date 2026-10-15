@@ -791,6 +791,10 @@
   "@signInWithGoogle": {
     "description": "Button label for Google sign-in."
   },
+  "signInOrDivider": "OR",
+  "@signInOrDivider": {
+    "description": "Divider between email and provider sign-in buttons."
+  },
   "signInWithApple": "Sign in with Apple",
   "@signInWithApple": {
     "description": "Button label for Apple sign-in."
@@ -1381,6 +1385,24 @@
   "@recurringNew": {
     "description": "Action button to create a new recurring rule."
   },
+  "recurringActiveTab": "Active ({count})",
+  "@recurringActiveTab": {
+    "description": "Active recurring rules tab label with rule count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recurringPausedTab": "Paused ({count})",
+  "@recurringPausedTab": {
+    "description": "Paused recurring rules tab label with rule count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "recurringEdit": "Edit Recurring",
   "@recurringEdit": {
     "description": "Title for editing recurring rule."
@@ -1570,6 +1592,14 @@
   "goalAccountLabel": "Linked Account (Optional)",
   "@goalAccountLabel": {
     "description": "Form label for linked account."
+  },
+  "goalNoAccountOption": "None (General Saved)",
+  "@goalNoAccountOption": {
+    "description": "Dropdown option for a goal with no linked account."
+  },
+  "goalNoDate": "Not set",
+  "@goalNoDate": {
+    "description": "Goal deadline placeholder when no date is chosen."
   },
   "goalNotesLabel": "Notes (Optional)",
   "@goalNotesLabel": {

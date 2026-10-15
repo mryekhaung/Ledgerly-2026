@@ -612,6 +612,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signInWithGoogle => 'Sign in with Google';
 
   @override
+  String get signInOrDivider => 'OR';
+
+  @override
   String get signInWithApple => 'Sign in with Apple';
 
   @override
@@ -1065,6 +1068,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recurringNew => 'New Recurring';
 
   @override
+  String recurringActiveTab(int count) {
+    return 'Active ($count)';
+  }
+
+  @override
+  String recurringPausedTab(int count) {
+    return 'Paused ($count)';
+  }
+
+  @override
   String get recurringEdit => 'Edit Recurring';
 
   @override
@@ -1207,6 +1220,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get goalAccountLabel => 'Linked Account (Optional)';
+
+  @override
+  String get goalNoAccountOption => 'None (General Saved)';
+
+  @override
+  String get goalNoDate => 'Not set';
 
   @override
   String get goalNotesLabel => 'Notes (Optional)';

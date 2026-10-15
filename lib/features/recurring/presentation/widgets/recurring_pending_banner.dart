@@ -42,7 +42,7 @@ class RecurringPendingBanner extends ConsumerWidget {
                 Text(
                   strings('recurringPendingBannerTitle'),
                   style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: colors.warning,
                   ),
                 ),

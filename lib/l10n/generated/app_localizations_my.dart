@@ -617,6 +617,9 @@ class AppLocalizationsMy extends AppLocalizations {
   String get signInWithGoogle => 'Google ဖြင့် ဝင်မည်';
 
   @override
+  String get signInOrDivider => 'သို့မဟုတ်';
+
+  @override
   String get signInWithApple => 'Apple ဖြင့် ဝင်မည်';
 
   @override
@@ -1080,6 +1083,16 @@ class AppLocalizationsMy extends AppLocalizations {
   String get recurringNew => 'ထပ်တလဲလဲ စာရင်းအသစ်';
 
   @override
+  String recurringActiveTab(int count) {
+    return 'လုပ်ဆောင်ဆဲ ($count)';
+  }
+
+  @override
+  String recurringPausedTab(int count) {
+    return 'ခေတ္တရပ်ဆိုင်းထားသော ($count)';
+  }
+
+  @override
   String get recurringEdit => 'ထပ်တလဲလဲ စာရင်း ပြင်ဆင်ရန်';
 
   @override
@@ -1226,6 +1239,12 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get goalAccountLabel => 'ချိတ်ဆက်မည့် အကောင့် (ရွေးချယ်ရန်)';
+
+  @override
+  String get goalNoAccountOption => 'မရှိ (အထွေထွေစုဆောင်းငွေ)';
+
+  @override
+  String get goalNoDate => 'မသတ်မှတ်ရသေးပါ';
 
   @override
   String get goalNotesLabel => 'မှတ်ချက် (ရွေးချယ်ရန်)';

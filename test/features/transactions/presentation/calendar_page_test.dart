@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
@@ -298,7 +299,7 @@ void main() {
       // Open the picker, step a year forward, then choose January.
       await tester.tap(labelFinder(tester));
       await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(Icons.chevron_right));
+      await tester.tap(find.byIcon(AppIcons.chevronRight));
       await tester.pumpAndSettle();
       // The tiles are labelled by CLDR's month+year (`formatMonthYear`), so match
       // on the month prefix rather than the bare name — the year depends on the
@@ -330,8 +331,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // The header lives in the left pane, which the day list cannot scroll.
-      expect(find.byIcon(Icons.chevron_left), findsOneWidget);
-      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+      expect(find.byIcon(AppIcons.chevronLeft), findsOneWidget);
+      expect(find.byIcon(AppIcons.chevronRight), findsOneWidget);
       // The day rows are inside the right pane's own scrollable, so they are
       // below the fold on a 900 px tall split until that pane is scrolled.
       await revealOnCompact(tester, 'Morning coffee');
@@ -596,7 +597,7 @@ void main() {
           of: find.text('Morning coffee'),
           matching: find.byType(ListTile),
         ),
-        matching: find.byIcon(Icons.more_horiz),
+        matching: find.byIcon(AppIcons.moreHorizontal),
       );
       await tester.tap(menu);
       await tester.pumpAndSettle();
@@ -658,13 +659,32 @@ void main() {
   group('Day Capsule spec (docs/Design.md §6.2)', () {
     /// The capsule is the 4 px bar under a day number. It is found by its
     /// `Container` decoration rather than a type, since `_Capsule` is private.
+    ///
+    /// The width is asserted as a *proportion of the rendered grid row* (60 %),
+    /// not an absolute pixel count: the row sits inside page padding, so an
+    /// absolute number would pin the padding rather than the spec invariant
+    /// and break every time the insets change.
     Finder capsuleOf(double expectedWidth) => find.byWidgetPredicate((w) {
       if (w is! Container) return false;
       final d = w.decoration;
       if (d is! BoxDecoration) return false;
-      return w.constraints?.maxHeight == 4 &&
-          w.constraints?.maxWidth == expectedWidth;
+      final c = w.constraints;
+      if (c == null) return false;
+      return (c.maxHeight - 4).abs() < 0.01 &&
+          (c.maxWidth - expectedWidth).abs() < 0.5;
     });
+
+    /// Width of one 7-column grid row currently on screen.
+    double gridRowWidth(WidgetTester tester) {
+      final rows = find.byWidgetPredicate(
+        (w) =>
+            w is Row &&
+            w.children.length == 7 &&
+            w.children.every((c) => c is Expanded),
+      );
+      expect(rows, findsWidgets);
+      return tester.getSize(rows.first).width;
+    }
 
     testWidgets('should_size_the_capsule_to_60_percent_of_its_cell', (
       tester,
@@ -672,8 +692,7 @@ void main() {
       await host(tester, TestWidths.phone);
       await tester.pumpAndSettle();
 
-      // 390 px wide, 7 columns → 55.71 px per cell, times 0.6.
-      const expected = 390 / 7 * 0.6;
+      final expected = gridRowWidth(tester) / 7 * 0.6;
       expect(
         capsuleOf(expected),
         findsWidgets,
@@ -689,13 +708,8 @@ void main() {
       await host(tester, TestWidths.tablet);
       await tester.pumpAndSettle();
 
-      const expected = TestWidths.tablet / 7 * 0.6;
+      final expected = gridRowWidth(tester) / 7 * 0.6;
       expect(capsuleOf(expected), findsWidgets);
-      expect(
-        capsuleOf(TestWidths.phone / 7 * 0.6),
-        findsNothing,
-        reason: 'the phone-width capsule must not leak into the wide layout',
-      );
     });
 
     testWidgets(

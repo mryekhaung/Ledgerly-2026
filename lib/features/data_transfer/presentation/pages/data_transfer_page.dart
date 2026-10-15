@@ -161,7 +161,7 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
                 Text(
                   strings('exportSummaryTitle'),
                   style: Theme.of(context).textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                      ?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Row(
@@ -315,7 +315,7 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
                 Text(
                   strings('importPreviewTitle'),
                   style: Theme.of(context).textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                      ?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Row(
@@ -429,7 +429,7 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
               Text(
                 strings('backupTitle'),
                 style: Theme.of(context).textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w700),
+                    ?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
@@ -467,7 +467,7 @@ class _DataTransferPageState extends ConsumerState<DataTransferPage> {
               Text(
                 strings('restoreTitle'),
                 style: Theme.of(context).textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w700),
+                    ?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: AppSpacing.xs),
               TextField(

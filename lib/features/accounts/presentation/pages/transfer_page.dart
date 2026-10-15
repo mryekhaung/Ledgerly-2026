@@ -355,7 +355,7 @@ class _TransferPageState extends ConsumerState<TransferPage> {
                 textInputAction: TextInputAction.next,
                 onChanged: (text) => _onAmountChanged(text, fromAccount),
                 style: AppTypography.textTheme(colors).titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                    ?.copyWith(fontWeight: FontWeight.w600),
                 decoration: InputDecoration(
                   prefixText: fromAccount != null
                       ? '${fromAccount.currency.symbol} '

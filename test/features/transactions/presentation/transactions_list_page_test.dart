@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
@@ -103,8 +104,13 @@ void main() {
       expect(find.text('Morning coffee'), findsOneWidget);
       expect(find.text('Monthly salary'), findsNothing);
 
-      // Clear search
-      final clearIcon = find.byIcon(Icons.clear);
+      // Clear search (the clear glyph comes from the AppIcons vocabulary).
+      // Scoped to the field: an active search also reveals the "Clear all"
+      // chip, which carries the same close glyph.
+      final clearIcon = find.descendant(
+        of: find.byType(TextField),
+        matching: find.byIcon(AppIcons.close),
+      );
       expect(clearIcon, findsOneWidget);
       await tester.tap(clearIcon);
       await tester.pumpAndSettle();
@@ -157,7 +163,7 @@ void main() {
       await host(tester);
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.tune));
+      await tester.tap(find.byIcon(AppIcons.tune));
       await tester.pumpAndSettle();
 
       expect(find.byType(TransactionFilterSheet), findsOneWidget);

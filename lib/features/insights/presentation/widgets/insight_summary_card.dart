@@ -5,6 +5,7 @@ import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/features/insights/domain/entities/period_comparison.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_totals.dart';
 import 'package:material_ui/material_ui.dart';
@@ -31,12 +32,9 @@ class InsightSummaryCard extends StatelessWidget {
     final netMoney = Money.minor(summary.netMinor, currency);
     final deltaPct = comparison.expenseDeltaPercentage;
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: colors.surfaceSubtle,
-        borderRadius: AppRadius.borderMd,
-      ),
+    // §5.2: insight summaries are AppCards (surfaceRaised, radius.lg),
+    // not bespoke subtle containers.
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

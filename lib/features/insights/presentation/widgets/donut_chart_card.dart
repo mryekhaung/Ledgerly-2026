@@ -6,6 +6,7 @@ import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/insights/domain/entities/category_breakdown.dart';
 import 'package:material_ui/material_ui.dart';
@@ -37,12 +38,8 @@ class DonutChartCard extends StatelessWidget {
 
     final totalMoney = Money.minor(totalExpenseMinor, currency);
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: colors.surfaceSubtle,
-        borderRadius: AppRadius.borderMd,
-      ),
+    // §5.2: chart cards are AppCards, not bespoke subtle containers.
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

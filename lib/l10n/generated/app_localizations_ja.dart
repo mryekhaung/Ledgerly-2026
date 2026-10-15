@@ -592,6 +592,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get signInWithGoogle => 'Googleでログイン';
 
   @override
+  String get signInOrDivider => 'または';
+
+  @override
   String get signInWithApple => 'Appleでサインイン';
 
   @override
@@ -1029,6 +1032,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get recurringNew => '定期取引を追加';
 
   @override
+  String recurringActiveTab(int count) {
+    return '有効 ($count)';
+  }
+
+  @override
+  String recurringPausedTab(int count) {
+    return '一時停止中 ($count)';
+  }
+
+  @override
   String get recurringEdit => '定期取引を編集';
 
   @override
@@ -1166,6 +1179,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get goalAccountLabel => '連携口座（任意）';
+
+  @override
+  String get goalNoAccountOption => 'なし（一般貯蓄）';
+
+  @override
+  String get goalNoDate => '未設定';
 
   @override
   String get goalNotesLabel => 'メモ（任意）';

@@ -229,7 +229,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
                             ? '—'
                             : formState.name.trim(),
                         style: AppTypography.textTheme(colors).titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                            ?.copyWith(fontWeight: FontWeight.w600),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -491,17 +491,10 @@ class _ColorSwatch extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
+          // Selection is the 3 px ring alone: §4.3 allows only flat/raised/
+          // floating elevation, and a bespoke glow is a fourth level.
           border: isSelected
               ? Border.all(color: colors.textOnBrand, width: 3)
-              : null,
-          boxShadow: isSelected
-              ? <BoxShadow>[
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.5),
-                    blurRadius: 6,
-                    spreadRadius: 1,
-                  ),
-                ]
               : null,
         ),
         child: isSelected

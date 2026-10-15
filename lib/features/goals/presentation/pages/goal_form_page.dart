@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -166,7 +167,7 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
                 margin: const EdgeInsets.only(bottom: AppSpacing.md),
                 decoration: BoxDecoration(
                   color: colors.moneyOut.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.borderMd,
                   border: Border.all(color: colors.moneyOut),
                 ),
                 child: Text(
@@ -221,14 +222,18 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
             // Target Date picker tile
             ListTile(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppRadius.borderSm,
                 side: BorderSide(color: colors.border),
               ),
               title: Text(strings('goalTargetDateLabel')),
               subtitle: Text(
+                // §7: dates render via intl for the active locale, never as a
+                // hand-built ISO fragment.
                 formState.targetDate != null
-                    ? '${formState.targetDate!.year}-${formState.targetDate!.month.toString().padLeft(2, '0')}-${formState.targetDate!.day.toString().padLeft(2, '0')}'
-                    : 'Not set',
+                    ? DateFormat.yMd(
+                        Localizations.localeOf(context).toLanguageTag(),
+                      ).format(formState.targetDate!.toDateTime())
+                    : strings('goalNoDate'),
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -256,9 +261,9 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
                   border: const OutlineInputBorder(),
                 ),
                 items: [
-                  const DropdownMenuItem(
+                  DropdownMenuItem(
                     value: null,
-                    child: Text('None (General Saved)'),
+                    child: Text(strings('goalNoAccountOption')),
                   ),
                   for (final acc in accounts)
                     DropdownMenuItem(value: acc.id, child: Text(acc.name)),
@@ -343,17 +348,10 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
                       decoration: BoxDecoration(
                         color: Color(colorVal),
                         shape: BoxShape.circle,
+                        // Selection is the 3 px ring alone: §4.3 allows only
+                        // flat/raised/floating elevation, not a bespoke glow.
                         border: formState.colorValue == colorVal
                             ? Border.all(color: colors.textOnBrand, width: 3)
-                            : null,
-                        boxShadow: formState.colorValue == colorVal
-                            ? [
-                                BoxShadow(
-                                  color: Color(colorVal).withValues(alpha: 0.5),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                ),
-                              ]
                             : null,
                       ),
                     ),

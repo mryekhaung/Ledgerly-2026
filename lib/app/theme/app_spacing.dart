@@ -76,6 +76,14 @@ abstract final class AppRadius {
   /// site actually needs one.
   static const Radius radiusSm = Radius.circular(sm);
 
+  /// The same value as [borderMd], for widgets that need a single [Radius]
+  /// (sheet top corners via `BorderRadius.vertical`).
+  static const Radius radiusMd = Radius.circular(md);
+
+  /// The same value as [borderLg], for widgets that need a single [Radius]
+  /// (sheet top corners via `BorderRadius.vertical`).
+  static const Radius radiusLg = Radius.circular(lg);
+
   /// The same value as [borderXl], for widgets that need a single [Radius]
   /// (`showModalBottomSheet` / `BorderRadius.vertical` shapes). Add more
   /// variants only when a call site actually needs one.

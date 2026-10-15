@@ -96,12 +96,16 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
               tabs: <SegmentedTab<int>>[
                 SegmentedTab<int>(
                   value: 0,
-                  label: 'Active (${activeItems.length})',
+                  label: AppStrings.fill(context, 'recurringActiveTab', {
+                    'count': activeItems.length,
+                  }),
                   icon: AppIcons.success,
                 ),
                 SegmentedTab<int>(
                   value: 1,
-                  label: 'Paused (${pausedItems.length})',
+                  label: AppStrings.fill(context, 'recurringPausedTab', {
+                    'count': pausedItems.length,
+                  }),
                   icon: AppIcons.pauseCircle,
                 ),
               ],

@@ -136,7 +136,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                 Text(
                   _isSignUp ? strings('signUpTitle') : strings('signInTitle'),
                   style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
                   ),
                 ),
@@ -229,8 +229,8 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                             backgroundColor: colors.brandPrimary,
                             foregroundColor: colors.textOnBrand,
                             minimumSize: const Size.fromHeight(50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: AppRadius.borderMd,
                             ),
                           ),
                           child: Text(
@@ -269,7 +269,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                         horizontal: AppSpacing.md,
                       ),
                       child: Text(
-                        'OR',
+                        strings('signInOrDivider'),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: colors.textSecondary,
                         ),
@@ -286,8 +286,8 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                     foregroundColor: colors.textPrimary,
                     side: BorderSide(color: colors.borderStrong),
                     minimumSize: const Size.fromHeight(48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: AppRadius.borderMd,
                     ),
                   ),
                   icon: const Icon(Icons.g_mobiledata_rounded, size: 26),
@@ -300,8 +300,8 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                     foregroundColor: colors.textPrimary,
                     side: BorderSide(color: colors.borderStrong),
                     minimumSize: const Size.fromHeight(48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: AppRadius.borderMd,
                     ),
                   ),
                   icon: const Icon(Icons.apple_rounded, size: 22),

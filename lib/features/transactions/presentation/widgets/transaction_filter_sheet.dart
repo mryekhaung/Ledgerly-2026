@@ -206,7 +206,7 @@ class _TransactionFilterSheetState
     return Container(
       decoration: BoxDecoration(
         color: colors.surfaceRaised,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: AppRadius.radiusLg),
       ),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
@@ -240,7 +240,7 @@ class _TransactionFilterSheetState
                   strings('filterTitle'),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: colors.textPrimary,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 TextButton(
@@ -289,7 +289,7 @@ class _TransactionFilterSheetState
             const SizedBox(height: AppSpacing.xs),
             InkWell(
               onTap: _pickCategory,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppRadius.borderMd,
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.md,
@@ -297,7 +297,7 @@ class _TransactionFilterSheetState
                 ),
                 decoration: BoxDecoration(
                   color: colors.surfaceSubtle,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.borderMd,
                   border: Border.all(color: colors.border),
                 ),
                 child: Row(
@@ -361,8 +361,8 @@ class _TransactionFilterSheetState
                         horizontal: AppSpacing.sm,
                         vertical: AppSpacing.md,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: AppRadius.borderMd,
                       ),
                     ),
                     child: Text(
@@ -386,8 +386,8 @@ class _TransactionFilterSheetState
                         horizontal: AppSpacing.sm,
                         vertical: AppSpacing.md,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: AppRadius.borderMd,
                       ),
                     ),
                     child: Text(
@@ -438,8 +438,8 @@ class _TransactionFilterSheetState
                         horizontal: AppSpacing.md,
                         vertical: AppSpacing.sm,
                       ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      border: const OutlineInputBorder(
+                        borderRadius: AppRadius.borderMd,
                       ),
                     ),
                   ),
@@ -461,8 +461,8 @@ class _TransactionFilterSheetState
                         horizontal: AppSpacing.md,
                         vertical: AppSpacing.sm,
                       ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      border: const OutlineInputBorder(
+                        borderRadius: AppRadius.borderMd,
                       ),
                     ),
                   ),
@@ -476,8 +476,8 @@ class _TransactionFilterSheetState
               onPressed: _apply,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: AppRadius.borderMd,
                 ),
               ),
               child: Text(strings('filterApply')),

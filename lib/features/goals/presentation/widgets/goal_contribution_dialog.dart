@@ -289,9 +289,9 @@ class _GoalContributionDialogState
                     border: const OutlineInputBorder(),
                   ),
                   items: [
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: null,
-                      child: Text('None (General Saved)'),
+                      child: Text(strings('goalNoAccountOption')),
                     ),
                     for (final acc in accounts)
                       DropdownMenuItem(value: acc.id, child: Text(acc.name)),

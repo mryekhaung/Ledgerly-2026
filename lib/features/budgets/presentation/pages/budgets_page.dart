@@ -128,7 +128,7 @@ class BudgetsPage extends ConsumerWidget {
                 Text(
                   strings('budgetsCategory'),
                   style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 if (categoryProgresses.isNotEmpty)

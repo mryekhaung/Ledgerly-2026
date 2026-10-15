@@ -15,6 +15,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/utils/month_grid_layout.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/month_year_picker_page.dart';
@@ -794,10 +795,7 @@ class _Capsule extends StatelessWidget {
       width: cellWidth * 0.6,
       height: 4,
       margin: const EdgeInsets.only(top: 2),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: const BorderRadius.all(AppRadius.radiusSm),
-      ),
+      decoration: BoxDecoration(color: color, borderRadius: AppRadius.borderSm),
     );
   }
 }
@@ -823,12 +821,8 @@ class _SummaryCard extends ConsumerWidget {
     // the month figures the grid uses.
     final netMoney = Money.minor(total.netMinor, currency);
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: colors.surfaceSubtle,
-        borderRadius: AppRadius.borderMd,
-      ),
+    // Design.md §6.3: the summary card directly under the grid IS an AppCard.
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

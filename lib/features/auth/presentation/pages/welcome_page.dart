@@ -161,7 +161,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                     height: 72,
                     decoration: BoxDecoration(
                       color: colors.brandSubtle,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: AppRadius.borderLg,
                       border: Border.all(
                         color: colors.brandPrimary.withAlpha(50),
                       ),
@@ -178,7 +178,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                   strings('welcomeTitle'),
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: colors.textPrimary,
                   ),
                 ),
@@ -215,7 +215,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                             child: Text(
                               strings('welcomeMonthStartQuestion'),
                               style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: colors.textPrimary,
                               ),
                             ),
@@ -251,7 +251,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                         ),
                         decoration: BoxDecoration(
                           color: colors.surface,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: AppRadius.borderSm,
                           border: Border.all(color: colors.border),
                         ),
                         child: Row(
@@ -301,8 +301,8 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                       backgroundColor: colors.brandPrimary,
                       foregroundColor: colors.textOnBrand,
                       minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: AppRadius.borderMd,
                       ),
                     ),
                     icon: const Icon(AppIcons.person),
@@ -320,8 +320,8 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                       foregroundColor: colors.textPrimary,
                       side: BorderSide(color: colors.borderStrong),
                       minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: AppRadius.borderMd,
                       ),
                     ),
                     icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
@@ -339,8 +339,8 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
                       foregroundColor: colors.textPrimary,
                       side: BorderSide(color: colors.borderStrong),
                       minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: AppRadius.borderMd,
                       ),
                     ),
                     icon: const Icon(Icons.apple_rounded, size: 24),
@@ -454,22 +454,22 @@ class _SelectorDayChip extends StatelessWidget {
       label: 'Day $day',
       child: Material(
         color: bg,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.borderSm,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: AppRadius.borderSm,
           child: Container(
             width: size,
             height: 38,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppRadius.borderSm,
               border: Border.all(color: border),
             ),
             child: Text(
               '$day',
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 color: fg,
               ),
             ),

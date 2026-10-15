@@ -257,6 +257,35 @@ void main() {
         const <String, int>{},
       );
     });
+
+    test('should_use_a_radius_token_instead_of_a_matching_literal', () {
+      // A literal that *happens* to equal a scale value is still a bypass:
+      // the value and the token can drift apart silently, and a reader cannot
+      // tell a deliberate "12" from a coincidental one. Tokens exist for all
+      // five scale values (`borderSm/Md/Lg/Xl/Full`, plus `radiusSm/Md/Lg/Xl`
+      // for single-`Radius` slots), so no call site needs the literal.
+      final sites = <Site>[];
+      for (final file in dartFilesIn('lib')) {
+        final path = relative(file.path);
+        if (path == 'lib/app/theme/app_spacing.dart') continue;
+
+        final lines = file.readAsLinesSync();
+        for (var i = 0; i < lines.length; i++) {
+          if (RegExp(r'(?:Border)?Radius\.circular\((8|12|20|28|999)\)')
+              .hasMatch(withoutComment(lines[i]))) {
+            sites.add(Site(path, i + 1, lines[i].trim()));
+          }
+        }
+      }
+
+      expectWithinBudget(
+        'on-scale literal radius',
+        'docs/Design.md §4.2 — write AppRadius.borderMd, not '
+            'BorderRadius.circular(12): the token is the single source',
+        sites,
+        const <String, int>{},
+      );
+    });
   });
 
   // ---------------------------------------------------------------------------
@@ -814,6 +843,18 @@ void main() {
       expect(match, isNotNull);
       expect(int.parse(match!.group(1)!), 16);
       expect(pattern.hasMatch('BorderRadius.circular(20)'), isTrue);
+    });
+
+    test('should_flag_an_on_scale_literal_but_pass_a_token', () {
+      final pattern = RegExp(
+        r'(?:Border)?Radius\.circular\((8|12|20|28|999)\)',
+      );
+
+      expect(
+        pattern.hasMatch('borderRadius: BorderRadius.circular(12)'),
+        isTrue,
+      );
+      expect(pattern.hasMatch('borderRadius: AppRadius.borderMd'), isFalse);
     });
 
     test('should_flag_a_raw_scaffold_but_dismiss_a_messenger', () {

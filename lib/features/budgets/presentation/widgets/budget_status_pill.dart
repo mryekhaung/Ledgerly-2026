@@ -42,10 +42,7 @@ class BudgetStatusPill extends StatelessWidget {
         horizontal: AppSpacing.sm,
         vertical: 3,
       ),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: bg, borderRadius: AppRadius.borderMd),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[

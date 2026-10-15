@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/features/profile/data/datasources/avatar_svg_composer.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
@@ -47,8 +48,8 @@ void main() {
 
       expect(find.byType(AvatarEditorPage), findsOneWidget);
 
-      // 2. Close editor via top-bar close button
-      await tester.tap(find.byIcon(Icons.close_rounded));
+      // 2. Close editor via top-bar close button (AppIcons vocabulary).
+      await tester.tap(find.byIcon(AppIcons.close));
       await tester.pumpAndSettle();
 
       expect(find.byType(AvatarEditorPage), findsNothing);

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -148,8 +149,8 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
             decoration: InputDecoration(
               labelText: strings('budgetFieldAmount'),
               prefixText: '${formState.currency.code.toUpperCase()} ',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+              border: const OutlineInputBorder(
+                borderRadius: AppRadius.borderMd,
               ),
               errorText: formState.fieldErrors['amount'] != null
                   ? strings(formState.fieldErrors['amount']!)
@@ -171,8 +172,8 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
                 : (categories.isNotEmpty ? categories.first.id : null),
             decoration: InputDecoration(
               labelText: strings('budgetFieldCategory'),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+              border: const OutlineInputBorder(
+                borderRadius: AppRadius.borderMd,
               ),
               errorText: formState.fieldErrors['category'] != null
                   ? strings(formState.fieldErrors['category']!)
@@ -210,8 +211,8 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
               initialValue: formState.accountId,
               decoration: InputDecoration(
                 labelText: strings('recurringFieldAccountOptional'),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.borderMd,
                 ),
               ),
               items: <DropdownMenuItem<String?>>[
@@ -240,8 +241,8 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
             initialValue: formState.frequency,
             decoration: InputDecoration(
               labelText: strings('recurringFieldFrequency'),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+              border: const OutlineInputBorder(
+                borderRadius: AppRadius.borderMd,
               ),
             ),
             items: RecurringFrequency.values.map((freq) {
@@ -276,12 +277,16 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
           ListTile(
             tileColor: colors.surfaceRaised,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppRadius.borderMd,
               side: BorderSide(color: colors.border.withValues(alpha: 0.5)),
             ),
             leading: Icon(AppIcons.calendar, color: colors.brandPrimary),
             title: Text(strings('recurringFieldStartDate')),
-            subtitle: Text('${formState.startDate}'),
+            // §7: dates render via intl for the active locale, never ISO.
+            subtitle: Text(
+              DateFormat.yMd(Localizations.localeOf(context).toLanguageTag())
+                  .format(formState.startDate.toDateTime()),
+            ),
             trailing: const Icon(AppIcons.chevronForward, size: 14),
             onTap: () => _pickDate(
               initialDate: formState.startDate,
@@ -312,12 +317,15 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
             ListTile(
               tileColor: colors.surfaceRaised,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppRadius.borderMd,
                 side: BorderSide(color: colors.border.withValues(alpha: 0.5)),
               ),
               leading: Icon(AppIcons.event, color: colors.moneyOut),
               title: Text(strings('recurringFieldEndDate')),
-              subtitle: Text('${formState.endDate}'),
+              subtitle: Text(
+                DateFormat.yMd(Localizations.localeOf(context).toLanguageTag())
+                    .format(formState.endDate!.toDateTime()),
+              ),
               trailing: const Icon(AppIcons.chevronForward, size: 14),
               onTap: () => _pickDate(
                 initialDate: formState.endDate!,
@@ -353,8 +361,8 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
             decoration: InputDecoration(
               labelText: strings('transactionNoteLabel'),
               hintText: strings('transactionNoteHint'),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+              border: const OutlineInputBorder(
+                borderRadius: AppRadius.borderMd,
               ),
             ),
             onChanged: (val) {

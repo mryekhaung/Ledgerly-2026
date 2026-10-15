@@ -8,6 +8,7 @@ import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
@@ -237,13 +238,9 @@ class _PreviewCard extends StatelessWidget {
       {'range': previousRange},
     );
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: colors.surfaceSubtle,
-        borderRadius: AppRadius.borderMd,
-        border: Border.all(color: colors.border),
-      ),
+    // §5.2: preview cards are AppCards; the status border rides its slot.
+    return AppCard(
+      border: Border.all(color: colors.border),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

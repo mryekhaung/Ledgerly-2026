@@ -352,13 +352,49 @@ interpolation) — they need `recurringActiveTab` / `recurringPausedTab` ARB key
 with a count placeholder. Insight/chart cards still hand-roll `Container` +
 `BoxDecoration` (`surfaceSubtle` + `borderMd`) instead of `AppCard`.
 
-**Pre-existing local failures (not from this phase):** a full `flutter test`
-run shows 14 failures that reproduce identically on the clean tree
-(`git stash` baseline): `auth_pages_test` AccountPage, 4×
-`month_year_picker_page_test`, `avatar_editor_memory_test`,
-`profile_pages_test` discard-dialog, 2× `transactions_list_page_test`,
-5× `calendar_page_test` (month picker, wide split, overflow menu, 2× capsule
-spec). CI is the oracle for whether these reproduce there.
+### D. Post-3.5 compliance sweep — COMPLETE (`flutter test`: 1367 green)
+
+The full suite carried 14 red tests at the `db5fe12` baseline (reproduced on a
+`git stash` clean tree, so none came from Phase 3.5). Root causes and fixes,
+one PR-shaped commit:
+
+- ☑ **Stale icon finders (10)** — the Rule 8 vocabulary migration changed
+  glyphs (`chevron_left` → `chevron_left_outlined`, …) but the tests still
+  searched raw codepoints: month/year picker (4), avatar editor close (2),
+  transactions search/tune (2), calendar switcher + overflow menu (2). Tests
+  now find by the `AppIcons` role constants.
+- ☑ **Capsule width tests (2)** — asserted `390 / 7 * 0.6`, ignoring the 16 px
+  page padding `AppScaffold` wraps the grid in (30.69 px actual). Rewritten as
+  a proportion of the *rendered* row (tolerance ±0.5), so padding changes can
+  never break them again.
+- ☑ **Auth delete dialog (1)** — the Delete row sits below the fold on a
+  600 px window; the tap silently missed. Test now `scrollUntilVisible`s first.
+- ☑ **Search-clear ambiguity (1)** — active search shows two close glyphs
+  (field + Clear-all chip); the finder is now scoped to the `TextField`.
+- ☑ **Radius token bypass (36 sites)** — `BorderRadius.circular(12/20/8)`
+  hand-writes values `AppRadius.borderMd/Lg/Sm` already own. All migrated
+  (plus new `radiusMd`/`radiusLg` single-`Radius` siblings); Rule 2 gained a
+  token-*usage* test so the value-level bypass is closed. Bonus: 18 newly
+  `const`-eligible shapes (tokens are const, literals were not).
+- ☑ **Hardcoded copy (§7)** — recurring `Active/Paused (n)` tabs,
+  goal `None (General Saved)` ×2, goal `Not set` + hand-built ISO date,
+  recurring start/end ISO dates, sign-in `OR` divider, goals `Error: $e` dump
+  (now an `ErrorBanner` with Retry) — all ARB keys / intl / spec treatment.
+- ☑ **w700 demotion (21 sites)** — no token is heavier than w600; every
+  `bold`/`w700` in features is now `w600` (headline sizes included — weight
+  comes from size, not boldness, in this system).
+- ☑ **Bespoke glows (2)** — color-swatch selection had a `BoxShadow` glow on
+  top of its 3 px ring; §4.3 allows only flat/raised/floating. Ring alone now.
+- ☑ **Insight/calendar/category/month heroes → `AppCard` (8)** — summary,
+  donut, bar, cash-flow, top-categories, calendar summary, category preview,
+  month preview, net worth. `surfaceSubtle` + `borderMd` treatments are gone;
+  status borders ride the `AppCard.border` slot.
+
+Deliberately **not** done (judgment, recorded): splitting 500+ line pages
+(`calendar_page`, `avatar_editor_page`) — high-churn refactor, needs its own
+phase with per-extraction goldens; replacing the Material outlined glyph set
+with custom 2026 line-art — an art commission, not a code violation (Rule 8
+already pins one glyph per concept).
 
 ### C. Judgment items — done
 

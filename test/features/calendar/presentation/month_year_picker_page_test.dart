@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/month_year_picker_page.dart';
@@ -127,7 +128,9 @@ void main() {
     await tester.pumpAndSettle();
 
     // Tap "next year" — the picker is still open, so nothing has popped.
-    await tester.tap(find.byIcon(Icons.chevron_right));
+    // The chevrons come from the AppIcons vocabulary (Rule 8), so the finder
+    // uses the role constant, not a raw Material codepoint.
+    await tester.tap(find.byIcon(AppIcons.chevronRight));
     await tester.pumpAndSettle();
 
     expect(find.text('2027'), findsOneWidget);
@@ -140,7 +143,7 @@ void main() {
     await host(tester, LocalDate(2026, 5, 1)).open();
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.chevron_left));
+    await tester.tap(find.byIcon(AppIcons.chevronLeft));
     await tester.pumpAndSettle();
 
     expect(find.text('2025'), findsOneWidget);
@@ -155,13 +158,13 @@ void main() {
 
     final back = tester.widget<IconButton>(
       find.ancestor(
-        of: find.byIcon(Icons.chevron_left),
+        of: find.byIcon(AppIcons.chevronLeft),
         matching: find.byType(IconButton),
       ),
     );
     final forward = tester.widget<IconButton>(
       find.ancestor(
-        of: find.byIcon(Icons.chevron_right),
+        of: find.byIcon(AppIcons.chevronRight),
         matching: find.byType(IconButton),
       ),
     );
@@ -179,7 +182,7 @@ void main() {
     for (var i = 0; i < 12; i++) {
       final button = tester.widget<IconButton>(
         find.ancestor(
-          of: find.byIcon(Icons.chevron_left),
+          of: find.byIcon(AppIcons.chevronLeft),
           matching: find.byType(IconButton),
         ),
       );
@@ -191,7 +194,7 @@ void main() {
     expect(find.text('1'), findsOneWidget);
     final back = tester.widget<IconButton>(
       find.ancestor(
-        of: find.byIcon(Icons.chevron_left),
+        of: find.byIcon(AppIcons.chevronLeft),
         matching: find.byType(IconButton),
       ),
     );

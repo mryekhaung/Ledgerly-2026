@@ -1240,6 +1240,12 @@ abstract class AppLocalizations {
   /// **'Sign in with Google'**
   String get signInWithGoogle;
 
+  /// Divider between email and provider sign-in buttons.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
+  String get signInOrDivider;
+
   /// Button label for Apple sign-in.
   ///
   /// In en, this message translates to:
@@ -2104,6 +2110,18 @@ abstract class AppLocalizations {
   /// **'New Recurring'**
   String get recurringNew;
 
+  /// Active recurring rules tab label with rule count.
+  ///
+  /// In en, this message translates to:
+  /// **'Active ({count})'**
+  String recurringActiveTab(int count);
+
+  /// Paused recurring rules tab label with rule count.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused ({count})'**
+  String recurringPausedTab(int count);
+
   /// Title for editing recurring rule.
   ///
   /// In en, this message translates to:
@@ -2373,6 +2391,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Linked Account (Optional)'**
   String get goalAccountLabel;
+
+  /// Dropdown option for a goal with no linked account.
+  ///
+  /// In en, this message translates to:
+  /// **'None (General Saved)'**
+  String get goalNoAccountOption;
+
+  /// Goal deadline placeholder when no date is chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get goalNoDate;
 
   /// Form label for notes.
   ///

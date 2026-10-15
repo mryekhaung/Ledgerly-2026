@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:material_ui/material_ui.dart';
@@ -28,13 +29,9 @@ class NetWorthCard extends ConsumerWidget {
     final netWorth = ref.watch(totalNetWorthProvider);
     final currency = ref.watch(currencyProvider);
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: colors.surfaceRaised,
-        borderRadius: AppRadius.borderXl,
-        border: Border.all(color: colors.border),
-      ),
+    // §5.2: hero summaries are AppCards (surfaceRaised, radius.lg).
+    return AppCard(
+      border: Border.all(color: colors.border),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

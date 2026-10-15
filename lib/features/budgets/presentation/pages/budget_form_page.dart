@@ -211,7 +211,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
           Text(
             strings('budgetFieldCategory'),
             style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -251,8 +251,8 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
                   (categories.isNotEmpty ? categories.first.id : null),
               decoration: InputDecoration(
                 labelText: strings('budgetFieldCategory'),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.borderMd,
                 ),
               ),
               items: categories.map((cat) {
@@ -286,7 +286,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
           Text(
             strings('budgetFieldAmount'),
             style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -299,8 +299,8 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
               errorText: formState.fieldErrors['amount'] != null
                   ? strings(formState.fieldErrors['amount']!)
                   : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+              border: const OutlineInputBorder(
+                borderRadius: AppRadius.borderMd,
               ),
             ),
             onChanged: (val) {
@@ -321,7 +321,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
               Text(
                 strings('budgetFieldThreshold'),
                 style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               Container(
@@ -331,12 +331,12 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
                 ),
                 decoration: BoxDecoration(
                   color: colors.warningSubtle,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: AppRadius.borderSm,
                 ),
                 child: Text(
                   '${(formState.alertThreshold * 100).round()}%',
                   style: AppTypography.caption.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: colors.warning,
                   ),
                 ),
@@ -370,7 +370,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
           Text(
             strings('categoriesPreview'),
             style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),

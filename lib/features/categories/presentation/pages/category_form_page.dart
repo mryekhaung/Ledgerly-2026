@@ -3,6 +3,7 @@ import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
@@ -260,23 +261,21 @@ class _PreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
+    final strings = AppStrings.of(context);
     // Falls back to the hint so an empty name still renders a plausible row
     // rather than a blank gem with nothing beside it.
     final name = state.name.trim().isEmpty ? '—' : state.name.trim();
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: colors.surfaceSubtle,
-        borderRadius: AppRadius.borderLg,
-      ),
+    // §5.2: previews are AppCards, not bespoke subtle containers.
+    return AppCard(
       child: CategoryGemLabel(
         name: name,
         colorValue: state.colorValue,
         iconKey: state.iconKey,
         size: CategoryGemSize.lg,
-        subtitle: state.kind == CategoryKind.income ? 'Income' : 'Expense',
+        subtitle: state.kind == CategoryKind.income
+            ? strings('transactionDirectionIncome')
+            : strings('transactionDirectionExpense'),
       ),
     );
   }

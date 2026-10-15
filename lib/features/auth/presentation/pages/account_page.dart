@@ -155,7 +155,7 @@ class AccountPage extends ConsumerWidget {
                   Text(
                     user?.displayName ?? (isGuest ? 'Guest User' : 'User'),
                     style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: colors.textPrimary,
                     ),
                   ),
@@ -176,7 +176,7 @@ class AccountPage extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isGuest ? colors.surface : colors.brandSubtle,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: AppRadius.borderLg,
                       border: Border.all(
                         color: isGuest
                             ? colors.border
@@ -237,7 +237,7 @@ class AccountPage extends ConsumerWidget {
                           child: Text(
                             strings('accountLinkBannerTitle'),
                             style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               color: colors.textPrimary,
                             ),
                           ),

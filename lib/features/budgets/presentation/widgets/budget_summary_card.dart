@@ -118,7 +118,7 @@ class BudgetSummaryCard extends StatelessWidget {
               Text(
                 strings('budgetOverallSummary'),
                 style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               BudgetStatusPill(status: p.status),
@@ -147,7 +147,7 @@ class BudgetSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppRadius.borderSm,
             child: LinearProgressIndicator(
               value: p.progressFraction,
               minHeight: 10,
@@ -200,7 +200,7 @@ class BudgetSummaryCard extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: colors.brandPrimary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppRadius.borderSm,
               ),
               child: Row(
                 children: <Widget>[
