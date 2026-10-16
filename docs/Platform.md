@@ -1,11 +1,11 @@
-# Platform.md — Adaptive UI (iOS Liquid Glass · Android Material 3 · Responsive Web)
+# Platform.md — Adaptive UI (iOS native · Android Material 3 · Responsive Web)
 
 One codebase, one domain layer, one set of brand tokens — **platform-specific chrome and controls**, **window-size-specific layouts**.
 
 ## 1. Targets
 | Target | Visual language | Notes |
 |---|---|---|
-| iOS / iPadOS | **Liquid Glass** (iOS 26 design), graceful frosted fallback on older iOS | App Store |
+| iOS / iPadOS | Native iOS controls; system Liquid Glass on iOS 26+, opaque Cupertino fallback | App Store |
 | Android (phone/tablet/foldable) | **Material 3** (Expressive where stable) | Play Store |
 | Web (planned, not committed) | Material 3-based, **fully responsive**, mouse + keyboard friendly | Keep web-ready from day one; ship later |
 
@@ -17,8 +17,7 @@ core/platform/
   adaptive_style.dart      # InheritedWidget exposing platform + size class + reduceTransparency
 core/widgets/
   app_button/  app_button.dart (public API) · app_button_ios.dart · app_button_material.dart
-  app_nav/     adaptive_nav.dart · glass_tab_bar.dart · m3_navigation_bar.dart · nav_rail_sidebar.dart
-  glass/       glass_surface.dart (see §4)
+  app_nav/     adaptive_nav.dart · native iOS tab bar · M3 navigation bar · nav rail/sidebar
   ...every design-system component follows: one public widget → per-platform implementations
 ```
 **Rules**
@@ -29,14 +28,14 @@ core/widgets/
 5. Each adaptive component ships a golden test per platform × light/dark.
 
 ## 3. Component mapping
-| Concern | iOS — Liquid Glass | Android — Material 3 | Web (≥ medium) |
+| Concern | iOS — native Cupertino | Android — Material 3 | Web (≥ medium) |
 |---|---|---|---|
-| Primary nav | Floating glass tab bar, can shrink on scroll | M3 `NavigationBar` | `NavigationRail` (medium) → sidebar drawer (expanded) |
-| Top bar | Large collapsing title, glass toolbar buttons | M3 Top App Bar (Large/Medium collapsing) | Header bar with page title + actions |
-| Primary action (+) | Glass circular button / toolbar item | M3 FAB (Extended FAB on wide) | Extended FAB or header button + shortcut `N` |
-| Sheets | Glass sheet with detents, grabber | M3 Modal Bottom Sheet | Centered dialog / side panel |
+| Primary nav | Native `UITabBar` on iOS 26+; `CupertinoTabBar` on older iOS | M3 `NavigationBar` | `NavigationRail` (medium) → sidebar drawer (expanded) |
+| Top bar | Cupertino navigation bar | M3 Top App Bar (Large/Medium collapsing) | Header bar with page title + actions |
+| Primary action (+) | Native-style toolbar action | M3 FAB (Extended FAB on wide) | Extended FAB or header button + shortcut `N` |
+| Sheets | Cupertino sheet | M3 Modal Bottom Sheet | Centered dialog / side panel |
 | Date picker | Cupertino-style wheel / compact inline | M3 Date Picker | M3 Date Picker (dialog) |
-| Segmented control | Glass segmented (Expense/Income) | M3 `SegmentedButton` | M3 `SegmentedButton` |
+| Segmented control | Cupertino segmented (Expense/Income) | M3 `SegmentedButton` | M3 `SegmentedButton` |
 | Switch / toggles | Cupertino switch | M3 switch | M3 switch |
 | Dialogs / confirm | Alert + action sheet | M3 AlertDialog | M3 AlertDialog |
 | Page transition | iOS push + edge-swipe back | M3 shared-axis + predictive back | Fade-through |
@@ -46,28 +45,18 @@ core/widgets/
 | Body font | System (SF) + Noto Sans Myanmar fallback | Roboto/system + Noto Sans Myanmar | Bundled Inter + Noto fonts (web has no reliable system fallback) |
 | Amounts | Inter tabular (all platforms, brand consistency) | same | same |
 
-## 4. Liquid Glass in Flutter (checked Oct 2026)
-Flutter's built-in widgets do not render the system's Liquid Glass by themselves. As of Flutter 3.47, **Cupertino is a standalone package (`cupertino_ui` 1.0, weekly releases)** so official iOS-design updates can arrive without an SDK upgrade — but don't assume full Liquid Glass parity; verify per release.
+## 4. Native platform UI
+`adaptive_platform_ui: ^1.0.2` provides platform-specific navigation and controls:
 
-Options found:
-| Option | What it is | Verdict |
-|---|---|---|
-| **Native platform views** — `cupertino_native_better` (^1.3.8) / `cupertino_native_plus` (community forks) | Real iOS 26 UIKit/SwiftUI widgets (glass buttons, `LiquidGlassContainer`, native tab bar `CNTabBarNative` with minimize-on-scroll) composited under Flutter | **Most authentic look.** Cost: platform-view overhead, community maintenance (fork landscape is fragmented), the native tab bar sits on top of / in place of the Flutter app, which must be reconciled with go_router shells and our responsive layouts |
-| **Shader renderer** — `liquid_glass_renderer` (0.2.0-dev.4) | Pure-Flutter refraction shader | **Experimental/prerelease.** Needs Impeller, GPU-heavy, authors warn against blind production use. Use only for 1–2 small elements, or skip |
-| **Blur fallback** — `BackdropFilter` + tint + hairline | Frosted look, zero dependencies | Always implemented (iOS < 26, low-end devices, Reduce Transparency) |
+- iOS 26+: a native UIKit tab bar with the system Liquid Glass effect.
+- iOS 15–25: native-style Cupertino controls with opaque surfaces.
+- Android: Material navigation and controls.
+- The app minimum is iOS 15, matching the package's podspec requirement.
 
-**Decision (to confirm in the Phase 0 spike):**
-1. Build everything behind **`GlassSurface` / `AdaptiveNav`** (no package imports in pages).
-2. Ship the **blur fallback first** (works everywhere, zero risk).
-3. Spike **`cupertino_native_better`** for the iOS 26 tab bar + glass buttons; adopt only if it survives: hot-restart stability, go_router integration, accessibility (VoiceOver, Reduce Transparency), and a 12-month maintenance check. Keep it behind the interface so it can be dropped.
-4. Do **not** depend on `liquid_glass_renderer` for core UI.
-
-Usage rules:
-- Glass is for the **floating chrome layer only** (tab bar, toolbar buttons, FAB, sheets) — **never content cards**.
-- Respect *Reduce Transparency* / *Increase Contrast* → solid `surface`.
-- Max ~3 glass surfaces on screen; `RepaintBoundary`; profile on an older iPhone in `--profile`.
-- Content scrolls **under** the glass bars (insets, not fixed gaps).
-- iOS < 26: same layout, blur fallback. Android/web: M3 surfaces — never imitate glass.
+Do not imitate Liquid Glass with Flutter `BackdropFilter`, translucent tint, or
+decorative hairlines. Use the package's native iOS 26 bar where supported; use
+opaque Cupertino surfaces on older iOS and Material surfaces on Android/web.
+Content cards are always opaque brand surfaces.
 
 ## 5. Responsive layout (M3 window size classes)
 | Class | Width | Layout |

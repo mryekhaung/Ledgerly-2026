@@ -14,7 +14,7 @@ Status: **prototype** — real user count unknown. Backend is **free-tier only**
 | `docs/Product.md` | Any feature work — scope, user stories, acceptance criteria |
 | `docs/Design.md` | Any UI work — tokens, components, screen specs (MANDATORY for UI) |
 | `docs/Architecture.md` | Creating/moving files, new features, DI, state |
-| `docs/Platform.md` | Any UI work — iOS Liquid Glass / Android Material 3 / responsive web (MANDATORY for UI) |
+| `docs/Platform.md` | Any UI work — native iOS / Android Material 3 / responsive web (MANDATORY for UI) |
 | `docs/Auth.md` | Auth, profile, account deletion |
 | `docs/Avatar.md` | Avatar editor, Open Peeps assets, avatar model & renderer |
 | `docs/DataModel.md` | Entities, DB schema, money handling |
@@ -33,7 +33,7 @@ Status: **prototype** — real user count unknown. Backend is **free-tier only**
 7. **Memory & performance discipline** (see `docs/Conventions.md` §Memory): dispose everything, `autoDispose` providers, `const` widgets, `ListView.builder`, paginate, select-based rebuilds.
 8. **UI quality bar = `docs/Design.md`.** Clean, polished, modern, premium UI/UX. **Do NOT produce admin-dashboard aesthetics** (dense tables, heavy borders, generic Material cards). Use **dedicated, separate CRUD pages** (list page → detail/form page), not inline dialogs or mega-screens. Keep layouts consistent across all screens via shared scaffolds/components.
 9. **No hardcoded** colors, text styles, spacing, radii, strings. Use design tokens + l10n.
-10. **Platform-adaptive UI.** iOS = **Liquid Glass**, Android = **Material 3**, Web = responsive M3. Pages never branch on platform; only `core/widgets` adaptive components do (see `Platform.md`). Layouts adapt by **window size class** (compact/medium/expanded/large), never by device guesses. Test at 360/768/1440 px.
+10. **Platform-adaptive UI.** iOS = native Cupertino controls (system Liquid Glass only where iOS provides it), Android = **Material 3**, Web = responsive M3. Pages never branch on platform; only `core/widgets` adaptive components do (see `Platform.md`). Layouts adapt by **window size class** (compact/medium/expanded/large), never by device guesses. Test at 360/768/1440 px.
 11. **Web-ready from day one.** No `dart:io` outside conditional imports; every package must support iOS + Android (+ web or a stub behind an interface).
 12. **Auth is optional & pluggable.** Guest mode always works. Apple/Google sign-in, in-app account deletion, and store compliance per `Auth.md`.
 13. **Versions are pinned in `docs/Versions.md`.** Use Flutter 3.47.1 APIs (no deprecated/legacy: no `StateProvider`, no `dart:html`, no `package:flutter/material.dart` imports). Prerelease packages only behind an interface + exit plan.
@@ -74,7 +74,7 @@ Status: **prototype** — real user count unknown. Backend is **free-tier only**
 - [ ] All streams/controllers/timers/listeners disposed
 - [ ] Providers are `autoDispose` unless they must live app-wide
 - [ ] UI matches `Design.md` tokens; light **and** dark mode checked
-- [ ] Looks native on **iOS (Liquid Glass)** and **Android (M3)**; verified at compact / medium / expanded widths
+- [ ] Looks native on **iOS (Cupertino)** and **Android (M3)**; verified at compact / medium / expanded widths
 - [ ] Strings localized (en/my/ja); long Burmese/Japanese text doesn't overflow
 - [ ] Empty / loading / error states implemented
 - [ ] Tests added; analyzer clean

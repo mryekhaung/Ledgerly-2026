@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/nav_destinations.dart';
@@ -14,8 +15,7 @@ import 'package:material_ui/material_ui.dart';
 /// Owns exactly one decision — **where the nav sits relative to the content**,
 /// which follows the window size class (`docs/Platform.md` §5):
 ///
-///  * **compact** — nav is a bottom bar; content fills the screen and scrolls
-///    *under* it. The page is inset by the bar's height so nothing is hidden.
+///  * **compact** — the platform's adaptive bottom bar is docked below content.
 ///  * **medium / expanded / large** — nav is a rail or sidebar on the left and
 ///    the content is the `Expanded` pane beside it.
 ///
@@ -100,36 +100,12 @@ class _AppShellState extends ConsumerState<AppShell> {
       );
     }
 
-    // Compact: the bar floats over the content. `extendBody` lets a page's
-    // scrollable run to the screen edge and be seen *through* the glass, which
-    // is the whole point of the bar — but that also means the last row of a list
-    // would sit underneath it.
-    //
-    // The fix belongs here, not in each page: the shell adds the bar's height to
-    // the bottom view padding, so any page that already respects safe areas
-    // (`SafeArea`, a `ListView` with `padding`, a `SliverAppBar`) clears the bar
-    // for free and none of them has to know the bar exists.
-    return Scaffold(
-      extendBody: true,
-      body: MediaQuery(
-        data: MediaQuery.of(context).copyWith(
-          padding: MediaQuery.paddingOf(
-            context,
-          ).copyWith(bottom: MediaQuery.paddingOf(context).bottom + _barInset),
-          viewPadding: MediaQuery.viewPaddingOf(context).copyWith(
-            bottom: MediaQuery.viewPaddingOf(context).bottom + _barInset,
-          ),
-        ),
-        child: widget.child,
-      ),
-      bottomNavigationBar: nav,
+    // Compact layouts use the package scaffold so iOS can use its native tab
+    // bar while Android keeps the app's themed Material navigation.
+    return AdaptiveScaffold(
+      body: nav.adaptiveScaffoldBody(context, widget.child),
+      bottomNavigationBar: nav.bottomNavigationBar(context),
+      minimizeBehavior: TabBarMinimizeBehavior.onScrollDown,
     );
   }
-
-  /// Height reserved for the compact bottom bar, excluding the system inset.
-  ///
-  /// Matches the M3 `NavigationBar` height the bar sets, so the reserved space
-  /// and the painted bar agree. The glass bar is shorter, so it reserves the
-  /// same — a consistent gap beats a gap that changes with the platform.
-  static const double _barInset = 64;
 }

@@ -191,7 +191,7 @@ void main() {
       expect(adaptive.reduceTransparency, isFalse);
     });
 
-    testWidgets('should_mark_ios_glass_capable_when_platform_is_ios', (
+    testWidgets('should_mark_ios_as_cupertino_when_platform_is_ios', (
       tester,
     ) async {
       await tester.pumpWidget(hostApp(platform: AppPlatform.ios));
@@ -201,10 +201,10 @@ void main() {
       final adaptive = AdaptiveStyle.of(context);
 
       expect(adaptive.platform, AppPlatform.ios);
-      expect(adaptive.canUseGlass, isTrue);
+      expect(adaptive.platform.usesCupertino, isTrue);
     });
 
-    testWidgets('should_disable_glass_when_platform_is_android', (
+    testWidgets('should_use_material_interactions_when_platform_is_android', (
       tester,
     ) async {
       await tester.pumpWidget(hostApp());
@@ -212,7 +212,7 @@ void main() {
 
       final context = tester.element(find.byType(Scaffold).first);
 
-      expect(AdaptiveStyle.of(context).canUseGlass, isFalse);
+      expect(AdaptiveStyle.of(context).platform.usesCupertino, isFalse);
     });
 
     testWidgets('should_report_medium_size_class_at_default_test_surface', (

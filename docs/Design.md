@@ -90,8 +90,6 @@ are exported. Widgets never reference the raw palette.
 | `warning` | `#9C6606` | Budget near limit — 4.53:1 on the page |
 | `warningSubtle` | `#FCF0D8` | Warning capsule fill |
 | `overlay` | `#0F1720` @ 32% | Scrims |
-| `glassTint` | `#FFFFFF` @ 62% | Glass surface fill (see §2.5) |
-| `glassStroke` | `#FFFFFF` @ 45% | Glass hairline highlight |
 
 > **Ratios are against the `surface` the token actually sits on.** §2.7 moved the
 > light page from `#FFFFFF` to `#F5F7FA`, so every light-mode ratio above shifted
@@ -129,8 +127,6 @@ are exported. Widgets never reference the raw palette.
 | `warning` | `#E0A63C` | |
 | `warningSubtle` | `#33280F` | |
 | `overlay` | `#000000` @ 55% | |
-| `glassTint` | `#182029` @ 58% | |
-| `glassStroke` | `#FFFFFF` @ 12% | |
 
 > **The dark accents are lightened only as far as AA requires.** They used to run
 > far brighter than their light twins — `moneyIn` was **+63 %** and `brandPrimary`
@@ -273,21 +269,12 @@ AA on all four light surfaces (§2.7).
 > pair. Do not "brighten" these for aesthetics without re-running the contrast test.
 
 
-### 2.5 Glass tokens (iOS only)
+### 2.5 Platform-native surfaces
 
-Defined here so `core/widgets/glass/` has one source. Glass is **floating chrome only** —
-never a content card (`Platform.md` §4).
-
-| Token | Value |
-|---|---|
-| `glassBlurSigma` | `18` (compact) / `24` (medium+) |
-| `glassTint` | see §2.2 / §2.3 |
-| `glassStroke` | see §2.2 / §2.3 |
-| `glassStrokeWidth` | `0.5` |
-| `glassRadius` | `radius.xl` (28) for bars, `radius.lg` (20) for buttons |
-
-Fallback chain: native glass → `BackdropFilter` blur → **solid `surfaceRaised`** when
-*Reduce Transparency* or *Increase Contrast* is on. The fallback is not optional.
+The app does not simulate Liquid Glass with blur, tint, or translucent borders.
+On supported iOS versions, native navigation chrome is provided by
+`adaptive_platform_ui`; older iOS uses opaque Cupertino surfaces. Content cards
+remain opaque `surfaceRaised` surfaces on every platform.
 
 ---
 
@@ -350,7 +337,7 @@ Base unit **4**. Only these values exist:
 | `sm` | 8 | Chips, capsules, small badges |
 | `md` | 12 | Inputs, list-group containers |
 | `lg` | 20 | Cards, sheets |
-| `xl` | 28 | Glass bars, FAB, large surfaces |
+| `xl` | 28 | FAB, large surfaces |
 | `full` | 999 | Pills, avatars, circular buttons |
 
 ### 4.3 Elevation
@@ -361,7 +348,7 @@ We prefer **tint + hairline** over shadow. Only three levels:
 |---|---|---|---|
 | `flat` | none, `border` hairline | none, `border` hairline | Rows, grouped lists |
 | `raised` | `0 1 2 rgba(15,23,32,.06)` | none, lighter surface | Cards |
-| `floating` | `0 8 24 rgba(15,23,32,.12)` | `0 8 24 rgba(0,0,0,.4)` | FAB, glass bars, sheets |
+| `floating` | `0 8 24 rgba(15,23,32,.12)` | `0 8 24 rgba(0,0,0,.4)` | FAB, sheets |
 
 ### 4.4 Motion (`app/theme/app_motion.dart`)
 
@@ -389,8 +376,8 @@ widget only.
 
 The shared page frame. Every page uses it — no raw `Scaffold` in features.
 
-- Owns: safe areas, top bar (adaptive), bottom nav inset, background (`surface`), the content column,
-  and the scroll-under-glass insets.
+- Owns: safe areas, top bar (adaptive), bottom nav inset, background (`surface`), and the content
+  column. The shell owns the native tab bar and its content inset.
 - The **content column** is capped at 1200 px by default, or at the page's `contentMaxWidth` when it
   declares one (a form or prose list: 560). The frame caps *and centres* the column and derives the
   top bar title's inset from it, so the title's left edge lands on the content's rather than at a
@@ -398,7 +385,7 @@ The shared page frame. Every page uses it — no raw `Scaffold` in features.
   offset (`docs/Roadmap.md` §G.8 R2 / §J).
 - Props: `title`, `leading`, `actions`, `bottomNav`, `floatingAction`, `body`, `isScrollable`,
   `contentMaxWidth`, `contentInset`.
-- **Top bar**: iOS large collapsing title w/ glass toolbar; Android M3 Large Top App Bar.
+- **Top bar**: iOS Cupertino navigation bar; Android M3 Large Top App Bar.
 
 ### 5.2 `AppCard`
 
@@ -431,7 +418,7 @@ Renders a `Money`. The only widget allowed to format money.
 
 ### 5.5 `SegmentedTabs`
 
-- iOS: glass segmented control. Android: M3 `SegmentedButton`. Web: M3.
+- iOS: Cupertino segmented control. Android: M3 `SegmentedButton`. Web: M3.
 - Pill shape (`radius.full`), height 32, label `label` token.
 - Selected: `brandSubtle` fill + `onBrandSubtle` label. Unselected: `textSecondary`, no fill.
   The on-colour matters — `brandPrimary` on `brandSubtle` fails AA (§2.6).
@@ -477,10 +464,10 @@ The atomic list unit. Replaces any table.
   (`textSecondary`, centered, max 2 lines), one action button.
 - Never an empty screen with just "No data".
 
-### 5.10 `GlassDock` (iOS) / `M3NavigationBar` (Android)
+### 5.10 Native iOS tab bar / `M3NavigationBar` (Android)
 
-- iOS: floating glass bar, `radius.xl`, inset `lg` from screen edges and bottom safe area, blur per
-  §2.5. Shrinks on scroll-down, expands on scroll-up.
+- iOS 26+: `adaptive_platform_ui`'s native `UITabBar` and system Liquid Glass; older iOS: opaque
+  `CupertinoTabBar`. No Flutter blur/tint imitation.
 - Android: M3 `NavigationBar`, opaque `surfaceRaised`, hairline top border.
 - 3–5 destinations. Active icon filled, inactive outlined; label always visible.
 

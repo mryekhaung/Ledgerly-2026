@@ -182,7 +182,7 @@ class _AppButtonState extends State<AppButton> {
       child: Center(child: childContent),
     );
 
-    if (platform.usesLiquidGlass) {
+    if (platform.usesCupertino) {
       button = GestureDetector(
         onTapDown: _handleTapDown,
         onTapUp: _handleTapUp,

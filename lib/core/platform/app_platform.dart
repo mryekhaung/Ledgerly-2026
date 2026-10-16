@@ -23,8 +23,8 @@ enum AppPlatform {
     };
   }
 
-  /// True when iOS Liquid Glass chrome applies (docs/Platform.md §4).
-  bool get usesLiquidGlass => this == AppPlatform.ios;
+  /// True when the platform should use native Cupertino interaction patterns.
+  bool get usesCupertino => this == AppPlatform.ios;
 
   /// True when Material 3 chrome applies.
   bool get usesMaterial => this != AppPlatform.ios;

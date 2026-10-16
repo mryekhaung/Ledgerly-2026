@@ -108,7 +108,7 @@ class _AppCardState extends State<AppCard> {
     );
 
     if (widget.onTap != null) {
-      if (platform.usesLiquidGlass) {
+      if (platform.usesCupertino) {
         // iOS: micro fade to 96% opacity + light haptic, never a ripple (docs/Design.md §5.2).
         content = GestureDetector(
           onTapDown: _handleTapDown,

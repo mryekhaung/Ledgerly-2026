@@ -1,10 +1,14 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
+// `AdaptiveBottomNavigationBar.cupertinoTabBar` is typed to Flutter's widget.
+import 'package:flutter/cupertino.dart'
+    as flutter_cupertino
+    show BottomNavigationBarItem, CupertinoTabBar;
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/router/nav_destinations.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/adaptive_style.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
-import 'package:ledgerly/core/widgets/glass/glass_surface.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The app's primary navigation chrome (docs/Platform.md §3).
@@ -15,7 +19,7 @@ import 'package:material_ui/material_ui.dart';
 ///
 /// | Platform | compact | medium | expanded / large |
 /// |---|---|---|---|
-/// | iOS | floating glass bar | rail | sidebar |
+/// | iOS | native adaptive tab bar | rail | sidebar |
 /// | Android / web | M3 `NavigationBar` | rail | sidebar |
 ///
 /// Size class beats platform: an iPad in landscape gets the sidebar, and an
@@ -56,9 +60,12 @@ class AdaptiveNav extends StatelessWidget {
       );
     }
 
-    // Compact: iOS floats a glass bar, everyone else docks an M3 bar.
-    if (adaptive.canUseGlass) {
-      return _GlassNavBar(
+    // Compact iOS uses the platform's Cupertino tab bar. AppShell passes the
+    // adaptive configuration below to AdaptiveScaffold, which upgrades it to
+    // the native iOS 26 tab bar when available.
+    if (adaptive.platform.usesCupertino) {
+      return _cupertinoNavBar(
+        context: context,
         current: current,
         onSelect: onSelect,
         destinationLabel: (d) => d.label(strings),
@@ -76,6 +83,97 @@ class AdaptiveNav extends StatelessWidget {
   /// Kept as a small escape hatch because the sidebar/rail need the shell's own
   /// navigation callback and the bar does not.
   static String routeOf(NavDestination destination) => destination.route;
+
+  /// Builds the package configuration used by AppShell's compact scaffold.
+  AdaptiveBottomNavigationBar bottomNavigationBar(BuildContext context) {
+    final strings = AppStrings.of(context);
+    final colors = AppThemeColors.of(context);
+
+    return AdaptiveBottomNavigationBar(
+      items: <AdaptiveNavigationDestination>[
+        for (final destination in NavDestination.all)
+          AdaptiveNavigationDestination(
+            icon: _symbolFor(destination, selected: false),
+            selectedIcon: _symbolFor(destination, selected: true),
+            label: destination.label(strings),
+          ),
+      ],
+      selectedIndex: current?.index ?? 0,
+      onTap: (index) => onSelect(NavDestination.all[index]),
+      useNativeBottomBar: true,
+      cupertinoTabBar: _cupertinoNavBar(
+        context: context,
+        current: current,
+        onSelect: onSelect,
+        destinationLabel: (destination) => destination.label(strings),
+      ),
+      bottomNavigationBar: _MaterialNavBar(
+        current: current,
+        onSelect: onSelect,
+        destinationLabel: (destination) => destination.label(strings),
+      ),
+      selectedItemColor: colors.brandPrimary,
+      unselectedItemColor: colors.textSecondary,
+    );
+  }
+
+  /// Adds scroll clearance for iOS 26's overlay tab bar.
+  Widget adaptiveScaffoldBody(BuildContext context, Widget child) {
+    if (!PlatformInfo.isIOS26OrHigher()) return child;
+
+    final mediaQuery = MediaQuery.of(context);
+    return MediaQuery(
+      data: mediaQuery.copyWith(
+        padding: mediaQuery.padding.copyWith(
+          bottom: mediaQuery.padding.bottom + _nativeTabBarContentInset,
+        ),
+        viewPadding: mediaQuery.viewPadding.copyWith(
+          bottom: mediaQuery.viewPadding.bottom + _nativeTabBarContentInset,
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  static const double _nativeTabBarContentInset = 64;
+
+  static String _symbolFor(
+    NavDestination destination, {
+    required bool selected,
+  }) => switch (destination) {
+    NavDestination.calendar => 'calendar',
+    NavDestination.insights => selected ? 'chart.pie.fill' : 'chart.pie',
+    NavDestination.categories =>
+      selected ? 'square.grid.2x2.fill' : 'square.grid.2x2',
+    NavDestination.settings => selected ? 'gearshape.fill' : 'gearshape',
+  };
+
+  flutter_cupertino.CupertinoTabBar _cupertinoNavBar({
+    required BuildContext context,
+    required NavDestination? current,
+    required ValueChanged<NavDestination> onSelect,
+    required String Function(NavDestination) destinationLabel,
+  }) {
+    final colors = AppThemeColors.of(context);
+    return flutter_cupertino.CupertinoTabBar(
+      currentIndex: current?.index ?? 0,
+      onTap: (index) => onSelect(NavDestination.all[index]),
+      backgroundColor: colors.surfaceRaised,
+      activeColor: colors.brandPrimary,
+      inactiveColor: colors.textSecondary,
+      height: 50,
+      iconSize: 24,
+      border: Border(top: BorderSide(color: colors.border, width: 0.5)),
+      items: <flutter_cupertino.BottomNavigationBarItem>[
+        for (final destination in NavDestination.all)
+          flutter_cupertino.BottomNavigationBarItem(
+            icon: Icon(destination.icon),
+            activeIcon: Icon(destination.selectedIcon),
+            label: destinationLabel(destination),
+          ),
+      ],
+    );
+  }
 }
 
 /// Whether [location] should read as [destination] being selected.
@@ -111,129 +209,51 @@ class _MaterialNavBar extends StatelessWidget {
     // transparent and every destination keeps its unselected icon.
     final hasSelection = current != null;
 
-    return DockedBottomBar(
-      child: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          // Brand-derived colours rather than Material's defaults, so the
-          // selected pill matches the rest of the app (docs/Design.md §2.2).
-          indicatorColor: hasSelection
-              ? colors.brandSubtle
-              : Colors.transparent,
-          backgroundColor: colors.surfaceRaised,
-          labelTextStyle: WidgetStateProperty.resolveWith(
-            (states) => Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: states.contains(WidgetState.selected) && hasSelection
-                  ? colors.brandPrimary
-                  : colors.textSecondary,
-              fontWeight: states.contains(WidgetState.selected) && hasSelection
-                  ? FontWeight.w600
-                  : null,
-            ),
-          ),
-        ),
-        child: NavigationBar(
-          // The bar is always visible; content scrolls beneath it via the
-          // shell's inset (docs/Platform.md §4: content scrolls *under* chrome).
-          height: 64,
-          selectedIndex: current?.index ?? 0,
-          onDestinationSelected: (index) => onSelect(NavDestination.all[index]),
-          destinations: <Widget>[
-            for (final destination in NavDestination.all)
-              NavigationDestination(
-                icon: Icon(destination.icon),
-                selectedIcon: Icon(
-                  destination.selectedIcon,
-                  color: hasSelection ? colors.brandPrimary : null,
-                ),
-                label: destinationLabel(destination),
-              ),
-          ],
-        ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surfaceRaised,
+        border: Border(top: BorderSide(color: colors.border)),
       ),
-    );
-  }
-}
-
-/// Floating glass bar — the compact iOS layout (docs/Design.md §5.10).
-class _GlassNavBar extends StatelessWidget {
-  const _GlassNavBar({
-    required this.current,
-    required this.onSelect,
-    required this.destinationLabel,
-  });
-
-  final NavDestination? current;
-  final ValueChanged<NavDestination> onSelect;
-  final String Function(NavDestination) destinationLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingGlassBar(
-      child: Row(
-        children: <Widget>[
-          for (final destination in NavDestination.all)
-            Expanded(
-              child: _GlassNavItem(
-                destination: destination,
-                label: destinationLabel(destination),
-                selected: destination == current,
-                onTap: () => onSelect(destination),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-/// One item inside the glass bar: icon over label, with a subtle brand tint
-/// behind the active one.
-class _GlassNavItem extends StatelessWidget {
-  const _GlassNavItem({
-    required this.destination,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final NavDestination destination;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
-    final textTheme = Theme.of(context).textTheme;
-
-    return Semantics(
-      selected: selected,
-      button: true,
-      label: label,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AppRadius.borderLg,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                selected ? destination.selectedIcon : destination.icon,
-                size: 24,
-                color: selected ? colors.brandPrimary : colors.textSecondary,
-              ),
-              const SizedBox(height: AppSpacing.xxs),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: textTheme.labelSmall?.copyWith(
-                  color: selected ? colors.brandPrimary : colors.textSecondary,
-                  fontWeight: selected ? FontWeight.w600 : null,
+      child: SafeArea(
+        top: false,
+        child: MediaQuery.removePadding(
+          context: context,
+          removeBottom: true,
+          child: NavigationBarTheme(
+            data: NavigationBarThemeData(
+              indicatorColor: hasSelection
+                  ? colors.brandSubtle
+                  : Colors.transparent,
+              backgroundColor: colors.surfaceRaised,
+              labelTextStyle: WidgetStateProperty.resolveWith(
+                (states) => Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: states.contains(WidgetState.selected) && hasSelection
+                      ? colors.brandPrimary
+                      : colors.textSecondary,
+                  fontWeight:
+                      states.contains(WidgetState.selected) && hasSelection
+                      ? FontWeight.w600
+                      : null,
                 ),
               ),
-            ],
+            ),
+            child: NavigationBar(
+              height: 64,
+              selectedIndex: current?.index ?? 0,
+              onDestinationSelected: (index) =>
+                  onSelect(NavDestination.all[index]),
+              destinations: <Widget>[
+                for (final destination in NavDestination.all)
+                  NavigationDestination(
+                    icon: Icon(destination.icon),
+                    selectedIcon: Icon(
+                      destination.selectedIcon,
+                      color: hasSelection ? colors.brandPrimary : null,
+                    ),
+                    label: destinationLabel(destination),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

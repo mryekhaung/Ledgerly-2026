@@ -205,10 +205,8 @@ abstract interface class AppColors {
   Color get warning;
   Color get warningSubtle;
 
-  // --- Scrim & glass ---
+  // --- Scrim ---
   Color get overlay;
-  Color get glassTint;
-  Color get glassStroke;
 
   /// True when this is the dark scheme. Used only by adaptive components that
   /// need to pick an alpha or blur strength the tokens can't express.
@@ -286,12 +284,6 @@ final class AppColorsLight implements AppColors {
   Color get overlay => const Color(0x520F1720); // ink900 @ 32%
 
   @override
-  Color get glassTint => const Color(0x9EFFFFFF); // @ 62%
-
-  @override
-  Color get glassStroke => const Color(0x73FFFFFF); // @ 45%
-
-  @override
   bool get isDark => false;
 }
 
@@ -364,12 +356,6 @@ final class AppColorsDark implements AppColors {
 
   @override
   Color get overlay => const Color(0x8C000000); // @ 55%
-
-  @override
-  Color get glassTint => const Color(0x94182029); // surfaceRaised @ 58%
-
-  @override
-  Color get glassStroke => const Color(0x1FFFFFFF); // @ 12%
 
   @override
   bool get isDark => true;

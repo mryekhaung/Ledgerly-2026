@@ -37,9 +37,6 @@ class AdaptiveStyle extends InheritedWidget {
   /// True when bold text is enabled — weight 500 becomes 600 in some styles.
   final bool boldText;
 
-  /// True when iOS Liquid Glass chrome may be used.
-  bool get canUseGlass => platform.usesLiquidGlass && !reduceTransparency;
-
   /// Reads the nearest [AdaptiveStyle], falling back to a sensible,
   /// non-platform-specific default when absent (goldens, isolated previews).
   static AdaptiveStyle of(BuildContext context) {

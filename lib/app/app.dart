@@ -1,4 +1,6 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'
+    show GlobalCupertinoLocalizations;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_router.dart';
@@ -106,6 +108,7 @@ class LedgerlyApp extends ConsumerWidget {
       // `<dynamic>` accepts both. `Object?` is the common supertype that does.
       localizationsDelegates: const <LocalizationsDelegate<Object?>>[
         ...GlobalMaterialLocalizations.delegates,
+        GlobalCupertinoLocalizations.delegate,
         AppLocalizations.delegate,
       ],
 

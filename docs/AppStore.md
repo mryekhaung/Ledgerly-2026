@@ -3,7 +3,7 @@
 **Target:** App Store (iPhone + iPad) via Codemagic CI/CD.  
 **Bundle ID:** `com.yk.ledgerly` (unified across Debug, Profile, and Release).  
 **Version:** Dynamic from `pubspec.yaml` (build number auto-incremented by Codemagic).  
-**Policies verified:** Apple App Store Review Guidelines, iOS 26 SDK requirement (mandatory April 28 2026), iOS 13 minimum (mandatory September 9 2026).
+**Policies verified:** Apple App Store Review Guidelines, iOS 26 SDK requirement (mandatory April 28 2026), iOS 15 app minimum.
 
 Legend: ☐ todo · ☑ done · ⚠️ owner action required
 
@@ -111,7 +111,7 @@ Minimum 5 screenshots per device. Recommended screens: Calendar, Transactions, B
 
 ### 4.2 SDK requirement ✅
 `codemagic.yaml` uses `xcode: latest` (Xcode 26 / iOS 26 SDK). Mandatory since April 28, 2026. ✅  
-`IPHONEOS_DEPLOYMENT_TARGET = 13.0` satisfies iOS 13+ minimum requirement. ✅
+`IPHONEOS_DEPLOYMENT_TARGET = 15.0` is the app minimum, matching `adaptive_platform_ui`'s iOS deployment requirement. ✅
 
 ### 4.3 Privacy manifest ✅
 `PrivacyInfo.xcprivacy` is registered in `project.pbxproj` (`PBXResourcesBuildPhase`). Xcode bundles it into `Runner.app/PrivacyInfo.xcprivacy`. Required reasons for `FileTimestamp` (DDA9.1), `UserDefaults` (CA92.1), and `DiskSpace` (E174.1) are declared. ✅

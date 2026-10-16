@@ -172,7 +172,7 @@ class AppScaffold extends StatelessWidget {
             // keeps the platform default, so this cannot shift a page that did
             // not opt in.
             titleSpacing: contentMaxWidth == null ? null : gutter + inset,
-            centerTitle: platform.usesLiquidGlass,
+            centerTitle: platform.usesCupertino,
             backgroundColor: Colors.transparent,
             elevation: 0,
             scrolledUnderElevation: 0,
@@ -188,7 +188,7 @@ class AppScaffold extends StatelessWidget {
 
     if (isScrollable) {
       content = SingleChildScrollView(
-        physics: platform.usesLiquidGlass
+        physics: platform.usesCupertino
             ? const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
               )

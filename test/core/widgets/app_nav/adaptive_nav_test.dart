@@ -1,3 +1,8 @@
+import 'package:flutter/cupertino.dart'
+    as flutter_cupertino
+    show CupertinoTabBar;
+import 'package:flutter_localizations/flutter_localizations.dart'
+    show GlobalCupertinoLocalizations;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/router/nav_destinations.dart';
@@ -5,7 +10,6 @@ import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/widgets/app_nav/adaptive_nav.dart';
-import 'package:ledgerly/core/widgets/glass/glass_surface.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -15,7 +19,7 @@ import '../../../support/app_test_host.dart';
 ///
 /// The point of these tests is the **branch table** in `docs/Platform.md` §3:
 /// the same widget must produce a bottom bar, a rail or a sidebar purely from
-/// the width, and must never imitate glass off-iOS. Those are exactly the
+/// the width, and uses platform-native navigation on compact layouts. Those are exactly the
 /// decisions a screenshot cannot verify, because a wrong branch still renders
 /// *something*.
 void main() {
@@ -35,6 +39,7 @@ void main() {
       child: MaterialApp(
         localizationsDelegates: const <LocalizationsDelegate<Object?>>[
           ...GlobalMaterialLocalizations.delegates,
+          GlobalCupertinoLocalizations.delegate,
           AppLocalizations.delegate,
         ],
         supportedLocales: const <Locale>[Locale('en')],
@@ -83,6 +88,7 @@ void main() {
           child: MaterialApp(
             localizationsDelegates: const <LocalizationsDelegate<Object?>>[
               ...GlobalMaterialLocalizations.delegates,
+              GlobalCupertinoLocalizations.delegate,
               AppLocalizations.delegate,
             ],
             supportedLocales: const <Locale>[Locale('en')],
@@ -113,50 +119,52 @@ void main() {
       expect(navRect.bottom, lessThanOrEqualTo(844.0 - bottomPadding));
     });
 
-    testWidgets('should_use_the_floating_glass_bar_on_ios', (tester) async {
+    testWidgets('should_use_an_opaque_cupertino_tab_bar_on_ios', (
+      tester,
+    ) async {
+      final tapped = <NavDestination>[];
+      await tester.pumpWidget(
+        host(
+          width: TestWidths.phone,
+          platform: AppPlatform.ios,
+          onSelect: tapped.add,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(flutter_cupertino.CupertinoTabBar), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+      final bar = tester.widget<flutter_cupertino.CupertinoTabBar>(
+        find.byType(flutter_cupertino.CupertinoTabBar),
+      );
+      expect(bar.backgroundColor, const Color(0xFFFFFFFF));
+      expect(bar.currentIndex, NavDestination.calendar.index);
+
+      await tester.tap(find.text('Settings'));
+      await tester.pumpAndSettle();
+      expect(tapped, <NavDestination>[NavDestination.settings]);
+    });
+
+    testWidgets('should_configure_native_ios26_and_cupertino_fallback', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         host(width: TestWidths.phone, platform: AppPlatform.ios),
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(FloatingGlassBar), findsOneWidget);
-      expect(find.byType(NavigationBar), findsNothing);
-      // The blur is the actual glass implementation (docs/Platform.md §4:
-      // ship the blur fallback first).
-      expect(find.byType(BackdropFilter), findsWidgets);
+      final config =
+          AdaptiveNav(
+            current: NavDestination.settings,
+            onSelect: (_) {},
+          ).bottomNavigationBar(
+            tester.element(find.byType(flutter_cupertino.CupertinoTabBar)),
+          );
+      expect(config.useNativeBottomBar, isTrue);
+      expect(config.items, hasLength(NavDestination.all.length));
+      expect(config.selectedIndex, NavDestination.settings.index);
+      expect(config.cupertinoTabBar, isNotNull);
     });
-
-    testWidgets(
-      'should_fall_back_to_a_solid_surface_when_transparency_is_reduced',
-      (tester) async {
-        // Reduce Transparency must degrade the glass to a solid surface — a
-        // legibility requirement, not a nicety.
-        await tester.pumpWidget(
-          ProviderScope(
-            child: MaterialApp(
-              home: MediaQuery(
-                data: const MediaQueryData(
-                  size: Size(390, 900),
-                  highContrast: true,
-                ),
-                child: AppTestScopes(
-                  platform: AppPlatform.ios,
-                  child: AdaptiveNav(
-                    current: NavDestination.calendar,
-                    onSelect: (_) {},
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        // No blur at all: `canUseGlass` is false, so GlassSurface takes the solid
-        // branch.
-        expect(find.byType(BackdropFilter), findsNothing);
-      },
-    );
 
     testWidgets('should_show_every_destination_label', (tester) async {
       await tester.pumpWidget(host(width: TestWidths.phone));
@@ -279,7 +287,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(NavigationRail), findsOneWidget);
-      expect(find.byType(FloatingGlassBar), findsNothing);
+      expect(find.byType(flutter_cupertino.CupertinoTabBar), findsNothing);
     });
   });
 

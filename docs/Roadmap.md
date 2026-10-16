@@ -50,10 +50,10 @@ Phase 5 (Release) is unstarted.
   - ✅ `scripts/codegen.sh` — the committed-codegen entry point.
   - ⚠ **`build_runner` has never run.** `drift_dev` has not validated the `@TableIndex` / `@DriftDatabase` annotations, and no `.g.dart` exists yet. The DAO/table signatures were compile-checked against a hand-written replica of the generated code, and the emitted SQL was asserted textually (38 assertions); the schema was checked with 58 further assertions. **CI's first `build_runner` + `flutter test` is the real validation** — treat the first CI run as part of this item, not after it.
   - The item stays ◐ until that CI run is green; see `docs/Versions.md` §3 for the four build-behaviour facts (monolithic codegen, aggregate annotation, `isNotNull` collision, `updateById` naming) that were derived from drift's source and cost real debugging time.
-- ◐ `core/platform/` (AppPlatform, WindowSizeClass, AdaptiveStyle) + `GlassSurface` spike: blur fallback first, then `cupertino_native_better` (native iOS 26 tab bar/buttons); `liquid_glass_renderer` experimental only — decide & document
-  - ✅ `core/platform/` done (`app_platform.dart`, `window_size.dart`, `adaptive_style.dart` + `window_size_test.dart`); GlassSurface spike still todo, so the item stays ◐.
+- ◐ `core/platform/` (AppPlatform, WindowSizeClass, AdaptiveStyle) + native platform UI integration.
+  - ✅ `core/platform/` done (`app_platform.dart`, `window_size.dart`, `adaptive_style.dart` + `window_size_test.dart`); native navigation integration uses `adaptive_platform_ui`.
 - ☐ Web spike: Drift (`drift_flutter` WASM) + conditional imports + fonts + `flutter build web --wasm` running
-- ◐ Design-system widgets (adaptive iOS/Material impls + responsive helpers): AppScaffold, AppCard, CategoryGem, AmountText, SegmentedTabs, ListRow, buttons, fields, EmptyState, GlassDock (+ goldens)
+- ◐ Design-system widgets (adaptive iOS/Material impls + responsive helpers): AppScaffold, AppCard, CategoryGem, AmountText, SegmentedTabs, ListRow, buttons, fields, EmptyState, native tab bar (+ goldens)
   - 📄 Specs for all of these live in `docs/Design.md` §5
   - ✅ `AmountText`, `AppCard`, `ListRow`, `SegmentedTabs`, `AppButton`, `AppScaffold` shipped under `core/widgets/`; covered by widget tests (`amount_text_test.dart`, `design_system_widgets_test.dart`).
   - ☐ Goldens not yet scaffolded.
@@ -179,7 +179,7 @@ Every `lib/features/*` folder named below exists but holds only `.gitkeep` scaff
   - ✅ **Memory & Lifecycle**: Bounded LRU cache verification (Avatar editor 10x open/close ≤ 32 cache limit). Navigating push/pop across screens 10x and viewport rotation across portrait/landscape 10x produces zero memory leaks, disposed controller errors, or unhandled exceptions.
   - ✅ Tests: `test/core/accessibility/accessibility_test.dart` and `test/core/memory/screen_lifecycle_memory_test.dart` passing 100%.
 - ☐ **Milestone: TestFlight/internal build**
-- ☑ **`AdaptiveNav`** — **built and verified on `emulator-5554`.** The glass tab bar / M3 `NavigationBar` / rail / sidebar are all in place: `NavDestination` (the single source of truth for the four destinations and their route matcher), `GlassSurface`/`FloatingGlassBar`/`DockedBottomBar`, `AdaptiveNav` (compact → M3 bar on Android/web, floating glass bar on iOS; medium → `NavigationRail`; expanded/large → 240 px sidebar), and `AppShell` (mounted from the router's `ShellRoute`; also raises the bottom `MediaQuery` padding so content is never hidden behind the bar). `_PlaceholderShell` is gone and `_PlaceholderPage` now renders the shared coming-soon state.
+- ☑ **`AdaptiveNav`** — compact iOS uses `adaptive_platform_ui`'s native iOS 26 tab bar and Cupertino fallback, Android/web use M3 `NavigationBar`, medium uses `NavigationRail`, and expanded/large use a 240 px sidebar. `AppShell` mounts it from the router's `ShellRoute`; `_PlaceholderShell` is gone and `_PlaceholderPage` renders the shared coming-soon state.
   - Size class beats platform: a wide Android tablet gets the same sidebar as an iPad (`docs/Platform.md` §2 rule 4).
   - On-device: all four destinations navigate by tapping, the active pill follows, the landscape window switches to the sidebar, and logcat shows no `overflow`/`RenderFlex` across the whole run.
   - `--dart-define=INITIAL_ROUTE=/settings` still starts a dev build on a specific route (`AppEnvironment.initialRouteFromDartDefine`, ignored in prod) — useful for screenshotting a page directly.

@@ -118,7 +118,7 @@
 | Dart | **3.13.5** | ✅ installed (bundled with that Flutter, `bin/cache/dart-sdk`) |
 | Pin with | **FVM** (`.fvmrc` = `3.47.1`), CI uses `FLUTTER_VERSION: 3.47.1` | ✅ `.fvmrc` created · local SDK is 3.47.7 — close enough for a patch-level pin; CI stays on 3.47.1 |
 | `pubspec.yaml` | `environment: sdk: ^3.13.0` · `flutter: ">=3.47.0"` | ✅ applied |
-| iOS | Xcode with iOS 26 SDK (Liquid Glass on rebuild); Flutter 3.47 raised min iOS (reported 15) — check `Platform.md`/release notes. UIScene lifecycle + Swift Package Manager are the default direction | ⚠ confirm in release notes |
+| iOS | Xcode with iOS 26 SDK; app minimum iOS 15 (required by `adaptive_platform_ui`). UIScene lifecycle + Swift Package Manager are the default direction | ✅ configured |
 | Android | AGP 9 supported since 3.41; set `targetSdk` per current Play requirement; check 16 KB page-size compliance for native libs | ⚠ confirm at release time. Flavors `dev`/`prod` configured in `android/app/build.gradle.kts`; app label now reads `@string/app_name` |
 | Web | Wasm build: `flutter build web --release --wasm` (Wasm deferred loading is experimental); use `package:web`, never `dart:html` | ✅ per 3.47 notes |
 
@@ -138,8 +138,6 @@
 | `go_router` | **^17.x** (17.0.0 confirmed; resolve latest 17.x+) | breaks APIs between majors — read changelog; keep `go_router_builder` on matching major |
 | `freezed` / `freezed_annotation` | **freezed 3.2.5** (Feb 2026; may be newer) | 3.x syntax: classes are `sealed`/`abstract` with mixin; **don't use 4.0 dev prerelease**. Pair with `build_runner`, `json_serializable` |
 | `material_ui`, `cupertino_ui` | **1.0** | see §2 |
-| `cupertino_native_better` | **^1.3.8** (community) | native iOS 26 Liquid Glass widgets via platform views — see `Platform.md` §4 |
-| `liquid_glass_renderer` | **0.2.0-dev.4** (prerelease, **experimental**) | needs Impeller; heavy on GPU — **not a default dependency** |
 
 ### Not verified yet — resolve with `flutter pub add`, then record here
 `get_it`, `dio`, `pretty_dio_logger`, `fl_chart`, `intl`, `flutter_svg`, `dynamic_color`, `file_picker`, `share_plus`, `csv`, `path_provider`, `shared_preferences`, `flutter_secure_storage`, `local_auth`, `firebase_core`, `firebase_auth`, `cloud_firestore`, `google_sign_in`, `sign_in_with_apple`, `mocktail`, `leak_tracker`, `very_good_analysis`/`flutter_lints`.
@@ -155,6 +153,7 @@ constraints below rather than `any`.
 |---|---|---|---|
 | `material_ui` | **1.6.0** | `^1.6.0` | Material 3 widgets — replaces `package:flutter/material.dart` |
 | `cupertino_ui` | **1.1.2** | `^1.1.2` | Cupertino widgets — replaces `package:flutter/cupertino.dart`; also supplies `CupertinoPageTransitionsBuilder` |
+| `adaptive_platform_ui` | **1.0.2** | `^1.0.2` | Native iOS 26 tab bar, Cupertino fallback, and Material navigation; requires iOS 15 |
 | `flutter_riverpod` | **3.4.3** | `^3.4.3` | Presentation state (Riverpod 3 — see §4) |
 | `go_router` | **17.5.0** | `^17.5.0` | Routing |
 | `get_it` | **9.3.0** | `^9.3.0` | DI for data/domain |
