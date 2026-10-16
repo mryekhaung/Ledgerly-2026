@@ -157,8 +157,7 @@ workflows:
 
       - name: Build iOS IPA
         script: |
-          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0)
-          BUILD_NUMBER=$((${LATEST_BUILD_NUMBER:-0} + 1))
+          BUILD_NUMBER="${PROJECT_BUILD_NUMBER:?Codemagic did not provide PROJECT_BUILD_NUMBER}"
           PACKAGE_VERSION=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
           flutter build ipa \
             --release \

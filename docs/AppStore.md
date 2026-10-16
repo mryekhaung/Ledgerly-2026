@@ -2,7 +2,7 @@
 
 **Target:** App Store (iPhone + iPad) via Codemagic CI/CD.  
 **Bundle ID:** `com.yk.ledgerly` (unified across Debug, Profile, and Release).  
-**Version:** Dynamic from `pubspec.yaml` (build number auto-incremented by Codemagic).  
+**Version:** Release version from `pubspec.yaml`; build number uses Codemagic's per-project build counter.
 **Policies verified:** Apple App Store Review Guidelines, iOS 26 SDK requirement (mandatory April 28 2026), iOS 15 app minimum.
 
 Legend: ☐ todo · ☑ done · ⚠️ owner action required
@@ -27,7 +27,7 @@ Legend: ☐ todo · ☑ done · ⚠️ owner action required
 - ☑ **`ios/ExportOptions.plist`** — Export options for `flutter build ipa`. Method: `app-store`. Team ID configured: `29T87PGHWL`.
 - ☑ **`codemagic.yaml`** — Two automated workflows:
   - `ios-test`: Triggers on PRs and `feature/*` branches. Runs `flutter pub get`, Drift codegen, `flutter gen-l10n`, `flutter analyze --fatal-infos`, and `flutter test --coverage`.
-  - `ios-release`: Triggers on push to `dev`, `main`, and `prod`. Runs tests, configures signing via `xcode-project use-profiles`, auto-increments build number via `app-store-connect get-latest-app-store-build-number` using App ID `6823720064` and API integration `Ye Khaung`, builds release IPA, and publishes to TestFlight.
+  - `ios-release`: Triggers on push to `dev`, `main`, and `prod`. Runs tests, configures signing via `xcode-project use-profiles`, sets the build number from Codemagic's `PROJECT_BUILD_NUMBER`, builds the release IPA, and publishes to TestFlight.
 - ☑ **`ios/Runner.xcodeproj/project.pbxproj`** — Configured:
   - `PRODUCT_BUNDLE_IDENTIFIER` set to `com.yk.ledgerly` for Runner (Debug, Profile, Release) and `com.yk.ledgerly.RunnerTests`.
   - `DEVELOPMENT_TEAM` and `TargetAttributes.DevelopmentTeam` set to `29T87PGHWL`.
