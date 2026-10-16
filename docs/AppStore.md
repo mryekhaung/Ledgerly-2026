@@ -26,8 +26,8 @@ Legend: ☐ todo · ☑ done · ⚠️ owner action required
   - ProMotion / 120 Hz enabled (`CADisableMinimumFrameDurationOnPhone: true`).
 - ☑ **`ios/ExportOptions.plist`** — Export options for `flutter build ipa`. Method: `app-store`. Team ID configured: `29T87PGHWL`.
 - ☑ **`codemagic.yaml`** — Two automated workflows:
-  - `ios-test`: Triggers on push/PR to `dev` and `feature/*`. Runs `flutter pub get`, Drift codegen, `flutter gen-l10n`, `flutter analyze --fatal-infos`, and `flutter test --coverage`.
-  - `ios-release`: Triggers on push to `main` and `prod`. Runs tests, configures signing via `xcode-project use-profiles`, auto-increments build number via `app-store-connect get-latest-app-store-build-number` using App ID `6823720064`, builds release IPA, and publishes to TestFlight.
+  - `ios-test`: Triggers on PRs and `feature/*` branches. Runs `flutter pub get`, Drift codegen, `flutter gen-l10n`, `flutter analyze --fatal-infos`, and `flutter test --coverage`.
+  - `ios-release`: Triggers on push to `dev`, `main`, and `prod`. Runs tests, configures signing via `xcode-project use-profiles`, auto-increments build number via `app-store-connect get-latest-app-store-build-number` using App ID `6823720064` and API integration `Ye Khaung`, builds release IPA, and publishes to TestFlight.
 - ☑ **`ios/Runner.xcodeproj/project.pbxproj`** — Configured:
   - `PRODUCT_BUNDLE_IDENTIFIER` set to `com.yk.ledgerly` for Runner (Debug, Profile, Release) and `com.yk.ledgerly.RunnerTests`.
   - `DEVELOPMENT_TEAM` and `TargetAttributes.DevelopmentTeam` set to `29T87PGHWL`.

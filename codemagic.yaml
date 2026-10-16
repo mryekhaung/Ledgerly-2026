@@ -27,7 +27,7 @@
 
 workflows:
 
-  # ── ios-test: PR / dev branch checks ────────────────────────────────────
+  # ── ios-test: PR / feature branch checks ────────────────────────────────
   ios-test:
     name: iOS — Analyze & Test
     max_build_duration: 60
@@ -37,11 +37,13 @@ workflows:
         - push
         - pull_request
       branch_patterns:
-        - pattern: dev
-          include: true
         - pattern: 'feature/*'
           include: true
+        - pattern: dev
+          include: false
         - pattern: main
+          include: false
+        - pattern: prod
           include: false
 
     environment:
@@ -88,7 +90,7 @@ workflows:
           success: false
           failure: true
 
-  # ── ios-release: main → TestFlight ──────────────────────────────────────
+  # ── ios-release: dev / main / prod → TestFlight ─────────────────────────
   ios-release:
     name: iOS — Release (TestFlight → App Store)
     max_build_duration: 120
@@ -97,6 +99,8 @@ workflows:
       events:
         - push
       branch_patterns:
+        - pattern: dev
+          include: true
         - pattern: main
           include: true
         - pattern: prod
@@ -104,7 +108,7 @@ workflows:
 
     # Link to the App Store Connect integration created in the Codemagic UI.
     integrations:
-      app_store_connect: codemagic
+      app_store_connect: Ye Khaung
 
     environment:
       flutter: 3.47.1
