@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!--
+  PrivacyInfo.xcprivacy — App privacy manifest (required by Apple since spring 2024).
+  https://developer.apple.com/documentation/bundleresources/privacy-manifest-files
+
+  Ledgerly is a LOCAL-FIRST budget manager:
+    • No network requests to any server (Phase 4 Sync not yet built).
+    • No analytics, no crash reporting, no advertising SDKs.
+    • No camera, microphone, location, contacts, or photos access.
+    • All data lives on-device in a SQLite DB (Drift/sqlite3) and Flutter preferences.
+
+  Required-reason APIs this app uses:
+    • NSPrivacyAccessedAPICategoryFileTimestamp
+        — SQLite / drift_flutter reads file modification timestamps to decide
+          whether to re-open or hot-reload the database file.
+          Declared reason: DDA9.1 (accessing files the app created itself).
+    • NSPrivacyAccessedAPICategoryUserDefaults
+        — Flutter engine stores platform-channel preferences in NSUserDefaults
+          (e.g. locale, text scale). No user-identifying values are written there.
+          Declared reason: CA92.1 (accessing only the app's own user-defaults).
+    • NSPrivacyAccessedAPICategoryDiskSpace
+        — drift_flutter checks available disk space before writing large blobs
+          (backup/export). Required reason: E174.1.
+-->
+<dict>
+  <!-- ── Tracking ─────────────────────────────────────────────────── -->
+  <!-- The app does NOT track users across apps or websites. -->
+  <key>NSPrivacyTracking</key>
+  <false/>
+
+  <!-- ── Tracking domains ──────────────────────────────────────────── -->
+  <key>NSPrivacyTrackingDomains</key>
+  <array/>
+
+  <!-- ── Data types collected ─────────────────────────────────────── -->
+  <!--
+    Ledgerly collects NO data. All financial data entered by the user
+    stays on-device. No third-party analytics, no crash reporters,
+    no advertising frameworks are included in this build.
+  -->
+  <key>NSPrivacyCollectedDataTypes</key>
+  <array/>
+
+  <!-- ── Required-reason APIs ──────────────────────────────────────── -->
+  <key>NSPrivacyAccessedAPITypes</key>
+  <array>
+    <!--
+      File timestamps — SQLite (drift) checks file mtime to decide whether
+      to reuse a cached database handle. The app only accesses files it
+      creates itself inside its sandbox.
+    -->
+    <dict>
+      <key>NSPrivacyAccessedAPIType</key>
+      <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+      <key>NSPrivacyAccessedAPITypeReasons</key>
+      <array>
+        <string>DDA9.1</string>
+      </array>
+    </dict>
+
+    <!--
+      User defaults — Flutter engine stores locale / text-scale / rendering
+      flags in NSUserDefaults. Only the app's own domain is accessed.
+    -->
+    <dict>
+      <key>NSPrivacyAccessedAPIType</key>
+      <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+      <key>NSPrivacyAccessedAPITypeReasons</key>
+      <array>
+        <string>CA92.1</string>
+      </array>
+    </dict>
+
+    <!--
+      Disk space — drift_flutter / path_provider queries available free space
+      before writing backup/export files so it can surface a meaningful error.
+    -->
+    <dict>
+      <key>NSPrivacyAccessedAPIType</key>
+      <string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+      <key>NSPrivacyAccessedAPITypeReasons</key>
+      <array>
+        <string>E174.1</string>
+      </array>
+    </dict>
+  </array>
+</dict>
+</plist>

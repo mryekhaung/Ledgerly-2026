@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!--
+  ios/ExportOptions.plist
+  Passed to `flutter build ipa` via `--export-options-plist`.
+  Used by Codemagic's release workflow (codemagic.yaml ios-release-workflow).
+
+  References:
+    https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases
+    https://docs.codemagic.io/yaml-quick-start/building-a-flutter-app/
+
+  All signing values except `teamID` are resolved automatically by
+  Xcode when CODE_SIGN_STYLE = Automatic (set in the Xcode project).
+  `teamID` MUST match the Apple Developer Team ID in App Store Connect.
+
+  ⚠️  OWNER ACTION REQUIRED:
+      Replace XXXXXXXXXX with your actual Apple Developer Team ID.
+      Find it at: https://developer.apple.com/account → Membership details.
+-->
+<dict>
+  <!--
+    method: app-store
+    Produces a signed IPA for App Store / TestFlight submission.
+    Other valid values: ad-hoc, enterprise, development.
+  -->
+  <key>method</key>
+  <string>app-store</string>
+
+  <!--
+    destination: export
+    Writes the IPA to the build output directory.
+    Use "upload" to push directly to App Store Connect (Codemagic
+    handles this separately via the app_store_connect publisher).
+  -->
+  <key>destination</key>
+  <string>export</string>
+
+  <!--
+    Apple Developer Team ID (Membership -> Team ID).
+  -->
+  <key>teamID</key>
+  <string>29T87PGHWL</string>
+
+  <!--
+    Automatic signing — Xcode resolves provisioning profile from
+    the bundle identifier and the team.
+  -->
+  <key>signingStyle</key>
+  <string>automatic</string>
+
+  <!--
+    Strip Swift symbols from the IPA to reduce download size.
+    The dSYM is uploaded as a separate artifact for crash symbolication.
+  -->
+  <key>stripSwiftSymbols</key>
+  <true/>
+
+  <!--
+    Upload dSYM to App Store Connect automatically for crash reporting.
+  -->
+  <key>uploadSymbols</key>
+  <true/>
+
+  <!--
+    Bitcode is deprecated since Xcode 14 / iOS 16 — do not enable it.
+  -->
+  <key>compileBitcode</key>
+  <false/>
+
+  <!--
+    Manage version numbers in the IPA rather than delegating to
+    App Store Connect. Codemagic increments the build number via
+    `app-store-connect get-latest-app-store-build-number`.
+  -->
+  <key>manageAppVersionAndBuildNumber</key>
+  <false/>
+</dict>
+</plist>

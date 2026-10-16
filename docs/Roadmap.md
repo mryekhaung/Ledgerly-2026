@@ -1565,9 +1565,17 @@ hand-audit chores.
 - ☐ Web release (PWA, responsive QA, browser support matrix)
 - ☐ Supabase adapter (prove swap)
 
-## Phase 5 — Release — NOT STARTED
+## Phase 5 — Release — IN PROGRESS
 
-- ☐ Store checklist from `Platform.md` §7 (Sign in with Apple, data safety, deletion URL, iPad/tablet screenshots)
+- ☑ **iOS App Store & Codemagic CI/CD preparation** (`docs/AppStore.md`):
+  - ✅ Privacy manifest `ios/Runner/PrivacyInfo.xcprivacy` created and wired into `project.pbxproj` (`PBXResourcesBuildPhase`).
+  - ✅ Bundle ID aligned to `com.yk.ledgerly` across Xcode project (Debug, Profile, Release) and `codemagic.yaml`.
+  - ✅ Standardized v1.0 entitlements: omitted unnecessary `.entitlements` file so provisioning profile needs no extra capabilities for code signing.
+  - ✅ Configured `Info.plist`: encryption exemption (`ITSAppUsesNonExemptEncryption = false`), display name, supported locales (`en`, `my`, `ja`), ProMotion 120 Hz.
+  - ✅ Export options `ios/ExportOptions.plist` created with Team ID `29T87PGHWL`.
+  - ✅ `codemagic.yaml` CI/CD pipeline configured for `ios-test` and `ios-release` with App ID `6823720064`, automated build numbering, and TestFlight upload.
+  - ⏳ Owner actions pending: App Store Connect API Key (`.p8`) and distribution certificates uploaded in Codemagic.
+- ☐ Store checklist from `Platform.md` §7 (data safety, deletion URL, iPad/tablet screenshots)
 - ☐ Store listing, privacy policy, screenshots
 - ☐ Crash reporting + (opt-in) analytics decision
 - ☐ Beta with Osaka Myanmar community → feedback loop

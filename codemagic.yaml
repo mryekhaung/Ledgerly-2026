@@ -1,0 +1,187 @@
+# codemagic.yaml — Ledgerly iOS release pipeline
+#
+# Managed CI/CD via Codemagic (https://codemagic.io).
+# Docs: https://docs.codemagic.io/yaml-quick-start/building-a-flutter-app/
+#
+# ── Two workflows ──────────────────────────────────────────────────────────
+#   ios-test      runs on every push to dev / feature/*. Analyze + test.
+#   ios-release   runs on push to main. Build + sign + upload TestFlight.
+#
+# ── Secrets (configure in Codemagic UI → Environment groups) ───────────────
+#   Group: appstore_credentials
+#     APP_STORE_APPLE_ID          Numeric app ID from App Store Connect.
+#     APP_STORE_CONNECT_ISSUER_ID API key issuer UUID.
+#     APP_STORE_CONNECT_KEY_ID    API key ID (e.g. AB12CD34EF).
+#     APP_STORE_CONNECT_PRIVATE_KEY  Contents of the .p8 file (multi-line).
+#
+#   Group: ios_signing  (managed by Codemagic's signing wizard)
+#     Provisioning profile + certificate are handled automatically;
+#     no raw Base64 values needed here.
+#
+# ── Owner actions before first run ─────────────────────────────────────────
+#   1. Apple Developer Team ID configured: 29T87PGHWL (in ios/ExportOptions.plist & project.pbxproj).
+#   2. Register bundle ID com.yk.ledgerly in App Store Connect.
+#   3. App created in App Store Connect: numeric Apple ID 6823720064.
+#   4. Create an App Store Connect API Key (Admin role), add to env group.
+#   5. In Codemagic: Settings → iOS signing → App Store + your cert.
+
+workflows:
+
+  # ── ios-test: PR / dev branch checks ────────────────────────────────────
+  ios-test:
+    name: iOS — Analyze & Test
+    max_build_duration: 60
+
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: dev
+          include: true
+        - pattern: 'feature/*'
+          include: true
+        - pattern: main
+          include: false
+
+    environment:
+      flutter: 3.47.1
+      xcode: latest
+      cocoapods: default
+
+    scripts:
+      - name: Flutter pub get
+        script: flutter pub get
+
+      - name: Drift codegen
+        script: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Generate l10n
+        script: |
+          env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY \
+            flutter gen-l10n
+
+      - name: Flutter analyze
+        script: |
+          env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY \
+            flutter analyze --fatal-infos
+
+      - name: Flutter test
+        script: |
+          env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY \
+            flutter test --coverage
+
+      - name: Install CocoaPods
+        script: |
+          if [ -f "ios/Podfile" ]; then
+            (cd ios && pod install)
+          fi
+
+    artifacts:
+      - flutter_drive.log
+
+    publishing:
+      email:
+        recipients:
+          - $CM_SUBMITTER_EMAIL
+        notify:
+          success: false
+          failure: true
+
+  # ── ios-release: main → TestFlight ──────────────────────────────────────
+  ios-release:
+    name: iOS — Release (TestFlight → App Store)
+    max_build_duration: 120
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+        - pattern: prod
+          include: true
+
+    # Link to the App Store Connect integration created in the Codemagic UI.
+    integrations:
+      app_store_connect: codemagic
+
+    environment:
+      flutter: 3.47.1
+      xcode: latest
+      cocoapods: default
+
+      # Populated by Codemagic's signing wizard (distribution_type = app_store).
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.yk.ledgerly
+
+      vars:
+        # Numeric App ID from App Store Connect.
+        APP_STORE_APPLE_ID: 6823720064
+
+    scripts:
+      - name: Flutter pub get
+        script: flutter pub get
+
+      - name: Drift codegen
+        script: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Generate l10n
+        script: |
+          env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY \
+            flutter gen-l10n
+
+      - name: Flutter analyze
+        script: |
+          env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY \
+            flutter analyze --fatal-infos
+
+      - name: Flutter test
+        script: |
+          env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY \
+            flutter test
+
+      - name: Set up code signing profiles
+        script: xcode-project use-profiles
+
+      - name: Install CocoaPods
+        script: |
+          if [ -f "ios/Podfile" ]; then
+            (cd ios && pod install)
+          fi
+
+      - name: Build iOS IPA
+        script: |
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0)
+          BUILD_NUMBER=$((${LATEST_BUILD_NUMBER:-0} + 1))
+          PACKAGE_VERSION=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          flutter build ipa \
+            --release \
+            --build-name="${PACKAGE_VERSION:-1.0.0}" \
+            --build-number="$BUILD_NUMBER" \
+            --export-options-plist=ios/ExportOptions.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - '*.dSYM.zip'
+
+    publishing:
+      email:
+        recipients:
+          - $CM_SUBMITTER_EMAIL
+        notify:
+          success: true
+          failure: true
+
+      app_store_connect:
+        auth: integration
+
+        # Every build goes to TestFlight for internal review first.
+        submit_to_testflight: true
+        beta_groups:
+          - Internal Testers
+
+        # Flip to true for public App Store submission.
+        submit_to_app_store: false

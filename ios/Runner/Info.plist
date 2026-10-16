@@ -2,10 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- ── Performance ──────────────────────────────────────────────── -->
+	<!-- Allow ProMotion / 120 Hz display on supported iPhones. -->
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+
+	<!-- ── Bundle identity ──────────────────────────────────────────── -->
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<!-- Display name shown under the home-screen icon (max ~12 chars). -->
 	<key>CFBundleDisplayName</key>
 	<string>Ledgerly</string>
 	<key>CFBundleExecutable</key>
@@ -15,17 +20,45 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>ledgerly</string>
+	<string>Ledgerly</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<!-- Marketing version → App Store Connect "Version" field (e.g. 1.0.0). -->
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<!-- Build number → App Store Connect "Build" field, auto-incremented by Codemagic. -->
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+
+	<!-- ── Localizations ────────────────────────────────────────────── -->
+	<!-- Declare every locale the app supports (en / my / ja). -->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>my</string>
+		<string>ja</string>
+	</array>
+
+	<!-- ── Encryption (App Store compliance) ────────────────────────── -->
+	<!--
+	  Ledgerly uses only OS-provided SQLite encryption (none beyond iOS Data
+	  Protection) and HTTPS for future sync (standard TLS). It does NOT
+	  implement any custom or proprietary encryption algorithms.
+	  Setting this to <false/> means the app is EXEMPT from US export
+	  compliance documentation (ERN not required).
+	  Review annually — if Phase 4 adds end-to-end encryption, flip to <true/>
+	  and provide an ERN number in App Store Connect.
+	-->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+
+	<!-- ── iOS requirement ──────────────────────────────────────────── -->
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+
+	<!-- ── Scene lifecycle (Flutter multi-scene support) ────────────── -->
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -47,18 +80,26 @@
 			</array>
 		</dict>
 	</dict>
+
+	<!-- Pointer / trackpad / Magic Keyboard support on iPadOS. -->
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- ── Launch & main storyboard ─────────────────────────────────── -->
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+
+	<!-- ── Orientations ──────────────────────────────────────────────── -->
+	<!-- iPhone: portrait + both landscapes (landscape useful for charts). -->
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- iPad: all four orientations. -->
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -66,5 +107,28 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+	<!-- ── Appearance ────────────────────────────────────────────────── -->
+	<!--
+	  Do NOT lock to light/dark — the app fully supports both modes
+	  (docs/Design.md §K). Omitting UIUserInterfaceStyle lets the user's
+	  system preference and the in-app theme toggle (Settings) both work.
+	-->
+
+	<!-- ── Privacy usage descriptions ───────────────────────────────── -->
+	<!--
+	  Ledgerly does NOT request camera, microphone, location, contacts,
+	  photos, Face ID, or any other sensitive capability in v1.0.
+	  Add usage strings here if future phases introduce such features.
+	  Submitting without a required usage string causes an App Store
+	  rejection — do not add strings for capabilities you don't request.
+	-->
+
+	<!-- ── URL schemes ──────────────────────────────────────────────── -->
+	<!--
+	  No custom URL schemes in v1.0.
+	  If Phase 4 introduces deep links (e.g. from a web portal or widget),
+	  add CFBundleURLTypes here.
+	-->
 </dict>
 </plist>
