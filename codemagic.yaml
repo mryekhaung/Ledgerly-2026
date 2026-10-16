@@ -157,7 +157,13 @@ workflows:
 
       - name: Build iOS IPA
         script: |
-          BUILD_NUMBER=$((${PROJECT_BUILD_NUMBER:?Codemagic did not provide PROJECT_BUILD_NUMBER} + 1))
+          PROJECT_NEXT_BUILD_NUMBER=$((${PROJECT_BUILD_NUMBER:?Codemagic did not provide PROJECT_BUILD_NUMBER} + 1))
+          PUBSPEC_BUILD_NUMBER=$(sed -n 's/^version: [^+]*+\([0-9][0-9]*\)$/\1/p' pubspec.yaml)
+          if [ -z "$PUBSPEC_BUILD_NUMBER" ]; then
+            echo "Could not read the build number from pubspec.yaml" >&2
+            exit 1
+          fi
+          BUILD_NUMBER=$((PUBSPEC_BUILD_NUMBER > PROJECT_NEXT_BUILD_NUMBER ? PUBSPEC_BUILD_NUMBER : PROJECT_NEXT_BUILD_NUMBER))
           echo "Using iOS build number: $BUILD_NUMBER"
           PACKAGE_VERSION=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
           flutter build ipa \
