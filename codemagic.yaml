@@ -157,7 +157,8 @@ workflows:
 
       - name: Build iOS IPA
         script: |
-          BUILD_NUMBER="${PROJECT_BUILD_NUMBER:?Codemagic did not provide PROJECT_BUILD_NUMBER}"
+          BUILD_NUMBER=$((${PROJECT_BUILD_NUMBER:?Codemagic did not provide PROJECT_BUILD_NUMBER} + 1))
+          echo "Using iOS build number: $BUILD_NUMBER"
           PACKAGE_VERSION=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
           flutter build ipa \
             --release \
