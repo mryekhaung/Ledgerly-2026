@@ -255,6 +255,80 @@ void main() {
         );
       }
     });
+
+    for (final brightness in Brightness.values) {
+      testWidgets(
+        'should_paint_the_active_item_with_on_brand_subtle_in_${brightness.name}',
+        (tester) async {
+          // `brandPrimary` on the `brandSubtle` pill fails AA (Roadmap §K.1-2);
+          // the active icon and label must use the pill's on-colour.
+          await pumpAppHost(
+            tester,
+            size: const Size(TestWidths.phone, 800),
+            platform: AppPlatform.android,
+            brightness: brightness,
+            home: Scaffold(
+              bottomNavigationBar: AdaptiveNav(
+                current: NavDestination.insights,
+                onSelect: (_) {},
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          final colors = brightness == Brightness.dark
+              ? const AppColorsDark()
+              : const AppColorsLight();
+          final theme = tester
+              .widget<NavigationBarTheme>(find.byType(NavigationBarTheme))
+              .data;
+          const selected = <WidgetState>{WidgetState.selected};
+          const unselected = <WidgetState>{};
+
+          expect(theme.indicatorColor, colors.brandSubtle);
+          expect(
+            theme.iconTheme?.resolve(selected)?.color,
+            colors.onBrandSubtle,
+          );
+          expect(
+            theme.iconTheme?.resolve(unselected)?.color,
+            colors.textSecondary,
+          );
+          expect(
+            theme.labelTextStyle?.resolve(selected)?.color,
+            colors.onBrandSubtle,
+          );
+          expect(
+            theme.labelTextStyle?.resolve(unselected)?.color,
+            colors.textSecondary,
+          );
+        },
+      );
+    }
+
+    testWidgets('should_keep_the_app_navigation_bar_theme_when_overriding', (
+      tester,
+    ) async {
+      // A bare `NavigationBarTheme(data: …)` drops the inherited theme, so the
+      // bar lost the app's flat (elevation 0) surface.
+      await pumpAppHost(
+        tester,
+        size: const Size(TestWidths.phone, 800),
+        platform: AppPlatform.android,
+        home: Scaffold(
+          bottomNavigationBar: AdaptiveNav(
+            current: NavDestination.calendar,
+            onSelect: (_) {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final theme = tester
+          .widget<NavigationBarTheme>(find.byType(NavigationBarTheme))
+          .data;
+      expect(theme.elevation, 0);
+    });
   });
 
   group('medium width', () {

@@ -119,7 +119,21 @@ class AdaptiveNav extends StatelessWidget {
 
   /// Adds scroll clearance for iOS 26's overlay tab bar.
   Widget adaptiveScaffoldBody(BuildContext context, Widget child) {
-    if (!PlatformInfo.isIOS26OrHigher()) return child;
+    if (!PlatformInfo.isIOS26OrHigher()) {
+      // Android: `Scaffold` already removes the bottom padding for its body.
+      if (!PlatformInfo.isIOS) return child;
+
+      // iOS < 26: the package docks a `CupertinoTabBar` in a `Column` below the
+      // body, and `CupertinoPageScaffold` (unlike `CupertinoTabScaffold`) does
+      // not consume the bottom safe area. The tab bar pads itself for the home
+      // indicator, so without this every page adds that inset a second time as
+      // a dead band above the bar.
+      return MediaQuery.removePadding(
+        context: context,
+        removeBottom: true,
+        child: child,
+      );
+    }
 
     final mediaQuery = MediaQuery.of(context);
     return MediaQuery(
@@ -209,6 +223,20 @@ class _MaterialNavBar extends StatelessWidget {
     // transparent and every destination keeps its unselected icon.
     final hasSelection = current != null;
 
+    // Merge into the app theme rather than replacing it: a bare
+    // `NavigationBarTheme(data: …)` discards the inherited `navigationBarTheme`,
+    // so the bar fell back to M3's default elevation instead of the app's flat
+    // tint-and-hairline surface (docs/Design.md §4.3).
+    final base = Theme.of(context).navigationBarTheme;
+    final labelStyle = Theme.of(context).textTheme.labelSmall;
+
+    // M3 paints the active icon and label in the on-colour of the indicator.
+    // That is `onBrandSubtle` (>= 4.5:1 on `brandSubtle`); `brandPrimary` on the
+    // pill measured 3.90:1 light / 3.43:1 dark — below AA (Roadmap §K.1-2). It is
+    // the same pairing the rail and sidebar already use.
+    bool isSelected(Set<WidgetState> states) =>
+        hasSelection && states.contains(WidgetState.selected);
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.surfaceRaised,
@@ -220,20 +248,25 @@ class _MaterialNavBar extends StatelessWidget {
           context: context,
           removeBottom: true,
           child: NavigationBarTheme(
-            data: NavigationBarThemeData(
+            data: base.copyWith(
               indicatorColor: hasSelection
                   ? colors.brandSubtle
                   : Colors.transparent,
               backgroundColor: colors.surfaceRaised,
-              labelTextStyle: WidgetStateProperty.resolveWith(
-                (states) => Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: states.contains(WidgetState.selected) && hasSelection
-                      ? colors.brandPrimary
+              elevation: base.elevation ?? 0,
+              iconTheme: WidgetStateProperty.resolveWith(
+                (states) => IconThemeData(
+                  color: isSelected(states)
+                      ? colors.onBrandSubtle
                       : colors.textSecondary,
-                  fontWeight:
-                      states.contains(WidgetState.selected) && hasSelection
-                      ? FontWeight.w600
-                      : null,
+                ),
+              ),
+              labelTextStyle: WidgetStateProperty.resolveWith(
+                (states) => labelStyle?.copyWith(
+                  color: isSelected(states)
+                      ? colors.onBrandSubtle
+                      : colors.textSecondary,
+                  fontWeight: isSelected(states) ? FontWeight.w600 : null,
                 ),
               ),
             ),
@@ -246,10 +279,7 @@ class _MaterialNavBar extends StatelessWidget {
                 for (final destination in NavDestination.all)
                   NavigationDestination(
                     icon: Icon(destination.icon),
-                    selectedIcon: Icon(
-                      destination.selectedIcon,
-                      color: hasSelection ? colors.brandPrimary : null,
-                    ),
+                    selectedIcon: Icon(destination.selectedIcon),
                     label: destinationLabel(destination),
                   ),
               ],

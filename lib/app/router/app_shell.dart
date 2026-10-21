@@ -102,10 +102,22 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     // Compact layouts use the package scaffold so iOS can use its native tab
     // bar while Android keeps the app's themed Material navigation.
-    return AdaptiveScaffold(
-      body: nav.adaptiveScaffoldBody(context, widget.child),
-      bottomNavigationBar: nav.bottomNavigationBar(context),
-      minimizeBehavior: TabBarMinimizeBehavior.onScrollDown,
+    //
+    // `adaptive_platform_ui` decides light/dark for the iOS 26 native tab bar
+    // (`overrideUserInterfaceStyle`) and for its default text colour from
+    // `MediaQuery.platformBrightness` — the *device* setting. The app lets the
+    // user pin light or dark independently of the device, so with a pinned mode
+    // the glass bar rendered in the opposite style to our token colours (pale
+    // glass under a dark page, or the reverse). Feeding it the resolved theme
+    // brightness keeps the package and the app in agreement.
+    return MediaQuery(
+      data: MediaQuery.of(context)
+          .copyWith(platformBrightness: Theme.brightnessOf(context)),
+      child: AdaptiveScaffold(
+        body: nav.adaptiveScaffoldBody(context, widget.child),
+        bottomNavigationBar: nav.bottomNavigationBar(context),
+        minimizeBehavior: TabBarMinimizeBehavior.onScrollDown,
+      ),
     );
   }
 }
