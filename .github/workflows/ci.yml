@@ -42,7 +42,7 @@ jobs:
           # literal would be clipped) but the failure mode is a miss, not a false
           # alarm, and `flutter analyze` catches the real cases anyway.
           check() {
-            local label="$1" pattern="$2" path="$3"
+            local label="$1" pattern="$2" path="$3" skip="${4:-__none__}"
             local matches
             matches=$(
               find "$path" -name '*.dart' \
@@ -52,7 +52,8 @@ jobs:
                 | while IFS= read -r file; do
                     sed 's://.*$::' "$file" | sed "s|^|$file:|"
                   done \
-                | grep -E "$pattern" || true
+                | grep -E "$pattern" \
+                | grep -v -F "$skip:" || true
             )
             if [ -n "$matches" ]; then
               echo "::error::$label"
@@ -68,10 +69,14 @@ jobs:
             "lib"
 
           # 2. Material/Cupertino must come from the standalone packages, not the SDK.
+          #    One reviewed exception: adaptive_nav.dart. `adaptive_platform_ui`'s
+          #    `cupertinoTabBar` parameter is typed to the SDK's `CupertinoTabBar`,
+          #    which `cupertino_ui`'s class is not assignable to.
           check \
             "Import package:flutter/material.dart or cupertino.dart. Use material_ui / cupertino_ui (docs/Versions.md §2)." \
             "package:flutter/(material|cupertino)\.dart" \
-            "lib"
+            "lib" \
+            "lib/core/widgets/app_nav/adaptive_nav.dart"
 
           # 3. Web-unsafe libraries (docs/Platform.md §6).
           check \
