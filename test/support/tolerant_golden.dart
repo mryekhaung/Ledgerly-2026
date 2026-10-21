@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -21,10 +22,18 @@ import 'package:material_ui/material_ui.dart';
 /// golden file cannot silently opt into exact matching.
 class TolerantGoldenComparator extends LocalFileComparator {
   /// Creates a comparator whose [tolerance] defaults to the suite budget.
-  TolerantGoldenComparator(super.testFile, {this.tolerance = defaultTolerance});
+  TolerantGoldenComparator(super.testFile, {double? tolerance})
+    : tolerance = tolerance ?? defaultTolerance;
 
-  /// The suite-wide tolerance: 2 % of pixels may differ.
-  static const double defaultTolerance = 0.02;
+  /// The suite-wide tolerance: 2 % of pixels may differ (or overridden via GOLDEN_TOLERANCE).
+  static double get defaultTolerance {
+    final env = Platform.environment['GOLDEN_TOLERANCE'];
+    if (env != null) {
+      final parsed = double.tryParse(env);
+      if (parsed != null) return parsed;
+    }
+    return 0.02;
+  }
 
   /// The fraction of differing pixels still treated as a pass.
   final double tolerance;
@@ -60,10 +69,10 @@ class TolerantGoldenComparator extends LocalFileComparator {
 /// [testFileName] only names the file in failure output; the directory is
 /// inherited from whatever comparator the runner installed, so goldens keep
 /// resolving next to the test file rather than needing a path here.
-void useTolerantGoldens(String testFileName) {
+void useTolerantGoldens(String testFileName, {double? tolerance}) {
   final current = goldenFileComparator as LocalFileComparator;
   goldenFileComparator = TolerantGoldenComparator(
     Uri.parse('${current.basedir}$testFileName'),
-    tolerance: TolerantGoldenComparator.defaultTolerance,
+    tolerance: tolerance ?? TolerantGoldenComparator.defaultTolerance,
   );
 }

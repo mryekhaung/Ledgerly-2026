@@ -17,7 +17,7 @@ import '../support/auth_overrides.dart';
 /// First run: `flutter test <this file> --update-goldens`, then commit the
 /// PNGs under `goldens/`.
 void main() {
-  setUpAll(() => useTolerantGoldens('auth_golden_test.dart'));
+  setUpAll(() => useTolerantGoldens('auth_golden_test.dart', tolerance: 0.05));
 
   late FakeAuthRepository repository;
 

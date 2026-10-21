@@ -22,27 +22,27 @@ class DayGridSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const columns = 7;
-        const totalSpacing = AppSpacing.xs * (columns - 1);
-        final itemWidth = (constraints.maxWidth - totalSpacing) / columns;
-        final chipSize = itemWidth < 38 ? 38.0 : itemWidth;
-
-        return Wrap(
-          spacing: AppSpacing.xs,
-          runSpacing: AppSpacing.xs,
-          children: <Widget>[
-            for (var day = 1; day <= 28; day++)
-              _SelectorDayChip(
-                day: day,
-                isSelected: day == selectedDay,
-                size: chipSize,
-                onTap: () => onSelect(day),
-              ),
-          ],
-        );
-      },
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (var row = 0; row < 4; row++) ...<Widget>[
+          if (row > 0) const SizedBox(height: AppSpacing.xs),
+          Row(
+            children: <Widget>[
+              for (var col = 0; col < 7; col++) ...<Widget>[
+                if (col > 0) const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: _SelectorDayChip(
+                    day: row * 7 + col + 1,
+                    isSelected: (row * 7 + col + 1) == selectedDay,
+                    onTap: () => onSelect(row * 7 + col + 1),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ],
     );
   }
 }
@@ -51,13 +51,11 @@ class _SelectorDayChip extends StatelessWidget {
   const _SelectorDayChip({
     required this.day,
     required this.isSelected,
-    required this.size,
     required this.onTap,
   });
 
   final int day;
   final bool isSelected;
-  final double size;
   final VoidCallback onTap;
 
   @override
@@ -79,7 +77,6 @@ class _SelectorDayChip extends StatelessWidget {
           onTap: onTap,
           borderRadius: AppRadius.borderSm,
           child: Container(
-            width: size,
             height: 38,
             alignment: Alignment.center,
             decoration: BoxDecoration(
