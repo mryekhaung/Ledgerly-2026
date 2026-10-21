@@ -37,7 +37,10 @@ class TolerantGoldenComparator extends LocalFileComparator {
     );
     if (!result.passed && result.diffPercent > tolerance) {
       final error = await generateFailureOutput(result, golden, basedir);
-      throw FlutterError(error);
+      throw FlutterError(
+        'Golden mismatch for $golden: diff was ${(result.diffPercent * 100).toStringAsFixed(2)}% '
+        '(tolerance is ${(tolerance * 100).toStringAsFixed(2)}%)\n$error',
+      );
     }
     return result.passed || result.diffPercent <= tolerance;
   }
