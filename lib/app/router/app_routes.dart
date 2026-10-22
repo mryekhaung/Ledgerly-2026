@@ -30,6 +30,10 @@ abstract final class AppRoutes {
   static const String transactionNew = '/transactions/new';
   static const String transactionNewName = 'transactionNew';
 
+  /// Edit an existing category (pushed from the categories list; outside the shell).
+  static const String categoryEdit = '/categories/edit';
+  static const String categoryEditName = 'categoryEdit';
+
   /// Relative to [transactionNew], so the router nests it and the two paths can
   /// never collide.
   static const String transactionEditRelative = ':id/edit';

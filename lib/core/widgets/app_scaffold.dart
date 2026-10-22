@@ -253,9 +253,18 @@ class _AppCupertinoBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
+    final navigator = Navigator.of(context);
+    final resolvedLeading =
+        leading ??
+        (navigator.canPop()
+            ? cupertino.CupertinoNavigationBarBackButton(
+                onPressed: navigator.pop,
+              )
+            : null);
+
     final navBar = cupertino.CupertinoNavigationBar(
-      automaticallyImplyLeading: true,
-      leading: leading,
+      automaticallyImplyLeading: false,
+      leading: resolvedLeading,
       middle: middle,
       trailing: trailing,
       border: null,

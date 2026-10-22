@@ -1,11 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
-import 'package:ledgerly/features/categories/presentation/pages/category_form_page.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_form_notifier.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_list_notifier.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -152,9 +155,7 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
       return;
     }
 
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (_) => const CategoryFormPage()));
+    unawaited(context.pushNamed(AppRoutes.categoryEditName));
   }
 
   /// Hides the wide layout's detail pane.

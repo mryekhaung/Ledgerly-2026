@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
@@ -14,6 +15,7 @@ import 'package:ledgerly/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:ledgerly/features/auth/presentation/pages/welcome_page.dart';
 import 'package:ledgerly/features/budgets/presentation/pages/budget_form_page.dart';
 import 'package:ledgerly/features/budgets/presentation/pages/budgets_page.dart';
+import 'package:ledgerly/features/categories/presentation/pages/category_form_page.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
 import 'package:ledgerly/features/data_transfer/presentation/pages/data_transfer_page.dart';
 import 'package:ledgerly/features/goals/presentation/pages/goal_form_page.dart';
@@ -163,6 +165,16 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
         path: '/profile/avatar',
         name: AppRoutes.avatarEditorName,
         builder: (context, state) => const AvatarEditorPage(),
+      ),
+
+      // Category create/edit is outside the shell so the iOS tab bar does not
+      // remain visible over the form. The route is pushed from the categories
+      // list and therefore also gets the native interactive back gesture.
+      GoRoute(
+        path: AppRoutes.categoryEdit,
+        name: AppRoutes.categoryEditName,
+        pageBuilder: (context, state) =>
+            const CupertinoPage<void>(child: CategoryFormPage()),
       ),
 
       // Account forms and transfers (Phase 3).
