@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#121820"/>
+      <stop offset="50%" stop-color="#0A0F15"/>
+      <stop offset="100%" stop-color="#05080C"/>
+    </linearGradient>
+
+    <radialGradient id="centerGlow" cx="50%" cy="48%" r="55%">
+      <stop offset="0%" stop-color="#0E7C66" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#0E7C66" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#05080C" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="rimStroke" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.08"/>
+    </linearGradient>
+
+    <linearGradient id="verticalPillarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#41DEB7"/>
+      <stop offset="25%" stop-color="#22A287"/>
+      <stop offset="65%" stop-color="#0E7C66"/>
+      <stop offset="100%" stop-color="#073B30"/>
+    </linearGradient>
+
+    <linearGradient id="horizontalBaseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0E7C66"/>
+      <stop offset="40%" stop-color="#16A284"/>
+      <stop offset="80%" stop-color="#28BF9C"/>
+      <stop offset="100%" stop-color="#4DF0C8"/>
+    </linearGradient>
+
+    <linearGradient id="capTopGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#188C74"/>
+      <stop offset="50%" stop-color="#2BC8A4"/>
+      <stop offset="100%" stop-color="#7EF2D6"/>
+    </linearGradient>
+
+    <linearGradient id="capMidGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0B6B57"/>
+      <stop offset="60%" stop-color="#149A7E"/>
+      <stop offset="100%" stop-color="#28C5A0"/>
+    </linearGradient>
+
+    <linearGradient id="specularPill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.45"/>
+      <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="specularHoriz" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#bgGrad)"/>
+  <rect width="1024" height="1024" fill="url(#centerGlow)"/>
+  <rect x="2" y="2" width="1020" height="1020" rx="224" fill="none" stroke="url(#rimStroke)" stroke-width="2.5"/>
+
+  <g id="ledgerly-mark">
+    <!-- Horizontal Base (L-foot) -->
+    <rect x="270" y="654" width="484" height="126" rx="63" fill="url(#horizontalBaseGrad)"/>
+    <rect x="272" y="656" width="480" height="122" rx="61" fill="none" stroke="url(#specularHoriz)" stroke-width="2"/>
+
+    <!-- Middle Tier Capsule -->
+    <rect x="444" y="492" width="310" height="106" rx="53" fill="url(#capMidGrad)"/>
+    <rect x="446" y="494" width="306" height="102" rx="51" fill="none" stroke="url(#specularHoriz)" stroke-width="1.8"/>
+
+    <!-- Top Tier Capsule -->
+    <rect x="444" y="336" width="220" height="106" rx="53" fill="url(#capTopGrad)"/>
+    <rect x="446" y="338" width="216" height="102" rx="51" fill="none" stroke="url(#specularHoriz)" stroke-width="1.8"/>
+
+    <!-- Luminous Gem Dot (CategoryGem motif) -->
+    <circle cx="718" cy="389" r="46" fill="#4DF0C8"/>
+    <circle cx="718" cy="389" r="44" fill="none" stroke="url(#specularPill)" stroke-width="2"/>
+    <circle cx="718" cy="389" r="18" fill="#FFFFFF" fill-opacity="0.65"/>
+
+    <!-- Vertical Spine Pillar (L-stem) -->
+    <rect x="270" y="224" width="126" height="556" rx="63" fill="url(#verticalPillarGrad)"/>
+    <rect x="272" y="226" width="122" height="552" rx="61" fill="none" stroke="url(#specularPill)" stroke-width="2.2"/>
+  </g>
+</svg>

@@ -1,6 +1,7 @@
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -29,12 +30,9 @@ class SegmentedTab<T> {
 
 /// Adaptive segmented tabs control (docs/Design.md §5.5).
 ///
-/// * Pill shape (`radius.full`), fixed height 32 px.
+/// * iOS: Cupertino-style sliding segmented control — quiet haptic, no ink.
+/// * Material/Web: pill track with a sliding `brandSubtle` thumb.
 /// * Label uses `AppTypography.label` token.
-/// * Selected: `brandSubtle` fill + `onBrandSubtle` label. The on-colour matters
-///   — `brandPrimary` on that fill fails AA (§2.6, Roadmap §K.1-2).
-/// * Unselected: `textSecondary`, transparent fill.
-/// * Sliding indicator animates with `AppMotion.short` (180 ms).
 /// * Max **3** segments supported; more must use a chip row (docs/Design.md §5.5).
 class SegmentedTabs<T> extends StatelessWidget {
   /// Creates [SegmentedTabs].
@@ -63,14 +61,48 @@ class SegmentedTabs<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final platform = AppPlatform.resolve();
+    if (platform.usesCupertino) {
+      return _CupertinoSegmentedTabs<T>(
+        tabs: tabs,
+        selected: selected,
+        onChanged: onChanged,
+        isExpanded: isExpanded,
+      );
+    }
+    return _MaterialSegmentedTabs<T>(
+      tabs: tabs,
+      selected: selected,
+      onChanged: onChanged,
+      isExpanded: isExpanded,
+    );
+  }
+}
+
+/// iOS implementation — a quiet sliding thumb, no ink, no border-radius trickery.
+class _CupertinoSegmentedTabs<T> extends StatelessWidget {
+  const _CupertinoSegmentedTabs({
+    required this.tabs,
+    required this.selected,
+    required this.onChanged,
+    required this.isExpanded,
+  });
+
+  final List<SegmentedTab<T>> tabs;
+  final T selected;
+  final ValueChanged<T> onChanged;
+  final bool isExpanded;
+
+  @override
+  Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final selectedIndex = tabs.indexWhere((tab) => tab.value == selected);
 
-    final content = LayoutBuilder(
+    return LayoutBuilder(
       builder: (context, constraints) {
         final totalWidth = isExpanded
             ? constraints.maxWidth
-            : (tabs.length * 100.0);
+            : (tabs.length * 96.0);
         final tabWidth = (totalWidth - 4.0) / tabs.length;
         final activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
 
@@ -84,7 +116,6 @@ class SegmentedTabs<T> extends StatelessWidget {
           ),
           child: Stack(
             children: <Widget>[
-              // Sliding active indicator
               AnimatedPositioned(
                 duration: AppMotion.short,
                 curve: AppMotion.standard,
@@ -92,21 +123,22 @@ class SegmentedTabs<T> extends StatelessWidget {
                 top: 0,
                 bottom: 0,
                 width: tabWidth,
-                child: Container(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: colors.brandSubtle,
+                    color: colors.surfaceRaised,
                     borderRadius: AppRadius.borderFull,
+                    border: Border.all(color: colors.border),
+                    boxShadow: AppElevation.raised(colors),
                   ),
                 ),
               ),
-              // Interactive tabs
               Row(
                 mainAxisSize: isExpanded ? MainAxisSize.max : MainAxisSize.min,
                 children: <Widget>[
                   for (var i = 0; i < tabs.length; i++)
                     Expanded(
                       flex: isExpanded ? 1 : 0,
-                      child: _SegmentItem<T>(
+                      child: _CupertinoSegmentItem<T>(
                         tab: tabs[i],
                         isSelected: tabs[i].value == selected,
                         onTap: () {
@@ -124,13 +156,11 @@ class SegmentedTabs<T> extends StatelessWidget {
         );
       },
     );
-
-    return content;
   }
 }
 
-class _SegmentItem<T> extends StatelessWidget {
-  const _SegmentItem({
+class _CupertinoSegmentItem<T> extends StatelessWidget {
+  const _CupertinoSegmentItem({
     required this.tab,
     required this.isSelected,
     required this.onTap,
@@ -143,9 +173,140 @@ class _SegmentItem<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    // The selected segment sits on the `brandSubtle` pill, so its label and
-    // icon use `onBrandSubtle`: `brandPrimary` on that fill measured 3.90:1
-    // light and 3.43:1 dark, both below AA for 13 px text (§K.1-2).
+    final textColor = isSelected ? colors.textPrimary : colors.textSecondary;
+
+    return Semantics(
+      label: tab.semanticsLabel ?? tab.label,
+      selected: isSelected,
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox(
+          height: 28,
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                if (tab.icon != null) ...<Widget>[
+                  Icon(tab.icon, size: 14, color: textColor),
+                  const SizedBox(width: AppSpacing.xs),
+                ],
+                Flexible(
+                  child: Text(
+                    tab.label,
+                    style: AppTypography.label.copyWith(
+                      color: textColor,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Material/Web implementation — the M3 pill this control started as.
+class _MaterialSegmentedTabs<T> extends StatelessWidget {
+  const _MaterialSegmentedTabs({
+    required this.tabs,
+    required this.selected,
+    required this.onChanged,
+    required this.isExpanded,
+  });
+
+  final List<SegmentedTab<T>> tabs;
+  final T selected;
+  final ValueChanged<T> onChanged;
+  final bool isExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final selectedIndex = tabs.indexWhere((tab) => tab.value == selected);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final totalWidth = isExpanded
+            ? constraints.maxWidth
+            : (tabs.length * 100.0);
+        final tabWidth = (totalWidth - 4.0) / tabs.length;
+        final activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
+
+        return Container(
+          height: 32,
+          width: isExpanded ? double.infinity : totalWidth,
+          padding: const EdgeInsets.all(AppSpacing.xxs),
+          decoration: BoxDecoration(
+            color: colors.surfaceSubtle,
+            borderRadius: AppRadius.borderFull,
+          ),
+          child: Stack(
+            children: <Widget>[
+              AnimatedPositioned(
+                duration: AppMotion.short,
+                curve: AppMotion.standard,
+                left: activeIndex * tabWidth,
+                top: 0,
+                bottom: 0,
+                width: tabWidth,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: colors.brandSubtle,
+                    borderRadius: AppRadius.borderFull,
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisSize: isExpanded ? MainAxisSize.max : MainAxisSize.min,
+                children: <Widget>[
+                  for (var i = 0; i < tabs.length; i++)
+                    Expanded(
+                      flex: isExpanded ? 1 : 0,
+                      child: _MaterialSegmentItem<T>(
+                        tab: tabs[i],
+                        isSelected: tabs[i].value == selected,
+                        onTap: () {
+                          if (tabs[i].value != selected) {
+                            AppFeedback.selection();
+                            onChanged(tabs[i].value);
+                          }
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _MaterialSegmentItem<T> extends StatelessWidget {
+  const _MaterialSegmentItem({
+    required this.tab,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final SegmentedTab<T> tab;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     final textColor = isSelected ? colors.onBrandSubtle : colors.textSecondary;
 
     return Semantics(
@@ -158,11 +319,6 @@ class _SegmentItem<T> extends StatelessWidget {
         child: SizedBox(
           height: 28,
           child: Center(
-            // The label must be bounded (Flexible) so a long translation
-            // (Burmese/Japanese) ellipsizes instead of overflowing the tab:
-            // a min-size Row hands its children unbounded width, under which
-            // `ellipsis` never engages and the Row overflows (docs/Design.md
-            // §7 — long my/ja strings are expected, not exceptional).
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[

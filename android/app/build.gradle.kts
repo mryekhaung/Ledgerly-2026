@@ -143,6 +143,22 @@ gradle.projectsEvaluated {
                     source.copyTo(dir.resolve(aliasName), overwrite = true)
                 }
             }
+
+        // Also alias .aab bundles so flagless `flutter build appbundle` resolves.
+        tasks.matching { it.name == "bundle${variant.name.replaceFirstChar { c -> c.uppercase() }}" }
+            .configureEach {
+                doLast {
+                    val bundleDir = layout.buildDirectory.dir("outputs/bundle/${variant.name}").get().asFile
+                    val genericBundleDir = layout.buildDirectory.dir("outputs/bundle/$modeName").get().asFile
+                    genericBundleDir.mkdirs()
+                    bundleDir.listFiles()?.forEach { file ->
+                        if (file.extension == "aab") {
+                            file.copyTo(genericBundleDir.resolve("app-$modeName.aab"), overwrite = true)
+                            file.copyTo(bundleDir.resolve("app-$modeName.aab"), overwrite = true)
+                        }
+                    }
+                }
+            }
     }
 }
 
