@@ -135,21 +135,12 @@ class AdaptiveNav extends StatelessWidget {
       );
     }
 
-    final mediaQuery = MediaQuery.of(context);
-    return MediaQuery(
-      data: mediaQuery.copyWith(
-        padding: mediaQuery.padding.copyWith(
-          bottom: mediaQuery.padding.bottom + _nativeTabBarContentInset,
-        ),
-        viewPadding: mediaQuery.viewPadding.copyWith(
-          bottom: mediaQuery.viewPadding.bottom + _nativeTabBarContentInset,
-        ),
-      ),
-      child: child,
-    );
+    // iOS 26+: the package overlays the native `UITabBar` above the body and
+    // already applies its own safe-area/content insets. Injecting an extra
+    // synthetic bottom inset here leaves dead space below the bar, so keep the
+    // body untouched and let the native chrome own the clearance.
+    return child;
   }
-
-  static const double _nativeTabBarContentInset = 64;
 
   static String _symbolFor(
     NavDestination destination, {

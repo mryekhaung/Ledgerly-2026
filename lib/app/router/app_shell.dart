@@ -116,7 +116,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       child: AdaptiveScaffold(
         body: nav.adaptiveScaffoldBody(context, widget.child),
         bottomNavigationBar: nav.bottomNavigationBar(context),
-        minimizeBehavior: TabBarMinimizeBehavior.onScrollDown,
+        minimizeBehavior: TabBarMinimizeBehavior.never,
       ),
     );
   }
