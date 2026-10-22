@@ -42,7 +42,7 @@ jobs:
           # literal would be clipped) but the failure mode is a miss, not a false
           # alarm, and `flutter analyze` catches the real cases anyway.
           check() {
-            local label="$1" pattern="$2" path="$3" skip="${4:-__none__}"
+            local label="$1" pattern="$2" path="$3" skips="${4:-__none__}"
             local matches
             matches=$(
               find "$path" -name '*.dart' \
@@ -52,9 +52,14 @@ jobs:
                 | while IFS= read -r file; do
                     sed 's://.*$::' "$file" | sed "s|^|$file:|"
                   done \
-                | grep -E "$pattern" \
-                | grep -v -F "$skip:" || true
+                | grep -E "$pattern" || true
             )
+            # $skips is a space-separated list of exempted file paths.
+            local skip
+            for skip in $skips; do
+              [ -n "$matches" ] || break
+              matches=$(printf '%s\n' "$matches" | grep -v -F "$skip:" || true)
+            done
             if [ -n "$matches" ]; then
               echo "::error::$label"
               echo "$matches"
@@ -69,14 +74,17 @@ jobs:
             "lib"
 
           # 2. Material/Cupertino must come from the standalone packages, not the SDK.
-          #    One reviewed exception: adaptive_nav.dart. `adaptive_platform_ui`'s
-          #    `cupertinoTabBar` parameter is typed to the SDK's `CupertinoTabBar`,
-          #    which `cupertino_ui`'s class is not assignable to.
+          #    Two reviewed exceptions where `adaptive_platform_ui`'s API is
+          #    typed to the SDK widgets, which `cupertino_ui` can't satisfy:
+          #    - adaptive_nav.dart:  `cupertinoTabBar` takes the SDK `CupertinoTabBar`.
+          #    - app_scaffold.dart:  `cupertinoNavigationBar` is cast to the SDK
+          #      `ObstructingPreferredSizeWidget`, so it needs the SDK
+          #      `CupertinoNavigationBar`.
           check \
             "Import package:flutter/material.dart or cupertino.dart. Use material_ui / cupertino_ui (docs/Versions.md §2)." \
             "package:flutter/(material|cupertino)\.dart" \
             "lib" \
-            "lib/core/widgets/app_nav/adaptive_nav.dart"
+            "lib/core/widgets/app_nav/adaptive_nav.dart lib/core/widgets/app_scaffold.dart"
 
           # 3. Web-unsafe libraries (docs/Platform.md §6).
           check \
