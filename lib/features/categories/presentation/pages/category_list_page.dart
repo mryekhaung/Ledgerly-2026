@@ -7,6 +7,7 @@ import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_form_notifier.dart';
@@ -177,22 +178,13 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
   /// asking.
   Future<void> _delete(Category category) async {
     final strings = AppStrings.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await AppDialog.confirm(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(strings('categoriesDeleteConfirmTitle')),
-        content: Text(strings('categoriesDeleteConfirmBody')),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(strings('actionCancel')),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(strings('actionDelete')),
-          ),
-        ],
-      ),
+      title: strings('categoriesDeleteConfirmTitle'),
+      message: strings('categoriesDeleteConfirmBody'),
+      confirmLabel: strings('actionDelete'),
+      cancelLabel: strings('actionCancel'),
+      isDestructive: true,
     );
     if (confirmed != true) return;
 

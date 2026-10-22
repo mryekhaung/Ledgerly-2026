@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
@@ -103,14 +106,14 @@ class SettingsPage extends ConsumerWidget {
     BuildContext context,
     String Function(String key) strings,
   ) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(strings('settingsCreditsTitle')),
-        content: Text(strings('settingsCreditsAvatar')),
+    unawaited(
+      AppDialog.show<void>(
+        context: context,
+        title: strings('settingsCreditsTitle'),
+        content: strings('settingsCreditsAvatar'),
         actions: <Widget>[
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
+            onPressed: () => Navigator.of(context).pop(),
             child: Text(strings('actionDone')),
           ),
         ],

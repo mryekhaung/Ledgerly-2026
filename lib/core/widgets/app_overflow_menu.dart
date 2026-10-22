@@ -1,3 +1,4 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
@@ -72,7 +73,31 @@ class AppOverflowMenu<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    if (!(platform ?? AppPlatform.resolve()).usesMaterial) {
+    final resolvedPlatform = platform ?? AppPlatform.resolve();
+    if (!resolvedPlatform.usesMaterial) {
+      if (PlatformInfo.isIOS26OrHigher()) {
+        final menuItems = <AdaptivePopupMenuEntry>[
+          for (final item in items)
+            AdaptivePopupMenuItem<T>(
+              label: item.label,
+              value: item.value,
+              isDestructive: item.destructive,
+            ),
+        ];
+        return AdaptivePopupMenuButton.widget<T>(
+          items: menuItems,
+          onSelected: (index, entry) {
+            if (entry.value != null) {
+              onSelected(entry.value as T);
+            }
+          },
+          child: IconButton(
+            icon: Icon(icon, color: colors.textSecondary),
+            tooltip: tooltip,
+            onPressed: null,
+          ),
+        );
+      }
       return IconButton(
         icon: Icon(icon, color: colors.textSecondary),
         tooltip: tooltip,

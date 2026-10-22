@@ -1,7 +1,7 @@
 name: ledgerly
 description: "A Budget Tracker & Manager Flutter project — compact, premium personal finance for iOS/Android/web."
 publish_to: 'none'
-version: 1.0.0+11
+version: 1.0.0+12
 
 # Toolchain is pinned by .fvmrc (Flutter 3.47.1). CI must use the same version.
 # See docs/Versions.md — that file is the single source of truth for versions.

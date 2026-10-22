@@ -7,6 +7,7 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
+import 'package:ledgerly/core/widgets/app_switch_tile.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/data_transfer/domain/entities/import_entities.dart';
 import 'package:ledgerly/features/data_transfer/presentation/providers/data_transfer_providers.dart';
@@ -155,7 +156,7 @@ class ImportTab extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          SwitchListTile(
+          AppSwitchTile(
             value: importState.options.skipDuplicates,
             title: Text(strings('importSkipDuplicates')),
             onChanged: (val) {
@@ -164,7 +165,7 @@ class ImportTab extends ConsumerWidget {
               );
             },
           ),
-          SwitchListTile(
+          AppSwitchTile(
             value: importState.options.autoCreateCategories,
             title: Text(strings('importAutoCreateCategories')),
             onChanged: (val) {

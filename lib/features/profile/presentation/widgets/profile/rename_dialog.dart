@@ -1,3 +1,6 @@
+import 'package:cupertino_ui/cupertino_ui.dart'
+    show CupertinoAlertDialog, CupertinoDialogAction, CupertinoTextField;
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/features/profile/domain/usecases/save_display_name.dart';
 import 'package:material_ui/material_ui.dart';
@@ -34,6 +37,35 @@ class _RenameDialogState extends State<RenameDialog> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    final platform = AppPlatform.resolve();
+
+    if (platform.usesCupertino) {
+      return CupertinoAlertDialog(
+        title: Text(strings('profileEditName')),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: CupertinoTextField(
+            controller: _controller,
+            autofocus: true,
+            maxLength: SaveDisplayName.maxLength,
+            textInputAction: TextInputAction.done,
+            placeholder: strings('profileNameHint'),
+            onSubmitted: (value) => Navigator.of(context).pop(value),
+          ),
+        ),
+        actions: <Widget>[
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(strings('actionCancel')),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(context).pop(_controller.text),
+            child: Text(strings('actionSave')),
+          ),
+        ],
+      );
+    }
 
     return AlertDialog(
       title: Text(strings('profileEditName')),

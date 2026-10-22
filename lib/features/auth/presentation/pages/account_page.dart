@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/auth/domain/entities/auth_provider_type.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
@@ -52,22 +52,12 @@ class AccountPage extends ConsumerWidget {
 
   Future<void> _signOut(BuildContext context, WidgetRef ref) async {
     final strings = AppStrings.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await AppDialog.confirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(strings('accountSignOut')),
-        content: Text(strings('accountSignOutConfirm')),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(strings('actionCancel')),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(strings('accountSignOut')),
-          ),
-        ],
-      ),
+      title: strings('accountSignOut'),
+      message: strings('accountSignOutConfirm'),
+      confirmLabel: strings('accountSignOut'),
+      cancelLabel: strings('actionCancel'),
     );
 
     if (confirmed != true || !context.mounted) return;
@@ -85,25 +75,13 @@ class AccountPage extends ConsumerWidget {
 
   Future<void> _deleteAccount(BuildContext context, WidgetRef ref) async {
     final strings = AppStrings.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await AppDialog.confirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(strings('accountDeleteTitle')),
-        content: Text(strings('accountDeleteBody')),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(strings('actionCancel')),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppThemeColors.of(ctx).moneyOut,
-            ),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(strings('accountDeleteConfirm')),
-          ),
-        ],
-      ),
+      title: strings('accountDeleteTitle'),
+      message: strings('accountDeleteBody'),
+      confirmLabel: strings('accountDeleteConfirm'),
+      cancelLabel: strings('actionCancel'),
+      isDestructive: true,
     );
 
     if (confirmed != true || !context.mounted) return;

@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/budgets/domain/entities/budget.dart';
 import 'package:ledgerly/features/budgets/presentation/providers/budget_providers.dart';
@@ -97,25 +98,13 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
     final id = widget.budgetId;
     if (id == null) return;
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await AppDialog.confirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(strings('budgetConfirmDelete')),
-        content: Text(strings('budgetConfirmDeleteMessage')),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(MaterialLocalizations.of(ctx).cancelButtonLabel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppThemeColors.of(context).moneyOut,
-            ),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(strings('budgetsDelete')),
-          ),
-        ],
-      ),
+      title: strings('budgetConfirmDelete'),
+      message: strings('budgetConfirmDeleteMessage'),
+      confirmLabel: strings('budgetsDelete'),
+      cancelLabel: MaterialLocalizations.of(context).cancelButtonLabel,
+      isDestructive: true,
     );
 
     if (confirmed == true && mounted) {

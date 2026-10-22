@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_date_picker.dart';
+import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
@@ -75,7 +77,7 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
     required LocalDate initialDate,
     required ValueChanged<LocalDate> onPicked,
   }) async {
-    final picked = await showDatePicker(
+    final picked = await AppDatePicker.show(
       context: context,
       initialDate: initialDate.toDateTime(),
       firstDate: DateTime(2000),
@@ -99,22 +101,13 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
 
   Future<void> _handleDelete(String ruleId) async {
     final strings = AppStrings.of(context);
-    final confirm = await showDialog<bool>(
+    final confirm = await AppDialog.confirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(strings('recurringConfirmDelete')),
-        content: Text(strings('recurringConfirmDeleteMessage')),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(strings('actionCancel')),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(strings('actionDelete')),
-          ),
-        ],
-      ),
+      title: strings('recurringConfirmDelete'),
+      message: strings('recurringConfirmDeleteMessage'),
+      confirmLabel: strings('actionDelete'),
+      cancelLabel: strings('actionCancel'),
+      isDestructive: true,
     );
     if (confirm == true && mounted) {
       await ref

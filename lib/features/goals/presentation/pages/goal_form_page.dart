@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_date_picker.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
@@ -83,7 +84,7 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
           )
         : now.add(const Duration(days: 90));
 
-    final picked = await showDatePicker(
+    final picked = await AppDatePicker.show(
       context: context,
       initialDate: initialDate,
       firstDate: now.subtract(const Duration(days: 365)),

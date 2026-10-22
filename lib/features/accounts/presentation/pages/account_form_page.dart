@@ -6,7 +6,9 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
+import 'package:ledgerly/core/widgets/app_switch_tile.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account_type.dart';
 import 'package:ledgerly/features/accounts/presentation/account_catalog.dart';
@@ -93,25 +95,13 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
     if (accountId == null) return;
 
     final strings = AppStrings.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await AppDialog.confirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(strings('accountConfirmDelete')),
-        content: Text(strings('accountConfirmDeleteMessage')),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(strings('actionCancel')),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppThemeColors.of(context).warning,
-            ),
-            child: Text(strings('actionDelete')),
-          ),
-        ],
-      ),
+      title: strings('accountConfirmDelete'),
+      message: strings('accountConfirmDeleteMessage'),
+      confirmLabel: strings('actionDelete'),
+      cancelLabel: strings('actionCancel'),
+      isDestructive: true,
     );
 
     if (confirmed == true && mounted) {
@@ -295,7 +285,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
           const SizedBox(height: AppSpacing.lg),
 
           // Include in Net Worth toggle
-          SwitchListTile(
+          AppSwitchTile(
             value: formState.includeInTotal,
             onChanged: notifier.setIncludeInTotal,
             title: Text(

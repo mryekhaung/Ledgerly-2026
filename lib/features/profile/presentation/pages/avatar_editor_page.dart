@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_catalog.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_config.dart';
@@ -186,22 +187,13 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
 
   Future<void> _showDiscardConfirmDialog() async {
     final strings = AppStrings.of(context);
-    final discard = await showDialog<bool>(
+    final discard = await AppDialog.confirm(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(strings('avatarEditorDiscardTitle')),
-        content: Text(strings('avatarEditorDiscardMessage')),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(strings('avatarEditorKeepEditing')),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(strings('avatarEditorDiscardConfirm')),
-          ),
-        ],
-      ),
+      title: strings('avatarEditorDiscardTitle'),
+      message: strings('avatarEditorDiscardMessage'),
+      confirmLabel: strings('avatarEditorDiscardConfirm'),
+      cancelLabel: strings('avatarEditorKeepEditing'),
+      isDestructive: true,
     );
 
     if (discard == true && mounted) {

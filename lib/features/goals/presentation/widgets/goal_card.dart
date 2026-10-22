@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
+import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/domain/usecases/delete_savings_goal.dart';
 import 'package:ledgerly/features/goals/domain/usecases/set_goal_archived.dart';
@@ -35,25 +36,13 @@ class GoalCard extends ConsumerWidget {
 
   Future<void> _handleDelete(BuildContext context, WidgetRef ref) async {
     final strings = AppStrings.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await AppDialog.confirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(strings('deleteGoal')),
-        content: Text(strings('deleteGoalConfirm')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(strings('actionCancel')),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppThemeColors.of(context).moneyOut,
-            ),
-            child: Text(strings('deleteGoal')),
-          ),
-        ],
-      ),
+      title: strings('deleteGoal'),
+      message: strings('deleteGoalConfirm'),
+      confirmLabel: strings('deleteGoal'),
+      cancelLabel: strings('actionCancel'),
+      isDestructive: true,
     );
 
     if (confirmed == true && context.mounted) {

@@ -4,6 +4,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_switch_tile.dart';
 import 'package:ledgerly/features/recurring/domain/entities/recurring_frequency.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -113,7 +114,7 @@ class RecurringScheduleSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
 
         // Has end date switch
-        SwitchListTile(
+        AppSwitchTile(
           title: Text(strings('recurringFieldHasEndDate')),
           value: hasEndDate,
           onChanged: onHasEndDateChanged,
@@ -138,7 +139,7 @@ class RecurringScheduleSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
 
         // Auto-add switch
-        SwitchListTile(
+        AppSwitchTile(
           title: Text(strings('recurringFieldAutoAdd')),
           subtitle: Text(
             strings('recurringFieldAutoAddDesc'),

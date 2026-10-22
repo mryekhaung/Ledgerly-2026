@@ -7,6 +7,7 @@ import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
@@ -68,25 +69,13 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
     Account account,
     String Function(String) strings,
   ) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await AppDialog.confirm(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(strings('accountConfirmDelete')),
-        content: Text(strings('accountConfirmDeleteMessage')),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(strings('actionCancel')),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppThemeColors.of(context).warning,
-            ),
-            child: Text(strings('actionDelete')),
-          ),
-        ],
-      ),
+      title: strings('accountConfirmDelete'),
+      message: strings('accountConfirmDeleteMessage'),
+      confirmLabel: strings('actionDelete'),
+      cancelLabel: strings('actionCancel'),
+      isDestructive: true,
     );
 
     if (confirmed == true && mounted) {

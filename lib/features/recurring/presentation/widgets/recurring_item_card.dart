@@ -11,6 +11,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
+import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
 import 'package:ledgerly/core/widgets/capped_row.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
@@ -257,22 +258,13 @@ class RecurringItemCard extends ConsumerWidget {
           );
         }
       case 'delete':
-        final confirm = await showDialog<bool>(
+        final confirm = await AppDialog.confirm(
           context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(strings('recurringConfirmDelete')),
-            content: Text(strings('recurringConfirmDeleteMessage')),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: Text(strings('actionCancel')),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                child: Text(strings('actionDelete')),
-              ),
-            ],
-          ),
+          title: strings('recurringConfirmDelete'),
+          message: strings('recurringConfirmDeleteMessage'),
+          confirmLabel: strings('actionDelete'),
+          cancelLabel: strings('actionCancel'),
+          isDestructive: true,
         );
         if (confirm == true) {
           await scheduler.delete(item.id);
