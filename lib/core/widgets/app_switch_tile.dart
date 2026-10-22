@@ -1,3 +1,4 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoSwitch;
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -7,7 +8,8 @@ import 'package:material_ui/material_ui.dart';
 
 /// An adaptive switch list row (docs/Design.md §5).
 ///
-/// * iOS: Cupertino-style switch ([CupertinoSwitch]).
+/// * iOS 26+: [IOS26Switch] with smooth Liquid Glass animation.
+/// * iOS <= 18: Cupertino-style switch ([CupertinoSwitch]).
 /// * Material / Web: Material 3 Switch with subtle track tint.
 class AppSwitchTile extends StatelessWidget {
   /// Creates an [AppSwitchTile].
@@ -54,16 +56,30 @@ class AppSwitchTile extends StatelessWidget {
     final resolvedPlatform = platform ?? AppPlatform.resolve();
 
     if (resolvedPlatform.usesCupertino) {
-      final switchWidget = CupertinoSwitch(
-        value: value,
-        onChanged: enabled
-            ? (newVal) {
-                AppFeedback.selection();
-                onChanged?.call(newVal);
-              }
-            : null,
-        activeTrackColor: activeColor ?? colors.brandPrimary,
-      );
+      final Widget switchWidget;
+      if (PlatformInfo.isIOS26OrHigher()) {
+        switchWidget = IOS26Switch(
+          value: value,
+          onChanged: enabled
+              ? (newVal) {
+                  AppFeedback.selection();
+                  onChanged?.call(newVal);
+                }
+              : null,
+          activeColor: activeColor ?? colors.brandPrimary,
+        );
+      } else {
+        switchWidget = CupertinoSwitch(
+          value: value,
+          onChanged: enabled
+              ? (newVal) {
+                  AppFeedback.selection();
+                  onChanged?.call(newVal);
+                }
+              : null,
+          activeTrackColor: activeColor ?? colors.brandPrimary,
+        );
+      }
 
       return Padding(
         padding: contentPadding ?? const EdgeInsets.symmetric(vertical: 8),

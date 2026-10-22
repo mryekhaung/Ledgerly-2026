@@ -1,3 +1,4 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -30,7 +31,8 @@ class SegmentedTab<T> {
 
 /// Adaptive segmented tabs control (docs/Design.md §5.5).
 ///
-/// * iOS: Cupertino-style sliding segmented control — quiet haptic, no ink.
+/// * iOS 26+: Native iOS 26 UISegmentedControl with Liquid Glass.
+/// * iOS <= 18: Cupertino-style sliding segmented control — quiet haptic, no ink.
 /// * Material/Web: pill track with a sliding `brandSubtle` thumb.
 /// * Label uses `AppTypography.label` token.
 /// * Max **3** segments supported; more must use a chip row (docs/Design.md §5.5).
@@ -68,6 +70,23 @@ class SegmentedTabs<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final resolvedPlatform = platform ?? AppPlatform.resolve();
     if (resolvedPlatform.usesCupertino) {
+      if (PlatformInfo.isIOS26OrHigher()) {
+        final colors = AppThemeColors.of(context);
+        final selectedIndex = tabs.indexWhere((tab) => tab.value == selected);
+        return IOS26SegmentedControl(
+          labels: tabs.map((t) => t.label).toList(),
+          selectedIndex: selectedIndex >= 0 ? selectedIndex : 0,
+          onValueChanged: (index) {
+            AppFeedback.selection();
+            onChanged(tabs[index].value);
+          },
+          textColor: colors.textSecondary,
+          selectedTextColor: colors.textPrimary,
+          color: colors.surfaceRaised,
+          shrinkWrap: !isExpanded,
+          height: 32.0,
+        );
+      }
       return _CupertinoSegmentedTabs<T>(
         tabs: tabs,
         selected: selected,
