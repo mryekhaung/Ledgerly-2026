@@ -116,25 +116,35 @@ class LedgerlyApp extends ConsumerWidget {
       // AppStringsScope wraps the generated bindings so a runtime ARB key
       // (e.g. one carried out of a ValidationFailure) resolves the same way a
       // compile-time key does.
-      builder: (context, child) => AdaptiveStyleScope(
-        platformOverride: platformOverride,
-        child: AppStringsScope(
-          lookup: AppStringLookup.of(AppLocalizations.of(context)),
-          child: AppThemeColors(
-            // `effectiveBrightness` rather than reading MediaQuery again: this
-            // is what makes an explicit light/dark choice recolour the custom
-            // tokens too, instead of only Material's own scheme.
-            colors: effectiveBrightness == Brightness.dark
-                ? darkColors
-                : lightColors,
-            // Declarative edge-to-edge bar style: dark icons on light
-            // surfaces and vice versa. `AnnotatedRegion` (not a
-            // `SystemChrome.set…` call in `build`) so theme switches apply
-            // without a side effect, and pages without an `AppBar` are
-            // covered too (`docs/Platform.md` §2).
-            child: AnnotatedRegion<SystemUiOverlayStyle>(
-              value: AppTheme.systemOverlayStyle(effectiveBrightness),
-              child: child ?? const SizedBox.shrink(),
+      //
+      // `platformBrightness` is pinned to the *resolved* app brightness for the
+      // whole tree. `adaptive_platform_ui`, `CupertinoPageScaffold`, native
+      // platform views and `CupertinoColors.resolveFrom` all read the device
+      // setting from `MediaQuery`; without this, a pinned light/dark choice
+      // only held for the shell and every pushed page followed the device.
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(platformBrightness: effectiveBrightness),
+        child: AdaptiveStyleScope(
+          platformOverride: platformOverride,
+          child: AppStringsScope(
+            lookup: AppStringLookup.of(AppLocalizations.of(context)),
+            child: AppThemeColors(
+              // `effectiveBrightness` rather than reading MediaQuery again: this
+              // is what makes an explicit light/dark choice recolour the custom
+              // tokens too, instead of only Material's own scheme.
+              colors: effectiveBrightness == Brightness.dark
+                  ? darkColors
+                  : lightColors,
+              // Declarative edge-to-edge bar style: dark icons on light
+              // surfaces and vice versa. `AnnotatedRegion` (not a
+              // `SystemChrome.set…` call in `build`) so theme switches apply
+              // without a side effect, and pages without an `AppBar` are
+              // covered too (`docs/Platform.md` §2).
+              child: AnnotatedRegion<SystemUiOverlayStyle>(
+                value: AppTheme.systemOverlayStyle(effectiveBrightness),
+                child: child ?? const SizedBox.shrink(),
+              ),
             ),
           ),
         ),

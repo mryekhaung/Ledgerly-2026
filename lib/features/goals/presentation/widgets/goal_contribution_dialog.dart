@@ -43,10 +43,14 @@ class GoalContributionDialog extends ConsumerStatefulWidget {
   }) {
     return showModalBottomSheet<void>(
       context: context,
+      // Root navigator: keeps the sheet above the shell's bottom tab bar.
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) =>
-          GoalContributionDialog(goal: goal, initialMode: initialMode),
+      builder: (context) => SafeArea(
+        top: false,
+        child: GoalContributionDialog(goal: goal, initialMode: initialMode),
+      ),
     );
   }
 

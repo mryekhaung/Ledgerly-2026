@@ -168,6 +168,8 @@ class ChoiceRow<T> extends StatelessWidget {
 
     await showModalBottomSheet<void>(
       context: context,
+      // Root navigator: keeps the sheet above the shell's bottom tab bar.
+      useRootNavigator: true,
       backgroundColor: colors.surfaceRaised,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: AppRadius.radiusXl),

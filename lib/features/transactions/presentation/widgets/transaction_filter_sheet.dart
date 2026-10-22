@@ -45,11 +45,17 @@ class TransactionFilterSheet extends ConsumerStatefulWidget {
   }) {
     return showModalBottomSheet<void>(
       context: context,
+      // Root navigator: the shell's navigator sits *inside* the page body, so a
+      // sheet pushed there is laid out under the bottom tab bar.
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => TransactionFilterSheet(
-        initialFilter: initialFilter,
-        onApply: onApply,
+      builder: (context) => SafeArea(
+        top: false,
+        child: TransactionFilterSheet(
+          initialFilter: initialFilter,
+          onApply: onApply,
+        ),
       ),
     );
   }
