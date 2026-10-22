@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
@@ -202,7 +203,7 @@ class CalendarPage extends ConsumerWidget {
     LocalDate currentMonth,
   ) async {
     final chosen = await Navigator.of(context).push<LocalDate>(
-      MaterialPageRoute<LocalDate>(
+      cupertino.CupertinoPageRoute<LocalDate>(
         builder: (_) => MonthYearPickerPage(initialMonth: currentMonth),
       ),
     );

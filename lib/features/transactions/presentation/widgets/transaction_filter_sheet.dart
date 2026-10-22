@@ -1,3 +1,4 @@
+import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
@@ -159,7 +160,7 @@ class _TransactionFilterSheetState
     };
 
     final chosen = await Navigator.of(context).push<Category>(
-      MaterialPageRoute<Category>(
+      cupertino.CupertinoPageRoute<Category>(
         builder: (_) => CategoryPickerPage(kind: kind, selectedId: _categoryId),
       ),
     );
@@ -173,7 +174,7 @@ class _TransactionFilterSheetState
     final now = DateTime.now();
     final today = LocalDate(now.year, now.month, now.day);
     final chosen = await Navigator.of(context).push<LocalDate>(
-      MaterialPageRoute<LocalDate>(
+      cupertino.CupertinoPageRoute<LocalDate>(
         builder: (_) => MonthDayPickerPage(initialDate: _startDate ?? today),
       ),
     );
@@ -186,7 +187,7 @@ class _TransactionFilterSheetState
     final now = DateTime.now();
     final today = LocalDate(now.year, now.month, now.day);
     final chosen = await Navigator.of(context).push<LocalDate>(
-      MaterialPageRoute<LocalDate>(
+      cupertino.CupertinoPageRoute<LocalDate>(
         builder: (_) => MonthDayPickerPage(initialDate: _endDate ?? today),
       ),
     );

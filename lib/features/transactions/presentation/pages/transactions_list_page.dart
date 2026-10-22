@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
@@ -92,7 +93,7 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
         : CategoryKind.expense;
 
     final chosen = await Navigator.of(context).push<Category>(
-      MaterialPageRoute<Category>(
+      cupertino.CupertinoPageRoute<Category>(
         builder: (_) => CategoryPickerPage(
           kind: kind,
           selectedId: currentFilter.categoryId,

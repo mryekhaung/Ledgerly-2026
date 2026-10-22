@@ -1,3 +1,4 @@
+import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -218,7 +219,7 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
   /// Opens the category picker and stores the choice.
   Future<void> _pickCategory(TransactionDirection direction) async {
     final chosen = await Navigator.of(context).push<Category>(
-      MaterialPageRoute<Category>(
+      cupertino.CupertinoPageRoute<Category>(
         builder: (_) => CategoryPickerPage(
           kind: _kindFor(direction),
           selectedId: ref.read(transactionFormProvider).categoryId,
@@ -232,7 +233,7 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
   /// Opens the day picker and stores the choice.
   Future<void> _pickDate(LocalDate current) async {
     final chosen = await Navigator.of(context).push<LocalDate>(
-      MaterialPageRoute<LocalDate>(
+      cupertino.CupertinoPageRoute<LocalDate>(
         builder: (_) => MonthDayPickerPage(initialDate: current),
       ),
     );

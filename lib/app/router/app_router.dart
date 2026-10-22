@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
@@ -38,9 +38,9 @@ import 'package:material_ui/material_ui.dart';
 
 /// Builds the app's router.
 ///
-/// Phase 0 scope: the **skeleton only** — a shell route with placeholder pages so
+/// Phase 0 scope: the **skeleton only** â€” a shell route with placeholder pages so
 /// navigation, deep links, and the responsive shell can be exercised before any
-/// feature exists (Roadmap Phase 0, docs/Architecture.md §9).
+/// feature exists (Roadmap Phase 0, docs/Architecture.md Â§9).
 ///
 /// Feature pages replace the placeholders one roadmap item at a time; the route
 /// table shape stays the same.
@@ -80,46 +80,55 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
 
       // Pushed sub-screens (outside the shell) so they hide the bottom
       // navigation bar, have full vertical canvas, and support seamless
-      // predictive back gestures.
+      // predictive back gestures. Every route uses a CupertinoPage so iOS
+      // edge-swipe-back and the native transition both work.
       GoRoute(
         path: AppRoutes.transactions,
         name: AppRoutes.transactionsName,
-        builder: (context, state) => const TransactionsListPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: TransactionsListPage()),
       ),
       GoRoute(
         path: AppRoutes.settingsMonthStartsOn,
         name: AppRoutes.settingsMonthStartsOnName,
-        builder: (context, state) => const MonthStartsOnPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: MonthStartsOnPage()),
       ),
       GoRoute(
         path: AppRoutes.profile,
         name: AppRoutes.profileName,
-        builder: (context, state) => const ProfilePage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: ProfilePage()),
       ),
       GoRoute(
         path: AppRoutes.account,
         name: AppRoutes.accountName,
-        builder: (context, state) => const AccountPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: AccountPage()),
       ),
       GoRoute(
         path: AppRoutes.dataTransfer,
         name: AppRoutes.dataTransferName,
-        builder: (context, state) => const DataTransferPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: DataTransferPage()),
       ),
       GoRoute(
         path: AppRoutes.accounts,
         name: AppRoutes.accountsName,
-        builder: (context, state) => const AccountsPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: AccountsPage()),
       ),
       GoRoute(
         path: AppRoutes.budgets,
         name: AppRoutes.budgetsName,
-        builder: (context, state) => const BudgetsPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: BudgetsPage()),
       ),
       GoRoute(
         path: AppRoutes.recurring,
         name: AppRoutes.recurringName,
-        builder: (context, state) => const RecurringListPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: RecurringListPage()),
       ),
 
       // Onboarding / Welcome and Sign-In are top-level routes OUTSIDE the shell
@@ -127,22 +136,25 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
       GoRoute(
         path: AppRoutes.welcome,
         name: AppRoutes.welcomeName,
-        builder: (context, state) => const WelcomePage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: WelcomePage()),
       ),
       GoRoute(
         path: AppRoutes.signIn,
         name: AppRoutes.signInName,
-        builder: (context, state) => const SignInPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: SignInPage()),
       ),
 
       // Add / edit transaction are top-level (outside the shell) so they can be
       // presented as a full-screen page on compact and a centered modal page on
-      // medium+ (docs/Platform.md §5).
+      // medium+ (docs/Platform.md Â§5).
       GoRoute(
         path: AppRoutes.transactionNew,
         name: AppRoutes.transactionNewName,
-        builder: (context, state) =>
-            TransactionFormPage(initialDate: _dateFromQuery(state)),
+        pageBuilder: (context, state) => cupertino.CupertinoPage<void>(
+          child: TransactionFormPage(initialDate: _dateFromQuery(state)),
+        ),
         routes: <RouteBase>[
           // Nested so the edit path inherits the new-transaction segment and the
           // two can never be confused: `/transactions/new` vs
@@ -150,13 +162,14 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
           GoRoute(
             path: AppRoutes.transactionEditRelative,
             name: AppRoutes.transactionEditName,
-            builder: (context, state) =>
-                _TransactionEditLoader(id: state.pathParameters['id']!),
+            pageBuilder: (context, state) => cupertino.CupertinoPage<void>(
+              child: _TransactionEditLoader(id: state.pathParameters['id']!),
+            ),
           ),
         ],
       ),
 
-      // Avatar editor is a full-screen route OUTSIDE the shell (docs/Avatar.md §2
+      // Avatar editor is a full-screen route OUTSIDE the shell (docs/Avatar.md Â§2
       // step 0): no bottom navigation, so the pinned Save bar owns the bottom
       // edge and the preview never competes with a tab bar. Reached by deep link
       // `/profile/avatar` or by `pushNamed` from the Profile page; popping
@@ -164,7 +177,8 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
       GoRoute(
         path: '/profile/avatar',
         name: AppRoutes.avatarEditorName,
-        builder: (context, state) => const AvatarEditorPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: AvatarEditorPage()),
       ),
 
       // Category create/edit is outside the shell so the iOS tab bar does not
@@ -174,27 +188,31 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
         path: AppRoutes.categoryEdit,
         name: AppRoutes.categoryEditName,
         pageBuilder: (context, state) =>
-            const CupertinoPage<void>(child: CategoryFormPage()),
+            const cupertino.CupertinoPage<void>(child: CategoryFormPage()),
       ),
 
       // Account forms and transfers (Phase 3).
       GoRoute(
         path: AppRoutes.accountNew,
         name: AppRoutes.accountNewName,
-        builder: (context, state) => const AccountFormPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: AccountFormPage()),
       ),
       GoRoute(
         path: AppRoutes.accountEdit,
         name: AppRoutes.accountEditName,
-        builder: (context, state) =>
-            AccountFormPage(accountId: state.pathParameters['id']),
+        pageBuilder: (context, state) => cupertino.CupertinoPage<void>(
+          child: AccountFormPage(accountId: state.pathParameters['id']),
+        ),
       ),
       GoRoute(
         path: AppRoutes.accountTransfer,
         name: AppRoutes.accountTransferName,
-        builder: (context, state) => TransferPage(
-          initialFromId: state.uri.queryParameters['from'],
-          initialToId: state.uri.queryParameters['to'],
+        pageBuilder: (context, state) => cupertino.CupertinoPage<void>(
+          child: TransferPage(
+            initialFromId: state.uri.queryParameters['from'],
+            initialToId: state.uri.queryParameters['to'],
+          ),
         ),
       ),
 
@@ -202,43 +220,50 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
       GoRoute(
         path: AppRoutes.budgetNew,
         name: AppRoutes.budgetNewName,
-        builder: (context, state) =>
-            BudgetFormPage(initialType: state.uri.queryParameters['type']),
+        pageBuilder: (context, state) => cupertino.CupertinoPage<void>(
+          child: BudgetFormPage(initialType: state.uri.queryParameters['type']),
+        ),
       ),
       GoRoute(
         path: AppRoutes.budgetEdit,
         name: AppRoutes.budgetEditName,
-        builder: (context, state) =>
-            BudgetFormPage(budgetId: state.pathParameters['id']),
+        pageBuilder: (context, state) => cupertino.CupertinoPage<void>(
+          child: BudgetFormPage(budgetId: state.pathParameters['id']),
+        ),
       ),
 
       // Recurring forms (Phase 3).
       GoRoute(
         path: AppRoutes.recurringNew,
         name: AppRoutes.recurringNewName,
-        builder: (context, state) => const RecurringFormPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: RecurringFormPage()),
       ),
       GoRoute(
         path: AppRoutes.recurringEdit,
         name: AppRoutes.recurringEditName,
-        builder: (context, state) =>
-            RecurringFormPage(recurringId: state.pathParameters['id']),
+        pageBuilder: (context, state) => cupertino.CupertinoPage<void>(
+          child: RecurringFormPage(recurringId: state.pathParameters['id']),
+        ),
       ),
       GoRoute(
         path: AppRoutes.goals,
         name: AppRoutes.goalsName,
-        builder: (context, state) => const GoalsListPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: GoalsListPage()),
       ),
       GoRoute(
         path: AppRoutes.goalsNew,
         name: AppRoutes.goalsNewName,
-        builder: (context, state) => const GoalFormPage(),
+        pageBuilder: (context, state) =>
+            const cupertino.CupertinoPage<void>(child: GoalFormPage()),
       ),
       GoRoute(
         path: AppRoutes.goalsEdit,
         name: AppRoutes.goalsEditName,
-        builder: (context, state) =>
-            GoalFormPage(goalId: state.pathParameters['id']),
+        pageBuilder: (context, state) => cupertino.CupertinoPage<void>(
+          child: GoalFormPage(goalId: state.pathParameters['id']),
+        ),
       ),
     ],
   );
@@ -247,7 +272,7 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
 /// Reads the optional `?date=yyyyMMdd` a deep link or the calendar may supply.
 ///
 /// Parsed through `LocalDate.fromPacked` so a malformed value is dropped rather
-/// than crashing the page — the form falls back to today.
+/// than crashing the page â€” the form falls back to today.
 LocalDate? _dateFromQuery(GoRouterState state) {
   final raw = state.uri.queryParameters['date'];
   if (raw == null) return null;
