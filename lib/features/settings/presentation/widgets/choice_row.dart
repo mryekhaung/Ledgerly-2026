@@ -1,6 +1,7 @@
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/widgets/app_bottom_sheet.dart';
 import 'package:ledgerly/core/widgets/list_row.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:material_ui/material_ui.dart';
@@ -166,47 +167,52 @@ class ChoiceRow<T> extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final selected = _selected;
 
-    await showModalBottomSheet<void>(
+    await AppBottomSheet.show<void>(
       context: context,
-      // Root navigator: keeps the sheet above the shell's bottom tab bar.
       useRootNavigator: true,
       backgroundColor: colors.surfaceRaised,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: AppRadius.radiusXl),
       ),
       builder: (sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            // Ten currencies are taller than a short phone: without
-            // this the sheet overflows and the last rows are unreachable (and
-            // Flutter paints the yellow-and-black overflow stripes in debug).
-            // `shrinkWrap` inside a `Flexible` keeps the sheet only as tall as
-            // it needs to be *up to* the available space.
-            Flexible(
-              child: ListView(
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  for (final option in options)
-                    ListRow(
-                      title: Text(option.label),
-                      trailing: option.value == selected?.value
-                          ? Icon(AppIcons.check, color: colors.brandPrimary)
-                          : null,
-                      onTap: () {
-                        Navigator.of(sheetContext).pop();
-                        // Guard against a no-op save: re-picking the current
-                        // value would still write four rows and show "Settings
-                        // saved.", which reads like a bug.
-                        if (option.value != value) onChanged(option.value);
-                      },
-                    ),
-                ],
+        child: Container(
+          decoration: BoxDecoration(
+            color: colors.surfaceRaised,
+            borderRadius: const BorderRadius.vertical(top: AppRadius.radiusXl),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              // Ten currencies are taller than a short phone: without
+              // this the sheet overflows and the last rows are unreachable (and
+              // Flutter paints the yellow-and-black overflow stripes in debug).
+              // `shrinkWrap` inside a `Flexible` keeps the sheet only as tall as
+              // it needs to be *up to* the available space.
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    for (final option in options)
+                      ListRow(
+                        title: Text(option.label),
+                        trailing: option.value == selected?.value
+                            ? Icon(AppIcons.check, color: colors.brandPrimary)
+                            : null,
+                        onTap: () {
+                          Navigator.of(sheetContext).pop();
+                          // Guard against a no-op save: re-picking the current
+                          // value would still write four rows and show "Settings
+                          // saved.", which reads like a bug.
+                          if (option.value != value) onChanged(option.value);
+                        },
+                      ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
+              const SizedBox(height: AppSpacing.sm),
+            ],
+          ),
         ),
       ),
     );

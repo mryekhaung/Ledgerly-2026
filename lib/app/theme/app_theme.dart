@@ -77,6 +77,32 @@ abstract final class AppTheme {
           : NoSplash.splashFactory,
       visualDensity: VisualDensity.standard,
 
+      cupertinoOverrideTheme: CupertinoThemeData(
+        brightness: brightness,
+        primaryColor: colors.brandPrimary,
+        primaryContrastingColor: colors.textOnBrand,
+        barBackgroundColor: colors.surfaceRaised,
+        scaffoldBackgroundColor: colors.surface,
+        applyThemeToAll: true,
+        textTheme: CupertinoTextThemeData(
+          primaryColor: colors.brandPrimary,
+          textStyle: TextStyle(
+            color: colors.textPrimary,
+            fontFamily: AppTypography.fontFamily,
+          ),
+          actionTextStyle: TextStyle(
+            color: colors.brandPrimary,
+            fontFamily: AppTypography.fontFamily,
+          ),
+          navTitleTextStyle: AppTypography.title.copyWith(
+            color: colors.textPrimary,
+          ),
+          navLargeTitleTextStyle: AppTypography.titleLarge.copyWith(
+            color: colors.textPrimary,
+          ),
+        ),
+      ),
+
       // Cards: we prefer tint + hairline to elevation (docs/Design.md §4.3).
       cardTheme: CardThemeData(
         color: colors.surfaceRaised,

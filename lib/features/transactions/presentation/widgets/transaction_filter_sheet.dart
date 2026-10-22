@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_bottom_sheet.dart';
 import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
@@ -43,19 +45,13 @@ class TransactionFilterSheet extends ConsumerStatefulWidget {
     required TransactionFilter initialFilter,
     required ValueChanged<TransactionFilter> onApply,
   }) {
-    return showModalBottomSheet<void>(
+    return AppBottomSheet.show<void>(
       context: context,
-      // Root navigator: the shell's navigator sits *inside* the page body, so a
-      // sheet pushed there is laid out under the bottom tab bar.
       useRootNavigator: true,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => SafeArea(
-        top: false,
-        child: TransactionFilterSheet(
-          initialFilter: initialFilter,
-          onApply: onApply,
-        ),
+      builder: (context) => TransactionFilterSheet(
+        initialFilter: initialFilter,
+        onApply: onApply,
       ),
     );
   }
@@ -233,18 +229,20 @@ class _TransactionFilterSheetState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            // Drag handle
-            Center(
-              child: Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: colors.border,
-                  borderRadius: AppRadius.borderSm,
+            // Drag handle for Material
+            if (AppPlatform.resolve().usesMaterial) ...[
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colors.border,
+                    borderRadius: AppRadius.borderSm,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.md),
+            ],
 
             // Header row
             Row(

@@ -3,7 +3,9 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_bottom_sheet.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/domain/usecases/add_goal_contribution.dart';
@@ -41,16 +43,12 @@ class GoalContributionDialog extends ConsumerStatefulWidget {
     required SavingsGoal goal,
     GoalContributionMode initialMode = GoalContributionMode.deposit,
   }) {
-    return showModalBottomSheet<void>(
+    return AppBottomSheet.show<void>(
       context: context,
-      // Root navigator: keeps the sheet above the shell's bottom tab bar.
       useRootNavigator: true,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => SafeArea(
-        top: false,
-        child: GoalContributionDialog(goal: goal, initialMode: initialMode),
-      ),
+      builder: (context) =>
+          GoalContributionDialog(goal: goal, initialMode: initialMode),
     );
   }
 
@@ -191,18 +189,19 @@ class _GoalContributionDialogState
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Drag handle
-          Center(
-            child: Container(
-              width: 36,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: AppSpacing.md),
-              decoration: BoxDecoration(
-                color: colors.border,
-                borderRadius: AppRadius.borderSm,
+          // Drag handle for Material
+          if (AppPlatform.resolve().usesMaterial)
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: colors.border,
+                  borderRadius: AppRadius.borderSm,
+                ),
               ),
             ),
-          ),
 
           ContributionHeader(mode: _mode, goal: widget.goal),
 

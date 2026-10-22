@@ -1,18 +1,12 @@
-import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:cupertino_ui/cupertino_ui.dart'
-    show
-        CupertinoAlertDialog,
-        CupertinoColors,
-        CupertinoDialogAction,
-        showCupertinoDialog;
+    show CupertinoAlertDialog, CupertinoDialogAction, showCupertinoDialog;
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// An adaptive alert and confirmation dialog.
 ///
-/// * iOS 26+: [IOS26AlertDialog] with Liquid Glass.
-/// * iOS <= 18: [CupertinoAlertDialog].
+/// * iOS: [CupertinoAlertDialog] styled with design tokens.
 /// * Material / Web: M3 [AlertDialog].
 class AppDialog {
   const AppDialog._();
@@ -29,55 +23,45 @@ class AppDialog {
     bool isDestructive = false,
     AppPlatform? platform,
   }) async {
+    final colors = AppThemeColors.of(context);
     final resolvedPlatform = platform ?? AppPlatform.resolve();
-    if (resolvedPlatform.usesCupertino) {
-      if (PlatformInfo.isIOS26OrHigher()) {
-        bool result = false;
-        await showCupertinoDialog<void>(
-          context: context,
-          barrierColor: CupertinoColors.transparent,
-          builder: (dialogContext) => IOS26AlertDialog(
-            title: title,
-            message: message,
-            actions: <AlertAction>[
-              AlertAction(
-                title: cancelLabel ?? 'Cancel',
-                style: AlertActionStyle.cancel,
-                onPressed: () {
-                  result = false;
-                },
-              ),
-              AlertAction(
-                title: confirmLabel,
-                style: isDestructive
-                    ? AlertActionStyle.destructive
-                    : AlertActionStyle.primary,
-                onPressed: () {
-                  result = true;
-                },
-              ),
-            ],
-          ),
-        );
-        return result;
-      }
 
-      // iOS 18 and below (Cupertino)
+    if (resolvedPlatform.usesCupertino) {
       final result = await showCupertinoDialog<bool>(
         context: context,
         builder: (dialogContext) => CupertinoAlertDialog(
-          title: Text(title),
-          content: Text(message),
+          title: Text(
+            title,
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(message, style: TextStyle(color: colors.textSecondary)),
+          ),
           actions: <Widget>[
             CupertinoDialogAction(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(cancelLabel ?? 'Cancel'),
+              child: Text(
+                cancelLabel ?? 'Cancel',
+                style: TextStyle(color: colors.brandPrimary),
+              ),
             ),
             CupertinoDialogAction(
               isDestructiveAction: isDestructive,
               isDefaultAction: !isDestructive,
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(confirmLabel),
+              child: Text(
+                confirmLabel,
+                style: TextStyle(
+                  color: isDestructive ? colors.moneyOut : colors.brandPrimary,
+                  fontWeight: isDestructive
+                      ? FontWeight.normal
+                      : FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
@@ -89,7 +73,6 @@ class AppDialog {
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
-        final colors = AppThemeColors.of(context);
         return AlertDialog(
           title: Text(title),
           content: Text(message),
@@ -121,15 +104,28 @@ class AppDialog {
     List<Widget>? actions,
     AppPlatform? platform,
   }) {
+    final colors = AppThemeColors.of(context);
     final resolvedPlatform = platform ?? AppPlatform.resolve();
-    final child = contentWidget ?? (content != null ? Text(content) : null);
+    final child =
+        contentWidget ??
+        (content != null
+            ? Text(content, style: TextStyle(color: colors.textSecondary))
+            : null);
 
     if (resolvedPlatform.usesCupertino) {
       return showCupertinoDialog<T>(
         context: context,
         builder: (dialogContext) => CupertinoAlertDialog(
-          title: Text(title),
-          content: child,
+          title: Text(
+            title,
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: child != null
+              ? Padding(padding: const EdgeInsets.only(top: 8.0), child: child)
+              : null,
           actions: <Widget>[
             for (final action in actions ?? <Widget>[])
               CupertinoDialogAction(
