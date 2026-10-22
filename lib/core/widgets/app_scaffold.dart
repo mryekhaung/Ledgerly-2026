@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:ledgerly/app/theme/app_icons.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
+import 'package:flutter/cupertino.dart' as cupertino;
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -122,16 +123,23 @@ class AppScaffold extends StatelessWidget {
         bottom != null;
 
     PreferredSizeWidget? appBar;
+    AdaptiveAppBar? adaptiveAppBar;
     if (hasAppBar) {
       if (platform.usesCupertino) {
-        appBar = _CupertinoAppBar(
-          title: resolvedTitle,
-          leading: leading,
-          actions: actions,
-          bottom: bottom,
-          titleSpacing: contentMaxWidth == null ? null : gutter + inset,
-          backgroundColor: colors.surface,
-          iconColor: colors.textPrimary,
+        adaptiveAppBar = AdaptiveAppBar(
+          // The iOS 26+ native `UIToolbar` can't host arbitrary widgets, and
+          // `bottom` (TabBar) has no slot in `AdaptiveAppBar` — keep the real
+          // CupertinoNavigationBar so every page keeps its tabs and action
+          // widgets.
+          useNativeToolbar: false,
+          cupertinoNavigationBar: _AppCupertinoBar(
+            middle: resolvedTitle,
+            leading: leading,
+            trailing: actions == null
+                ? null
+                : Row(mainAxisSize: MainAxisSize.min, children: actions!),
+            bottom: bottom,
+          ),
         );
       } else {
         appBar = AppBar(
@@ -178,9 +186,28 @@ class AppScaffold extends StatelessWidget {
 
     if (useSafeArea) {
       content = SafeArea(
-        top: appBar == null,
+        // iOS delegates its chrome to `AdaptiveScaffold`, which measures the
+        // CupertinoNavigationBar itself — only the Material path needs the
+        // scaffold-aware top inset.
+        top: !platform.usesCupertino && appBar == null,
         bottom: bottomNavigationBar == null,
         child: content,
+      );
+    }
+
+    if (platform.usesCupertino) {
+      // On iOS 26+ the shell's native `UITabBar` overlays the body rather than
+      // consuming layout space, and the package only lifts its own FAB 16 px.
+      // Give ours the tab-bar's height (~80 px) so it clears the glass bar.
+      Widget? fab = floatingActionButton;
+      if (fab != null && PlatformInfo.isIOS26OrHigher()) {
+        fab = Padding(padding: const EdgeInsets.only(bottom: 80), child: fab);
+      }
+      return AdaptiveScaffold(
+        appBar: adaptiveAppBar,
+        body: content,
+        backgroundColor: backgroundColor ?? colors.surface,
+        floatingActionButton: fab,
       );
     }
 
@@ -194,85 +221,49 @@ class AppScaffold extends StatelessWidget {
   }
 }
 
-/// The iOS top bar — a quiet Cupertino-style navigation bar.
-class _CupertinoAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _CupertinoAppBar({
-    required this.title,
+/// The iOS top bar — a real `CupertinoNavigationBar` so the page inherits the
+/// platform's back affordance, blur, and title behaviour instead of a
+/// hand-drawn header. It keeps the app's custom widgets (tabs in [bottom],
+/// icon buttons in [trailing]) because the iOS 26+ native `UIToolbar` can only
+/// host SF-symbol actions.
+class _AppCupertinoBar extends StatelessWidget
+    implements cupertino.ObstructingPreferredSizeWidget {
+  const _AppCupertinoBar({
+    required this.middle,
     required this.leading,
-    required this.actions,
+    required this.trailing,
     required this.bottom,
-    required this.titleSpacing,
-    required this.backgroundColor,
-    required this.iconColor,
   });
 
-  final Widget? title;
+  final Widget? middle;
   final Widget? leading;
-  final List<Widget>? actions;
+  final Widget? trailing;
   final PreferredSizeWidget? bottom;
-  final double? titleSpacing;
-  final Color backgroundColor;
-  final Color iconColor;
 
-  static const double _barHeight = 56;
+  /// Matches `CupertinoNavigationBar`'s intrinsic height so the
+  /// `CupertinoPageScaffold` insets the body correctly.
+  static const double _barHeight = 44;
 
   @override
   Size get preferredSize =>
       Size.fromHeight(_barHeight + (bottom?.preferredSize.height ?? 0));
 
   @override
-  Widget build(BuildContext context) {
-    final canPop = Navigator.maybeOf(context)?.canPop() ?? false;
-    final effectiveLeading =
-        leading ?? (canPop ? _CupertinoBackButton(color: iconColor) : null);
-
-    final trailing = actions == null
-        ? null
-        : Row(mainAxisSize: MainAxisSize.min, children: actions!);
-
-    return Container(
-      height: _barHeight,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        border: Border(
-          bottom: BorderSide(
-            color: AppThemeColors.of(context).border,
-            width: 0.5,
-          ),
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: NavigationToolbar(
-          leading: effectiveLeading == null
-              ? null
-              : Padding(
-                  padding: const EdgeInsets.only(left: AppSpacing.sm),
-                  child: effectiveLeading,
-                ),
-          middle: title,
-          trailing: trailing,
-          middleSpacing: titleSpacing ?? NavigationToolbar.kMiddleSpacing,
-        ),
-      ),
-    );
-  }
-}
-
-/// iOS-style back button — a chevron, not an arrow.
-class _CupertinoBackButton extends StatelessWidget {
-  const _CupertinoBackButton({required this.color});
-
-  final Color color;
+  bool shouldFullyObstruct(BuildContext context) => true;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: () => Navigator.of(context).maybePop(),
-    behavior: HitTestBehavior.opaque,
-    child: SizedBox(
-      width: AppHitTarget.minimum,
-      height: AppHitTarget.minimum,
-      child: Center(child: Icon(AppIcons.chevronLeft, color: color, size: 28)),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final navBar = cupertino.CupertinoNavigationBar(
+      automaticallyImplyLeading: true,
+      leading: leading,
+      middle: middle,
+      trailing: trailing,
+      border: null,
+    );
+    if (bottom == null) return navBar;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[navBar, bottom!],
+    );
+  }
 }
