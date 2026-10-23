@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show IOS26Switch;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -62,6 +64,33 @@ void main() {
 
       expect(find.text('Notifications'), findsOneWidget);
       expect(find.text('Enable alerts'), findsOneWidget);
+    });
+  });
+
+  group('AppSwitchTile on iOS 26+', () {
+    testWidgets('should_render_ios26_switch_when_isIOS26_is_true', (
+      tester,
+    ) async {
+      bool value = false;
+      await tester.pumpWidget(
+        host(
+          StatefulBuilder(
+            builder: (context, setState) => AppSwitchTile(
+              title: const Text('Notifications'),
+              subtitle: const Text('Enable alerts'),
+              value: value,
+              platform: AppPlatform.ios,
+              isIOS26: true,
+              onChanged: (val) {
+                setState(() => value = val);
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(IOS26Switch), findsOneWidget);
     });
   });
 }

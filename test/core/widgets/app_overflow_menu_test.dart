@@ -1,5 +1,7 @@
+import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoButton;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
@@ -21,10 +23,12 @@ void main() {
   AppOverflowMenu<String> menu(
     ValueChanged<String> onSelected, {
     AppPlatform? platform,
+    bool? isIOS26,
   }) => AppOverflowMenu<String>(
     cancelLabel: 'Cancel',
     onSelected: onSelected,
     platform: platform,
+    isIOS26: isIOS26,
     items: const <OverflowMenuItem<String>>[
       OverflowMenuItem<String>(value: 'edit', label: 'Edit'),
       OverflowMenuItem<String>(
@@ -91,5 +95,20 @@ void main() {
       expect(picked, isNull);
       expect(find.text('Edit'), findsNothing);
     });
+  });
+
+  group('AppOverflowMenu on iOS 26+', () {
+    testWidgets(
+      'should_render_adaptive_popup_menu_button_when_isIOS26_is_true',
+      (tester) async {
+        await tester.pumpWidget(
+          host(menu((_) {}, platform: AppPlatform.ios, isIOS26: true)),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(CupertinoButton), findsWidgets);
+        expect(find.byIcon(AppIcons.moreHorizontal), findsOneWidget);
+      },
+    );
   });
 }

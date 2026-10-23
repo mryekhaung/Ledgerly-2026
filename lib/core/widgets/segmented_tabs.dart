@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show IOS26SegmentedControl, PlatformInfo;
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -30,7 +32,8 @@ class SegmentedTab<T> {
 
 /// Adaptive segmented tabs control (docs/Design.md §5.5).
 ///
-/// * iOS: Cupertino-style sliding segmented control — quiet haptic, no ink.
+/// * iOS 26+: Native iOS 26 UISegmentedControl with Liquid Glass ([IOS26SegmentedControl]).
+/// * iOS < 26: Cupertino-style sliding segmented control — quiet haptic, no ink.
 /// * Material/Web: pill track with a sliding `brandSubtle` thumb.
 /// * Label uses `AppTypography.label` token.
 /// * Max **3** segments supported; more must use a chip row (docs/Design.md §5.5).
@@ -42,6 +45,7 @@ class SegmentedTabs<T> extends StatelessWidget {
     required this.onChanged,
     this.isExpanded = true,
     this.platform,
+    this.isIOS26,
     super.key,
   }) : assert(
          tabs.length >= 2 && tabs.length <= 3,
@@ -64,10 +68,39 @@ class SegmentedTabs<T> extends StatelessWidget {
   /// host — the same idiom `AppOverflowMenu` and `AppTheme.light` use.
   final AppPlatform? platform;
 
+  /// Optional override for iOS 26+ native segmented control mode.
+  final bool? isIOS26;
+
   @override
   Widget build(BuildContext context) {
     final resolvedPlatform = platform ?? AppPlatform.resolve();
+    final effectiveIsIOS26 = isIOS26 ?? PlatformInfo.isIOS26OrHigher();
+
     if (resolvedPlatform.usesCupertino) {
+      if (effectiveIsIOS26) {
+        final colors = AppThemeColors.of(context);
+        final selectedIndex = tabs.indexWhere((tab) => tab.value == selected);
+        return SizedBox(
+          height: 36.0,
+          width: isExpanded ? double.infinity : (tabs.length * 96.0),
+          child: IOS26SegmentedControl(
+            labels: tabs.map((t) => t.label).toList(),
+            selectedIndex: selectedIndex >= 0 ? selectedIndex : 0,
+            onValueChanged: (index) {
+              if (index >= 0 && index < tabs.length) {
+                AppFeedback.selection();
+                onChanged(tabs[index].value);
+              }
+            },
+            textColor: colors.textSecondary,
+            selectedTextColor: colors.textPrimary,
+            color: colors.brandPrimary,
+            shrinkWrap: false,
+            height: 36.0,
+          ),
+        );
+      }
+
       return _CupertinoSegmentedTabs<T>(
         tabs: tabs,
         selected: selected,

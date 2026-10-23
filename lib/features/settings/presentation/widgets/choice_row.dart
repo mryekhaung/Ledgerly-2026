@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show PlatformInfo;
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -166,6 +168,7 @@ class ChoiceRow<T> extends StatelessWidget {
   Future<void> _openSheet(BuildContext context) async {
     final colors = AppThemeColors.of(context);
     final selected = _selected;
+    final isIOS26 = PlatformInfo.isIOS26OrHigher();
 
     await AppBottomSheet.show<void>(
       context: context,
@@ -177,7 +180,7 @@ class ChoiceRow<T> extends StatelessWidget {
       builder: (sheetContext) => SafeArea(
         child: Container(
           decoration: BoxDecoration(
-            color: colors.surfaceRaised,
+            color: isIOS26 ? Colors.transparent : colors.surfaceRaised,
             borderRadius: const BorderRadius.vertical(top: AppRadius.radiusXl),
           ),
           child: Column(

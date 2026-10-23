@@ -1,3 +1,6 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show IOS26AlertDialog;
+import 'package:flutter/cupertino.dart' show DefaultCupertinoLocalizations;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -7,6 +10,11 @@ import 'package:material_ui/material_ui.dart';
 
 void main() {
   Widget host(Widget child) => MaterialApp(
+    localizationsDelegates: const [
+      DefaultMaterialLocalizations.delegate,
+      DefaultCupertinoLocalizations.delegate,
+      DefaultWidgetsLocalizations.delegate,
+    ],
     home: AppThemeColors(
       colors: const AppColorsLight(),
       child: Scaffold(body: Center(child: child)),
@@ -162,6 +170,39 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(result, isFalse);
+    });
+  });
+
+  group('AppDialog on iOS 26+', () {
+    testWidgets('should_render_ios26_alert_dialog_when_isIOS26_is_true', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () async {
+                await AppDialog.confirm(
+                  context: context,
+                  title: 'iOS 26 Confirm',
+                  message: 'Liquid Glass message',
+                  confirmLabel: 'OK',
+                  cancelLabel: 'Cancel',
+                  platform: AppPlatform.ios,
+                  isIOS26: true,
+                );
+              },
+              child: const Text('Open'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(IOS26AlertDialog), findsOneWidget);
     });
   });
 }

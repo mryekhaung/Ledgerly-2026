@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show PlatformInfo;
 import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -212,10 +214,11 @@ class _TransactionFilterSheetState
     }
 
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final isIOS26 = PlatformInfo.isIOS26OrHigher();
 
     return Container(
       decoration: BoxDecoration(
-        color: colors.surfaceRaised,
+        color: isIOS26 ? Colors.transparent : colors.surfaceRaised,
         borderRadius: const BorderRadius.vertical(top: AppRadius.radiusLg),
       ),
       padding: EdgeInsets.fromLTRB(

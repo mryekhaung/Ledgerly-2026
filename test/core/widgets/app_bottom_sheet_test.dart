@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveBlurView;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -66,6 +68,37 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('iOS Sheet Content'), findsOneWidget);
+    });
+  });
+
+  group('AppBottomSheet on iOS 26+', () {
+    testWidgets('should_render_adaptive_blur_view_when_isIOS26_is_true', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () async {
+                await AppBottomSheet.show<void>(
+                  context: context,
+                  platform: AppPlatform.ios,
+                  isIOS26: true,
+                  builder: (ctx) => const Text('iOS 26 Glass Sheet Content'),
+                );
+              },
+              child: const Text('Open'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AdaptiveBlurView), findsOneWidget);
+      expect(find.text('iOS 26 Glass Sheet Content'), findsOneWidget);
     });
   });
 }

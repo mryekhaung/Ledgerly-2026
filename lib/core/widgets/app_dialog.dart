@@ -1,12 +1,19 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AlertAction, AlertActionStyle, IOS26AlertDialog, PlatformInfo;
 import 'package:cupertino_ui/cupertino_ui.dart'
-    show CupertinoAlertDialog, CupertinoDialogAction, showCupertinoDialog;
+    show
+        CupertinoAlertDialog,
+        CupertinoColors,
+        CupertinoDialogAction,
+        showCupertinoDialog;
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// An adaptive alert and confirmation dialog.
 ///
-/// * iOS: [CupertinoAlertDialog] styled with design tokens.
+/// * iOS 26+: [IOS26AlertDialog] with Liquid Glass.
+/// * iOS < 26: [CupertinoAlertDialog] styled with design tokens.
 /// * Material / Web: M3 [AlertDialog].
 class AppDialog {
   const AppDialog._();
@@ -22,11 +29,45 @@ class AppDialog {
     String? cancelLabel,
     bool isDestructive = false,
     AppPlatform? platform,
+    bool? isIOS26,
   }) async {
     final colors = AppThemeColors.of(context);
     final resolvedPlatform = platform ?? AppPlatform.resolve();
+    final effectiveIsIOS26 = isIOS26 ?? PlatformInfo.isIOS26OrHigher();
 
     if (resolvedPlatform.usesCupertino) {
+      if (effectiveIsIOS26) {
+        bool result = false;
+        await showCupertinoDialog<void>(
+          context: context,
+          barrierColor: CupertinoColors.transparent,
+          barrierDismissible: false,
+          builder: (dialogContext) => IOS26AlertDialog(
+            title: title,
+            message: message,
+            actions: <AlertAction>[
+              AlertAction(
+                title: cancelLabel ?? 'Cancel',
+                style: AlertActionStyle.cancel,
+                onPressed: () {
+                  result = false;
+                },
+              ),
+              AlertAction(
+                title: confirmLabel,
+                style: isDestructive
+                    ? AlertActionStyle.destructive
+                    : AlertActionStyle.primary,
+                onPressed: () {
+                  result = true;
+                },
+              ),
+            ],
+          ),
+        );
+        return result;
+      }
+
       final result = await showCupertinoDialog<bool>(
         context: context,
         builder: (dialogContext) => CupertinoAlertDialog(
@@ -103,9 +144,11 @@ class AppDialog {
     Widget? contentWidget,
     List<Widget>? actions,
     AppPlatform? platform,
+    bool? isIOS26,
   }) {
     final colors = AppThemeColors.of(context);
     final resolvedPlatform = platform ?? AppPlatform.resolve();
+    final effectiveIsIOS26 = isIOS26 ?? PlatformInfo.isIOS26OrHigher();
     final child =
         contentWidget ??
         (content != null
@@ -113,6 +156,24 @@ class AppDialog {
             : null);
 
     if (resolvedPlatform.usesCupertino) {
+      if (effectiveIsIOS26 && contentWidget == null) {
+        return showCupertinoDialog<T>(
+          context: context,
+          barrierColor: CupertinoColors.transparent,
+          barrierDismissible: true,
+          builder: (dialogContext) => IOS26AlertDialog(
+            title: title,
+            message: content,
+            actions: <AlertAction>[
+              AlertAction(
+                title: 'OK',
+                style: AlertActionStyle.defaultAction,
+                onPressed: () {},
+              ),
+            ],
+          ),
+        );
+      }
       return showCupertinoDialog<T>(
         context: context,
         builder: (dialogContext) => CupertinoAlertDialog(

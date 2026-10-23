@@ -1,3 +1,9 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show
+        AdaptivePopupMenuButton,
+        AdaptivePopupMenuItem,
+        AdaptivePopupMenuEntry,
+        PlatformInfo;
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
@@ -33,10 +39,9 @@ class OverflowMenuItem<T> {
 
 /// The row/card overflow menu: `···` button plus actions.
 ///
-/// Platform-adaptive (`docs/Platform.md` §2 — only `core/widgets` branches on
-/// platform): a Material popup menu where Material applies, a Cupertino action
-/// sheet on iOS. Pages must not reach for a raw `PopupMenuButton`, which would
-/// put a Material menu on iOS (enforced by Rule 12 in `design_rules_test.dart`).
+/// * iOS 26+: Native Liquid Glass UIMenu ([AdaptivePopupMenuButton]).
+/// * iOS < 26: Cupertino action sheet ([showCupertinoModalPopup]).
+/// * Material / Web: M3 [PopupMenuButton].
 class AppOverflowMenu<T> extends StatelessWidget {
   /// Creates an [AppOverflowMenu].
   const AppOverflowMenu({
@@ -46,6 +51,7 @@ class AppOverflowMenu<T> extends StatelessWidget {
     this.icon = AppIcons.moreHorizontal,
     this.tooltip,
     this.platform,
+    this.isIOS26,
     super.key,
   }) : assert(items.length >= 2, 'An overflow menu needs 2+ actions.');
 
@@ -69,11 +75,41 @@ class AppOverflowMenu<T> extends StatelessWidget {
   /// the real host once via [AppPlatform.resolve].
   final AppPlatform? platform;
 
+  /// Optional override for iOS 26+ native menu mode.
+  final bool? isIOS26;
+
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final resolvedPlatform = platform ?? AppPlatform.resolve();
+    final effectiveIsIOS26 = isIOS26 ?? PlatformInfo.isIOS26OrHigher();
+
     if (!resolvedPlatform.usesMaterial) {
+      if (effectiveIsIOS26) {
+        final menuItems = <AdaptivePopupMenuEntry>[
+          for (final item in items)
+            AdaptivePopupMenuItem<T>(
+              label: item.label,
+              value: item.value,
+              isDestructive: item.destructive,
+            ),
+        ];
+        return AdaptivePopupMenuButton.widget<T>(
+          items: menuItems,
+          onSelected: (index, entry) {
+            final val = entry.value;
+            if (val != null) {
+              onSelected(val);
+            }
+          },
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: null,
+            child: Icon(icon, color: colors.textSecondary),
+          ),
+        );
+      }
+
       final button = CupertinoButton(
         padding: EdgeInsets.zero,
         onPressed: () => _showSheet(context, colors),

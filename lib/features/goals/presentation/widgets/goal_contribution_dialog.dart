@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show PlatformInfo;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -173,6 +175,7 @@ class _GoalContributionDialogState
     final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
     final accountsAsync = ref.watch(accountsStreamProvider);
+    final isIOS26 = PlatformInfo.isIOS26OrHigher();
 
     return Container(
       padding: EdgeInsets.only(
@@ -182,15 +185,15 @@ class _GoalContributionDialogState
         bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.xl,
       ),
       decoration: BoxDecoration(
-        color: colors.surfaceRaised,
+        color: isIOS26 ? Colors.transparent : colors.surfaceRaised,
         borderRadius: const BorderRadius.vertical(top: AppRadius.radiusXl),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Drag handle for Material
-          if (AppPlatform.resolve().usesMaterial)
+          // Drag handle for Material (or iOS < 26)
+          if (!isIOS26 && AppPlatform.resolve().usesMaterial)
             Center(
               child: Container(
                 width: 36,

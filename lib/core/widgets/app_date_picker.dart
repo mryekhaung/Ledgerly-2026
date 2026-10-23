@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveDatePicker, PlatformInfo;
 import 'package:cupertino_ui/cupertino_ui.dart'
     show
         CupertinoButton,
@@ -10,7 +12,8 @@ import 'package:material_ui/material_ui.dart';
 
 /// An adaptive date picker (docs/Design.md §5).
 ///
-/// * iOS: Cupertino modal wheel date picker.
+/// * iOS 26+: [AdaptiveDatePicker] with native iOS 26 wheel picker.
+/// * iOS < 26: Cupertino modal wheel date picker.
 /// * Material / Web: Material 3 date picker dialog.
 class AppDatePicker {
   const AppDatePicker._();
@@ -24,10 +27,21 @@ class AppDatePicker {
     String? cancelLabel,
     String? doneLabel,
     AppPlatform? platform,
+    bool? isIOS26,
   }) async {
     final resolvedPlatform = platform ?? AppPlatform.resolve();
+    final effectiveIsIOS26 = isIOS26 ?? PlatformInfo.isIOS26OrHigher();
 
     if (resolvedPlatform.usesCupertino) {
+      if (effectiveIsIOS26) {
+        return AdaptiveDatePicker.show(
+          context: context,
+          initialDate: initialDate,
+          firstDate: firstDate,
+          lastDate: lastDate,
+        );
+      }
+
       DateTime tempDate = initialDate;
       final colors = AppThemeColors.of(context);
 
