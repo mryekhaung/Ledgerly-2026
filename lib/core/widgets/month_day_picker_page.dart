@@ -4,6 +4,8 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/utils/month_grid_layout.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Picks a single calendar day in a month grid.
@@ -40,21 +42,19 @@ class _MonthDayPickerPageState extends State<MonthDayPickerPage> {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(strings('transactionDateLabel')),
-        // The year is not selectable here: a transaction dated outside the
-        // current year is almost always a typo, and the calendar screen is the
-        // surface for browsing history.
-        actions: <Widget>[
-          TextButton(
-            onPressed: () =>
-                Navigator.of(context)
-                    .pop(LocalDate.fromDateTime(DateTime.now())),
-            child: Text(strings('calendarToday')),
-          ),
-        ],
-      ),
+    return AppScaffold(
+      title: strings('transactionDateLabel'),
+      // The year is not selectable here: a transaction dated outside the
+      // current year is almost always a typo, and the calendar screen is the
+      // surface for browsing history.
+      actions: <Widget>[
+        AppButton(
+          variant: AppButtonVariant.ghost,
+          onPressed: () =>
+              Navigator.of(context).pop(LocalDate.fromDateTime(DateTime.now())),
+          label: strings('calendarToday'),
+        ),
+      ],
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: <Widget>[

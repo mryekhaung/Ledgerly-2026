@@ -1,6 +1,7 @@
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_select_field.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
@@ -71,16 +72,16 @@ class BudgetScopeSection extends StatelessWidget {
 
         // If Category Budget, render Category Dropdown Selector
         if (!isTotal) ...<Widget>[
-          DropdownButtonFormField<String>(
-            initialValue: selectedCategoryId,
+          AppSelectField<String>(
+            value: selectedCategoryId,
             decoration: InputDecoration(
               labelText: strings('budgetFieldCategory'),
               border: const OutlineInputBorder(
                 borderRadius: AppRadius.borderMd,
               ),
             ),
-            items: categories.map((cat) {
-              return DropdownMenuItem<String>(
+            options: categories.map((cat) {
+              return AppSelectOption<String>(
                 value: cat.id,
                 child: Row(
                   children: <Widget>[

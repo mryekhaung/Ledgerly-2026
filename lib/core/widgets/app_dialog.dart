@@ -142,7 +142,7 @@ class AppDialog {
     required String title,
     String? content,
     Widget? contentWidget,
-    List<Widget>? actions,
+    String? actionLabel,
     AppPlatform? platform,
     bool? isIOS26,
   }) {
@@ -154,6 +154,8 @@ class AppDialog {
         (content != null
             ? Text(content, style: TextStyle(color: colors.textSecondary))
             : null);
+    final resolvedActionLabel =
+        actionLabel ?? MaterialLocalizations.of(context).okButtonLabel;
 
     if (resolvedPlatform.usesCupertino) {
       if (effectiveIsIOS26 && contentWidget == null) {
@@ -166,7 +168,7 @@ class AppDialog {
             message: content,
             actions: <AlertAction>[
               AlertAction(
-                title: 'OK',
+                title: resolvedActionLabel,
                 style: AlertActionStyle.defaultAction,
                 onPressed: () {},
               ),
@@ -188,11 +190,10 @@ class AppDialog {
               ? Padding(padding: const EdgeInsets.only(top: 8.0), child: child)
               : null,
           actions: <Widget>[
-            for (final action in actions ?? <Widget>[])
-              CupertinoDialogAction(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: action,
-              ),
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(resolvedActionLabel),
+            ),
           ],
         ),
       );
@@ -203,16 +204,12 @@ class AppDialog {
       builder: (dialogContext) => AlertDialog(
         title: Text(title),
         content: child,
-        actions:
-            actions ??
-            <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: Text(
-                  MaterialLocalizations.of(dialogContext).okButtonLabel,
-                ),
-              ),
-            ],
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(resolvedActionLabel),
+          ),
+        ],
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/budgets/domain/entities/budget.dart';
@@ -165,20 +166,11 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              FilledButton(
+              AppButton(
+                label: MaterialLocalizations.of(context).saveButtonLabel,
                 onPressed: formState.isSaving ? null : _handleSave,
-                child: formState.isSaving
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(
-                        MaterialLocalizations.of(context).saveButtonLabel,
-                        style: AppTypography.body.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                isLoading: formState.isSaving,
+                isExpanded: true,
               ),
               if (!isNew) ...<Widget>[
                 const SizedBox(height: AppSpacing.xs),

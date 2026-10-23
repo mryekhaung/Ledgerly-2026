@@ -6,8 +6,10 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
+import 'package:ledgerly/core/widgets/app_select_field.dart';
 import 'package:ledgerly/core/widgets/app_switch_tile.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account_type.dart';
@@ -221,10 +223,9 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
           // Account Type
           FieldLabel(label: strings('accountFieldType')),
           const SizedBox(height: AppSpacing.xs),
-          DropdownButtonFormField<AccountType>(
-            initialValue: formState.type,
-            decoration: const InputDecoration(),
-            items: AccountType.values.map((type) {
+          AppSelectField<AccountType>(
+            value: formState.type,
+            options: AccountType.values.map((type) {
               final label = switch (type.name) {
                 'cash' => strings('accountTypeCash'),
                 'bank' => strings('accountTypeBank'),
@@ -233,11 +234,12 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
                 'ewallet' => strings('accountTypeEwallet'),
                 _ => type.name,
               };
-              return DropdownMenuItem<AccountType>(
+              return AppSelectOption<AccountType>(
                 value: type,
                 child: Text(label),
               );
             }).toList(),
+            decoration: const InputDecoration(),
             onChanged: (val) {
               if (val != null) notifier.setType(val);
             },
@@ -247,17 +249,17 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
           // Currency
           FieldLabel(label: strings('accountFieldCurrency')),
           const SizedBox(height: AppSpacing.xs),
-          DropdownButtonFormField<CurrencyCode>(
-            initialValue: formState.currency,
-            decoration: const InputDecoration(),
-            items: CurrencyCode.values.map((c) {
-              return DropdownMenuItem<CurrencyCode>(
-                value: c,
+          AppSelectField<CurrencyCode>(
+            value: formState.currency,
+            options: CurrencyCode.values.map((currency) {
+              return AppSelectOption<CurrencyCode>(
+                value: currency,
                 child: Text(
-                  '${c.symbol}   ${c.code} (${c.name.toUpperCase()})',
+                  '${currency.symbol}   ${currency.code} (${currency.name.toUpperCase()})',
                 ),
               );
             }).toList(),
+            decoration: const InputDecoration(),
             onChanged: (val) {
               if (val != null) {
                 notifier.setCurrency(val);
@@ -340,23 +342,11 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
-          child: FilledButton(
+          child: AppButton(
+            label: strings('actionSave'),
             onPressed: formState.isSaving ? null : _handleSave,
-            style: FilledButton.styleFrom(
-              backgroundColor: colors.brandPrimary,
-              foregroundColor: colors.textOnBrand,
-              minimumSize: const Size.fromHeight(52),
-              shape: const RoundedRectangleBorder(
-                borderRadius: AppRadius.borderLg,
-              ),
-            ),
-            child: formState.isSaving
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(strings('actionSave')),
+            isLoading: formState.isSaving,
+            isExpanded: true,
           ),
         ),
       ),

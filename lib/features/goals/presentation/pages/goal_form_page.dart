@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_date_picker.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
@@ -205,24 +206,12 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
             ),
 
             // Save Button
-            FilledButton(
+            AppButton(
+              label: strings('saveGoal'),
               onPressed: formState.isSubmitting ? null : _handleSubmit,
-              style: FilledButton.styleFrom(
-                backgroundColor: colors.moneyIn,
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-              ),
-              child: formState.isSubmitting
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(
-                      strings('saveGoal'),
-                      style: AppTypography.body.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+              isLoading: formState.isSubmitting,
+              isExpanded: true,
+              color: colors.moneyIn,
             ),
           ],
         ),

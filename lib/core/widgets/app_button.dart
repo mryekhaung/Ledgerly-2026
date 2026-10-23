@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveButton, AdaptiveButtonStyle, PlatformInfo;
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -30,6 +32,9 @@ class AppButton extends StatefulWidget {
     this.icon,
     this.isLoading = false,
     this.isExpanded = false,
+    this.color,
+    this.platform,
+    this.isIOS26,
     this.semanticsLabel,
     super.key,
   });
@@ -51,6 +56,15 @@ class AppButton extends StatefulWidget {
 
   /// Whether the button expands to fill horizontal width.
   final bool isExpanded;
+
+  /// Optional tint for a primary action, such as income/expense feedback.
+  final Color? color;
+
+  /// Platform override for tests.
+  final AppPlatform? platform;
+
+  /// iOS 26+ override for tests.
+  final bool? isIOS26;
 
   /// Screen reader label.
   final String? semanticsLabel;
@@ -82,7 +96,8 @@ class _AppButtonState extends State<AppButton> {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
-    final platform = AppPlatform.resolve();
+    final platform = widget.platform ?? AppPlatform.resolve();
+    final isIOS26 = widget.isIOS26 ?? PlatformInfo.isIOS26OrHigher();
 
     final (
       Color backgroundColor,
@@ -91,7 +106,7 @@ class _AppButtonState extends State<AppButton> {
       double minHeight,
     ) = switch (widget.variant) {
       AppButtonVariant.primary => (
-        colors.brandPrimary,
+        widget.color ?? colors.brandPrimary,
         colors.textOnBrand,
         null,
         52.0,
@@ -166,6 +181,54 @@ class _AppButtonState extends State<AppButton> {
       borderRadius: AppRadius.borderFull,
       side: borderSide ?? BorderSide.none,
     );
+
+    if (platform.usesCupertino && isIOS26) {
+      final adaptiveStyle = switch (widget.variant) {
+        AppButtonVariant.primary => AdaptiveButtonStyle.prominentGlass,
+        AppButtonVariant.secondary => AdaptiveButtonStyle.bordered,
+        AppButtonVariant.ghost ||
+        AppButtonVariant.destructive => AdaptiveButtonStyle.plain,
+      };
+      final adaptiveButton = SizedBox(
+        width: widget.isExpanded ? double.infinity : null,
+        child: AdaptiveButton.child(
+          onPressed: _isEnabled
+              ? () {
+                  if (widget.variant == AppButtonVariant.destructive) {
+                    AppFeedback.destructive();
+                  } else {
+                    AppFeedback.selection();
+                  }
+                  widget.onPressed?.call();
+                }
+              : null,
+          enabled: _isEnabled,
+          style: adaptiveStyle,
+          color: widget.variant == AppButtonVariant.primary
+              ? backgroundColor
+              : foregroundColor,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: AppSpacing.sm,
+          ),
+          minSize: Size(
+            widget.isExpanded ? 0 : AppHitTarget.comfortable,
+            minHeight,
+          ),
+          borderRadius: AppRadius.borderFull,
+          useSmoothRectangleBorder: false,
+          child: childContent,
+        ),
+      );
+      return widget.semanticsLabel == null
+          ? adaptiveButton
+          : Semantics(
+              label: widget.semanticsLabel,
+              button: true,
+              enabled: _isEnabled,
+              child: adaptiveButton,
+            );
+    }
 
     Widget button = Container(
       constraints: BoxConstraints(

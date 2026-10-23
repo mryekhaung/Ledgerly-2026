@@ -32,12 +32,14 @@ core/widgets/
 |---|---|---|---|
 | Primary nav | Native `UITabBar` on iOS 26+; `CupertinoTabBar` on older iOS | M3 `NavigationBar` | `NavigationRail` (medium) → sidebar drawer (expanded) |
 | Top bar | Cupertino navigation bar | M3 Top App Bar (Large/Medium collapsing) | Header bar with page title + actions |
+| Buttons | Cupertino; native Liquid Glass buttons on iOS 26+ | M3 buttons | M3 buttons |
 | Primary action (+) | Native-style toolbar action | M3 FAB (Extended FAB on wide) | Extended FAB or header button + shortcut `N` |
 | Sheets | Cupertino sheet | M3 Modal Bottom Sheet | Centered dialog / side panel |
 | Date picker | Cupertino-style wheel / compact inline | M3 Date Picker | M3 Date Picker (dialog) |
 | Segmented control | Cupertino segmented (Expense/Income) | M3 `SegmentedButton` | M3 `SegmentedButton` |
 | Switch / toggles | Cupertino switch | M3 switch | M3 switch |
 | Dialogs / confirm | Alert + action sheet | M3 AlertDialog | M3 AlertDialog |
+| Form selectors | Native selection sheet | M3 dropdown field | M3 dropdown field |
 | Page transition | iOS push + edge-swipe back | M3 shared-axis + predictive back | Fade-through |
 | Feedback | `HapticFeedback` light/medium (taptic feel) | Haptics where supported | Hover/focus/pressed states |
 | System UI | Safe areas, Dynamic Island aware | Edge-to-edge, system bars transparent | Max content width, scrollbars |
@@ -51,6 +53,8 @@ core/widgets/
 - iOS 26+: a native UIKit tab bar with the system Liquid Glass effect.
 - iOS 15–25: native-style Cupertino controls with opaque surfaces.
 - Android: Material navigation and controls.
+- `AppSelectField` keeps Material dropdowns off iOS and presents options in an
+  adaptive Cupertino / Liquid Glass sheet.
 - The app minimum is iOS 15, matching the package's podspec requirement.
 
 Do not imitate Liquid Glass with Flutter `BackdropFilter`, translucent tint, or

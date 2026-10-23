@@ -42,12 +42,10 @@ class AppBottomSheet {
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(AppRadius.radiusXl),
                 child: AdaptiveBlurView(
-                  blurStyle: BlurStyle.systemMaterial,
+                  blurStyle: BlurStyle.systemUltraThinMaterial,
                   borderRadius: const BorderRadius.all(AppRadius.radiusXl),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: (backgroundColor ?? colors.surfaceRaised)
-                          .withValues(alpha: 0.85),
                       borderRadius: const BorderRadius.all(AppRadius.radiusXl),
                       border: Border.all(
                         color: colors.border.withValues(alpha: 0.3),

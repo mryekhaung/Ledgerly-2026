@@ -6,6 +6,7 @@ import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/money/money_formatter.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
+import 'package:ledgerly/core/widgets/app_select_field.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/account_catalog.dart';
 import 'package:material_ui/material_ui.dart';
@@ -66,15 +67,17 @@ class TransferAccountsSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
-          DropdownButtonFormField<String>(
-            initialValue: fromAccountId.isEmpty ? null : fromAccountId,
+          AppSelectField<String>(
+            value: fromAccountId.isEmpty ? null : fromAccountId,
+            options: accounts
+                .map(
+                  (account) => AppSelectOption<String>(
+                    value: account.id,
+                    child: AccountDropdownRow(account: account),
+                  ),
+                )
+                .toList(),
             decoration: const InputDecoration(),
-            items: accounts.map((a) {
-              return DropdownMenuItem<String>(
-                value: a.id,
-                child: AccountDropdownRow(account: a),
-              );
-            }).toList(),
             onChanged: (val) {
               if (val != null) onFromChanged(val);
             },
@@ -107,15 +110,17 @@ class TransferAccountsSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
-          DropdownButtonFormField<String>(
-            initialValue: toAccountId.isEmpty ? null : toAccountId,
+          AppSelectField<String>(
+            value: toAccountId.isEmpty ? null : toAccountId,
+            options: accounts
+                .map(
+                  (account) => AppSelectOption<String>(
+                    value: account.id,
+                    child: AccountDropdownRow(account: account),
+                  ),
+                )
+                .toList(),
             decoration: const InputDecoration(),
-            items: accounts.map((a) {
-              return DropdownMenuItem<String>(
-                value: a.id,
-                child: AccountDropdownRow(account: a),
-              );
-            }).toList(),
             onChanged: (val) {
               if (val != null) onToChanged(val);
             },

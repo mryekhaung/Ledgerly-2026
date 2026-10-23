@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveButton, AdaptiveButtonStyle;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
@@ -5,6 +7,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
@@ -196,6 +199,22 @@ void main() {
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
       expect(pressed, isTrue);
+    });
+
+    testWidgets('should_use_native_adaptive_button_on_iOS_26', (tester) async {
+      await tester.pumpWidget(
+        host(
+          const AppButton(
+            label: 'Save',
+            onPressed: null,
+            platform: AppPlatform.ios,
+            isIOS26: true,
+          ),
+        ),
+      );
+
+      final button = tester.widget<AdaptiveButton>(find.byType(AdaptiveButton));
+      expect(button.style, AdaptiveButtonStyle.prominentGlass);
     });
 
     testWidgets('should_show_spinner_when_is_loading', (tester) async {

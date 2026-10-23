@@ -2,6 +2,7 @@ import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_select_field.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
@@ -112,8 +113,8 @@ class RecurringDetailsSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
 
         // Category dropdown
-        DropdownButtonFormField<String>(
-          initialValue: categoryId.isNotEmpty
+        AppSelectField<String>(
+          value: categoryId.isNotEmpty
               ? categoryId
               : (categories.isNotEmpty ? categories.first.id : null),
           decoration: InputDecoration(
@@ -121,8 +122,8 @@ class RecurringDetailsSection extends StatelessWidget {
             border: const OutlineInputBorder(borderRadius: AppRadius.borderMd),
             errorText: categoryError,
           ),
-          items: categories.map((cat) {
-            return DropdownMenuItem<String>(
+          options: categories.map((cat) {
+            return AppSelectOption<String>(
               value: cat.id,
               child: Row(
                 children: <Widget>[
@@ -145,21 +146,21 @@ class RecurringDetailsSection extends StatelessWidget {
 
         // Account selector (optional)
         if (accounts.isNotEmpty) ...<Widget>[
-          DropdownButtonFormField<String?>(
-            initialValue: accountId,
+          AppSelectField<String?>(
+            value: accountId,
             decoration: InputDecoration(
               labelText: strings('recurringFieldAccountOptional'),
               border: const OutlineInputBorder(
                 borderRadius: AppRadius.borderMd,
               ),
             ),
-            items: <DropdownMenuItem<String?>>[
-              DropdownMenuItem<String?>(
+            options: <AppSelectOption<String?>>[
+              AppSelectOption<String?>(
                 value: null,
                 child: Text(strings('recurringAccountNone')),
               ),
               ...accounts.map(
-                (acc) => DropdownMenuItem<String?>(
+                (acc) => AppSelectOption<String?>(
                   value: acc.id,
                   child: Text('${acc.name} (${acc.currency.code})'),
                 ),

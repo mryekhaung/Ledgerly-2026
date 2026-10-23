@@ -10,6 +10,7 @@ import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/utils/month_grid_layout.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/month_year_picker_page.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
@@ -107,9 +108,10 @@ class CalendarPage extends ConsumerWidget {
           onPressed: () => context.push(AppRoutes.transactions),
         ),
         if (state.canGoToToday)
-          TextButton(
+          AppButton(
+            variant: AppButtonVariant.ghost,
             onPressed: notifier.goToToday,
-            child: Text(strings('calendarToday')),
+            label: strings('calendarToday'),
           ),
       ],
       body: LayoutBuilder(

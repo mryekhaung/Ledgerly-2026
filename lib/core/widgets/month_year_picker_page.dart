@@ -3,6 +3,8 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Picks a month and year, returning the **first day** of the chosen month.
@@ -76,18 +78,16 @@ class _MonthYearPickerPageState extends State<MonthYearPickerPage> {
     final colors = AppThemeColors.of(context);
     final localizations = MaterialLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(strings('calendarPickMonth')),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () =>
-                Navigator.of(context)
-                    .pop(LocalDate.fromDateTime(DateTime.now())),
-            child: Text(strings('calendarToday')),
-          ),
-        ],
-      ),
+    return AppScaffold(
+      title: strings('calendarPickMonth'),
+      actions: <Widget>[
+        AppButton(
+          variant: AppButtonVariant.ghost,
+          onPressed: () =>
+              Navigator.of(context).pop(LocalDate.fromDateTime(DateTime.now())),
+          label: strings('calendarToday'),
+        ),
+      ],
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: <Widget>[

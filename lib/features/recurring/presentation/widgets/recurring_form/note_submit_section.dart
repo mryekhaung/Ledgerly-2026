@@ -1,6 +1,6 @@
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Note field, submit button and (when editing) the delete action.
@@ -38,7 +38,6 @@ class RecurringNoteSubmitSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
 
     return Column(
@@ -58,26 +57,20 @@ class RecurringNoteSubmitSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
 
         // Submit button
-        FilledButton(
+        AppButton(
+          label: strings('transactionSave'),
           onPressed: isSubmitting ? null : onSubmit,
-          child: isSubmitting
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(strings('transactionSave')),
+          isLoading: isSubmitting,
+          isExpanded: true,
         ),
 
         if (isEditing) ...<Widget>[
           const SizedBox(height: AppSpacing.md),
-          OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: colors.moneyOut,
-              side: BorderSide(color: colors.moneyOut),
-            ),
+          AppButton(
+            variant: AppButtonVariant.destructive,
             onPressed: onDelete,
-            child: Text(strings('recurringActionDelete')),
+            label: strings('recurringActionDelete'),
+            isExpanded: true,
           ),
         ],
       ],

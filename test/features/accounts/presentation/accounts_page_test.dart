@@ -146,7 +146,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('New Account'), findsOneWidget);
-      expect(find.byType(TextField), findsNWidgets(2));
+      final visibleField = find.byType(TextField, skipOffstage: false);
+      expect(tester.widget<TextField>(visibleField).controller?.text, isEmpty);
+      expect(visibleField, findsOneWidget);
     });
 
     testWidgets('renders edit form correctly', (tester) async {
@@ -162,7 +164,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Edit Account'), findsOneWidget);
-      expect(find.text('Cash Wallet'), findsNWidgets(2));
+      expect(find.text('Cash Wallet', skipOffstage: false), findsNWidgets(2));
     });
   });
 
@@ -181,8 +183,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Transfer Funds'), findsOneWidget);
-      expect(find.text('From Account'), findsOneWidget);
-      expect(find.text('To Account'), findsOneWidget);
+      expect(find.text('From Account', skipOffstage: false), findsOneWidget);
+      expect(find.text('To Account', skipOffstage: false), findsOneWidget);
     });
   });
 }

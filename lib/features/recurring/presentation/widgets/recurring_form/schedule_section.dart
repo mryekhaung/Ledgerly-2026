@@ -4,6 +4,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_select_field.dart';
 import 'package:ledgerly/core/widgets/app_switch_tile.dart';
 import 'package:ledgerly/features/recurring/domain/entities/recurring_frequency.dart';
 import 'package:material_ui/material_ui.dart';
@@ -71,13 +72,13 @@ class RecurringScheduleSection extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         // Frequency dropdown
-        DropdownButtonFormField<RecurringFrequency>(
-          initialValue: frequency,
+        AppSelectField<RecurringFrequency>(
+          value: frequency,
           decoration: InputDecoration(
             labelText: strings('recurringFieldFrequency'),
             border: const OutlineInputBorder(borderRadius: AppRadius.borderMd),
           ),
-          items: RecurringFrequency.values.map((freq) {
+          options: RecurringFrequency.values.map((freq) {
             final label = switch (freq) {
               RecurringFrequency.daily => strings('recurringFrequencyDaily'),
               RecurringFrequency.weekly => strings('recurringFrequencyWeekly'),
@@ -86,7 +87,7 @@ class RecurringScheduleSection extends StatelessWidget {
               ),
               RecurringFrequency.yearly => strings('recurringFrequencyYearly'),
             };
-            return DropdownMenuItem<RecurringFrequency>(
+            return AppSelectOption<RecurringFrequency>(
               value: freq,
               child: Text(label),
             );

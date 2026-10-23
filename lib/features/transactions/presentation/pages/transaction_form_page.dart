@@ -5,6 +5,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/amount_keypad.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/form_field_surface.dart';
 import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
@@ -115,14 +116,11 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
           ? strings('transactionEdit')
           : strings('transactionNew'),
       actions: <Widget>[
-        TextButton(
+        AppButton(
+          variant: AppButtonVariant.ghost,
           onPressed: state.isSaving ? null : notifier.save,
-          child: state.isSaving
-              ? const SizedBox.square(
-                  dimension: 18,
-                  child: CircularProgressIndicator.adaptive(strokeWidth: 2),
-                )
-              : Text(strings('transactionSave')),
+          label: strings('transactionSave'),
+          isLoading: state.isSaving,
         ),
       ],
       useSafeArea: false,

@@ -3,6 +3,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Start/end date pickers with a clear affordance.
@@ -56,24 +57,13 @@ class FilterDateRangeSection extends StatelessWidget {
         Row(
           children: <Widget>[
             Expanded(
-              child: OutlinedButton(
+              child: AppButton(
+                variant: AppButtonVariant.secondary,
                 onPressed: onPickStart,
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: AppSpacing.md,
-                  ),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: AppRadius.borderMd,
-                  ),
-                ),
-                child: Text(
-                  startDate == null
-                      ? strings('filterStartDate')
-                      : dateFormat.format(startDate!.toDateTime()),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                isExpanded: true,
+                label: startDate == null
+                    ? strings('filterStartDate')
+                    : dateFormat.format(startDate!.toDateTime()),
               ),
             ),
             const Padding(
@@ -81,24 +71,13 @@ class FilterDateRangeSection extends StatelessWidget {
               child: Text('~'),
             ),
             Expanded(
-              child: OutlinedButton(
+              child: AppButton(
+                variant: AppButtonVariant.secondary,
                 onPressed: onPickEnd,
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: AppSpacing.md,
-                  ),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: AppRadius.borderMd,
-                  ),
-                ),
-                child: Text(
-                  endDate == null
-                      ? strings('filterEndDate')
-                      : dateFormat.format(endDate!.toDateTime()),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                isExpanded: true,
+                label: endDate == null
+                    ? strings('filterEndDate')
+                    : dateFormat.format(endDate!.toDateTime()),
               ),
             ),
           ],
@@ -106,9 +85,10 @@ class FilterDateRangeSection extends StatelessWidget {
         if (startDate != null || endDate != null) ...<Widget>[
           Align(
             alignment: Alignment.centerRight,
-            child: TextButton(
+            child: AppButton(
+              variant: AppButtonVariant.ghost,
               onPressed: onClear,
-              child: Text(strings('filterClearAll')),
+              label: strings('filterClearAll'),
             ),
           ),
         ] else ...<Widget>[const SizedBox(height: AppSpacing.lg)],

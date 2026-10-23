@@ -2,7 +2,9 @@ import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_skeleton.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -67,6 +69,7 @@ class _SignInEmailFormState extends State<SignInEmailForm> {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
+    final usesCupertino = AppPlatform.resolve().usesCupertino;
 
     return Form(
       key: _formKey,
@@ -140,32 +143,53 @@ class _SignInEmailFormState extends State<SignInEmailForm> {
             // (docs/Design.md §5.11).
             const AppSkeleton(height: 50, radius: AppRadius.md)
           else ...<Widget>[
-            FilledButton(
-              onPressed: _submit,
-              style: FilledButton.styleFrom(
-                backgroundColor: colors.brandPrimary,
-                foregroundColor: colors.textOnBrand,
-                minimumSize: const Size.fromHeight(50),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: AppRadius.borderMd,
-                ),
-              ),
-              child: Text(
-                widget.isSignUp
+            if (usesCupertino)
+              AppButton(
+                isExpanded: true,
+                onPressed: _submit,
+                label: widget.isSignUp
                     ? strings('signUpTitle')
                     : strings('signInTitle'),
-                style: AppTypography.body.copyWith(fontWeight: FontWeight.w600),
+              )
+            else
+              FilledButton(
+                onPressed: _submit,
+                style: FilledButton.styleFrom(
+                  backgroundColor: colors.brandPrimary,
+                  foregroundColor: colors.textOnBrand,
+                  minimumSize: const Size.fromHeight(50),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: AppRadius.borderMd,
+                  ),
+                ),
+                child: Text(
+                  widget.isSignUp
+                      ? strings('signUpTitle')
+                      : strings('signInTitle'),
+                  style: AppTypography.body.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
             const SizedBox(height: AppSpacing.md),
-            TextButton(
-              onPressed: widget.onToggleMode,
-              child: Text(
-                widget.isSignUp
+            if (usesCupertino)
+              AppButton(
+                variant: AppButtonVariant.ghost,
+                onPressed: widget.onToggleMode,
+                label: widget.isSignUp
                     ? strings('haveAccountPrompt')
                     : strings('noAccountPrompt'),
+                isExpanded: true,
+              )
+            else
+              TextButton(
+                onPressed: widget.onToggleMode,
+                child: Text(
+                  widget.isSignUp
+                      ? strings('haveAccountPrompt')
+                      : strings('noAccountPrompt'),
+                ),
               ),
-            ),
           ],
         ],
       ),

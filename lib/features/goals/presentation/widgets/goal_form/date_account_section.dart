@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_select_field.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -87,19 +88,19 @@ class GoalDateAccountSection extends StatelessWidget {
 
         // Account selection
         accounts.when(
-          data: (accounts) => DropdownButtonFormField<String?>(
-            initialValue: accountId,
+          data: (accounts) => AppSelectField<String?>(
+            value: accountId,
             decoration: InputDecoration(
               labelText: strings('goalAccountLabel'),
               border: const OutlineInputBorder(),
             ),
-            items: [
-              DropdownMenuItem(
+            options: [
+              AppSelectOption<String?>(
                 value: null,
                 child: Text(strings('goalNoAccountOption')),
               ),
               for (final acc in accounts)
-                DropdownMenuItem(value: acc.id, child: Text(acc.name)),
+                AppSelectOption<String?>(value: acc.id, child: Text(acc.name)),
             ],
             onChanged: onAccountChanged,
           ),

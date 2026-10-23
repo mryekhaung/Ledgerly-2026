@@ -111,12 +111,7 @@ class SettingsPage extends ConsumerWidget {
         context: context,
         title: strings('settingsCreditsTitle'),
         content: strings('settingsCreditsAvatar'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(strings('actionDone')),
-          ),
-        ],
+        actionLabel: strings('actionDone'),
       ),
     );
   }

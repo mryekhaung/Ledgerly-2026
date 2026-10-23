@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_select_field.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/goals/presentation/widgets/goal_contribution_dialog.dart';
@@ -105,19 +106,22 @@ class ContributionForm extends StatelessWidget {
             if (accounts.isEmpty) return const SizedBox.shrink();
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.md),
-              child: DropdownButtonFormField<String?>(
-                initialValue: selectedAccountId,
+              child: AppSelectField<String?>(
+                value: selectedAccountId,
                 decoration: InputDecoration(
                   labelText: strings('goalAccountLabel'),
                   border: const OutlineInputBorder(),
                 ),
-                items: [
-                  DropdownMenuItem(
+                options: [
+                  AppSelectOption<String?>(
                     value: null,
                     child: Text(strings('goalNoAccountOption')),
                   ),
                   for (final acc in accounts)
-                    DropdownMenuItem(value: acc.id, child: Text(acc.name)),
+                    AppSelectOption<String?>(
+                      value: acc.id,
+                      child: Text(acc.name),
+                    ),
                 ],
                 onChanged: onAccountChanged,
               ),

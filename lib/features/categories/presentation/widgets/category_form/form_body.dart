@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_form_notifier.dart';
@@ -99,14 +100,11 @@ class CategoryFormBody extends ConsumerWidget {
           ],
 
           const SizedBox(height: AppSpacing.xxl),
-          FilledButton(
+          AppButton(
             onPressed: state.isSaving ? null : notifier.save,
-            child: state.isSaving
-                ? const SizedBox.square(
-                    dimension: 18,
-                    child: CircularProgressIndicator.adaptive(strokeWidth: 2),
-                  )
-                : Text(strings('actionSave')),
+            label: strings('actionSave'),
+            isLoading: state.isSaving,
+            isExpanded: true,
           ),
         ],
       ),

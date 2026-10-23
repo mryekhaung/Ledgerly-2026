@@ -1,6 +1,7 @@
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_skeleton.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -158,7 +159,11 @@ class ErrorBanner extends StatelessWidget {
           ),
           if (onRetry case final onRetry?) ...<Widget>[
             const SizedBox(width: AppSpacing.sm),
-            TextButton(onPressed: onRetry, child: Text(retryLabel ?? '')),
+            AppButton(
+              variant: AppButtonVariant.ghost,
+              onPressed: onRetry,
+              label: retryLabel ?? '',
+            ),
           ],
         ],
       ),

@@ -1,5 +1,5 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
-    show AdaptiveBlurView;
+    show AdaptiveBlurView, BlurStyle;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -97,7 +97,10 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(AdaptiveBlurView), findsOneWidget);
+      final blurView = tester.widget<AdaptiveBlurView>(
+        find.byType(AdaptiveBlurView),
+      );
+      expect(blurView.blurStyle, BlurStyle.systemUltraThinMaterial);
       expect(find.text('iOS 26 Glass Sheet Content'), findsOneWidget);
     });
   });

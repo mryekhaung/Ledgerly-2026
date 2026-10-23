@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_date_picker.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
@@ -245,23 +246,11 @@ class _TransferPageState extends ConsumerState<TransferPage> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
-          child: FilledButton(
+          child: AppButton(
+            label: strings('accountsTransferSubmit'),
             onPressed: formState.isSubmitting ? null : _handleSubmit,
-            style: FilledButton.styleFrom(
-              backgroundColor: colors.brandPrimary,
-              foregroundColor: colors.textOnBrand,
-              minimumSize: const Size.fromHeight(52),
-              shape: const RoundedRectangleBorder(
-                borderRadius: AppRadius.borderLg,
-              ),
-            ),
-            child: formState.isSubmitting
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(strings('accountsTransferSubmit')),
+            isLoading: formState.isSubmitting,
+            isExpanded: true,
           ),
         ),
       ),

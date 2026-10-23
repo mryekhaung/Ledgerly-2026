@@ -1,7 +1,11 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveTextField;
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Min/max amount fields with the apply action.
@@ -47,22 +51,10 @@ class FilterAmountRangeSection extends StatelessWidget {
         Row(
           children: <Widget>[
             Expanded(
-              child: TextField(
+              child: _amountInput(
+                context,
                 controller: minController,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: InputDecoration(
-                  hintText: strings('filterMinAmount'),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                  border: const OutlineInputBorder(
-                    borderRadius: AppRadius.borderMd,
-                  ),
-                ),
+                placeholder: strings('filterMinAmount'),
               ),
             ),
             const Padding(
@@ -70,22 +62,10 @@ class FilterAmountRangeSection extends StatelessWidget {
               child: Text('~'),
             ),
             Expanded(
-              child: TextField(
+              child: _amountInput(
+                context,
                 controller: maxController,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: InputDecoration(
-                  hintText: strings('filterMaxAmount'),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                  border: const OutlineInputBorder(
-                    borderRadius: AppRadius.borderMd,
-                  ),
-                ),
+                placeholder: strings('filterMaxAmount'),
               ),
             ),
           ],
@@ -93,17 +73,48 @@ class FilterAmountRangeSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
 
         // Action button
-        FilledButton(
+        AppButton(
+          label: strings('filterApply'),
           onPressed: onApply,
-          style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            shape: const RoundedRectangleBorder(
-              borderRadius: AppRadius.borderMd,
-            ),
-          ),
-          child: Text(strings('filterApply')),
+          isExpanded: true,
         ),
       ],
+    );
+  }
+
+  Widget _amountInput(
+    BuildContext context, {
+    required TextEditingController controller,
+    required String placeholder,
+  }) {
+    if (AppPlatform.resolve().usesCupertino) {
+      return AdaptiveTextField(
+        controller: controller,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        placeholder: placeholder,
+        cupertinoDecoration: BoxDecoration(
+          color: AppThemeColors.of(context).surfaceSubtle,
+          borderRadius: AppRadius.borderMd,
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+      );
+    }
+
+    return TextField(
+      controller: controller,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(
+        hintText: placeholder,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+        border: const OutlineInputBorder(borderRadius: AppRadius.borderMd),
+      ),
     );
   }
 }

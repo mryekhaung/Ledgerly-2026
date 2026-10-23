@@ -1,12 +1,21 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show
+        AdaptiveAlertDialog,
+        AdaptiveAlertDialogInput,
+        AlertAction,
+        AlertActionStyle,
+        PlatformInfo;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
+import 'package:ledgerly/features/profile/domain/usecases/save_display_name.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
 import 'package:ledgerly/features/profile/presentation/widgets/avatar.dart';
 import 'package:ledgerly/features/profile/presentation/widgets/profile/rename_dialog.dart';
@@ -72,10 +81,33 @@ class NameRow extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final current = profile.displayName;
 
-    final entered = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) => RenameDialog(initial: current),
-    );
+    final entered =
+        AppPlatform.resolve().usesCupertino && PlatformInfo.isIOS26OrHigher()
+        ? await AdaptiveAlertDialog.inputShow(
+            context: context,
+            title: strings('profileEditName'),
+            actions: <AlertAction>[
+              AlertAction(
+                title: strings('actionCancel'),
+                style: AlertActionStyle.cancel,
+                onPressed: () {},
+              ),
+              AlertAction(
+                title: strings('actionSave'),
+                style: AlertActionStyle.primary,
+                onPressed: () {},
+              ),
+            ],
+            input: AdaptiveAlertDialogInput(
+              placeholder: strings('profileNameHint'),
+              initialValue: current,
+              maxLength: SaveDisplayName.maxLength,
+            ),
+          )
+        : await showDialog<String>(
+            context: context,
+            builder: (dialogContext) => RenameDialog(initial: current),
+          );
 
     // Null is "cancelled"; an unchanged value is a no-op the user did not ask
     // for, so neither reaches the use case.

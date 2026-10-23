@@ -7,6 +7,7 @@ import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
@@ -87,9 +88,9 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
         icon: AppIcons.error,
         title: strings('stateErrorTitle'),
         body: strings('stateErrorBody'),
-        action: FilledButton(
+        action: AppButton(
           onPressed: () => ref.invalidate(categoryListProvider),
-          child: Text(strings('stateErrorRetry')),
+          label: strings('stateErrorRetry'),
         ),
       ),
       _ => const LoadingPlaceholder(),

@@ -3,12 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/period/period_calculator.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/auth/presentation/providers/auth_providers.dart';
 import 'package:ledgerly/features/auth/presentation/widgets/welcome/auth_buttons.dart';
@@ -142,16 +141,10 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
         // full ~384 px and overflows the 360 px toolbar. `Flexible` bounds it
         // so the label ellipsizes instead.
         Flexible(
-          child: TextButton(
+          child: AppButton(
+            variant: AppButtonVariant.ghost,
             onPressed: authState.isLoading ? null : _skip,
-            child: Text(
-              strings('welcomeSkip'),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.body.copyWith(
-                color: AppThemeColors.of(context).textSecondary,
-              ),
-            ),
+            label: strings('welcomeSkip'),
           ),
         ),
         const SizedBox(width: AppSpacing.sm),

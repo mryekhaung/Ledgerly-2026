@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/profile/domain/entities/avatar_catalog.dart';
@@ -65,22 +65,15 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    final colors = AppThemeColors.of(context);
     final config = _draft$;
     final width = MediaQuery.sizeOf(context).width;
     final isWide = WindowSizeClass.of(context).isTwoPaneCapable;
 
-    final saveButton = FilledButton(
+    final saveButton = AppButton(
+      label: strings('avatarEditorSave'),
       onPressed: _saving ? null : () => _save(config, strings),
-      child: _saving
-          ? SizedBox.square(
-              dimension: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colors.textOnBrand,
-              ),
-            )
-          : Text(strings('avatarEditorSave')),
+      isLoading: _saving,
+      isExpanded: true,
     );
 
     final Widget bodyContent;

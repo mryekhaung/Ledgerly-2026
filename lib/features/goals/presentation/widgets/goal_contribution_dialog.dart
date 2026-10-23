@@ -3,11 +3,11 @@ import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
-import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_bottom_sheet.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/domain/usecases/add_goal_contribution.dart';
@@ -230,28 +230,16 @@ class _GoalContributionDialogState
           ),
 
           // Action button
-          FilledButton(
+          AppButton(
+            label: _mode == GoalContributionMode.deposit
+                ? strings('depositAction')
+                : strings('withdrawAction'),
             onPressed: _isSubmitting ? null : _submit,
-            style: FilledButton.styleFrom(
-              backgroundColor: _mode == GoalContributionMode.deposit
-                  ? colors.moneyIn
-                  : colors.moneyOut,
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            ),
-            child: _isSubmitting
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(
-                    _mode == GoalContributionMode.deposit
-                        ? strings('depositAction')
-                        : strings('withdrawAction'),
-                    style: AppTypography.body.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+            isLoading: _isSubmitting,
+            isExpanded: true,
+            color: _mode == GoalContributionMode.deposit
+                ? colors.moneyIn
+                : colors.moneyOut,
           ),
         ],
       ),

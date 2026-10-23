@@ -9,6 +9,7 @@ import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_bottom_sheet.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
@@ -258,9 +259,10 @@ class _TransactionFilterSheetState
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                TextButton(
+                AppButton(
+                  variant: AppButtonVariant.ghost,
                   onPressed: _clearAll,
-                  child: Text(strings('filterClearAll')),
+                  label: strings('filterClearAll'),
                 ),
               ],
             ),

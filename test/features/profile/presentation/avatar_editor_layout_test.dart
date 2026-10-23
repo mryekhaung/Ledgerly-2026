@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
 import 'package:ledgerly/features/profile/presentation/pages/avatar_editor_page.dart';
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
@@ -81,7 +82,7 @@ void main() {
     testWidgets('save button is on-screen and hit-testable', (tester) async {
       await pumpAt(tester, 360, 2.0);
 
-      final saveFinder = find.byType(FilledButton);
+      final saveFinder = find.byType(AppButton);
       expect(saveFinder, findsOneWidget);
       // hitTestable() is false when the widget is off-screen or fully covered,
       // so this proves the pinned bar keeps it reachable.
