@@ -135,7 +135,9 @@ class TransactionRow extends ConsumerWidget {
               // because it only knows the window.
               ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxWidth: constraints.maxWidth * 0.4,
+                  maxWidth: constraints.maxWidth.isFinite
+                      ? constraints.maxWidth * 0.4
+                      : MediaQuery.sizeOf(context).width * 0.35,
                 ),
                 child: AmountText(
                   transaction.amount,

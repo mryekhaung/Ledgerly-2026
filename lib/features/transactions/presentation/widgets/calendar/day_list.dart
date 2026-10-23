@@ -52,6 +52,7 @@ class _DayListState extends ConsumerState<DayList> {
               )
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   _DayHeader(day: widget.day),
                   const SizedBox(height: AppSpacing.sm),

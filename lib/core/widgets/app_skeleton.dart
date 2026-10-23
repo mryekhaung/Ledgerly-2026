@@ -108,15 +108,7 @@ class AppSkeletonList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      // The skeleton is not scrollable content: it is a static hint, so it
-      // must not compete with the real list for scroll position.
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      // `AppSpacing.pageHorizontal` rather than the feature-layer
-      // `ResponsiveInsets` helper: `lib/core` must not depend on
-      // `lib/features` (docs/Architecture.md, enforced by the banned-imports
-      // job).
+    return Padding(
       padding:
           padding ??
           EdgeInsets.symmetric(
@@ -124,27 +116,32 @@ class AppSkeletonList extends StatelessWidget {
               MediaQuery.sizeOf(context).width,
             ),
           ),
-      itemCount: rows,
-      itemBuilder: (context, index) => SizedBox(
-        height: rowHeight,
-        child: const Row(
-          children: <Widget>[
-            AppSkeleton(width: 40, height: 40, shape: BoxShape.circle),
-            SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  AppSkeleton(width: 140, height: 14),
-                  SizedBox(height: AppSpacing.sm),
-                  AppSkeleton(width: 88, height: 12),
-                ],
-              ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: List<Widget>.generate(
+          rows,
+          (index) => SizedBox(
+            height: rowHeight,
+            child: const Row(
+              children: <Widget>[
+                AppSkeleton(width: 40, height: 40, shape: BoxShape.circle),
+                SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      AppSkeleton(width: 140, height: 14),
+                      SizedBox(height: AppSpacing.sm),
+                      AppSkeleton(width: 88, height: 12),
+                    ],
+                  ),
+                ),
+                SizedBox(width: AppSpacing.md),
+                AppSkeleton(width: 72, height: 16),
+              ],
             ),
-            SizedBox(width: AppSpacing.md),
-            AppSkeleton(width: 72, height: 16),
-          ],
+          ),
         ),
       ),
     );
