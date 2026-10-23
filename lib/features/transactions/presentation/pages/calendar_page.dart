@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -108,11 +109,17 @@ class CalendarPage extends ConsumerWidget {
           onPressed: () => context.push(AppRoutes.transactions),
         ),
         if (state.canGoToToday)
-          AppButton(
-            variant: AppButtonVariant.ghost,
-            onPressed: notifier.goToToday,
-            label: strings('calendarToday'),
-          ),
+          if (AppPlatform.resolve().usesCupertino)
+            AppButton(
+              variant: AppButtonVariant.ghost,
+              onPressed: notifier.goToToday,
+              label: strings('calendarToday'),
+            )
+          else
+            TextButton(
+              onPressed: notifier.goToToday,
+              child: Text(strings('calendarToday')),
+            ),
       ],
       body: LayoutBuilder(
         builder: (context, constraints) {
