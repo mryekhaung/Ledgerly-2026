@@ -1,8 +1,6 @@
-import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:cupertino_ui/cupertino_ui.dart'
     show
         CupertinoAlertDialog,
-        CupertinoColors,
         CupertinoDialogAction,
         showCupertinoDialog;
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -11,8 +9,7 @@ import 'package:material_ui/material_ui.dart';
 
 /// An adaptive alert and confirmation dialog.
 ///
-/// * iOS 26+: [IOS26AlertDialog] with Liquid Glass.
-/// * iOS <= 18: [CupertinoAlertDialog] styled with design tokens.
+/// * iOS: [CupertinoAlertDialog] styled with design tokens.
 /// * Material / Web: M3 [AlertDialog].
 class AppDialog {
   const AppDialog._();
@@ -33,38 +30,6 @@ class AppDialog {
     final resolvedPlatform = platform ?? AppPlatform.resolve();
 
     if (resolvedPlatform.usesCupertino) {
-      if (PlatformInfo.isIOS26OrHigher()) {
-        bool result = false;
-        await showCupertinoDialog<void>(
-          context: context,
-          barrierColor: CupertinoColors.transparent,
-          barrierDismissible: false,
-          builder: (dialogContext) => IOS26AlertDialog(
-            title: title,
-            message: message,
-            actions: <AlertAction>[
-              AlertAction(
-                title: cancelLabel ?? 'Cancel',
-                style: AlertActionStyle.cancel,
-                onPressed: () {
-                  result = false;
-                },
-              ),
-              AlertAction(
-                title: confirmLabel,
-                style: isDestructive
-                    ? AlertActionStyle.destructive
-                    : AlertActionStyle.primary,
-                onPressed: () {
-                  result = true;
-                },
-              ),
-            ],
-          ),
-        );
-        return result;
-      }
-
       final result = await showCupertinoDialog<bool>(
         context: context,
         builder: (dialogContext) => CupertinoAlertDialog(
