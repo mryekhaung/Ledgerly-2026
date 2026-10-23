@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
@@ -18,46 +17,54 @@ import '../../../support/calendar_grid_fixture.dart';
 import '../domain/fake_transaction_repository.dart';
 
 void main() {
-  testWidgets('CalendarPage on iOS with transactions renders rows without throwing', (tester) async {
-    final day = LocalDate(2026, 10, 3);
-    final txns = <Transaction>[
-      fakeTransaction(
-        id: 'txn-1',
-        categoryId: 'cat-food',
-        amountMinor: 5000,
-        date: day,
-        note: 'Coffee',
-      ),
-    ];
-    final fakes = FakeTransactionRepository(seed: txns);
-
-    await pumpAppHost(
-      tester,
-      size: const Size(390, 844),
-      platform: AppPlatform.ios,
-      home: const CalendarPage(),
-      overrides: <Override>[
-        watchDayTransactionsProvider.overrideWithValue(WatchDayTransactions(fakes)),
-        watchPeriodDailyTotalsProvider.overrideWithValue(WatchPeriodDailyTotals(fakes)),
-        watchDayTotalProvider.overrideWithValue(WatchDayTotal(fakes)),
-        watchPeriodTotalProvider.overrideWithValue(WatchPeriodTotal(fakes)),
-        categoryByIdProvider.overrideWith(
-          (ref, id) async => calendarGridCategories.firstWhere((c) => c.id == id),
+  testWidgets(
+    'CalendarPage on iOS with transactions renders rows without throwing',
+    (tester) async {
+      final day = LocalDate(2026, 10, 3);
+      final txns = <Transaction>[
+        fakeTransaction(
+          id: 'txn-1',
+          categoryId: 'cat-food',
+          amountMinor: 5000,
+          date: day,
+          note: 'Coffee',
         ),
-        currencyProvider.overrideWithValue(CurrencyCode.mmk),
-        weekStartProvider.overrideWithValue(WeekStart.monday),
-        calendarProvider.overrideWith(() => _SeededCalendarNotifier(day)),
-      ],
-    );
+      ];
+      final fakes = FakeTransactionRepository(seed: txns);
 
-    await tester.pumpAndSettle();
-    // Scroll to reveal the rows
-    await tester.drag(find.byType(ListView).first, const Offset(0, -400));
-    await tester.pumpAndSettle();
+      await pumpAppHost(
+        tester,
+        size: const Size(390, 844),
+        platform: AppPlatform.ios,
+        home: const CalendarPage(),
+        overrides: [
+          watchDayTransactionsProvider.overrideWithValue(
+            WatchDayTransactions(fakes),
+          ),
+          watchPeriodDailyTotalsProvider.overrideWithValue(
+            WatchPeriodDailyTotals(fakes),
+          ),
+          watchDayTotalProvider.overrideWithValue(WatchDayTotal(fakes)),
+          watchPeriodTotalProvider.overrideWithValue(WatchPeriodTotal(fakes)),
+          categoryByIdProvider.overrideWith(
+            (ref, id) async =>
+                calendarGridCategories.firstWhere((c) => c.id == id),
+          ),
+          currencyProvider.overrideWithValue(CurrencyCode.mmk),
+          weekStartProvider.overrideWithValue(WeekStart.monday),
+          calendarProvider.overrideWith(() => _SeededCalendarNotifier(day)),
+        ],
+      );
 
-    expect(tester.takeException(), isNull);
-    expect(find.text('Coffee'), findsOneWidget);
-  });
+      await tester.pumpAndSettle();
+      // Scroll to reveal the rows
+      await tester.drag(find.byType(ListView).first, const Offset(0, -400));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Coffee'), findsOneWidget);
+    },
+  );
 }
 
 class _SeededCalendarNotifier extends CalendarNotifier {
@@ -65,13 +72,6 @@ class _SeededCalendarNotifier extends CalendarNotifier {
   final LocalDate _day;
   @override
   CalendarState build() {
-    return CalendarState(
-      selectedDay: _day,
-      isTodaySelected: true,
-    );
+    return CalendarState(selectedDay: _day, isTodaySelected: true);
   }
 }
-
-
-
-

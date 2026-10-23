@@ -85,8 +85,10 @@ class _DayHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
-    final localizations =
-        Localizations.of<MaterialLocalizations>(context, MaterialLocalizations);
+    final localizations = Localizations.of<MaterialLocalizations>(
+      context,
+      MaterialLocalizations,
+    );
     final label = localizations != null
         ? localizations.formatMediumDate(day.toUtcDateTime().toLocal())
         : DateFormat.yMMMd().format(day.toUtcDateTime().toLocal());

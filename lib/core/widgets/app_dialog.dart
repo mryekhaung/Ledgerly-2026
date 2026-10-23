@@ -1,8 +1,5 @@
 import 'package:cupertino_ui/cupertino_ui.dart'
-    show
-        CupertinoAlertDialog,
-        CupertinoDialogAction,
-        showCupertinoDialog;
+    show CupertinoAlertDialog, CupertinoDialogAction, showCupertinoDialog;
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:material_ui/material_ui.dart';

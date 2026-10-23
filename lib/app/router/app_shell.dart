@@ -116,10 +116,7 @@ class _AppShellState extends ConsumerState<AppShell> {
       child: AdaptiveScaffold(
         body: nav.adaptiveScaffoldBody(
           context,
-          Material(
-            type: MaterialType.transparency,
-            child: widget.child,
-          ),
+          Material(type: MaterialType.transparency, child: widget.child),
         ),
         bottomNavigationBar: nav.bottomNavigationBar(context),
         minimizeBehavior: TabBarMinimizeBehavior.never,
