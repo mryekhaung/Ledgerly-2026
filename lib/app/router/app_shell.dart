@@ -114,7 +114,13 @@ class _AppShellState extends ConsumerState<AppShell> {
       data: MediaQuery.of(context)
           .copyWith(platformBrightness: Theme.brightnessOf(context)),
       child: AdaptiveScaffold(
-        body: nav.adaptiveScaffoldBody(context, widget.child),
+        body: nav.adaptiveScaffoldBody(
+          context,
+          Material(
+            type: MaterialType.transparency,
+            child: widget.child,
+          ),
+        ),
         bottomNavigationBar: nav.bottomNavigationBar(context),
         minimizeBehavior: TabBarMinimizeBehavior.never,
       ),

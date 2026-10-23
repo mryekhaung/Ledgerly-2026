@@ -205,7 +205,10 @@ class AppScaffold extends StatelessWidget {
       }
       return AdaptiveScaffold(
         appBar: adaptiveAppBar,
-        body: content,
+        body: Material(
+          color: backgroundColor ?? colors.surface,
+          child: content,
+        ),
         backgroundColor: backgroundColor ?? colors.surface,
         floatingActionButton: fab,
       );

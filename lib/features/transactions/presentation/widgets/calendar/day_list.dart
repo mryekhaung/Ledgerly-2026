@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -84,8 +85,11 @@ class _DayHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
-    final localizations = MaterialLocalizations.of(context);
-    final label = localizations.formatMediumDate(day.toUtcDateTime().toLocal());
+    final localizations =
+        Localizations.of<MaterialLocalizations>(context, MaterialLocalizations);
+    final label = localizations != null
+        ? localizations.formatMediumDate(day.toUtcDateTime().toLocal())
+        : DateFormat.yMMMd().format(day.toUtcDateTime().toLocal());
 
     return Container(
       padding: const EdgeInsets.symmetric(

@@ -74,11 +74,14 @@ class AppOverflowMenu<T> extends StatelessWidget {
     final colors = AppThemeColors.of(context);
     final resolvedPlatform = platform ?? AppPlatform.resolve();
     if (!resolvedPlatform.usesMaterial) {
-      return IconButton(
-        icon: Icon(icon, color: colors.textSecondary),
-        tooltip: tooltip,
+      final button = CupertinoButton(
+        padding: EdgeInsets.zero,
         onPressed: () => _showSheet(context, colors),
+        child: Icon(icon, color: colors.textSecondary),
       );
+      return tooltip == null
+          ? button
+          : Tooltip(message: tooltip!, child: button);
     }
 
     return PopupMenuButton<T>(
