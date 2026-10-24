@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
     show AdaptiveListTile;
-import 'package:flutter/material.dart' as flutter_material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +12,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/amount_text.dart';
+import 'package:ledgerly/core/widgets/app_material_ancestor.dart';
 import 'package:ledgerly/core/widgets/app_overflow_menu.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -77,8 +77,7 @@ class ListTransactionRow extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         child: Icon(AppIcons.destructive, color: colors.moneyOut),
       ),
-      child: flutter_material.Material(
-        type: flutter_material.MaterialType.transparency,
+      child: AppMaterialAncestor(
         child: AdaptiveListTile(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.sm,

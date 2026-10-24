@@ -1,12 +1,12 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
     show AdaptiveListTile;
-import 'package:flutter/material.dart' as flutter_material;
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_material_ancestor.dart';
 import 'package:ledgerly/core/widgets/app_select_field.dart';
 import 'package:ledgerly/core/widgets/app_switch_tile.dart';
 import 'package:ledgerly/features/recurring/domain/entities/recurring_frequency.dart';
@@ -102,8 +102,7 @@ class RecurringScheduleSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
 
         // Start Date row
-        flutter_material.Material(
-          type: flutter_material.MaterialType.transparency,
+        AppMaterialAncestor(
           child: AdaptiveListTile(
             backgroundColor: colors.surfaceRaised,
             separatorColor: colors.border.withValues(alpha: 0.5),
@@ -130,8 +129,7 @@ class RecurringScheduleSection extends StatelessWidget {
         ),
 
         if (hasEndDate && endDate != null) ...<Widget>[
-          flutter_material.Material(
-            type: flutter_material.MaterialType.transparency,
+          AppMaterialAncestor(
             child: AdaptiveListTile(
               backgroundColor: colors.surfaceRaised,
               separatorColor: colors.border.withValues(alpha: 0.5),

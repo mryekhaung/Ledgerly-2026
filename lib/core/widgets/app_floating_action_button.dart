@@ -5,11 +5,18 @@ import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
         AdaptiveButtonStyle,
         AdaptiveFloatingActionButton,
         PlatformInfo;
-import 'package:flutter/material.dart'
-    show Icon, Semantics, StatelessWidget, Tooltip, Widget;
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart'
-    show BuildContext, Color, IconData, VoidCallback;
+    show
+        BuildContext,
+        Color,
+        Icon,
+        IconData,
+        Semantics,
+        StatelessWidget,
+        Tooltip,
+        VoidCallback,
+        Widget;
 
 /// A floating action that uses Liquid Glass on iOS 26+ and native platform
 /// button styling elsewhere.

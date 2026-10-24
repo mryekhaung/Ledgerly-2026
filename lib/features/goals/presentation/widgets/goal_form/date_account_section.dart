@@ -1,6 +1,5 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
     show AdaptiveListTile;
-import 'package:flutter/material.dart' as flutter_material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
@@ -8,6 +7,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_material_ancestor.dart';
 import 'package:ledgerly/core/widgets/app_select_field.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:material_ui/material_ui.dart';
@@ -65,8 +65,7 @@ class GoalDateAccountSection extends StatelessWidget {
             borderRadius: AppRadius.borderSm,
             border: Border.all(color: colors.border),
           ),
-          child: flutter_material.Material(
-            type: flutter_material.MaterialType.transparency,
+          child: AppMaterialAncestor(
             child: AdaptiveListTile(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,

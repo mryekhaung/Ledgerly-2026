@@ -74,17 +74,19 @@ jobs:
             "lib"
 
           # 2. Material/Cupertino must come from the standalone packages, not the SDK.
-          #    Two reviewed exceptions where `adaptive_platform_ui`'s API is
+          #    Reviewed exceptions where `adaptive_platform_ui`'s API is
           #    typed to the SDK widgets, which `cupertino_ui` can't satisfy:
           #    - adaptive_nav.dart:  `cupertinoTabBar` takes the SDK `CupertinoTabBar`.
           #    - app_scaffold.dart:  `cupertinoNavigationBar` is cast to the SDK
           #      `ObstructingPreferredSizeWidget`, so it needs the SDK
           #      `CupertinoNavigationBar`.
+          #    - app_material_ancestor.dart: adaptive widget fallbacks use SDK
+          #      ListTile/Slider and require the SDK Material ancestor.
           check \
             "Import package:flutter/material.dart or cupertino.dart. Use material_ui / cupertino_ui (docs/Versions.md §2)." \
             "package:flutter/(material|cupertino)\.dart" \
             "lib" \
-            "lib/core/widgets/app_nav/adaptive_nav.dart lib/core/widgets/app_scaffold.dart"
+            "lib/core/widgets/app_nav/adaptive_nav.dart lib/core/widgets/app_scaffold.dart lib/core/widgets/app_material_ancestor.dart"
 
           # 3. Web-unsafe libraries (docs/Platform.md §6).
           check \
