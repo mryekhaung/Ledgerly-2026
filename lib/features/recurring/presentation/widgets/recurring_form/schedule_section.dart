@@ -1,6 +1,5 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
     show AdaptiveListTile;
-import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -66,9 +65,6 @@ class RecurringScheduleSection extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
-    final dateFormat = DateFormat.yMd(
-      Localizations.localeOf(context).toLanguageTag(),
-    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -101,69 +97,118 @@ class RecurringScheduleSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
 
-        // Start Date row
-        AppMaterialAncestor(
-          child: AdaptiveListTile(
-            backgroundColor: colors.surfaceRaised,
-            separatorColor: colors.border.withValues(alpha: 0.5),
-            hideBottomDivider: true,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: AppRadius.borderLg,
+            border: Border.all(color: colors.border.withValues(alpha: 0.7)),
+          ),
+          child: Material(
+            color: colors.surfaceRaised,
+            borderRadius: AppRadius.borderLg,
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: <Widget>[
+                _DatePickerTile(
+                  icon: AppIcons.calendar,
+                  iconColor: colors.brandPrimary,
+                  title: strings('recurringFieldStartDate'),
+                  date: startDate,
+                  onTap: onPickStart,
+                ),
+                Divider(height: 1, indent: AppSpacing.lg, color: colors.border),
+                AppSwitchTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.md,
+                  ),
+                  title: Text(strings('recurringFieldHasEndDate')),
+                  value: hasEndDate,
+                  onChanged: onHasEndDateChanged,
+                ),
+                if (hasEndDate && endDate != null) ...<Widget>[
+                  Divider(
+                    height: 1,
+                    indent: AppSpacing.lg,
+                    color: colors.border,
+                  ),
+                  _DatePickerTile(
+                    icon: AppIcons.event,
+                    iconColor: colors.moneyOut,
+                    title: strings('recurringFieldEndDate'),
+                    date: endDate!,
+                    onTap: onPickEnd,
+                  ),
+                ],
+              ],
             ),
-            leading: Icon(AppIcons.calendar, color: colors.brandPrimary),
-            title: Text(strings('recurringFieldStartDate')),
-            // §7: dates render via intl for the active locale, never ISO.
-            subtitle: Text(dateFormat.format(startDate.toDateTime())),
-            trailing: const Icon(AppIcons.chevronForward, size: 14),
-            onTap: onPickStart,
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.md),
 
-        // Has end date switch
-        AppSwitchTile(
-          title: Text(strings('recurringFieldHasEndDate')),
-          value: hasEndDate,
-          onChanged: onHasEndDateChanged,
-        ),
-
-        if (hasEndDate && endDate != null) ...<Widget>[
-          AppMaterialAncestor(
-            child: AdaptiveListTile(
-              backgroundColor: colors.surfaceRaised,
-              separatorColor: colors.border.withValues(alpha: 0.5),
-              hideBottomDivider: true,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: AppRadius.borderLg,
+            border: Border.all(color: colors.border.withValues(alpha: 0.7)),
+          ),
+          child: Material(
+            color: colors.surfaceRaised,
+            borderRadius: AppRadius.borderLg,
+            clipBehavior: Clip.antiAlias,
+            child: AppSwitchTile(
+              contentPadding: const EdgeInsets.all(AppSpacing.lg),
+              title: Text(strings('recurringFieldAutoAdd')),
+              subtitle: Text(
+                strings('recurringFieldAutoAddDesc'),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.textSecondary,
+                ),
               ),
-              leading: Icon(AppIcons.event, color: colors.moneyOut),
-              title: Text(strings('recurringFieldEndDate')),
-              subtitle: Text(dateFormat.format(endDate!.toDateTime())),
-              trailing: const Icon(AppIcons.chevronForward, size: 14),
-              onTap: onPickEnd,
+              value: autoAdd,
+              onChanged: onAutoAddChanged,
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-        ],
-
-        const SizedBox(height: AppSpacing.sm),
-
-        // Auto-add switch
-        AppSwitchTile(
-          title: Text(strings('recurringFieldAutoAdd')),
-          subtitle: Text(
-            strings('recurringFieldAutoAddDesc'),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colors.textSecondary,
-            ),
-          ),
-          value: autoAdd,
-          onChanged: onAutoAddChanged,
         ),
-        const SizedBox(height: AppSpacing.sm),
       ],
+    );
+  }
+}
+
+class _DatePickerTile extends StatelessWidget {
+  const _DatePickerTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.date,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final LocalDate date;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final dateLabel = MaterialLocalizations.of(context)
+        .formatMediumDate(date.toDateTime());
+    final colors = AppThemeColors.of(context);
+
+    return AppMaterialAncestor(
+      child: AdaptiveListTile(
+        backgroundColor: Colors.transparent,
+        separatorColor: colors.border,
+        hideBottomDivider: true,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.sm,
+        ),
+        leading: Icon(icon, color: iconColor),
+        title: Text(title),
+        subtitle: Text(dateLabel),
+        trailing: const Icon(AppIcons.chevronForward, size: 18),
+        onTap: onTap,
+      ),
     );
   }
 }

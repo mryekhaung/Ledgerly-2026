@@ -1,9 +1,14 @@
+import 'dart:async';
+
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveAppBarAction;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_form_notifier.dart';
 import 'package:ledgerly/features/categories/presentation/widgets/category_form/form_body.dart';
-import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The category create/edit form.
@@ -32,7 +37,9 @@ class CategoryFormPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = AppStrings.of(context);
+    final colors = AppThemeColors.of(context);
     final state = ref.watch(categoryFormProvider);
+    final notifier = ref.read(categoryFormProvider.notifier);
 
     // Popping on success is a side effect, so it is observed rather than done
     // inside `build` (`docs/Architecture.md` §5). The wide layout does not pop —
@@ -44,11 +51,21 @@ class CategoryFormPage extends ConsumerWidget {
       }
     });
 
-    return ModalFormScaffold(
+    return AppScaffold(
       title: state.isEditing
           ? strings('categoriesEdit')
           : strings('categoriesNew'),
-      child: const CategoryFormBody(),
+      adaptiveActions: <AdaptiveAppBarAction>[
+        AdaptiveAppBarAction(
+          title: strings('actionSave'),
+          label: strings('actionSave'),
+          tintColor: colors.brandPrimary,
+          onPressed: () {
+            if (!state.isSaving) unawaited(notifier.save());
+          },
+        ),
+      ],
+      body: const CategoryFormBody(),
     );
   }
 }

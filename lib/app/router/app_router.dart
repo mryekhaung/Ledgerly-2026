@@ -100,6 +100,8 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
           child: MonthDayPickerPage(
             initialDate:
                 _dateFromQuery(state) ?? LocalDate.fromDateTime(DateTime.now()),
+            firstDate: _dateFromQueryParameter(state, 'firstDate'),
+            lastDate: _dateFromQueryParameter(state, 'lastDate'),
           ),
         ),
       ),
@@ -312,7 +314,11 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
 /// Parsed through `LocalDate.fromPacked` so a malformed value is dropped rather
 /// than crashing the page â€” the form falls back to today.
 LocalDate? _dateFromQuery(GoRouterState state) {
-  final raw = state.uri.queryParameters['date'];
+  return _dateFromQueryParameter(state, 'date');
+}
+
+LocalDate? _dateFromQueryParameter(GoRouterState state, String parameter) {
+  final raw = state.uri.queryParameters[parameter];
   if (raw == null) return null;
   return LocalDate.fromPacked(int.tryParse(raw) ?? 0);
 }

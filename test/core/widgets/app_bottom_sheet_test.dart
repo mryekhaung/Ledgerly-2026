@@ -39,6 +39,17 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Material Sheet Content'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('app-bottom-sheet-drag-handle')),
+        findsOneWidget,
+      );
+
+      await tester.drag(
+        find.byKey(const ValueKey('app-bottom-sheet-drag-handle')),
+        const Offset(0, 100),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Material Sheet Content'), findsNothing);
     });
   });
 
@@ -68,6 +79,17 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('iOS Sheet Content'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('app-bottom-sheet-drag-handle')),
+        findsOneWidget,
+      );
+
+      await tester.drag(
+        find.byKey(const ValueKey('app-bottom-sheet-drag-handle')),
+        const Offset(0, 100),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('iOS Sheet Content'), findsNothing);
     });
   });
 
@@ -84,7 +106,13 @@ void main() {
                   context: context,
                   platform: AppPlatform.ios,
                   isIOS26: true,
-                  builder: (ctx) => const Text('iOS 26 Glass Sheet Content'),
+                  builder: (ctx) => ListView(
+                    children: <Widget>[
+                      const Text('iOS 26 Glass Sheet Content'),
+                      for (var index = 0; index < 20; index++)
+                        Text('Currency option $index'),
+                    ],
+                  ),
                 );
               },
               child: const Text('Open'),
@@ -102,6 +130,21 @@ void main() {
       );
       expect(blurView.blurStyle, BlurStyle.systemUltraThinMaterial);
       expect(find.text('iOS 26 Glass Sheet Content'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('app-bottom-sheet-drag-handle')),
+        findsOneWidget,
+      );
+      expect(
+        tester.getTopLeft(find.byType(AdaptiveBlurView)).dy,
+        greaterThanOrEqualTo(80),
+      );
+
+      await tester.drag(
+        find.byKey(const ValueKey('app-bottom-sheet-drag-handle')),
+        const Offset(0, 100),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('iOS 26 Glass Sheet Content'), findsNothing);
     });
   });
 }

@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
@@ -139,6 +141,60 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Save'), findsOneWidget);
+    });
+
+    testWidgets('opens the date picker from the start-date row', (
+      tester,
+    ) async {
+      final router = GoRouter(
+        initialLocation: '/',
+        routes: <RouteBase>[
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const RecurringFormPage(),
+          ),
+          GoRoute(
+            path: '/pickers/date',
+            name: 'transactionDatePicker',
+            builder: (context, state) => MonthDayPickerPage(
+              initialDate: LocalDate.fromPacked(
+                int.parse(state.uri.queryParameters['date']!),
+              )!,
+              firstDate: LocalDate(2000, 1, 1),
+              lastDate: LocalDate(2100, 12, 31),
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await pumpAppHost(
+        tester,
+        router: router,
+        overrides: <Override>[
+          pickableCategoriesProvider(CategoryKind.expense)
+              .overrideWith((ref) => Stream.value([testCategory])),
+          currencyProvider.overrideWith((ref) => CurrencyCode.usd),
+        ],
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Start Date'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MonthDayPickerPage), findsOneWidget);
+      expect(find.text('Monthly'), findsNothing);
+
+      await tester.tap(find.text('1'));
+      await tester.pumpAndSettle();
+      expect(find.byType(MonthDayPickerPage), findsNothing);
+
+      await tester.tap(find.text('Set an end date'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('End Date'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MonthDayPickerPage), findsOneWidget);
     });
   });
 }

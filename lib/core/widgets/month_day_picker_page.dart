@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveAppBarAction;
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
@@ -5,7 +7,6 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/utils/month_grid_layout.dart';
-import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -20,10 +21,21 @@ import 'package:material_ui/material_ui.dart';
 /// null when dismissed. Weeks start on Monday, matching the calendar screen.
 class MonthDayPickerPage extends StatefulWidget {
   /// Creates the picker.
-  const MonthDayPickerPage({required this.initialDate, super.key});
+  const MonthDayPickerPage({
+    required this.initialDate,
+    this.firstDate,
+    this.lastDate,
+    super.key,
+  });
 
   /// The day to open on, and to show as selected.
   final LocalDate initialDate;
+
+  /// Optional lower bound for selectable days.
+  final LocalDate? firstDate;
+
+  /// Optional upper bound for selectable days.
+  final LocalDate? lastDate;
 
   @override
   State<MonthDayPickerPage> createState() => _MonthDayPickerPageState();
@@ -42,24 +54,26 @@ class _MonthDayPickerPageState extends State<MonthDayPickerPage> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    final today = LocalDate.fromDateTime(DateTime.now());
 
     return AppScaffold(
       title: strings('transactionDateLabel'),
-      // The year is not selectable here: a transaction dated outside the
-      // current year is almost always a typo, and the calendar screen is the
-      // surface for browsing history.
-      actions: <Widget>[
-        AppButton(
-          variant: AppButtonVariant.ghost,
-          onPressed: () => context.pop(LocalDate.fromDateTime(DateTime.now())),
-          label: strings('calendarToday'),
-        ),
+      // The Today shortcut obeys the same optional bounds as the day cells.
+      adaptiveActions: <AdaptiveAppBarAction>[
+        if (_isWithinBounds(today))
+          AdaptiveAppBarAction(
+            title: strings('calendarToday'),
+            label: strings('calendarToday'),
+            onPressed: () => context.pop(today),
+          ),
       ],
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: <Widget>[
           _MonthSwitcher(
             month: _month,
+            canGoPrevious: _canBrowse(-1),
+            canGoNext: _canBrowse(1),
             onPrevious: () => _browse(-1),
             onNext: () => _browse(1),
           ),
@@ -69,6 +83,8 @@ class _MonthDayPickerPageState extends State<MonthDayPickerPage> {
           _MonthGrid(
             month: _month,
             selected: widget.initialDate,
+            firstDate: widget.firstDate,
+            lastDate: widget.lastDate,
             onPick: (day) => context.pop(day),
           ),
         ],
@@ -83,21 +99,44 @@ class _MonthDayPickerPageState extends State<MonthDayPickerPage> {
   /// copy of tested logic. It returns null past year 9999 or before year 1, and
   /// the browse simply stops there.
   void _browse(int delta) {
+    if (!_canBrowse(delta)) return;
     final next = _month.addMonths(delta);
     if (next == null) return;
     setState(() => _month = next);
   }
+
+  bool _canBrowse(int delta) {
+    final next = _month.addMonths(delta);
+    if (next == null) return false;
+    final first = widget.firstDate;
+    final last = widget.lastDate;
+    if (delta < 0 && first != null) {
+      return next.lastDayOfMonth.value >= first.value;
+    }
+    if (delta > 0 && last != null) {
+      return next.firstDayOfMonth.value <= last.value;
+    }
+    return true;
+  }
+
+  bool _isWithinBounds(LocalDate date) =>
+      (widget.firstDate == null || date.value >= widget.firstDate!.value) &&
+      (widget.lastDate == null || date.value <= widget.lastDate!.value);
 }
 
 /// The `< March 2026 >` header.
 class _MonthSwitcher extends StatelessWidget {
   const _MonthSwitcher({
     required this.month,
+    required this.canGoPrevious,
+    required this.canGoNext,
     required this.onPrevious,
     required this.onNext,
   });
 
   final LocalDate month;
+  final bool canGoPrevious;
+  final bool canGoNext;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
 
@@ -114,7 +153,7 @@ class _MonthSwitcher extends StatelessWidget {
     return Row(
       children: <Widget>[
         IconButton(
-          onPressed: onPrevious,
+          onPressed: canGoPrevious ? onPrevious : null,
           icon: const Icon(AppIcons.chevronLeft),
           tooltip: strings('calendarPreviousMonth'),
         ),
@@ -126,7 +165,7 @@ class _MonthSwitcher extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: onNext,
+          onPressed: canGoNext ? onNext : null,
           icon: const Icon(AppIcons.chevronRight),
           tooltip: strings('calendarNextMonth'),
         ),
@@ -174,11 +213,15 @@ class _MonthGrid extends StatelessWidget {
   const _MonthGrid({
     required this.month,
     required this.selected,
+    required this.firstDate,
+    required this.lastDate,
     required this.onPick,
   });
 
   final LocalDate month;
   final LocalDate selected;
+  final LocalDate? firstDate;
+  final LocalDate? lastDate;
   final ValueChanged<LocalDate> onPick;
 
   @override
@@ -205,6 +248,10 @@ class _MonthGrid extends StatelessWidget {
                     final day => _DayCell(
                       day: day,
                       isSelected: day.value == selected.value,
+                      isEnabled:
+                          (firstDate == null ||
+                              day.value >= firstDate!.value) &&
+                          (lastDate == null || day.value <= lastDate!.value),
                       onTap: () => onPick(day),
                     ),
                   },
@@ -221,11 +268,13 @@ class _DayCell extends StatelessWidget {
   const _DayCell({
     required this.day,
     required this.isSelected,
+    required this.isEnabled,
     required this.onTap,
   });
 
   final LocalDate day;
   final bool isSelected;
+  final bool isEnabled;
   final VoidCallback onTap;
 
   @override
@@ -238,7 +287,7 @@ class _DayCell extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onTap,
+          onTap: isEnabled ? onTap : null,
           customBorder: const CircleBorder(),
           child: Center(
             child: Container(
@@ -252,7 +301,11 @@ class _DayCell extends StatelessWidget {
               child: Text(
                 '${day.day}',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: isSelected ? colors.textOnBrand : colors.textPrimary,
+                  color: isSelected
+                      ? colors.textOnBrand
+                      : isEnabled
+                      ? colors.textPrimary
+                      : colors.textTertiary,
                 ),
               ),
             ),

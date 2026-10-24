@@ -191,7 +191,10 @@ class ChoiceRow<T> extends StatelessWidget {
               // Flutter paints the yellow-and-black overflow stripes in debug).
               // `shrinkWrap` inside a `Flexible` keeps the sheet only as tall as
               // it needs to be *up to* the available space.
-              Flexible(
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.65,
+                ),
                 child: ListView(
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,

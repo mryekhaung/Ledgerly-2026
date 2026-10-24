@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
-import 'package:ledgerly/core/widgets/app_date_picker.dart';
 import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
@@ -77,15 +77,16 @@ class _RecurringFormPageState extends ConsumerState<RecurringFormPage> {
     required LocalDate initialDate,
     required ValueChanged<LocalDate> onPicked,
   }) async {
-    final picked = await AppDatePicker.show(
-      context: context,
-      initialDate: initialDate.toDateTime(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+    final picked = await context.pushNamed<LocalDate>(
+      AppRoutes.transactionDatePickerName,
+      queryParameters: <String, String>{
+        'date': '${initialDate.value}',
+        'firstDate': '20000101',
+        'lastDate': '21001231',
+      },
     );
-    if (picked != null) {
-      onPicked(LocalDate.fromDateTime(picked));
-    }
+    if (picked == null || !mounted) return;
+    onPicked(picked);
   }
 
   Future<void> _handleSave() async {

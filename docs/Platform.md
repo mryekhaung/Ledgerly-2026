@@ -35,7 +35,7 @@ core/widgets/
 | Buttons | Cupertino; native Liquid Glass buttons on iOS 26+ | M3 buttons | M3 buttons |
 | Primary action (+) | Native-style toolbar action | M3 FAB (Extended FAB on wide) | Extended FAB or header button + shortcut `N` |
 | Sheets | Cupertino sheet | M3 Modal Bottom Sheet | Centered dialog / side panel |
-| Date picker | Cupertino-style wheel / compact inline | M3 Date Picker | M3 Date Picker (dialog) |
+| Date picker | Native adaptive picker; in-app calendar page for transaction/recurring dates | M3 picker; in-app calendar page for transaction/recurring dates | M3 picker; in-app calendar page for transaction/recurring dates |
 | Segmented control | Cupertino segmented (Expense/Income) | M3 `SegmentedButton` | M3 `SegmentedButton` |
 | Switch / toggles | Cupertino switch | M3 switch | M3 switch |
 | Dialogs / confirm | Alert + action sheet | M3 AlertDialog | M3 AlertDialog |
@@ -58,7 +58,10 @@ core/widgets/
   without native action equivalents retain the Cupertino navigation bar. The
   native toolbar overlays the body, so `AppScaffold` consumes the
   package-provided top inset even when a page's scrollable has explicit padding.
-- iOS 15–25: native-style Cupertino controls with opaque surfaces.
+- Category create/edit forms use `AppScaffold` and adaptive save actions so the
+  route uses the same native toolbar instead of a standalone Material form bar.
+- iOS 15–25: native-style Cupertino controls with opaque surfaces. App modal
+  sheets reserve space below the system/app bar and use a functional drag handle.
 - Android: Material navigation and controls.
 - `AppSelectField` keeps Material dropdowns off iOS and presents options in an
   adaptive Cupertino / Liquid Glass sheet.
@@ -81,6 +84,11 @@ Screen behaviors:
 - **Calendar:** compact → calendar above day list. medium+ → **left: month calendar + summary, right: selected-day transactions** (two panes) — but only while the body can hold both at their floors (a 300 px month pane, a 24 px gap and a 260 px day pane). Below that it stays one column, because a squeezed pair is worse than the single column it replaced (`docs/Roadmap.md` §J). Each pane scrolls independently.
 - **Add/Edit Transaction & other forms:** same *route*, different presentation — compact: full-screen page; medium+: centered modal page/side panel (max 560px). Still dedicated pages, never inline edit mazes.
 - **Categories:** compact list → form push; expanded → list (left) + form (right) master–detail.
+- **Recurring forms:** start/end dates open the shared routed calendar picker;
+  configured date bounds stay selectable and the picker remains a GoRouter page.
+- **Modal sheets:** shared sheets reserve top clearance beneath the native app
+  bar and expose a working downward drag-to-dismiss handle; long option lists
+  remain content-sized until they reach their height cap.
 - **Insights:** 1 → 2 → 3 column card grid; charts resize with `LayoutBuilder`.
 - **Settings:** compact list; expanded master–detail.
 - Never hardcode widths; use `ConstrainedBox(maxWidth)`, flex/grid, `SliverGrid`. Test: 360, 390, 430, 768, 1024, 1440 px; portrait + landscape; text scale 1.0 / 2.0.
