@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_floating_action_button.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
@@ -106,7 +107,7 @@ void main() {
 
       expect(find.byType(GoalCard), findsOneWidget);
       expect(find.text('Vacation to Japan'), findsOneWidget);
-      expect(find.byType(FloatingActionButton), findsOneWidget);
+      expect(find.byType(AppFloatingActionButton), findsOneWidget);
     });
 
     testWidgets('renders completed goals on Completed tab', (tester) async {

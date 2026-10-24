@@ -33,7 +33,7 @@ core/widgets/
 | Primary nav | Native `UITabBar` on iOS 26+; `CupertinoTabBar` on older iOS | M3 `NavigationBar` | `NavigationRail` (medium) → sidebar drawer (expanded) |
 | Top bar | Native Liquid Glass toolbar on iOS 26+ for plain titles and adaptive actions; Cupertino navigation bar otherwise | M3 Top App Bar (Large/Medium collapsing) | Header bar with page title + actions |
 | Buttons | Cupertino; native Liquid Glass buttons on iOS 26+ | M3 buttons | M3 buttons |
-| Primary action (+) | Native-style toolbar action | M3 FAB (Extended FAB on wide) | Extended FAB or header button + shortcut `N` |
+| Primary action (+) | Adaptive Liquid Glass / native FAB | Brand-colored M3 FAB (extended where labeled) | Brand-colored FAB or header action |
 | Sheets | Cupertino sheet | M3 Modal Bottom Sheet | Centered dialog / side panel |
 | Date picker | Native adaptive picker; in-app calendar page for transaction/recurring dates | M3 picker; in-app calendar page for transaction/recurring dates | M3 picker; in-app calendar page for transaction/recurring dates |
 | Segmented control | Cupertino segmented (Expense/Income) | M3 `SegmentedButton` | M3 `SegmentedButton` |

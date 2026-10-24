@@ -93,7 +93,7 @@ class SegmentedTabs<T> extends StatelessWidget {
               }
             },
             textColor: colors.textSecondary,
-            selectedTextColor: colors.textPrimary,
+            selectedTextColor: colors.textOnBrand,
             color: colors.brandPrimary,
             shrinkWrap: false,
             height: 36.0,

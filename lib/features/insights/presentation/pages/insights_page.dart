@@ -36,6 +36,7 @@ class InsightsPage extends ConsumerWidget {
     return AppScaffold(
       title: strings('insightsTitle'),
       useSafeArea: false,
+      reserveNativeTabBarSpace: true,
       body: SafeArea(
         child: Column(
           children: <Widget>[

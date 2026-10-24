@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/money/money.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_floating_action_button.dart';
 import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
@@ -84,7 +85,7 @@ void main() {
 
       expect(find.text('Recurring Transactions'), findsOneWidget);
       expect(find.text('No recurring transactions'), findsOneWidget);
-      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(find.byType(AppFloatingActionButton), findsNothing);
     });
 
     testWidgets('renders active recurring items and pending banner', (
@@ -113,7 +114,7 @@ void main() {
       expect(find.byType(RecurringItemCard), findsNWidgets(2));
       expect(find.text('Netflix 4K'), findsOneWidget);
       expect(find.text('Gym Membership'), findsOneWidget);
-      expect(find.byType(FloatingActionButton), findsOneWidget);
+      expect(find.byType(AppFloatingActionButton), findsOneWidget);
     });
   });
 

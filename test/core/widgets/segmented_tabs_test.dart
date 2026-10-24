@@ -8,12 +8,15 @@ import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:material_ui/material_ui.dart';
 
 void main() {
-  Widget host(Widget child) => MaterialApp(
-    home: AppThemeColors(
-      colors: const AppColorsLight(),
-      child: Scaffold(body: Center(child: child)),
-    ),
-  );
+  Widget host(Widget child, {Brightness brightness = Brightness.light}) =>
+      MaterialApp(
+        home: AppThemeColors(
+          colors: brightness == Brightness.dark
+              ? const AppColorsDark()
+              : const AppColorsLight(),
+          child: Scaffold(body: Center(child: child)),
+        ),
+      );
 
   const tabs = <SegmentedTab<String>>[
     SegmentedTab<String>(value: 'exp', label: 'Expense'),
@@ -41,6 +44,8 @@ void main() {
 
       expect(find.text('Expense'), findsOneWidget);
       expect(find.text('Income'), findsOneWidget);
+      final selectedLabel = tester.widget<Text>(find.text('Expense'));
+      expect(selectedLabel.style?.color, const AppColorsLight().onBrandSubtle);
 
       await tester.tap(find.text('Income'));
       await tester.pumpAndSettle();
@@ -101,6 +106,37 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(IOS26SegmentedControl), findsOneWidget);
+      expect(
+        tester
+            .widget<IOS26SegmentedControl>(find.byType(IOS26SegmentedControl))
+            .selectedTextColor,
+        const AppColorsLight().textOnBrand,
+      );
+    });
+
+    testWidgets('uses a contrasting selected label in dark mode', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          SegmentedTabs<String>(
+            tabs: tabs,
+            selected: 'exp',
+            platform: AppPlatform.ios,
+            isIOS26: true,
+            onChanged: (_) {},
+          ),
+          brightness: Brightness.dark,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .widget<IOS26SegmentedControl>(find.byType(IOS26SegmentedControl))
+            .selectedTextColor,
+        const AppColorsDark().textOnBrand,
+      );
     });
   });
 }

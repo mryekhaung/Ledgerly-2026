@@ -4,6 +4,7 @@ import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_period_selector.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/insights/domain/entities/category_breakdown.dart';
 import 'package:ledgerly/features/insights/domain/entities/daily_trend_point.dart';
@@ -143,6 +144,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      expect(
+        tester
+            .widget<AppScaffold>(find.byType(AppScaffold))
+            .reserveNativeTabBarSpace,
+        isTrue,
+      );
       expect(find.byType(InsightPeriodSwitcher), findsOneWidget);
       expect(find.byType(InsightSummaryCard), findsOneWidget);
       expect(find.byType(DonutChartCard), findsOneWidget);

@@ -7,6 +7,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_dialog.dart';
+import 'package:ledgerly/core/widgets/app_floating_action_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/budgets/presentation/providers/budget_providers.dart';
 import 'package:ledgerly/features/budgets/presentation/widgets/budget_category_row.dart';
@@ -63,12 +64,11 @@ class BudgetsPage extends ConsumerWidget {
     return AppScaffold(
       title: strings('budgetsTitle'),
       floatingActionButton: hasAnyBudget
-          ? FloatingActionButton.extended(
+          ? AppFloatingActionButton(
               onPressed: () => context.push(AppRoutes.budgetNew),
-              icon: const Icon(AppIcons.add),
-              label: Text(strings('budgetsNew')),
-              backgroundColor: colors.brandPrimary,
-              foregroundColor: colors.textOnBrand,
+              icon: AppIcons.add,
+              label: strings('budgetsNew'),
+              extended: true,
             )
           : null,
       body: ListView(

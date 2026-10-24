@@ -10,10 +10,12 @@ import 'package:material_ui/material_ui.dart'
     show
         BuildContext,
         Color,
+        FloatingActionButton,
         Icon,
         IconData,
         Semantics,
         StatelessWidget,
+        Text,
         Tooltip,
         VoidCallback,
         Widget;
@@ -26,6 +28,7 @@ class AppFloatingActionButton extends StatelessWidget {
     required this.onPressed,
     required this.icon,
     required this.label,
+    this.extended = false,
     this.backgroundColor,
     this.foregroundColor,
     super.key,
@@ -39,6 +42,9 @@ class AppFloatingActionButton extends StatelessWidget {
 
   /// The accessible name and tooltip.
   final String label;
+
+  /// Whether Material platforms should show the label beside the icon.
+  final bool extended;
 
   /// Optional tint for the button background.
   final Color? backgroundColor;
@@ -66,6 +72,25 @@ class AppFloatingActionButton extends StatelessWidget {
           style: AdaptiveButtonStyle.glass,
           size: AdaptiveButtonSize.large,
           useSmoothRectangleBorder: false,
+        ),
+      );
+    }
+
+    if (extended && !PlatformInfo.isIOS) {
+      return Semantics(
+        label: label,
+        button: true,
+        onTap: onPressed,
+        excludeSemantics: true,
+        child: Tooltip(
+          message: label,
+          child: FloatingActionButton.extended(
+            onPressed: onPressed,
+            backgroundColor: resolvedBackground,
+            foregroundColor: resolvedForeground,
+            icon: Icon(icon),
+            label: Text(label),
+          ),
         ),
       );
     }

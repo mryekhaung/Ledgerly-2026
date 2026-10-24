@@ -115,4 +115,46 @@ void main() {
       expect(column.left, closeTo(width - column.right, 0.01));
     });
   });
+
+  testWidgets('reserves the native tab bar overlay only when requested', (
+    tester,
+  ) async {
+    await pumpAppHost(
+      tester,
+      size: const Size(400, 800),
+      home: const AppScaffold(
+        body: SizedBox.expand(),
+        reserveNativeTabBarSpace: true,
+        isIOS26: true,
+      ),
+    );
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Padding &&
+            widget.padding == const EdgeInsets.only(bottom: 96),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('does not reserve native tab bar space by default', (
+    tester,
+  ) async {
+    await pumpAppHost(
+      tester,
+      size: const Size(400, 800),
+      home: const AppScaffold(body: SizedBox.expand(), isIOS26: true),
+    );
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Padding &&
+            widget.padding == const EdgeInsets.only(bottom: 96),
+      ),
+      findsNothing,
+    );
+  });
 }

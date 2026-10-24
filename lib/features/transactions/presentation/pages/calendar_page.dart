@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -48,7 +47,6 @@ class CalendarPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = AppStrings.of(context);
-    final colors = AppThemeColors.of(context);
     final state = ref.watch(calendarProvider);
     final notifier = ref.read(calendarProvider.notifier);
     final sizeClass = WindowSizeClass.of(context);
@@ -180,8 +178,6 @@ class CalendarPage extends ConsumerWidget {
       floatingActionButton: AppFloatingActionButton(
         onPressed: () =>
             unawaited(_openTransactionForm(context, state.selectedDay)),
-        backgroundColor: colors.brandPrimary,
-        foregroundColor: colors.textOnBrand,
         label: strings('transactionNew'),
         icon: AppIcons.add,
       ),

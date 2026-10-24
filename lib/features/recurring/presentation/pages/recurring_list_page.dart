@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_floating_action_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/recurring/presentation/providers/recurring_providers.dart';
@@ -29,7 +29,6 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
 
     final activeItems = ref.watch(activeRecurringListProvider);
@@ -70,12 +69,11 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
         ),
       ],
       floatingActionButton: displayedItems.isNotEmpty
-          ? FloatingActionButton.extended(
+          ? AppFloatingActionButton(
               onPressed: () => context.push(AppRoutes.recurringNew),
-              icon: const Icon(AppIcons.add),
-              label: Text(strings('recurringNew')),
-              backgroundColor: colors.brandPrimary,
-              foregroundColor: colors.textOnBrand,
+              icon: AppIcons.add,
+              label: strings('recurringNew'),
+              extended: true,
             )
           : null,
       body: ListView(

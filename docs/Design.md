@@ -378,6 +378,10 @@ The shared page frame. Every page uses it — no raw `Scaffold` in features.
 
 - Owns: safe areas, top bar (adaptive), bottom nav inset, background (`surface`), and the content
   column. The shell owns the native tab bar and its content inset.
+- Full-viewport pages that do not give their own scrollables bottom clearance opt into
+  `reserveNativeTabBarSpace` to keep content above the iOS 26 overlay.
+- All floating actions use `AppFloatingActionButton` with the shared brand colors; scaffold
+  placement stays platform-adaptive.
 - The **content column** is capped at 1200 px by default, or at the page's `contentMaxWidth` when it
   declares one (a form or prose list: 560). The frame caps *and centres* the column and derives the
   top bar title's inset from it, so the title's left edge lands on the content's rather than at a
@@ -418,9 +422,12 @@ Renders a `Money`. The only widget allowed to format money.
 
 ### 5.5 `SegmentedTabs`
 
-- iOS: Cupertino segmented control. Android: M3 `SegmentedButton`. Web: M3.
+- iOS 26+: native segmented control. Earlier iOS uses the Cupertino sliding
+  control. Android/Web use the M3-style pill track.
 - Pill shape (`radius.full`), height 32, label `label` token.
-- Selected: `brandSubtle` fill + `onBrandSubtle` label. Unselected: `textSecondary`, no fill.
+- The native control uses `brandPrimary` + `textOnBrand` for its selected state.
+  The tinted Material track uses `brandSubtle` + `onBrandSubtle`; unselected
+  labels use `textSecondary`.
   The on-colour matters — `brandPrimary` on `brandSubtle` fails AA (§2.6).
 - Sliding indicator animates with `short`. Max **3** segments; more becomes a scrollable chip row.
 
@@ -445,6 +452,8 @@ The atomic list unit. Replaces any table.
 | `destructive` | `moneyOut` text, no fill | Delete. Requires confirm. |
 | `icon` | 44×44 min hit target, `radius.full` | Toolbars |
 
+- Floating actions use `brandPrimary` + `textOnBrand`; `AppFloatingActionButton` supplies the
+  platform-specific appearance and tooltip/semantics.
 - Minimum hit target **44×44** everywhere (iOS HIG). Android may use 48 for FAB.
 - No button is ever disabled without an adjacent explanation. Prefer enabled + validation on press.
 

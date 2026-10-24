@@ -8,6 +8,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_floating_action_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/goals/domain/entities/savings_goal.dart';
 import 'package:ledgerly/features/goals/presentation/providers/goals_providers.dart';
@@ -68,12 +69,11 @@ class _GoalsListPageState extends ConsumerState<GoalsListPage> {
       ),
       floatingActionButton: activeGoalsAsync.maybeWhen(
         data: (goals) => goals.isNotEmpty
-            ? FloatingActionButton.extended(
+            ? AppFloatingActionButton(
                 onPressed: () => context.push(AppRoutes.goalsNew),
-                backgroundColor: colors.moneyIn,
-                foregroundColor: colors.textOnBrand,
-                icon: const Icon(AppIcons.add),
-                label: Text(strings('newGoal')),
+                icon: AppIcons.add,
+                label: strings('newGoal'),
+                extended: true,
               )
             : null,
         orElse: () => null,

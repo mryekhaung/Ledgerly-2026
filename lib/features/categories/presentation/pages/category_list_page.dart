@@ -9,6 +9,7 @@ import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_dialog.dart';
+import 'package:ledgerly/core/widgets/app_floating_action_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_form_notifier.dart';
@@ -101,10 +102,11 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
     if (sizeClass.usesSidebar) {
       return AppScaffold(
         title: strings('categoriesTitle'),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: AppFloatingActionButton(
           onPressed: _openForm,
-          icon: const Icon(AppIcons.add),
-          label: Text(strings('categoriesNew')),
+          icon: AppIcons.add,
+          label: strings('categoriesNew'),
+          extended: true,
         ),
         body: Row(
           // `stretch`, not `start`: the detail pane hosts `CategoryFormBody`,
@@ -132,10 +134,11 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
 
     return AppScaffold(
       title: strings('categoriesTitle'),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: AppFloatingActionButton(
         onPressed: _openForm,
-        icon: const Icon(AppIcons.add),
-        label: Text(strings('categoriesNew')),
+        icon: AppIcons.add,
+        label: strings('categoriesNew'),
+        extended: true,
       ),
       body: body,
     );

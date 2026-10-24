@@ -10,6 +10,8 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:material_ui/material_ui.dart';
 
+const double _nativeTabBarBottomInset = 96;
+
 /// The shared page frame (docs/Design.md §5.1).
 ///
 /// Owns:
@@ -37,6 +39,8 @@ class AppScaffold extends StatelessWidget {
     this.backgroundColor,
     this.contentMaxWidth,
     this.contentInset,
+    this.reserveNativeTabBarSpace = false,
+    this.isIOS26,
     super.key,
   });
 
@@ -87,6 +91,14 @@ class AppScaffold extends StatelessWidget {
   /// The inset used to compute the title's left edge when [contentMaxWidth] is
   /// set. Defaults to the page's horizontal padding.
   final double? contentInset;
+
+  /// Whether the body should reserve space for the shell's overlaid iOS 26 tab
+  /// bar. Use this for viewport-based pages whose scrollables do not include
+  /// their own bottom clearance.
+  final bool reserveNativeTabBarSpace;
+
+  /// Overrides iOS 26 detection in tests.
+  final bool? isIOS26;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -228,14 +240,15 @@ class AppScaffold extends StatelessWidget {
       );
     }
 
+    if (reserveNativeTabBarSpace &&
+        (isIOS26 ?? PlatformInfo.isIOS26OrHigher())) {
+      content = Padding(
+        padding: const EdgeInsets.only(bottom: _nativeTabBarBottomInset),
+        child: content,
+      );
+    }
+
     if (platform.usesCupertino) {
-      // On iOS 26+ the shell's native `UITabBar` overlays the body rather than
-      // consuming layout space, and the package only lifts its own FAB 16 px.
-      // Give ours the tab-bar's height (~80 px) so it clears the glass bar.
-      Widget? fab = floatingActionButton;
-      if (fab != null && PlatformInfo.isIOS26OrHigher()) {
-        fab = Padding(padding: const EdgeInsets.only(bottom: 80), child: fab);
-      }
       return AdaptiveScaffold(
         appBar: adaptiveAppBar,
         body: Material(
@@ -243,7 +256,7 @@ class AppScaffold extends StatelessWidget {
           child: content,
         ),
         backgroundColor: backgroundColor ?? colors.surface,
-        floatingActionButton: fab,
+        floatingActionButton: floatingActionButton,
       );
     }
 
