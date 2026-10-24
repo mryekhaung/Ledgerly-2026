@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveToolbarHost;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -207,7 +209,7 @@ class _TestSurround extends StatelessWidget {
     child: AppTestScopes(
       platform: platform,
       brightness: brightness,
-      child: child ?? const SizedBox.shrink(),
+      child: AdaptiveToolbarHost(child: child ?? const SizedBox.shrink()),
     ),
   );
 }

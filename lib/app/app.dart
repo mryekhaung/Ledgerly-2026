@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveToolbarHost;
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart'
     show GlobalCupertinoLocalizations;
@@ -143,7 +145,9 @@ class LedgerlyApp extends ConsumerWidget {
               // covered too (`docs/Platform.md` §2).
               child: AnnotatedRegion<SystemUiOverlayStyle>(
                 value: AppTheme.systemOverlayStyle(effectiveBrightness),
-                child: child ?? const SizedBox.shrink(),
+                child: AdaptiveToolbarHost(
+                  child: child ?? const SizedBox.shrink(),
+                ),
               ),
             ),
           ),

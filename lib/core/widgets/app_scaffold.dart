@@ -121,25 +121,31 @@ class AppScaffold extends StatelessWidget {
         leading != null ||
         actions != null ||
         bottom != null;
+    final useNativeToolbar =
+        PlatformInfo.isIOS26OrHigher() &&
+        title != null &&
+        titleWidget == null &&
+        leading == null &&
+        actions == null &&
+        bottom == null;
 
     PreferredSizeWidget? appBar;
     AdaptiveAppBar? adaptiveAppBar;
     if (hasAppBar) {
       if (platform.usesCupertino) {
         adaptiveAppBar = AdaptiveAppBar(
-          // The iOS 26+ native `UIToolbar` can't host arbitrary widgets, and
-          // `bottom` (TabBar) has no slot in `AdaptiveAppBar` — keep the real
-          // CupertinoNavigationBar so every page keeps its tabs and action
-          // widgets.
-          useNativeToolbar: false,
-          cupertinoNavigationBar: _AppCupertinoBar(
-            middle: resolvedTitle,
-            leading: leading,
-            trailing: actions == null
-                ? null
-                : Row(mainAxisSize: MainAxisSize.min, children: actions!),
-            bottom: bottom,
-          ),
+          title: title,
+          useNativeToolbar: useNativeToolbar,
+          cupertinoNavigationBar: useNativeToolbar
+              ? null
+              : _AppCupertinoBar(
+                  middle: resolvedTitle,
+                  leading: leading,
+                  trailing: actions == null
+                      ? null
+                      : Row(mainAxisSize: MainAxisSize.min, children: actions!),
+                  bottom: bottom,
+                ),
         );
       } else {
         appBar = AppBar(

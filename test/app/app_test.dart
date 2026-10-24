@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveToolbarHost;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -58,6 +60,15 @@ void main() {
 
       // The shell now mounts real chrome rather than a bare passthrough.
       expect(find.byType(AdaptiveNav), findsOneWidget);
+    });
+
+    testWidgets('should_install_adaptive_toolbar_host_around_router', (
+      tester,
+    ) async {
+      await tester.pumpWidget(hostApp());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AdaptiveToolbarHost), findsOneWidget);
     });
 
     testWidgets('should_apply_brand_primary_to_primary_buttons', (
