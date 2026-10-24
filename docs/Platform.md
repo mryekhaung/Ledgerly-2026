@@ -31,7 +31,7 @@ core/widgets/
 | Concern | iOS — native Cupertino | Android — Material 3 | Web (≥ medium) |
 |---|---|---|---|
 | Primary nav | Native `UITabBar` on iOS 26+; `CupertinoTabBar` on older iOS | M3 `NavigationBar` | `NavigationRail` (medium) → sidebar drawer (expanded) |
-| Top bar | Native Liquid Glass toolbar on iOS 26+ when the page uses a plain title; Cupertino navigation bar otherwise | M3 Top App Bar (Large/Medium collapsing) | Header bar with page title + actions |
+| Top bar | Native Liquid Glass toolbar on iOS 26+ for plain titles and adaptive actions; Cupertino navigation bar otherwise | M3 Top App Bar (Large/Medium collapsing) | Header bar with page title + actions |
 | Buttons | Cupertino; native Liquid Glass buttons on iOS 26+ | M3 buttons | M3 buttons |
 | Primary action (+) | Native-style toolbar action | M3 FAB (Extended FAB on wide) | Extended FAB or header button + shortcut `N` |
 | Sheets | Cupertino sheet | M3 Modal Bottom Sheet | Centered dialog / side panel |
@@ -52,9 +52,11 @@ core/widgets/
 
 - iOS 26+: a native UIKit tab bar with the system Liquid Glass effect.
 - iOS 26+: `AdaptiveToolbarHost` provides the native UIKit toolbar for pages
-  with a plain title and no custom leading, action, or bottom widgets. Pages
-  that need arbitrary toolbar widgets or a `TabBar` retain the Cupertino
-  navigation bar until those controls have adaptive action equivalents.
+  with a plain title and adaptive `AdaptiveAppBarAction`s. Pages that need
+  arbitrary toolbar widgets or a `TabBar` retain the Cupertino navigation bar
+  until those controls have adaptive action equivalents. The native toolbar
+  overlays the body, so `AppScaffold` consumes the package-provided top inset
+  even when a page's scrollable has explicit padding.
 - iOS 15–25: native-style Cupertino controls with opaque surfaces.
 - Android: Material navigation and controls.
 - `AppSelectField` keeps Material dropdowns off iOS and presents options in an

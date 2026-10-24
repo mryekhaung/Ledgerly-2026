@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart' as cupertino;
+import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -25,6 +26,7 @@ class AppScaffold extends StatelessWidget {
     this.titleWidget,
     this.leading,
     this.actions,
+    this.adaptiveActions,
     this.bottom,
     this.bottomNavigationBar,
     this.floatingActionButton,
@@ -51,6 +53,10 @@ class AppScaffold extends StatelessWidget {
 
   /// Trailing action widgets in the top app bar.
   final List<Widget>? actions;
+
+  /// Platform-adaptive actions. On iOS 26+ these can be rendered in the native
+  /// toolbar; on earlier iOS and Material platforms they use native controls.
+  final List<AdaptiveAppBarAction>? adaptiveActions;
 
   /// A widget below the top app bar — typically a `TabBar`.
   final PreferredSizeWidget? bottom;
@@ -120,6 +126,7 @@ class AppScaffold extends StatelessWidget {
         resolvedTitle != null ||
         leading != null ||
         actions != null ||
+        adaptiveActions != null ||
         bottom != null;
     final useNativeToolbar =
         PlatformInfo.isIOS26OrHigher() &&
@@ -135,8 +142,9 @@ class AppScaffold extends StatelessWidget {
       if (platform.usesCupertino) {
         adaptiveAppBar = AdaptiveAppBar(
           title: title,
+          actions: adaptiveActions,
           useNativeToolbar: useNativeToolbar,
-          cupertinoNavigationBar: useNativeToolbar
+          cupertinoNavigationBar: useNativeToolbar || adaptiveActions != null
               ? null
               : _AppCupertinoBar(
                   middle: resolvedTitle,
@@ -151,7 +159,12 @@ class AppScaffold extends StatelessWidget {
         appBar = AppBar(
           title: resolvedTitle,
           leading: leading,
-          actions: actions,
+          actions: <Widget>[
+            ...?actions,
+            ...?adaptiveActions?.map(
+              (action) => _materialAction(context, action),
+            ),
+          ],
           bottom: bottom,
           titleSpacing: contentMaxWidth == null ? null : gutter + inset,
           centerTitle: platform.usesCupertino,
@@ -192,10 +205,10 @@ class AppScaffold extends StatelessWidget {
 
     if (useSafeArea) {
       content = SafeArea(
-        // iOS delegates its chrome to `AdaptiveScaffold`, which measures the
-        // CupertinoNavigationBar itself — only the Material path needs the
-        // scaffold-aware top inset.
-        top: !platform.usesCupertino && appBar == null,
+        // Native iOS 26 toolbars overlay the body; the package adds their
+        // height to MediaQuery.padding, which this SafeArea must consume even
+        // when the page's scrollable supplies explicit padding.
+        top: (!platform.usesCupertino && appBar == null) || useNativeToolbar,
         bottom: bottomNavigationBar == null,
         child: content,
       );
@@ -226,6 +239,22 @@ class AppScaffold extends StatelessWidget {
       body: content,
       bottomNavigationBar: bottomNavigationBar,
       floatingActionButton: floatingActionButton,
+    );
+  }
+
+  Widget _materialAction(BuildContext context, AdaptiveAppBarAction action) {
+    final label = action.effectiveLabel;
+    if (action.title != null) {
+      return TextButton(
+        onPressed: () => action.press(context),
+        child: Text(action.title!),
+      );
+    }
+
+    return IconButton(
+      tooltip: label,
+      onPressed: () => action.press(context),
+      icon: action.iconWidget ?? Icon(action.icon ?? AppIcons.moreHorizontal),
     );
   }
 }

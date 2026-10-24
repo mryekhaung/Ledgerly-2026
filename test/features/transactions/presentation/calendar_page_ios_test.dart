@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
@@ -57,6 +58,11 @@ void main() {
       );
 
       await tester.pumpAndSettle();
+      final scaffold = tester.widget<AppScaffold>(find.byType(AppScaffold));
+      expect(scaffold.adaptiveActions, hasLength(2));
+      expect(scaffold.adaptiveActions?[0].iosSymbol, 'magnifyingglass');
+      expect(scaffold.adaptiveActions?[1].title, 'Today');
+
       // Scroll to reveal the rows
       await tester.drag(find.byType(ListView).first, const Offset(0, -400));
       await tester.pumpAndSettle();
@@ -72,6 +78,6 @@ class _SeededCalendarNotifier extends CalendarNotifier {
   final LocalDate _day;
   @override
   CalendarState build() {
-    return CalendarState(selectedDay: _day, isTodaySelected: true);
+    return CalendarState(selectedDay: _day, isTodaySelected: false);
   }
 }

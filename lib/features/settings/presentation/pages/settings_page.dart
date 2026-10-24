@@ -127,5 +127,5 @@ abstract final class _AppVersion {
   const _AppVersion._();
 
   /// Semver + build, matching `pubspec.yaml` `version:`.
-  static const String display = '1.0.0 (1)';
+  static const String display = '1.0.0 (23)';
 }
