@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -108,7 +109,7 @@ class _PickerRow extends StatelessWidget {
     final colors = AppThemeColors.of(context);
 
     return ListRow(
-      onTap: () => Navigator.of(context).pop(category),
+      onTap: () => context.pop(category),
       leading: CategoryGem(
         colorValue: category.colorValue,
         iconKey: category.iconKey,

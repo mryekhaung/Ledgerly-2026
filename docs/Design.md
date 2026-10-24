@@ -586,8 +586,11 @@ had drifted to 48 / 40 × 40 / 1.5.
 - Densities: compact shows capsule + number. Expanded shows capsule + number + tiny amount
   (`caption`, truncated) for cells wide enough (≥ 64 px).
 
-**Period switcher**: `‹` / `›` icons (`short` slide+fade of the grid), title is a tappable
-period picker. `today` button appears only when the visible period ≠ the current period.
+**Period switcher**: Calendar, Insights, and Budgets use the same raised selector. The
+Calendar label opens a full-screen month picker outside the navigation shell, so the primary
+bottom bar is not left visible on a secondary screen. The picker uses the shared selector to
+browse years and a localized 3 × 4 month grid with concise month names; `Today` is an adaptive
+toolbar action.
 Horizontal swipe on the grid changes month; the swipe must not fight the day-list scroll
 (grid owns horizontal, list owns vertical).
 

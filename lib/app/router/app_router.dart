@@ -7,6 +7,8 @@ import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/result.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
+import 'package:ledgerly/core/widgets/month_year_picker_page.dart';
 import 'package:ledgerly/features/accounts/presentation/pages/account_form_page.dart';
 import 'package:ledgerly/features/accounts/presentation/pages/accounts_page.dart';
 import 'package:ledgerly/features/accounts/presentation/pages/transfer_page.dart';
@@ -15,6 +17,8 @@ import 'package:ledgerly/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:ledgerly/features/auth/presentation/pages/welcome_page.dart';
 import 'package:ledgerly/features/budgets/presentation/pages/budget_form_page.dart';
 import 'package:ledgerly/features/budgets/presentation/pages/budgets_page.dart';
+import 'package:ledgerly/features/categories/domain/entities/category.dart';
+import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_form_page.dart';
 import 'package:ledgerly/features/categories/presentation/pages/category_list_page.dart';
 import 'package:ledgerly/features/data_transfer/presentation/pages/data_transfer_page.dart';
@@ -30,6 +34,7 @@ import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart
 import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/calendar_page.dart';
+import 'package:ledgerly/features/transactions/presentation/pages/category_picker_page.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/transaction_form_page.dart';
 import 'package:ledgerly/features/transactions/presentation/pages/transactions_list_page.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
@@ -76,6 +81,39 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
             builder: (context, state) => const SettingsPage(),
           ),
         ],
+      ),
+
+      GoRoute(
+        path: AppRoutes.calendarMonthPicker,
+        name: AppRoutes.calendarMonthPickerName,
+        pageBuilder: (context, state) => cupertino.CupertinoPage<LocalDate>(
+          child: MonthYearPickerPage(
+            initialMonth:
+                _dateFromQuery(state) ?? LocalDate.fromDateTime(DateTime.now()),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.transactionDatePicker,
+        name: AppRoutes.transactionDatePickerName,
+        pageBuilder: (context, state) => cupertino.CupertinoPage<LocalDate>(
+          child: MonthDayPickerPage(
+            initialDate:
+                _dateFromQuery(state) ?? LocalDate.fromDateTime(DateTime.now()),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.transactionCategoryPicker,
+        name: AppRoutes.transactionCategoryPickerName,
+        pageBuilder: (context, state) => cupertino.CupertinoPage<Category>(
+          child: CategoryPickerPage(
+            kind: CategoryKind.values.byName(
+              state.uri.queryParameters['kind'] ?? CategoryKind.expense.name,
+            ),
+            selectedId: state.uri.queryParameters['selectedId'],
+          ),
+        ),
       ),
 
       // Pushed sub-screens (outside the shell) so they hide the bottom
@@ -269,7 +307,7 @@ GoRouter createRouter({String initialLocation = AppRoutes.calendar}) {
   );
 }
 
-/// Reads the optional `?date=yyyyMMdd` a deep link or the calendar may supply.
+/// Reads an optional `?date=yyyyMMdd` supplied by the calendar or a deep link.
 ///
 /// Parsed through `LocalDate.fromPacked` so a malformed value is dropped rather
 /// than crashing the page â€” the form falls back to today.

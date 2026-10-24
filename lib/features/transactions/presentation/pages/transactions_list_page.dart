@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
     show AdaptiveAppBarAction;
-import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -19,7 +20,6 @@ import 'package:ledgerly/features/shared/presentation/widgets/state_placeholder.
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_filter.dart';
-import 'package:ledgerly/features/transactions/presentation/pages/category_picker_page.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_providers.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transactions_list_notifier.dart';
 import 'package:ledgerly/features/transactions/presentation/widgets/transaction_filter_sheet.dart';
@@ -95,13 +95,12 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
         ? CategoryKind.income
         : CategoryKind.expense;
 
-    final chosen = await Navigator.of(context).push<Category>(
-      cupertino.CupertinoPageRoute<Category>(
-        builder: (_) => CategoryPickerPage(
-          kind: kind,
-          selectedId: currentFilter.categoryId,
-        ),
-      ),
+    final chosen = await context.pushNamed<Category>(
+      AppRoutes.transactionCategoryPickerName,
+      queryParameters: <String, String>{
+        'kind': kind.name,
+        'selectedId': ?currentFilter.categoryId,
+      },
     );
 
     if (chosen != null && mounted) {

@@ -1,9 +1,13 @@
-import 'package:ledgerly/app/theme/app_icons.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveAppBarAction;
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
-import 'package:ledgerly/core/widgets/app_button.dart';
+import 'package:ledgerly/core/widgets/app_period_selector.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -48,14 +52,10 @@ class _MonthYearPickerPageState extends State<MonthYearPickerPage> {
   /// until the user actually taps one — browsing years is not choosing.
   late int _year;
 
-  /// The chosen month (1–12), highlighted in the grid.
-  late int _month;
-
   @override
   void initState() {
     super.initState();
     _year = widget.initialMonth.year;
-    _month = widget.initialMonth.month;
   }
 
   int get _minYear {
@@ -74,29 +74,37 @@ class _MonthYearPickerPageState extends State<MonthYearPickerPage> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
-    final localizations = MaterialLocalizations.of(context);
+    final locale = Localizations.localeOf(context);
 
     return AppScaffold(
       title: strings('calendarPickMonth'),
-      actions: <Widget>[
-        AppButton(
-          variant: AppButtonVariant.ghost,
-          onPressed: () =>
-              Navigator.of(context).pop(LocalDate.fromDateTime(DateTime.now())),
+      adaptiveActions: <AdaptiveAppBarAction>[
+        AdaptiveAppBarAction(
+          title: strings('calendarToday'),
           label: strings('calendarToday'),
+          onPressed: () => context.pop(LocalDate.fromDateTime(DateTime.now())),
         ),
       ],
       body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.md,
+          AppSpacing.lg,
+          AppSpacing.xl,
+        ),
         children: <Widget>[
-          _YearSwitcher(
-            year: _year,
-            canGoBack: _canGoBack,
-            canGoForward: _canGoForward,
-            onPrevious: () => setState(() => _year--),
-            onNext: () => setState(() => _year++),
+          AppPeriodSelector(
+            period: BudgetPeriod(
+              start: LocalDate(_year, 1, 1),
+              end: LocalDate(_year, 12, 31),
+            ),
+            isPayCycle: false,
+            labelOverride: '$_year',
+            previousTooltip: strings('calendarPreviousYear'),
+            nextTooltip: strings('calendarNextYear'),
+            onPrevious: _canGoBack ? () => setState(() => _year--) : null,
+            onNext: _canGoForward ? () => setState(() => _year++) : null,
           ),
           const SizedBox(height: AppSpacing.md),
           GridView.count(
@@ -105,18 +113,16 @@ class _MonthYearPickerPageState extends State<MonthYearPickerPage> {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: AppSpacing.sm,
             crossAxisSpacing: AppSpacing.sm,
-            childAspectRatio: 1.8,
+            childAspectRatio: 2.2,
             children: <Widget>[
               for (var month = 1; month <= 12; month++)
                 _MonthCell(
-                  // The month name comes from CLDR via MaterialLocalizations:
-                  // 12 names x 3 locales is data the platform already has right,
-                  // and duplicating it in the ARB would be 36 strings to keep
-                  // in sync for no gain (matches `MonthDayPickerPage`).
-                  label: localizations.formatMonthYear(DateTime(_year, month)),
-                  isSelected: month == _month,
-                  onTap: () =>
-                      Navigator.of(context).pop(LocalDate(_year, month, 1)),
+                  label: DateFormat.MMMM(locale.toLanguageTag())
+                      .format(DateTime(_year, month)),
+                  isSelected:
+                      _year == widget.initialMonth.year &&
+                      month == widget.initialMonth.month,
+                  onTap: () => context.pop(LocalDate(_year, month, 1)),
                 ),
             ],
           ),
@@ -124,59 +130,11 @@ class _MonthYearPickerPageState extends State<MonthYearPickerPage> {
           Text(
             strings('calendarPickMonthHint'),
             textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colors.textTertiary,
-            ),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: colors.textSecondary),
           ),
         ],
       ),
-    );
-  }
-}
-
-/// The `< 2026 >` year header.
-class _YearSwitcher extends StatelessWidget {
-  const _YearSwitcher({
-    required this.year,
-    required this.canGoBack,
-    required this.canGoForward,
-    required this.onPrevious,
-    required this.onNext,
-  });
-
-  final int year;
-  final bool canGoBack;
-  final bool canGoForward;
-  final VoidCallback onPrevious;
-  final VoidCallback onNext;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final strings = AppStrings.of(context);
-
-    return Row(
-      children: <Widget>[
-        IconButton(
-          // Null disables the button, which is the honest state at the range
-          // edge — the alternative is a tap that silently does nothing.
-          onPressed: canGoBack ? onPrevious : null,
-          icon: const Icon(AppIcons.chevronLeft),
-          tooltip: strings('calendarPreviousYear'),
-        ),
-        Expanded(
-          child: Text(
-            '$year',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.titleMedium,
-          ),
-        ),
-        IconButton(
-          onPressed: canGoForward ? onNext : null,
-          icon: const Icon(AppIcons.chevronRight),
-          tooltip: strings('calendarNextYear'),
-        ),
-      ],
     );
   }
 }
@@ -199,7 +157,7 @@ class _MonthCell extends StatelessWidget {
     final colors = AppThemeColors.of(context);
 
     return Material(
-      color: isSelected ? colors.brandSubtle : colors.surfaceSubtle,
+      color: isSelected ? colors.selectedFill : colors.surfaceRaised,
       borderRadius: AppRadius.borderMd,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -211,12 +169,7 @@ class _MonthCell extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodyMedium?.copyWith(
-              // `onBrandSubtle`, not `brandPrimary`: the selected tile is filled
-              // `brandSubtle`, and `brandPrimary` on that fill measured 3.90:1
-              // light / 3.43:1 dark — below AA (Roadmap §K.1-2). The old comment
-              // here claimed this was "the one pair that keeps its contrast in
-              // both themes", which the §K audit disproved.
-              color: isSelected ? colors.onBrandSubtle : colors.textPrimary,
+              color: isSelected ? colors.onSelectedFill : colors.textPrimary,
               fontWeight: isSelected ? FontWeight.w600 : null,
             ),
           ),

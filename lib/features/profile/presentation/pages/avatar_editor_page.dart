@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
@@ -172,7 +173,7 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
 
   Future<void> _onCancel() async {
     if (_draft$ == _initialConfig || _saving) {
-      Navigator.of(context).pop();
+      context.pop();
       return;
     }
     await _showDiscardConfirmDialog();
@@ -191,7 +192,7 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
 
     if (discard == true && mounted) {
       AppFeedback.destructive();
-      Navigator.of(context).pop();
+      context.pop();
     }
   }
 
@@ -211,7 +212,7 @@ class _AvatarEditorPageState extends ConsumerState<AvatarEditorPage> {
     }
 
     AppFeedback.success();
-    Navigator.of(context).pop();
+    context.pop();
     AppFeedback.confirm(context, message: strings('profileAvatarSaved'));
   }
 }

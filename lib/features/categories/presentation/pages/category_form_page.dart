@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_form_notifier.dart';
 import 'package:ledgerly/features/categories/presentation/widgets/category_form/form_body.dart';
@@ -38,8 +39,8 @@ class CategoryFormPage extends ConsumerWidget {
     // there is no route to pop — so the body reports success through its own
     // callback there instead.
     ref.listen(categoryFormProvider, (previous, next) {
-      if (next.saved && Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
+      if (next.saved && context.canPop()) {
+        context.pop();
       }
     });
 

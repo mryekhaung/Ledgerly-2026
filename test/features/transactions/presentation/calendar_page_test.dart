@@ -5,6 +5,7 @@ import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/router/app_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_colors.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
@@ -291,7 +292,9 @@ void main() {
     testWidgets('should_open_the_month_picker_when_the_title_is_tapped', (
       tester,
     ) async {
-      await host(tester, TestWidths.phone);
+      final router = createRouter();
+      addTearDown(router.dispose);
+      await host(tester, TestWidths.phone, router: router);
       await tester.pumpAndSettle();
 
       await tester.tap(labelFinder(tester));
@@ -299,12 +302,15 @@ void main() {
 
       // The picker's own app-bar title.
       expect(find.text('Jump to month'), findsOneWidget);
+      expect(find.text('Settings'), findsNothing);
     });
 
     testWidgets('should_jump_to_the_picked_month_and_close_the_picker', (
       tester,
     ) async {
-      await host(tester, TestWidths.phone);
+      final router = createRouter();
+      addTearDown(router.dispose);
+      await host(tester, TestWidths.phone, router: router);
       await tester.pumpAndSettle();
 
       // Open the picker, step a year forward, then choose January.
@@ -315,7 +321,7 @@ void main() {
       // The tiles are labelled by CLDR's month+year (`formatMonthYear`), so match
       // on the month prefix rather than the bare name — the year depends on the
       // real "today" and would otherwise make this break every New Year.
-      await tester.tap(find.textContaining('January '));
+      await tester.tap(find.text('January'));
       await tester.pumpAndSettle();
 
       // Back on the calendar, and the header year moved on.
@@ -726,9 +732,12 @@ void main() {
     testWidgets('keeps the month picker available from the pay-cycle label', (
       tester,
     ) async {
+      final router = createRouter();
+      addTearDown(router.dispose);
       await host(
         tester,
         TestWidths.phone,
+        router: router,
         extraOverrides: <Override>[monthStartDayProvider.overrideWithValue(10)],
       );
       await tester.pumpAndSettle();

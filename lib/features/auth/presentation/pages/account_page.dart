@@ -65,11 +65,7 @@ class AccountPage extends ConsumerWidget {
     final success = await ref.read(authNotifierProvider.notifier).signOut();
     if (!context.mounted) return;
     if (success) {
-      if (GoRouter.maybeOf(context) != null) {
-        context.go(AppRoutes.welcome);
-      } else if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
+      if (GoRouter.maybeOf(context) != null) context.go(AppRoutes.welcome);
     }
   }
 
@@ -93,11 +89,7 @@ class AccountPage extends ConsumerWidget {
     if (success) {
       AppFeedback.destructive();
       AppFeedback.confirm(context, message: strings('accountDeletedSuccess'));
-      if (GoRouter.maybeOf(context) != null) {
-        context.go(AppRoutes.welcome);
-      } else if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
+      if (GoRouter.maybeOf(context) != null) context.go(AppRoutes.welcome);
     }
   }
 

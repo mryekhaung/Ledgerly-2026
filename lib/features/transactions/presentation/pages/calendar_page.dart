@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
     show AdaptiveAppBarAction;
-import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
@@ -15,7 +14,6 @@ import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/utils/month_grid_layout.dart';
 import 'package:ledgerly/core/widgets/app_floating_action_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
-import 'package:ledgerly/core/widgets/month_year_picker_page.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/shared/presentation/widgets/responsive_layout.dart';
@@ -212,10 +210,9 @@ class CalendarPage extends ConsumerWidget {
     CalendarNotifier notifier,
     LocalDate currentMonth,
   ) async {
-    final chosen = await Navigator.of(context).push<LocalDate>(
-      cupertino.CupertinoPageRoute<LocalDate>(
-        builder: (_) => MonthYearPickerPage(initialMonth: currentMonth),
-      ),
+    final chosen = await context.pushNamed<LocalDate>(
+      AppRoutes.calendarMonthPickerName,
+      queryParameters: <String, String>{'date': '${currentMonth.value}'},
     );
     if (chosen == null) return;
 

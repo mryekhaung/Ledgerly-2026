@@ -59,11 +59,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
         .signInAnonymously();
     if (!mounted) return;
     if (success) {
-      if (GoRouter.maybeOf(context) != null) {
-        context.go(AppRoutes.calendar);
-      } else if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
+      if (GoRouter.maybeOf(context) != null) context.go(AppRoutes.calendar);
     } else {
       final failure = ref.read(authNotifierProvider).failure;
       AppFeedback.failure(
@@ -81,11 +77,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
         .signInWithGoogle();
     if (!mounted) return;
     if (success) {
-      if (GoRouter.maybeOf(context) != null) {
-        context.go(AppRoutes.calendar);
-      } else if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
+      if (GoRouter.maybeOf(context) != null) context.go(AppRoutes.calendar);
     } else {
       final failure = ref.read(authNotifierProvider).failure;
       AppFeedback.failure(
@@ -103,11 +95,7 @@ class _WelcomePageState extends ConsumerState<WelcomePage> {
         .signInWithApple();
     if (!mounted) return;
     if (success) {
-      if (GoRouter.maybeOf(context) != null) {
-        context.go(AppRoutes.calendar);
-      } else if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
+      if (GoRouter.maybeOf(context) != null) context.go(AppRoutes.calendar);
     } else {
       final failure = ref.read(authNotifierProvider).failure;
       AppFeedback.failure(

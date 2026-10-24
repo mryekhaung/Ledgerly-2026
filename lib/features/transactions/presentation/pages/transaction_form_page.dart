@@ -1,7 +1,8 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
     show AdaptiveAppBarAction;
-import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
@@ -11,14 +12,12 @@ import 'package:ledgerly/core/widgets/amount_keypad.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/form_field_surface.dart';
-import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
-import 'package:ledgerly/features/transactions/presentation/pages/category_picker_page.dart';
 import 'package:ledgerly/features/transactions/presentation/providers/transaction_form_notifier.dart';
 import 'package:ledgerly/features/transactions/presentation/transaction_form_state.dart';
 import 'package:ledgerly/features/transactions/presentation/widgets/transaction_form/category_field.dart';
@@ -106,7 +105,7 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
         // buzz again.
         AppFeedback.success();
         AppFeedback.confirm(context, message: strings('transactionSaved'));
-        if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+        if (context.canPop()) context.pop();
       }
     });
 
@@ -228,13 +227,12 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
 
   /// Opens the category picker and stores the choice.
   Future<void> _pickCategory(TransactionDirection direction) async {
-    final chosen = await Navigator.of(context).push<Category>(
-      cupertino.CupertinoPageRoute<Category>(
-        builder: (_) => CategoryPickerPage(
-          kind: _kindFor(direction),
-          selectedId: ref.read(transactionFormProvider).categoryId,
-        ),
-      ),
+    final chosen = await context.pushNamed<Category>(
+      AppRoutes.transactionCategoryPickerName,
+      queryParameters: <String, String>{
+        'kind': _kindFor(direction).name,
+        'selectedId': ?ref.read(transactionFormProvider).categoryId,
+      },
     );
     if (chosen == null || !mounted) return;
     ref.read(transactionFormProvider.notifier).setCategory(chosen.id);
@@ -242,10 +240,9 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
 
   /// Opens the day picker and stores the choice.
   Future<void> _pickDate(LocalDate current) async {
-    final chosen = await Navigator.of(context).push<LocalDate>(
-      cupertino.CupertinoPageRoute<LocalDate>(
-        builder: (_) => MonthDayPickerPage(initialDate: current),
-      ),
+    final chosen = await context.pushNamed<LocalDate>(
+      AppRoutes.transactionDatePickerName,
+      queryParameters: <String, String>{'date': '${current.value}'},
     );
     if (chosen == null || !mounted) return;
     ref.read(transactionFormProvider.notifier).setDate(chosen);

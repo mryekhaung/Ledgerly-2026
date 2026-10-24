@@ -1,8 +1,9 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
     show PlatformInfo;
-import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/app_platform.dart';
@@ -10,14 +11,12 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_bottom_sheet.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
-import 'package:ledgerly/core/widgets/month_day_picker_page.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/settings/presentation/providers/settings_providers.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_direction.dart';
 import 'package:ledgerly/features/transactions/domain/entities/transaction_filter.dart';
-import 'package:ledgerly/features/transactions/presentation/pages/category_picker_page.dart';
 import 'package:ledgerly/features/transactions/presentation/widgets/filter_sheet/amount_range_section.dart';
 import 'package:ledgerly/features/transactions/presentation/widgets/filter_sheet/category_section.dart';
 import 'package:ledgerly/features/transactions/presentation/widgets/filter_sheet/date_range_section.dart';
@@ -164,10 +163,12 @@ class _TransactionFilterSheetState
       _ => CategoryKind.expense,
     };
 
-    final chosen = await Navigator.of(context).push<Category>(
-      cupertino.CupertinoPageRoute<Category>(
-        builder: (_) => CategoryPickerPage(kind: kind, selectedId: _categoryId),
-      ),
+    final chosen = await context.pushNamed<Category>(
+      AppRoutes.transactionCategoryPickerName,
+      queryParameters: <String, String>{
+        'kind': kind.name,
+        'selectedId': ?_categoryId,
+      },
     );
 
     if (chosen != null && mounted) {
@@ -178,10 +179,11 @@ class _TransactionFilterSheetState
   Future<void> _pickStartDate() async {
     final now = DateTime.now();
     final today = LocalDate(now.year, now.month, now.day);
-    final chosen = await Navigator.of(context).push<LocalDate>(
-      cupertino.CupertinoPageRoute<LocalDate>(
-        builder: (_) => MonthDayPickerPage(initialDate: _startDate ?? today),
-      ),
+    final chosen = await context.pushNamed<LocalDate>(
+      AppRoutes.transactionDatePickerName,
+      queryParameters: <String, String>{
+        'date': '${(_startDate ?? today).value}',
+      },
     );
     if (chosen != null && mounted) {
       setState(() => _startDate = chosen);
@@ -191,10 +193,9 @@ class _TransactionFilterSheetState
   Future<void> _pickEndDate() async {
     final now = DateTime.now();
     final today = LocalDate(now.year, now.month, now.day);
-    final chosen = await Navigator.of(context).push<LocalDate>(
-      cupertino.CupertinoPageRoute<LocalDate>(
-        builder: (_) => MonthDayPickerPage(initialDate: _endDate ?? today),
-      ),
+    final chosen = await context.pushNamed<LocalDate>(
+      AppRoutes.transactionDatePickerName,
+      queryParameters: <String, String>{'date': '${(_endDate ?? today).value}'},
     );
     if (chosen != null && mounted) {
       setState(() => _endDate = chosen);

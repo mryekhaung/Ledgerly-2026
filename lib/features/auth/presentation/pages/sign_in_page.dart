@@ -57,8 +57,6 @@ class _SignInPageState extends ConsumerState<SignInPage> {
       } else {
         context.go(AppRoutes.calendar);
       }
-    } else if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
     }
   }
 

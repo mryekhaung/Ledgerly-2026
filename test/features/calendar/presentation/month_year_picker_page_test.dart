@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_period_selector.dart';
 import 'package:ledgerly/core/widgets/month_year_picker_page.dart';
 import 'package:ledgerly/l10n/app_localization.dart';
 import 'package:ledgerly/l10n/generated/app_localizations.dart';
@@ -40,7 +42,41 @@ void main() {
   }) {
     final popped = Completer<LocalDate?>();
 
-    final app = MaterialApp(
+    final router = GoRouter(
+      initialLocation: '/',
+      routes: <RouteBase>[
+        GoRoute(
+          path: '/',
+          builder: (context, state) => Scaffold(
+            body: Center(
+              child: Builder(
+                builder: (inner) => TextButton(
+                  onPressed: () async {
+                    final chosen = await inner.pushNamed<LocalDate>(
+                      'monthPicker',
+                    );
+                    if (!popped.isCompleted) popped.complete(chosen);
+                  },
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+        GoRoute(
+          path: '/picker',
+          name: 'monthPicker',
+          builder: (context, state) => MonthYearPickerPage(
+            initialMonth: initialMonth,
+            selectableYearRange: range,
+          ),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    final app = MaterialApp.router(
+      routerConfig: router,
       theme: AppTheme.light(),
       locale: locale ?? const Locale('en'),
       supportedLocales: AppLocalization.supportedLocales
@@ -54,26 +90,6 @@ void main() {
       // picker is pushed onto it and needs `AppThemeColors`/`AppStrings` too.
       builder: (context, child) =>
           AppTestScopes(child: child ?? const SizedBox.shrink()),
-      home: Scaffold(
-        body: Center(
-          child: Builder(
-            builder: (inner) => TextButton(
-              onPressed: () async {
-                final chosen = await Navigator.of(inner).push<LocalDate>(
-                  MaterialPageRoute<LocalDate>(
-                    builder: (_) => MonthYearPickerPage(
-                      initialMonth: initialMonth,
-                      selectableYearRange: range,
-                    ),
-                  ),
-                );
-                if (!popped.isCompleted) popped.complete(chosen);
-              },
-              child: const Text('open'),
-            ),
-          ),
-        ),
-      ),
     );
 
     return (
@@ -94,13 +110,10 @@ void main() {
 
     // The year header.
     expect(find.text('2026'), findsOneWidget);
-    // Twelve month tiles are on screen. Each label is CLDR's month+year (via
-    // `MaterialLocalizations.formatMonthYear`), not a bare month name — the
-    // picker deliberately reuses the platform's locale data instead of putting
-    // 12 names × 3 locales in the ARB.
-    expect(find.text('May 2026'), findsOneWidget);
-    expect(find.text('January 2026'), findsOneWidget);
-    expect(find.text('December 2026'), findsOneWidget);
+    expect(find.byType(AppPeriodSelector), findsOneWidget);
+    expect(find.text('May'), findsOneWidget);
+    expect(find.text('January'), findsOneWidget);
+    expect(find.text('December'), findsOneWidget);
   });
 
   testWidgets('should_return_the_first_day_of_the_tapped_month', (
@@ -110,7 +123,7 @@ void main() {
     await picker.open();
     final popped = picker.result;
 
-    await tester.tap(find.text('August 2026'));
+    await tester.tap(find.text('August'));
     await tester.pumpAndSettle();
 
     // `result` completes only once the picker pops, which the tap below does.
@@ -136,7 +149,7 @@ void main() {
     expect(find.text('2027'), findsOneWidget);
     expect(find.text('2026'), findsNothing);
     // Still on the picker: browsing is not choosing.
-    expect(find.text('January 2027'), findsOneWidget);
+    expect(find.text('January'), findsOneWidget);
   });
 
   testWidgets('should_go_back_a_year_too', (tester) async {

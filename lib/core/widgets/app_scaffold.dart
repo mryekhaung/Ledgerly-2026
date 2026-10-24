@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart' as cupertino;
+import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -314,12 +315,12 @@ class _AppCupertinoBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    final navigator = Navigator.of(context);
+    final router = GoRouter.maybeOf(context);
     final resolvedLeading =
         leading ??
-        (navigator.canPop()
+        (router?.canPop() ?? false
             ? cupertino.CupertinoNavigationBarBackButton(
-                onPressed: navigator.pop,
+                onPressed: () => router?.pop(),
               )
             : null);
 

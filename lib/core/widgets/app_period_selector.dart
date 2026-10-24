@@ -14,6 +14,7 @@ class AppPeriodSelector extends StatelessWidget {
     required this.onPrevious,
     required this.onNext,
     this.onSelectPeriod,
+    this.labelOverride,
     this.previousTooltip,
     this.nextTooltip,
     this.selectTooltip,
@@ -27,13 +28,16 @@ class AppPeriodSelector extends StatelessWidget {
   final bool isPayCycle;
 
   /// Moves to the previous period.
-  final VoidCallback onPrevious;
+  final VoidCallback? onPrevious;
 
   /// Moves to the next period.
-  final VoidCallback onNext;
+  final VoidCallback? onNext;
 
   /// Opens a period picker when the centered label is tapped.
   final VoidCallback? onSelectPeriod;
+
+  /// Replaces the formatted period label while retaining the shared control.
+  final String? labelOverride;
 
   /// Accessible label for the previous-period button.
   final String? previousTooltip;
@@ -49,27 +53,45 @@ class AppPeriodSelector extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
     final locale = Localizations.localeOf(context);
-    final label = isPayCycle
-        ? _formatPeriod(period, locale)
-        : MaterialLocalizations.of(context)
-              .formatMonthYear(DateTime(period.start.year, period.start.month));
+    final label =
+        labelOverride ??
+        (isPayCycle
+            ? _formatPeriod(period, locale)
+            : MaterialLocalizations.of(context).formatMonthYear(
+                DateTime(period.start.year, period.start.month),
+              ));
 
-    Widget periodLabel = Text(
-      label,
-      textAlign: TextAlign.center,
-      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-      overflow: TextOverflow.ellipsis,
+    Widget periodLabel = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Flexible(
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (onSelectPeriod != null) ...<Widget>[
+          const SizedBox(width: AppSpacing.xs),
+          Icon(AppIcons.dropdown, size: 18, color: colors.textSecondary),
+        ],
+      ],
     );
 
     if (onSelectPeriod != null) {
       periodLabel = InkWell(
         onTap: onSelectPeriod,
         borderRadius: AppRadius.borderSm,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-          child: selectTooltip == null
-              ? periodLabel
-              : Tooltip(message: selectTooltip!, child: periodLabel),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Center(
+            child: selectTooltip == null
+                ? periodLabel
+                : Tooltip(message: selectTooltip!, child: periodLabel),
+          ),
         ),
       );
     }
@@ -91,14 +113,12 @@ class AppPeriodSelector extends StatelessWidget {
             icon: const Icon(AppIcons.chevronLeft, size: 22),
             onPressed: onPrevious,
             tooltip: previousTooltip,
-            visualDensity: VisualDensity.compact,
           ),
           Expanded(child: Center(child: periodLabel)),
           IconButton(
             icon: const Icon(AppIcons.chevronRight, size: 22),
             onPressed: onNext,
             tooltip: nextTooltip,
-            visualDensity: VisualDensity.compact,
           ),
         ],
       ),

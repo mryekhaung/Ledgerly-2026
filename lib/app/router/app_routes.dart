@@ -10,6 +10,19 @@ abstract final class AppRoutes {
   static const String calendar = '/';
   static const String calendarName = 'calendar';
 
+  /// Full-screen calendar month picker, outside the primary navigation shell.
+  static const String calendarMonthPicker = '/calendar/month-picker';
+  static const String calendarMonthPickerName = 'calendarMonthPicker';
+
+  /// Full-screen date picker for forms and transaction filters.
+  static const String transactionDatePicker = '/pickers/date';
+  static const String transactionDatePickerName = 'transactionDatePicker';
+
+  /// Full-screen category picker for transaction forms and filters.
+  static const String transactionCategoryPicker = '/pickers/category';
+  static const String transactionCategoryPickerName =
+      'transactionCategoryPicker';
+
   /// Insights (Phase 2).
   static const String insights = '/insights';
   static const String insightsName = 'insights';

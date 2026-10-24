@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
@@ -50,8 +51,7 @@ class _MonthDayPickerPageState extends State<MonthDayPickerPage> {
       actions: <Widget>[
         AppButton(
           variant: AppButtonVariant.ghost,
-          onPressed: () =>
-              Navigator.of(context).pop(LocalDate.fromDateTime(DateTime.now())),
+          onPressed: () => context.pop(LocalDate.fromDateTime(DateTime.now())),
           label: strings('calendarToday'),
         ),
       ],
@@ -69,7 +69,7 @@ class _MonthDayPickerPageState extends State<MonthDayPickerPage> {
           _MonthGrid(
             month: _month,
             selected: widget.initialDate,
-            onPick: (day) => Navigator.of(context).pop(day),
+            onPick: (day) => context.pop(day),
           ),
         ],
       ),

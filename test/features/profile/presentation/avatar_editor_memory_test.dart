@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/features/profile/data/datasources/avatar_svg_composer.dart';
 import 'package:ledgerly/features/profile/domain/entities/user_profile.dart';
@@ -15,6 +17,28 @@ void main() {
   testWidgets('open and close editor 10x with bounded cache and zero errors', (
     tester,
   ) async {
+    final router = GoRouter(
+      initialLocation: '/',
+      routes: <RouteBase>[
+        GoRoute(
+          path: '/',
+          builder: (context, state) => Scaffold(
+            body: Center(
+              child: ElevatedButton(
+                onPressed: () => context.pushNamed(AppRoutes.avatarEditorName),
+                child: const Text('Open Editor'),
+              ),
+            ),
+          ),
+        ),
+        GoRoute(
+          path: '/profile/avatar',
+          name: AppRoutes.avatarEditorName,
+          builder: (context, state) => const AvatarEditorPage(),
+        ),
+      ],
+    );
+
     await pumpAppHost(
       tester,
       overrides: <Override>[
@@ -22,22 +46,7 @@ void main() {
           (_) => Stream.value(UserProfile.initial),
         ),
       ],
-      home: Builder(
-        builder: (context) => Scaffold(
-          body: Center(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const AvatarEditorPage(),
-                  ),
-                );
-              },
-              child: const Text('Open Editor'),
-            ),
-          ),
-        ),
-      ),
+      router: router,
     );
     await tester.pumpAndSettle();
 
@@ -63,5 +72,6 @@ void main() {
       lessThanOrEqualTo(32),
       reason: 'Composer LRU cache exceeded 32 limit',
     );
+    router.dispose();
   });
 }
