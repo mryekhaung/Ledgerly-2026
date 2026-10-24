@@ -1,6 +1,9 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveAppBarAction;
 import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
+import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/result/failure.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
@@ -90,6 +93,7 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    final colors = AppThemeColors.of(context);
     final state = ref.watch(transactionFormProvider);
     final notifier = ref.read(transactionFormProvider.notifier);
 
@@ -121,6 +125,14 @@ class _TransactionFormPageState extends ConsumerState<TransactionFormPage> {
           onPressed: state.isSaving ? null : notifier.save,
           label: strings('transactionSave'),
           isLoading: state.isSaving,
+        ),
+      ],
+      adaptiveActions: <AdaptiveAppBarAction>[
+        AdaptiveAppBarAction(
+          title: strings('transactionSave'),
+          label: strings('transactionSave'),
+          tintColor: colors.brandPrimary,
+          onPressed: notifier.save,
         ),
       ],
       useSafeArea: false,

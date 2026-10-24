@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_period_selector.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/insights/domain/entities/category_breakdown.dart';
 import 'package:ledgerly/features/insights/domain/entities/daily_trend_point.dart';
@@ -96,13 +97,14 @@ void main() {
     WidgetTester tester, {
     required Stream<PeriodInsights> stream,
     Size size = const Size(400, 800),
+    int monthStartDay = 1,
   }) async {
     await pumpAppHost(
       tester,
       size: size,
       overrides: <Override>[
         currencyProvider.overrideWith((ref) => CurrencyCode.usd),
-        monthStartDayProvider.overrideWith((ref) => 1),
+        monthStartDayProvider.overrideWith((ref) => monthStartDay),
         insightsPeriodProvider.overrideWith(
           () => _FixedPeriodNotifier(testPeriod),
         ),
@@ -148,6 +150,21 @@ void main() {
       expect(find.byType(CashFlowLineChartCard), findsOneWidget);
       expect(find.byType(TopCategoriesCard), findsOneWidget);
       expect(find.text('Groceries'), findsWidgets);
+    });
+
+    testWidgets('uses the shared raised selector for pay-cycle periods', (
+      tester,
+    ) async {
+      await hostInsights(
+        tester,
+        stream: Stream<PeriodInsights>.value(emptyInsights),
+        monthStartDay: 10,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AppPeriodSelector), findsOneWidget);
+      expect(find.textContaining(' – '), findsOneWidget);
+      expect(find.text('Pay cycle'), findsNothing);
     });
   });
 

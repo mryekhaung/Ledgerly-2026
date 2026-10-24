@@ -128,12 +128,14 @@ class AppScaffold extends StatelessWidget {
         actions != null ||
         adaptiveActions != null ||
         bottom != null;
+    // A custom action is safe on iOS 26+ only when its native equivalent is
+    // also supplied; the native toolbar cannot host arbitrary Flutter widgets.
     final useNativeToolbar =
         PlatformInfo.isIOS26OrHigher() &&
         title != null &&
         titleWidget == null &&
         leading == null &&
-        actions == null &&
+        (actions == null || adaptiveActions != null) &&
         bottom == null;
 
     PreferredSizeWidget? appBar;
@@ -145,7 +147,8 @@ class AppScaffold extends StatelessWidget {
           actions: adaptiveActions,
           useNativeToolbar: useNativeToolbar,
           cupertinoNavigationBar:
-              useNativeToolbar || (adaptiveActions != null && bottom == null)
+              useNativeToolbar ||
+                  (adaptiveActions != null && actions == null && bottom == null)
               ? null
               : _AppCupertinoBar(
                   middle: resolvedTitle,
@@ -156,7 +159,7 @@ class AppScaffold extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             ...?actions,
-                            if (bottom != null)
+                            if (actions == null || bottom != null)
                               ...?adaptiveActions?.map(_cupertinoAction),
                           ],
                         ),
@@ -168,10 +171,12 @@ class AppScaffold extends StatelessWidget {
           title: resolvedTitle,
           leading: leading,
           actions: <Widget>[
-            ...?actions,
-            ...?adaptiveActions?.map(
-              (action) => _materialAction(context, action),
-            ),
+            if (actions != null)
+              ...actions!
+            else
+              ...?adaptiveActions?.map(
+                (action) => _materialAction(context, action),
+              ),
           ],
           bottom: bottom,
           titleSpacing: contentMaxWidth == null ? null : gutter + inset,

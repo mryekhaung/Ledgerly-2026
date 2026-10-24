@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
-    show AdaptiveAppBarAction;
+    show AdaptiveAppBarAction, AdaptiveTabBarView;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
@@ -28,22 +28,7 @@ class AccountsPage extends ConsumerStatefulWidget {
   ConsumerState<AccountsPage> createState() => _AccountsPageState();
 }
 
-class _AccountsPageState extends ConsumerState<AccountsPage>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
+class _AccountsPageState extends ConsumerState<AccountsPage> {
   void _navigateToAdd() {
     unawaited(context.pushNamed(AppRoutes.accountNewName));
   }
@@ -121,16 +106,6 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
 
     return AppScaffold(
       title: strings('accountsTitle'),
-      bottom: TabBar(
-        controller: _tabController,
-        labelColor: colors.brandPrimary,
-        unselectedLabelColor: colors.textSecondary,
-        indicatorColor: colors.brandPrimary,
-        tabs: <Widget>[
-          Tab(text: strings('accountsActiveTab')),
-          Tab(text: strings('accountsArchivedTab')),
-        ],
-      ),
       adaptiveActions: <AdaptiveAppBarAction>[
         AdaptiveAppBarAction(
           iosSymbol: 'arrow.left.arrow.right',
@@ -139,8 +114,15 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
           onPressed: _navigateToTransfer,
         ),
       ],
-      body: TabBarView(
-        controller: _tabController,
+      body: AdaptiveTabBarView(
+        tabs: <String>[
+          strings('accountsActiveTab'),
+          strings('accountsArchivedTab'),
+        ],
+        selectedColor: colors.brandPrimary,
+        selectedLabelColor: colors.textOnBrand,
+        unselectedColor: colors.textSecondary,
+        backgroundColor: colors.surface,
         children: <Widget>[
           // Active Accounts Tab
           activeAccountsAsync.when(

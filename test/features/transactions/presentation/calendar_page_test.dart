@@ -13,6 +13,7 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_period_selector.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/presentation/providers/category_providers.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
@@ -392,41 +393,22 @@ void main() {
 
     /// The width the month label is actually allowed to occupy.
     ///
-    /// The label sits in a `Flexible` inside the switcher's inner `Row`, beside
-    /// a 4 px gap and a 20 px caret, so its available box is that row's width
-    /// minus those two — and both are read off the live widgets rather than
-    /// hardcoded, so changing the switcher's furniture fails here instead of
-    /// silently eating into the label.
-    ///
-    /// Measuring the **available box** is deliberate, and is what
-    /// `docs/Roadmap.md` §G.8 R5 calls for. The widget-test font advances each
-    /// glyph by about twice Inter, so an assertion on the rendered text width —
-    /// or on `TextOverflow`, which never throws — would pass or fail for a
-    /// reason that does not exist in the shipped app. The available box is
-    /// font-independent, and it is exactly what the original probe measured.
-    ///
-    /// The inner row is found by its `Flexible` child, matched on the *exact*
-    /// runtime type: the outer row's children are `Expanded`s, and `Expanded` is
-    /// a subclass of `Flexible`, so `is Flexible` would match both rows.
+    /// The centered label's available width is read from the shared selector's
+    /// live `Expanded` slot rather than inferred from the rendered text.
     double labelAvailableWidth(WidgetTester tester) {
       final rowFinder = find.descendant(
         of: find.byType(MonthSwitcher),
         matching: find.byWidgetPredicate(
-          (w) => w is Row && w.children.any((c) => c.runtimeType == Flexible),
+          (w) => w is Row && w.children.any((c) => c.runtimeType == Expanded),
         ),
       );
       expect(rowFinder, findsOneWidget);
 
       final row = tester.widget<Row>(rowFinder);
-      final rowWidth = tester.getSize(rowFinder).width;
-
-      var reserved = 0.0;
-      for (final child in row.children) {
-        if (child.runtimeType == Flexible) continue;
-        if (child is SizedBox) reserved += child.width ?? 0;
-        if (child is Icon) reserved += child.size ?? 24;
-      }
-      return rowWidth - reserved;
+      final labelSlot = row.children.singleWhere(
+        (child) => child.runtimeType == Expanded,
+      );
+      return tester.getSize(find.byWidget(labelSlot)).width;
     }
 
     /// Body widths to sweep, in 32 px steps.
@@ -469,9 +451,8 @@ void main() {
     testWidgets('should_leave_the_pay_cycle_label_room_to_live', (
       tester,
     ) async {
-      // Pay-cycle mode adds a "Pay cycle" caption under the range, and the
-      // range is the longest label the switcher ever shows. Checked at the
-      // narrowest body the page still splits at, which is the worst case.
+      // The range is the longest selector label. Check at the narrowest body
+      // the page still splits at, which is the worst case.
       await host(
         tester,
         584,
@@ -725,7 +706,7 @@ void main() {
     });
 
     testWidgets(
-      'shows date range and Pay cycle caption when monthStartDay is 10',
+      'shows the shared raised date-range selector for pay-cycle periods',
       (tester) async {
         await host(
           tester,
@@ -736,10 +717,27 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Pay cycle'), findsOneWidget);
+        expect(find.byType(AppPeriodSelector), findsOneWidget);
         expect(find.textContaining(' – '), findsOneWidget);
+        expect(find.text('Pay cycle'), findsNothing);
       },
     );
+
+    testWidgets('keeps the month picker available from the pay-cycle label', (
+      tester,
+    ) async {
+      await host(
+        tester,
+        TestWidths.phone,
+        extraOverrides: <Override>[monthStartDayProvider.overrideWithValue(10)],
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.textContaining(' – '));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Jump to month'), findsOneWidget);
+    });
 
     testWidgets(
       'shows tiny month label on the 1st of calendar month in pay-cycle mode',

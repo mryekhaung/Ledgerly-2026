@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveTabBarView;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
@@ -21,22 +23,7 @@ class GoalsListPage extends ConsumerStatefulWidget {
   ConsumerState<GoalsListPage> createState() => _GoalsListPageState();
 }
 
-class _GoalsListPageState extends ConsumerState<GoalsListPage>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
+class _GoalsListPageState extends ConsumerState<GoalsListPage> {
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
@@ -48,20 +35,17 @@ class _GoalsListPageState extends ConsumerState<GoalsListPage>
 
     return AppScaffold(
       title: strings('savingsGoalsTitle'),
-      bottom: TabBar(
-        controller: _tabController,
-        labelColor: colors.textPrimary,
-        unselectedLabelColor: colors.textSecondary,
-        indicatorColor: colors.moneyIn,
-        tabs: [
-          Tab(text: strings('savingsGoalsActiveTab')),
-          Tab(text: strings('savingsGoalsCompletedTab')),
-          Tab(text: strings('savingsGoalsArchivedTab')),
+      body: AdaptiveTabBarView(
+        tabs: <String>[
+          strings('savingsGoalsActiveTab'),
+          strings('savingsGoalsCompletedTab'),
+          strings('savingsGoalsArchivedTab'),
         ],
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
+        selectedColor: colors.moneyIn,
+        selectedLabelColor: colors.textOnBrand,
+        unselectedColor: colors.textSecondary,
+        backgroundColor: colors.surface,
+        children: <Widget>[
           _GoalsTab(
             goalsAsync: activeGoalsAsync,
             emptyTitle: strings('emptyGoalsTitle'),

@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveTabBarView;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
@@ -78,7 +80,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(TabBar), findsOneWidget);
+      expect(find.byType(AdaptiveTabBarView), findsOneWidget);
       expect(find.text('No Savings Goals Yet'), findsOneWidget);
     });
 
@@ -125,8 +127,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap Completed tab
-      await tester.tap(find.text('Completed'));
+      // Swipe to the completed tab.
+      await tester.drag(find.byType(AdaptiveTabBarView), const Offset(-400, 0));
       await tester.pumpAndSettle();
 
       expect(find.byType(GoalCard), findsOneWidget);
@@ -151,8 +153,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap Archived tab
-      await tester.tap(find.text('Archived'));
+      // Swipe past Completed to Archived.
+      await tester.drag(find.byType(AdaptiveTabBarView), const Offset(-400, 0));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(AdaptiveTabBarView), const Offset(-400, 0));
       await tester.pumpAndSettle();
 
       expect(find.byType(GoalCard), findsOneWidget);

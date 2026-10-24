@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveTabBarView;
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
@@ -82,7 +84,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(TabBar), findsOneWidget);
+      expect(find.byType(AdaptiveTabBarView), findsOneWidget);
       expect(find.text('No accounts yet'), findsOneWidget);
     });
 

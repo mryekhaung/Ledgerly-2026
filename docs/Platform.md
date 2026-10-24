@@ -52,11 +52,12 @@ core/widgets/
 
 - iOS 26+: a native UIKit tab bar with the system Liquid Glass effect.
 - iOS 26+: `AdaptiveToolbarHost` provides the native UIKit toolbar for pages
-  with a plain title and adaptive `AdaptiveAppBarAction`s. Pages that need
-  arbitrary toolbar widgets or a `TabBar` retain the Cupertino navigation bar
-  until those controls have adaptive action equivalents. The native toolbar
-  overlays the body, so `AppScaffold` consumes the package-provided top inset
-  even when a page's scrollable has explicit padding.
+  with a plain title and adaptive `AdaptiveAppBarAction`s. Pair custom fallback
+  actions with their adaptive equivalents; put page tabs in the body below the
+  toolbar rather than in `AppScaffold.bottom`. Arbitrary Flutter toolbar widgets
+  without native action equivalents retain the Cupertino navigation bar. The
+  native toolbar overlays the body, so `AppScaffold` consumes the
+  package-provided top inset even when a page's scrollable has explicit padding.
 - iOS 15–25: native-style Cupertino controls with opaque surfaces.
 - Android: Material navigation and controls.
 - `AppSelectField` keeps Material dropdowns off iOS and presents options in an

@@ -1,9 +1,8 @@
-import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
-import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_period_selector.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Top bar switcher for navigating budget periods on the Insights page.
@@ -23,18 +22,21 @@ class InsightPeriodSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
-    final locale = Localizations.localeOf(context);
-
-    final String label;
     if (isPayCycle) {
-      label = _formatPeriod(period, locale);
-    } else {
-      label = MaterialLocalizations.of(context)
-          .formatMonthYear(DateTime(period.start.year, period.start.month));
+      return AppPeriodSelector(
+        period: period,
+        isPayCycle: true,
+        onPrevious: onPrevious,
+        onNext: onNext,
+        previousTooltip: strings('insightsPreviousPeriod'),
+        nextTooltip: strings('insightsNextPeriod'),
+      );
     }
+
+    final theme = Theme.of(context);
+    final label = MaterialLocalizations.of(context)
+        .formatMonthYear(DateTime(period.start.year, period.start.month));
 
     return Row(
       children: <Widget>[
@@ -58,16 +60,6 @@ class InsightPeriodSwitcher extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleMedium,
                     ),
-                    if (isPayCycle) ...<Widget>[
-                      const SizedBox(height: AppSpacing.xxs),
-                      Text(
-                        strings('calendarPayCycle'),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colors.textSecondary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -81,19 +73,5 @@ class InsightPeriodSwitcher extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  static String _formatPeriod(BudgetPeriod period, Locale locale) {
-    final startDt = period.start.toDateTime();
-    final endDt = period.end.toDateTime();
-    final localeStr = locale.toLanguageTag();
-    if (period.start.year != period.end.year) {
-      final startYear = DateFormat.yMMMd(localeStr).format(startDt);
-      final endYear = DateFormat.yMMMd(localeStr).format(endDt);
-      return '$startYear – $endYear';
-    }
-    final startFmt = DateFormat.MMMd(localeStr).format(startDt);
-    final endFmt = DateFormat.MMMd(localeStr).format(endDt);
-    return '$startFmt – $endFmt';
   }
 }

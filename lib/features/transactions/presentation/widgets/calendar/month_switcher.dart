@@ -1,9 +1,9 @@
-import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_period_selector.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The `< March 2026 >` header.
@@ -12,8 +12,8 @@ import 'package:material_ui/material_ui.dart';
 /// only way to cross a year boundary without stepping through twelve `‹ ›`
 /// taps. The chevrons stay for the common one-month move.
 ///
-/// When [isPayCycle] is true (i.e. monthStartDay != 1), shows the period date
-/// range with a "Pay cycle" caption below it (docs/Roadmap.md Phase 1).
+/// When [isPayCycle] is true (i.e. monthStartDay != 1), uses the raised shared
+/// period selector used on the Budgets page.
 ///
 /// Extracted from `calendar_page.dart` (`docs/Conventions.md` §1).
 class MonthSwitcher extends StatelessWidget {
@@ -44,18 +44,25 @@ class MonthSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isPayCycle) {
+      final strings = AppStrings.of(context);
+      return AppPeriodSelector(
+        period: period,
+        isPayCycle: true,
+        onPrevious: onPrevious,
+        onNext: onNext,
+        onSelectPeriod: onPickMonth,
+        previousTooltip: strings('calendarPreviousMonth'),
+        nextTooltip: strings('calendarNextMonth'),
+        selectTooltip: strings('calendarPickMonth'),
+      );
+    }
+
     final theme = Theme.of(context);
     final colors = AppThemeColors.of(context);
     final strings = AppStrings.of(context);
-    final locale = Localizations.localeOf(context);
-
-    final String label;
-    if (isPayCycle) {
-      label = _formatPeriod(period, locale);
-    } else {
-      label = MaterialLocalizations.of(context)
-          .formatMonthYear(DateTime(period.start.year, period.start.month));
-    }
+    final label = MaterialLocalizations.of(context)
+        .formatMonthYear(DateTime(period.start.year, period.start.month));
 
     return Row(
       children: <Widget>[
@@ -106,16 +113,6 @@ class MonthSwitcher extends StatelessWidget {
                               ),
                             ],
                           ),
-                          if (isPayCycle) ...<Widget>[
-                            const SizedBox(height: AppSpacing.xxs),
-                            Text(
-                              strings('calendarPayCycle'),
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: colors.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
                         ],
                       ),
                     ),
@@ -132,19 +129,5 @@ class MonthSwitcher extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  static String _formatPeriod(BudgetPeriod period, Locale locale) {
-    final startDt = period.start.toDateTime();
-    final endDt = period.end.toDateTime();
-    final localeStr = locale.toLanguageTag();
-    if (period.start.year != period.end.year) {
-      final startYear = DateFormat.yMMMd(localeStr).format(startDt);
-      final endYear = DateFormat.yMMMd(localeStr).format(endDt);
-      return '$startYear – $endYear';
-    }
-    final startFmt = DateFormat.MMMd(localeStr).format(startDt);
-    final endFmt = DateFormat.MMMd(localeStr).format(endDt);
-    return '$startFmt – $endFmt';
   }
 }

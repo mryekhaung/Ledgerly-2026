@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveAppBarAction;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
@@ -53,22 +55,19 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
           IconButton(
             icon: const Icon(AppIcons.sync),
             tooltip: strings('recurringProcessNow'),
-            onPressed: () async {
-              final result = await ref
-                  .read(recurringSchedulerNotifierProvider.notifier)
-                  .runScheduler();
-              if (context.mounted) {
-                AppFeedback.confirm(
-                  context,
-                  message: AppStrings.fill(
-                    context,
-                    'recurringProcessedSuccess',
-                    {'count': result.generatedCount},
-                  ),
-                );
-              }
-            },
+            onPressed: () => _runScheduler(context),
           ),
+      ],
+      adaptiveActions: <AdaptiveAppBarAction>[
+        AdaptiveAppBarAction(
+          iosSymbol: 'arrow.clockwise',
+          icon: AppIcons.sync,
+          label: strings('recurringProcessNow'),
+          onPressed: () async {
+            if (schedulerState.isProcessing) return;
+            await _runScheduler(context);
+          },
+        ),
       ],
       floatingActionButton: displayedItems.isNotEmpty
           ? FloatingActionButton.extended(
@@ -141,5 +140,19 @@ class _RecurringListPageState extends ConsumerState<RecurringListPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _runScheduler(BuildContext context) async {
+    final result = await ref
+        .read(recurringSchedulerNotifierProvider.notifier)
+        .runScheduler();
+    if (context.mounted) {
+      AppFeedback.confirm(
+        context,
+        message: AppStrings.fill(context, 'recurringProcessedSuccess', {
+          'count': result.generatedCount,
+        }),
+      );
+    }
   }
 }
