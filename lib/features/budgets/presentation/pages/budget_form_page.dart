@@ -88,8 +88,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
     final success = await ref.read(budgetFormNotifierProvider.notifier).save();
     if (success && mounted) {
       AppFeedback.success();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(strings('budgetSavedSuccess'))));
+      AppFeedback.confirm(context, message: strings('budgetSavedSuccess'));
       context.pop();
     }
   }
@@ -114,9 +113,7 @@ class _BudgetFormPageState extends ConsumerState<BudgetFormPage> {
           .deleteBudget(id);
       if (success && mounted) {
         AppFeedback.success();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(strings('budgetDeletedSuccess'))),
-        );
+        AppFeedback.confirm(context, message: strings('budgetDeletedSuccess'));
         context.pop();
       }
     }

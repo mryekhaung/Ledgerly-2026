@@ -8,6 +8,7 @@ import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_date_picker.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
 import 'package:ledgerly/features/goals/presentation/providers/goals_providers.dart';
@@ -188,7 +189,7 @@ class _GoalFormPageState extends ConsumerState<GoalFormPage> {
             ),
 
             // Notes
-            TextField(
+            AppTextField(
               controller: _notesController,
               maxLines: 2,
               decoration: InputDecoration(

@@ -1,7 +1,8 @@
 import 'package:cupertino_ui/cupertino_ui.dart'
-    show CupertinoAlertDialog, CupertinoDialogAction, CupertinoTextField;
+    show CupertinoAlertDialog, CupertinoDialogAction;
 import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:ledgerly/features/profile/domain/usecases/save_display_name.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -44,12 +45,15 @@ class _RenameDialogState extends State<RenameDialog> {
         title: Text(strings('profileEditName')),
         content: Padding(
           padding: const EdgeInsets.only(top: 12),
-          child: CupertinoTextField(
+          child: AppTextField(
             controller: _controller,
             autofocus: true,
             maxLength: SaveDisplayName.maxLength,
             textInputAction: TextInputAction.done,
-            placeholder: strings('profileNameHint'),
+            decoration: InputDecoration(
+              hintText: strings('profileNameHint'),
+              counterText: '',
+            ),
             onSubmitted: (value) => Navigator.of(context).pop(value),
           ),
         ),

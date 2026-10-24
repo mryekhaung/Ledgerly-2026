@@ -144,14 +144,22 @@ class AppScaffold extends StatelessWidget {
           title: title,
           actions: adaptiveActions,
           useNativeToolbar: useNativeToolbar,
-          cupertinoNavigationBar: useNativeToolbar || adaptiveActions != null
+          cupertinoNavigationBar:
+              useNativeToolbar || (adaptiveActions != null && bottom == null)
               ? null
               : _AppCupertinoBar(
                   middle: resolvedTitle,
                   leading: leading,
-                  trailing: actions == null
+                  trailing: actions == null && adaptiveActions == null
                       ? null
-                      : Row(mainAxisSize: MainAxisSize.min, children: actions!),
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            ...?actions,
+                            if (bottom != null)
+                              ...?adaptiveActions?.map(_cupertinoAction),
+                          ],
+                        ),
                   bottom: bottom,
                 ),
         );
@@ -257,6 +265,16 @@ class AppScaffold extends StatelessWidget {
       icon: action.iconWidget ?? Icon(action.icon ?? AppIcons.moreHorizontal),
     );
   }
+
+  Widget _cupertinoAction(AdaptiveAppBarAction action) => Builder(
+    builder: (context) => cupertino.CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: () => action.press(context),
+      child: action.title != null
+          ? Text(action.title!)
+          : action.iconWidget ?? Icon(action.icon ?? AppIcons.moreHorizontal),
+    ),
+  );
 }
 
 /// The iOS top bar — a real `CupertinoNavigationBar` so the page inherits the

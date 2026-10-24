@@ -1,3 +1,4 @@
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The name field, owning its own [TextEditingController].
@@ -50,7 +51,7 @@ class _NameFieldState extends State<NameField> {
   }
 
   @override
-  Widget build(BuildContext context) => TextField(
+  Widget build(BuildContext context) => AppTextField(
     controller: _controller,
     autofocus: widget.autofocus,
     textInputAction: TextInputAction.done,

@@ -3,6 +3,7 @@ import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_select_field.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/goals/presentation/widgets/goal_contribution_dialog.dart';
@@ -86,7 +87,7 @@ class ContributionForm extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
 
         // Amount text field
-        TextField(
+        AppTextField(
           controller: amountController,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           autofocus: true,
@@ -132,7 +133,7 @@ class ContributionForm extends StatelessWidget {
         ),
 
         // Optional Note text field
-        TextField(
+        AppTextField(
           controller: noteController,
           decoration: InputDecoration(
             labelText: strings('goalNotesLabel'),

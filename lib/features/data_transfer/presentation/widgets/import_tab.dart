@@ -8,6 +8,7 @@ import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
 import 'package:ledgerly/core/widgets/app_switch_tile.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/data_transfer/domain/entities/import_entities.dart';
 import 'package:ledgerly/features/data_transfer/presentation/providers/data_transfer_providers.dart';
@@ -49,7 +50,7 @@ class ImportTab extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.md),
-        TextField(
+        AppTextField(
           controller: textController,
           maxLines: 5,
           decoration: InputDecoration(

@@ -1,9 +1,12 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveFloatingActionButton;
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/period/budget_period.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_floating_action_button.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
 import 'package:ledgerly/features/settings/presentation/pages/month_starts_on_page.dart';
 import 'package:ledgerly/features/settings/presentation/pages/settings_page.dart';
@@ -84,7 +87,14 @@ void main() {
         expect(selectedDaySemantics.label, contains('${today.day}'));
 
         // 4. FAB has button/tap semantics
-        final fab = find.byType(FloatingActionButton);
+        expect(find.byType(AppFloatingActionButton), findsOneWidget);
+        expect(find.byType(AdaptiveFloatingActionButton), findsOneWidget);
+        final fab = find.byWidgetPredicate(
+          (widget) =>
+              widget is Semantics &&
+              widget.properties.label == 'Add transaction' &&
+              widget.properties.button == true,
+        );
         expect(fab, findsOneWidget);
         final fabSemantics = tester.getSemantics(fab);
         expect(

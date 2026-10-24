@@ -1,6 +1,7 @@
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Amount limit field.
@@ -44,7 +45,7 @@ class BudgetAmountSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
-        TextFormField(
+        AppTextFormField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(

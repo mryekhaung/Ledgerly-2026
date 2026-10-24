@@ -42,9 +42,7 @@ class BudgetsPage extends ConsumerWidget {
           .deleteBudget(budgetId);
       if (success && context.mounted) {
         AppFeedback.success();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(strings('budgetDeletedSuccess'))),
-        );
+        AppFeedback.confirm(context, message: strings('budgetDeletedSuccess'));
       }
     }
   }

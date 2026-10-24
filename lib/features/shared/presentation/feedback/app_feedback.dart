@@ -1,4 +1,20 @@
+import 'dart:async';
+
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show
+        AdaptiveBlurView,
+        AdaptiveButton,
+        AdaptiveButtonSize,
+        AdaptiveButtonStyle,
+        AdaptiveSnackBar,
+        AdaptiveSnackBarType,
+        BlurStyle,
+        PlatformInfo;
 import 'package:flutter/services.dart';
+import 'package:ledgerly/app/theme/app_icons.dart';
+import 'package:ledgerly/app/theme/app_spacing.dart';
+import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -20,6 +36,9 @@ import 'package:material_ui/material_ui.dart';
 /// haptics are best-effort and must never be the reason an action fails
 /// (`docs/Agent.md` §6 — a missing vibration motor is not an error state).
 abstract final class AppFeedback {
+  static OverlayEntry? _ios26Entry;
+  static Timer? _ios26Timer;
+
   /// A short, light tap for a state change that is *reversible* — selecting a
   /// segment, toggling a direction, picking a swatch.
   static void selection() => HapticFeedback.selectionClick();
@@ -49,6 +68,9 @@ abstract final class AppFeedback {
       duration: duration,
       actionLabel: actionLabel,
       onAction: onAction,
+      type: AppPlatform.resolve().usesCupertino
+          ? AdaptiveSnackBarType.success
+          : AdaptiveSnackBarType.info,
     );
   }
 
@@ -62,13 +84,17 @@ abstract final class AppFeedback {
     required String message,
     String? retryLabel,
     VoidCallback? onRetry,
+    Duration duration = const Duration(seconds: 4),
   }) {
     _show(
       context,
       message: message,
-      duration: const Duration(seconds: 4),
+      duration: duration,
       actionLabel: retryLabel,
       onAction: onRetry,
+      type: AppPlatform.resolve().usesCupertino
+          ? AdaptiveSnackBarType.error
+          : AdaptiveSnackBarType.info,
     );
   }
 
@@ -97,6 +123,7 @@ abstract final class AppFeedback {
     required Duration duration,
     String? actionLabel,
     VoidCallback? onAction,
+    AdaptiveSnackBarType type = AdaptiveSnackBarType.info,
   }) {
     // Resolve the messenger *before* any await-free rebuild: calling
     // `ScaffoldMessenger.of` after the frame would just throw, and a feedback
@@ -106,9 +133,29 @@ abstract final class AppFeedback {
 
     // Clearing first means a rapid burst of edits shows the *latest* result
     // rather than a queue that lags seconds behind the user.
-    messenger
-      ..clearSnackBars()
-      ..showSnackBar(
+    messenger.clearSnackBars();
+    if (AppPlatform.resolve().usesCupertino && PlatformInfo.isIOS26OrHigher()) {
+      _showIOS26(
+        context,
+        message: message,
+        duration: duration,
+        actionLabel: actionLabel == null || onAction == null
+            ? null
+            : actionLabel,
+        onAction: onAction,
+        type: type,
+      );
+    } else if (AppPlatform.resolve().usesCupertino) {
+      AdaptiveSnackBar.show(
+        context,
+        message: message,
+        type: type,
+        duration: duration,
+        action: actionLabel == null || onAction == null ? null : actionLabel,
+        onActionPressed: onAction,
+      );
+    } else {
+      messenger.showSnackBar(
         SnackBar(
           content: Text(message),
           duration: duration,
@@ -117,6 +164,141 @@ abstract final class AppFeedback {
               : SnackBarAction(label: actionLabel, onPressed: onAction),
         ),
       );
+    }
+  }
+
+  static void _showIOS26(
+    BuildContext context, {
+    required String message,
+    required Duration duration,
+    required AdaptiveSnackBarType type,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    _ios26Timer?.cancel();
+    _ios26Entry?.remove();
+
+    late final OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (context) => _IOS26FeedbackBanner(
+        message: message,
+        type: type,
+        actionLabel: actionLabel,
+        onAction: onAction,
+        onDismiss: () => _dismissIOS26(entry),
+      ),
+    );
+    _ios26Entry = entry;
+    Overlay.of(context).insert(entry);
+    _ios26Timer = Timer(duration, () => _dismissIOS26(entry));
+  }
+
+  static void _dismissIOS26(OverlayEntry entry) {
+    if (!identical(_ios26Entry, entry)) return;
+    _ios26Timer?.cancel();
+    _ios26Timer = null;
+    _ios26Entry = null;
+    entry.remove();
+  }
+}
+
+class _IOS26FeedbackBanner extends StatelessWidget {
+  const _IOS26FeedbackBanner({
+    required this.message,
+    required this.type,
+    required this.onDismiss,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final String message;
+  final AdaptiveSnackBarType type;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+    final iconColor = switch (type) {
+      AdaptiveSnackBarType.info => colors.brandPrimary,
+      AdaptiveSnackBarType.success => colors.moneyIn,
+      AdaptiveSnackBarType.warning => colors.warning,
+      AdaptiveSnackBarType.error => colors.moneyOut,
+    };
+
+    final icon = switch (type) {
+      AdaptiveSnackBarType.info => AppIcons.info,
+      AdaptiveSnackBarType.success => AppIcons.success,
+      AdaptiveSnackBarType.warning => AppIcons.warning,
+      AdaptiveSnackBarType.error => AppIcons.error,
+    };
+
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            AppSpacing.sm,
+            AppSpacing.md,
+            0,
+          ),
+          child: ClipRRect(
+            borderRadius: AppRadius.borderLg,
+            child: AdaptiveBlurView(
+              blurStyle: BlurStyle.systemUltraThinMaterial,
+              borderRadius: AppRadius.borderLg,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: AppRadius.borderLg,
+                  border: Border.all(
+                    color: colors.border.withValues(alpha: 0.35),
+                    width: 0.5,
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Icon(icon, color: iconColor),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Semantics(
+                        liveRegion: true,
+                        child: Text(
+                          message,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: colors.textPrimary),
+                        ),
+                      ),
+                    ),
+                    if (actionLabel != null && onAction != null) ...<Widget>[
+                      const SizedBox(width: AppSpacing.xs),
+                      AdaptiveButton(
+                        onPressed: () {
+                          onAction!();
+                          onDismiss();
+                        },
+                        label: actionLabel!,
+                        textColor: colors.brandPrimary,
+                        style: AdaptiveButtonStyle.plain,
+                        size: AdaptiveButtonSize.small,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

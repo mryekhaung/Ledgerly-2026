@@ -692,7 +692,7 @@ void main() {
   // ---------------------------------------------------------------------------
 
   group('design rule: list rows use ListRow (docs/Design.md §5.6)', () {
-    /// Files allowed to keep a raw `ListTile`.
+    /// Files that use an adaptive tile for a form field or rich row.
     ///
     /// §5.6 calls `ListRow` "the atomic list unit" and says it replaces any
     /// table — which is a statement about **list** rows. The rule targets that
@@ -710,8 +710,8 @@ void main() {
     ///   `ListRow` exposes one `trailing` widget and a single-line subtitle,
     ///   so adopting it would silently drop the overflow menu.
     ///
-    /// Each is re-asserted below to still contain a `ListTile`, so the list
-    /// cannot rot into a permanent allowlist for files that no longer need it.
+    /// Each is re-asserted below to still contain an `AdaptiveListTile`, so the
+    /// list cannot rot into a permanent allowlist for files that no longer need it.
     const fieldAndRichRowPaths = <String>[
       'lib/features/goals/presentation/widgets/goal_form/date_account_section.dart',
       'lib/features/recurring/presentation/widgets/recurring_form/schedule_section.dart',
@@ -742,17 +742,17 @@ void main() {
     });
 
     test('should_keep_the_exempted_field_and_rich_rows', () {
-      // Re-asserts the exemption: a file listed above is exempt because it uses
-      // a `ListTile` for a *non-list* role, so it must still contain one.
+      // Re-asserts the exemption: each file still uses an adaptive tile for a
+      // *non-list* role.
       for (final path in fieldAndRichRowPaths) {
         final source = File(path).readAsStringSync();
         expect(
-          RegExp(r'(?<![A-Za-z])ListTile\(').hasMatch(source),
+          RegExp(r'AdaptiveListTile\(').hasMatch(source),
           isTrue,
           reason:
-              '$path is exempted from the ListRow rule because its ListTile is '
-              'a field or a rich row, not a list row; if that is no longer '
-              'true, remove it from fieldAndRichRowPaths.',
+              '$path is exempted from the ListRow rule because its '
+              'AdaptiveListTile is a field or a rich row, not a list row; if '
+              'that is no longer true, remove it from fieldAndRichRowPaths.',
         );
       }
     });

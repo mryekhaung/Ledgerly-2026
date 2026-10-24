@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveListTile;
+import 'package:flutter/material.dart' as flutter_material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -74,82 +77,89 @@ class ListTransactionRow extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         child: Icon(AppIcons.destructive, color: colors.moneyOut),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
-        onTap: () => _editTransaction(context),
-        leading: category == null
-            ? const SizedBox.square(dimension: 36)
-            : CategoryGem(
-                colorValue: category.colorValue,
-                iconKey: category.iconKey,
-                size: CategoryGemSize.md,
-              ),
-        title: Text(
-          category?.name ?? transaction.categoryId,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: AppTypography.body.copyWith(
-            color: colors.textPrimary,
-            fontWeight: FontWeight.w600,
+      child: flutter_material.Material(
+        type: flutter_material.MaterialType.transparency,
+        child: AdaptiveListTile(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.xs,
           ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (transaction.note case final note?) ...<Widget>[
-              Text(
-                note,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTypography.body.copyWith(color: colors.textSecondary),
-              ),
-            ],
-            Text(
-              dateFormat.format(transaction.date.toDateTime()),
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: colors.textSecondary),
-            ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.sizeOf(context).width * 0.35,
-              ),
-              child: AmountText(
-                transaction.amount,
-                style: AmountStyle.row,
-                signed: true,
-                color: transaction.direction == TransactionDirection.income
-                    ? colors.moneyIn
-                    : colors.moneyOut,
-              ),
-            ),
-            AppOverflowMenu<TransactionMenuAction>(
-              cancelLabel: strings('actionCancel'),
-              onSelected: (action) => switch (action) {
-                TransactionMenuAction.edit => _editTransaction(context),
-                TransactionMenuAction.delete => onDelete(),
-              },
-              items: <OverflowMenuItem<TransactionMenuAction>>[
-                OverflowMenuItem<TransactionMenuAction>(
-                  value: TransactionMenuAction.edit,
-                  label: strings('transactionEdit'),
+          backgroundColor: colors.surface,
+          hideBottomDivider: true,
+          onTap: () => _editTransaction(context),
+          leading: category == null
+              ? const SizedBox.square(dimension: 36)
+              : CategoryGem(
+                  colorValue: category.colorValue,
+                  iconKey: category.iconKey,
+                  size: CategoryGemSize.md,
                 ),
-                OverflowMenuItem<TransactionMenuAction>(
-                  value: TransactionMenuAction.delete,
-                  label: strings('actionDelete'),
-                  destructive: true,
+          title: Text(
+            category?.name ?? transaction.categoryId,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.body.copyWith(
+              color: colors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              if (transaction.note case final note?) ...<Widget>[
+                Text(
+                  note,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.body.copyWith(
+                    color: colors.textSecondary,
+                  ),
                 ),
               ],
-            ),
-          ],
+              Text(
+                dateFormat.format(transaction.date.toDateTime()),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: colors.textSecondary),
+              ),
+            ],
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.sizeOf(context).width * 0.35,
+                ),
+                child: AmountText(
+                  transaction.amount,
+                  style: AmountStyle.row,
+                  signed: true,
+                  color: transaction.direction == TransactionDirection.income
+                      ? colors.moneyIn
+                      : colors.moneyOut,
+                ),
+              ),
+              AppOverflowMenu<TransactionMenuAction>(
+                cancelLabel: strings('actionCancel'),
+                onSelected: (action) => switch (action) {
+                  TransactionMenuAction.edit => _editTransaction(context),
+                  TransactionMenuAction.delete => onDelete(),
+                },
+                items: <OverflowMenuItem<TransactionMenuAction>>[
+                  OverflowMenuItem<TransactionMenuAction>(
+                    value: TransactionMenuAction.edit,
+                    label: strings('transactionEdit'),
+                  ),
+                  OverflowMenuItem<TransactionMenuAction>(
+                    value: TransactionMenuAction.delete,
+                    label: strings('actionDelete'),
+                    destructive: true,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

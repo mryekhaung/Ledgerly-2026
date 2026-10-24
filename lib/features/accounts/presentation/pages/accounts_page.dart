@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveAppBarAction;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
@@ -8,6 +10,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_dialog.dart';
+import 'package:ledgerly/core/widgets/app_floating_action_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/presentation/providers/account_providers.dart';
@@ -128,10 +131,11 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
           Tab(text: strings('accountsArchivedTab')),
         ],
       ),
-      actions: <Widget>[
-        IconButton(
-          icon: const Icon(AppIcons.transfer),
-          tooltip: strings('accountsTransferButton'),
+      adaptiveActions: <AdaptiveAppBarAction>[
+        AdaptiveAppBarAction(
+          iosSymbol: 'arrow.left.arrow.right',
+          icon: AppIcons.transfer,
+          label: strings('accountsTransferButton'),
           onPressed: _navigateToTransfer,
         ),
       ],
@@ -229,11 +233,12 @@ class _AccountsPageState extends ConsumerState<AccountsPage>
       ),
       floatingActionButton: activeAccountsAsync.maybeWhen(
         data: (accounts) => accounts.isNotEmpty
-            ? FloatingActionButton(
+            ? AppFloatingActionButton(
                 onPressed: _navigateToAdd,
                 backgroundColor: colors.brandPrimary,
                 foregroundColor: colors.textOnBrand,
-                child: const Icon(AppIcons.add),
+                label: strings('accountsAddButton'),
+                icon: AppIcons.add,
               )
             : null,
         orElse: () => null,

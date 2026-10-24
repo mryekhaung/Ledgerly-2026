@@ -1,3 +1,6 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveListTile;
+import 'package:flutter/material.dart' as flutter_material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
@@ -56,33 +59,45 @@ class GoalDateAccountSection extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         // Target Date picker tile
-        ListTile(
-          shape: RoundedRectangleBorder(
+        Container(
+          decoration: BoxDecoration(
+            color: colors.surfaceRaised,
             borderRadius: AppRadius.borderSm,
-            side: BorderSide(color: colors.border),
+            border: Border.all(color: colors.border),
           ),
-          title: Text(strings('goalTargetDateLabel')),
-          subtitle: Text(
-            // §7: dates render via intl for the active locale, never as a
-            // hand-built ISO fragment.
-            targetDate != null
-                ? DateFormat.yMd(
-                    Localizations.localeOf(context).toLanguageTag(),
-                  ).format(targetDate!.toDateTime())
-                : noDateLabel,
+          child: flutter_material.Material(
+            type: flutter_material.MaterialType.transparency,
+            child: AdaptiveListTile(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              backgroundColor: Colors.transparent,
+              hideBottomDivider: true,
+              title: Text(strings('goalTargetDateLabel')),
+              subtitle: Text(
+                // §7: dates render via intl for the active locale, never as a
+                // hand-built ISO fragment.
+                targetDate != null
+                    ? DateFormat.yMd(
+                        Localizations.localeOf(context).toLanguageTag(),
+                      ).format(targetDate!.toDateTime())
+                    : noDateLabel,
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (targetDate != null)
+                    IconButton(
+                      icon: const Icon(AppIcons.close, size: 20),
+                      onPressed: onClearDate,
+                    ),
+                  const Icon(AppIcons.calendar),
+                ],
+              ),
+              onTap: onPickDate,
+            ),
           ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (targetDate != null)
-                IconButton(
-                  icon: const Icon(AppIcons.close, size: 20),
-                  onPressed: onClearDate,
-                ),
-              const Icon(AppIcons.calendar),
-            ],
-          ),
-          onTap: onPickDate,
         ),
         const SizedBox(height: AppSpacing.md),
 

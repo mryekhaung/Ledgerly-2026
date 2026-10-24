@@ -1,6 +1,7 @@
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Note field, submit button and (when editing) the delete action.
@@ -45,7 +46,7 @@ class RecurringNoteSubmitSection extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         // Note input
-        TextField(
+        AppTextField(
           controller: noteController,
           decoration: InputDecoration(
             labelText: strings('transactionNoteLabel'),

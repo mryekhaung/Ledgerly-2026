@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveListTile;
+import 'package:flutter/material.dart' as flutter_material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
@@ -90,88 +93,94 @@ class TransactionRow extends ConsumerWidget {
         color: colors.moneyOutSubtle,
         iconColor: colors.moneyOut,
       ),
-      child: ListTile(
-        onTap: () => unawaited(_editTransaction(context, transaction)),
-        leading: category == null
-            ? const SizedBox.square(dimension: 40)
-            : CategoryGem(
-                colorValue: category.colorValue,
-                iconKey: category.iconKey,
-                size: CategoryGemSize.md,
-              ),
-        title: Text(
-          category?.name ?? transaction.categoryId,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: transaction.note == null
-            ? null
-            : Text(
-                transaction.note!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-        trailing: LayoutBuilder(
-          builder: (context, constraints) => Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              // The amount is capped, not flexible. `ListTile` asserts when the
-              // trailing "consumes the entire tile width", and a `Flexible`
-              // child in an unbounded slot does exactly that — it expands to
-              // fill the slot, and the slot is the whole tile, so at 360 px with
-              // a 2.0 text scale the tile threw. A `ConstrainedBox` instead lets
-              // the amount take its natural width when there is room and shrink
-              // to the cap (where the built-in `ellipsis` takes over) when there
-              // is not.
-              //
-              // The cap is a share of the space the row **actually has**, not of
-              // the window. The row lives in a pane, and the two-pane calendar
-              // puts it in the *narrower* one: at an 894 px window the pane is
-              // 330 px while a window-relative cap allowed a 357 px amount —
-              // no cap at all. `ListTile` measures `trailing` against the whole
-              // tile and hands the title whatever is left, so an uncapped amount
-              // there both threw and starved the title. `LayoutBuilder` is what
-              // makes the share relative to the tile; a `MediaQuery` read cannot,
-              // because it only knows the window.
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: constraints.maxWidth.isFinite
-                      ? constraints.maxWidth * 0.4
-                      : MediaQuery.sizeOf(context).width * 0.35,
+      child: flutter_material.Material(
+        type: flutter_material.MaterialType.transparency,
+        child: AdaptiveListTile(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+          backgroundColor: colors.surface,
+          separatorColor: colors.border,
+          onTap: () => unawaited(_editTransaction(context, transaction)),
+          leading: category == null
+              ? const SizedBox.square(dimension: 40)
+              : CategoryGem(
+                  colorValue: category.colorValue,
+                  iconKey: category.iconKey,
+                  size: CategoryGemSize.md,
                 ),
-                child: AmountText(
-                  transaction.amount,
-                  style: AmountStyle.row,
-                  signed: true,
-                  color: transaction.direction == TransactionDirection.income
-                      ? colors.moneyIn
-                      : colors.moneyOut,
+          title: Text(
+            category?.name ?? transaction.categoryId,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: transaction.note == null
+              ? null
+              : Text(
+                  transaction.note!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              AppOverflowMenu<TransactionAction>(
-                cancelLabel: strings('actionCancel'),
-                onSelected: (action) => switch (action) {
-                  TransactionAction.edit => unawaited(
-                    _editTransaction(context, transaction),
+          trailing: LayoutBuilder(
+            builder: (context, constraints) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // The amount is capped, not flexible. `ListTile` asserts when the
+                // trailing "consumes the entire tile width", and a `Flexible`
+                // child in an unbounded slot does exactly that — it expands to
+                // fill the slot, and the slot is the whole tile, so at 360 px with
+                // a 2.0 text scale the tile threw. A `ConstrainedBox` instead lets
+                // the amount take its natural width when there is room and shrink
+                // to the cap (where the built-in `ellipsis` takes over) when there
+                // is not.
+                //
+                // The cap is a share of the space the row **actually has**, not of
+                // the window. The row lives in a pane, and the two-pane calendar
+                // puts it in the *narrower* one: at an 894 px window the pane is
+                // 330 px while a window-relative cap allowed a 357 px amount —
+                // no cap at all. `ListTile` measures `trailing` against the whole
+                // tile and hands the title whatever is left, so an uncapped amount
+                // there both threw and starved the title. `LayoutBuilder` is what
+                // makes the share relative to the tile; a `MediaQuery` read cannot,
+                // because it only knows the window.
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: constraints.maxWidth.isFinite
+                        ? constraints.maxWidth * 0.4
+                        : MediaQuery.sizeOf(context).width * 0.35,
                   ),
-                  TransactionAction.delete => unawaited(
-                    _deleteTransaction(context, ref, transaction),
+                  child: AmountText(
+                    transaction.amount,
+                    style: AmountStyle.row,
+                    signed: true,
+                    color: transaction.direction == TransactionDirection.income
+                        ? colors.moneyIn
+                        : colors.moneyOut,
                   ),
-                },
-                items: <OverflowMenuItem<TransactionAction>>[
-                  OverflowMenuItem<TransactionAction>(
-                    value: TransactionAction.edit,
-                    label: strings('transactionEdit'),
-                  ),
-                  OverflowMenuItem<TransactionAction>(
-                    value: TransactionAction.delete,
-                    label: strings('actionDelete'),
-                    destructive: true,
-                  ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                AppOverflowMenu<TransactionAction>(
+                  cancelLabel: strings('actionCancel'),
+                  onSelected: (action) => switch (action) {
+                    TransactionAction.edit => unawaited(
+                      _editTransaction(context, transaction),
+                    ),
+                    TransactionAction.delete => unawaited(
+                      _deleteTransaction(context, ref, transaction),
+                    ),
+                  },
+                  items: <OverflowMenuItem<TransactionAction>>[
+                    OverflowMenuItem<TransactionAction>(
+                      value: TransactionAction.edit,
+                      label: strings('transactionEdit'),
+                    ),
+                    OverflowMenuItem<TransactionAction>(
+                      value: TransactionAction.delete,
+                      label: strings('actionDelete'),
+                      destructive: true,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

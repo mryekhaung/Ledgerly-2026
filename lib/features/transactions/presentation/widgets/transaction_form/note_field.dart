@@ -1,5 +1,6 @@
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The free-text note field.
@@ -47,7 +48,7 @@ class _NoteFieldState extends State<NoteField> {
         color: colors.surfaceSubtle,
         borderRadius: AppRadius.borderMd,
       ),
-      child: TextField(
+      child: AppTextField(
         controller: widget.controller,
         onChanged: widget.onChanged,
         maxLines: 2,
@@ -55,6 +56,7 @@ class _NoteFieldState extends State<NoteField> {
         textCapitalization: TextCapitalization.sentences,
         style: theme.textTheme.bodyLarge?.copyWith(color: colors.textPrimary),
         cursorColor: colors.brandPrimary,
+        cupertinoDecoration: const BoxDecoration(color: Colors.transparent),
         // `border: InputBorder.none` is the point of this widget: the fill and
         // radius come from the container above, per `docs/Design.md` §5.8, which
         // forbids outline boxes.

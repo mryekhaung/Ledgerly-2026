@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveListTile;
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -696,7 +698,7 @@ void main() {
       final menu = find.descendant(
         of: find.ancestor(
           of: find.text('Morning coffee'),
-          matching: find.byType(ListTile),
+          matching: find.byType(AdaptiveListTile),
         ),
         matching: find.byIcon(AppIcons.moreHorizontal),
       );

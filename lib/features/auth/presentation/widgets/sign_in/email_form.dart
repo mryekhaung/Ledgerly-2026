@@ -6,6 +6,7 @@ import 'package:ledgerly/core/platform/app_platform.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_skeleton.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Email / password (/ name) form with submit and mode toggle.
@@ -77,7 +78,7 @@ class _SignInEmailFormState extends State<SignInEmailForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           if (widget.isSignUp) ...<Widget>[
-            TextFormField(
+            AppTextFormField(
               controller: _nameController,
               decoration: InputDecoration(
                 labelText: strings('displayNameLabel'),
@@ -89,7 +90,7 @@ class _SignInEmailFormState extends State<SignInEmailForm> {
             ),
             const SizedBox(height: AppSpacing.md),
           ],
-          TextFormField(
+          AppTextFormField(
             controller: _emailController,
             decoration: InputDecoration(
               labelText: strings('emailLabel'),
@@ -110,7 +111,7 @@ class _SignInEmailFormState extends State<SignInEmailForm> {
             },
           ),
           const SizedBox(height: AppSpacing.md),
-          TextFormField(
+          AppTextFormField(
             controller: _passwordController,
             obscureText: _obscurePassword,
             decoration: InputDecoration(

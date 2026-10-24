@@ -1,3 +1,8 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveSlider;
+import 'package:flutter/material.dart'
+    as flutter_material
+    show Material, MaterialType;
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
@@ -60,13 +65,16 @@ class BudgetThresholdSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.xs),
-        Slider(
-          value: threshold,
-          min: 0.5,
-          max: 1.0,
-          divisions: 10,
-          activeColor: colors.warning,
-          onChanged: onChanged,
+        flutter_material.Material(
+          type: flutter_material.MaterialType.transparency,
+          child: AdaptiveSlider(
+            value: threshold,
+            min: 0.5,
+            max: 1.0,
+            divisions: 10,
+            activeColor: colors.warning,
+            onChanged: onChanged,
+          ),
         ),
         Text(
           AppStrings.fill(context, 'budgetThresholdHint', <String, Object>{

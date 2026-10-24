@@ -5,6 +5,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -56,7 +57,7 @@ class TransferDetailsSection extends StatelessWidget {
           style: AppTypography.overline.copyWith(color: colors.textTertiary),
         ),
         const SizedBox(height: AppSpacing.xs),
-        TextField(
+        AppTextField(
           controller: amountController,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           textInputAction: TextInputAction.next,
@@ -102,7 +103,7 @@ class TransferDetailsSection extends StatelessWidget {
           style: AppTypography.overline.copyWith(color: colors.textTertiary),
         ),
         const SizedBox(height: AppSpacing.xs),
-        TextField(
+        AppTextField(
           controller: noteController,
           maxLength: 200,
           textInputAction: TextInputAction.done,

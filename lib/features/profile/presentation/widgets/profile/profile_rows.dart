@@ -19,6 +19,7 @@ import 'package:ledgerly/features/profile/domain/usecases/save_display_name.dart
 import 'package:ledgerly/features/profile/presentation/providers/profile_providers.dart';
 import 'package:ledgerly/features/profile/presentation/widgets/avatar.dart';
 import 'package:ledgerly/features/profile/presentation/widgets/profile/rename_dialog.dart';
+import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// The avatar row — tap to open the editor.
@@ -119,27 +120,31 @@ class NameRow extends ConsumerWidget {
 
     if (!context.mounted) return;
 
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.clearSnackBars();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          result.fold(
-            onSuccess: (_) => strings('profileNameSaved'),
-            // The field's own key when the validator produced one (too long,
-            // control characters) so the message names the actual problem; a
-            // storage error has no field and falls back to the generic text.
-            onErr: (failure) => switch (failure) {
-              ValidationFailure(:final fieldErrors) => strings(
-                fieldErrors['displayName'] ?? 'failureValidation',
-              ),
-              _ => strings('settingsSaveFailed'),
-            },
-          ),
+    final message = result.fold(
+      onSuccess: (_) => strings('profileNameSaved'),
+      // The field's own key when the validator produced one (too long,
+      // control characters) so the message names the actual problem; a
+      // storage error has no field and falls back to the generic text.
+      onErr: (failure) => switch (failure) {
+        ValidationFailure(:final fieldErrors) => strings(
+          fieldErrors['displayName'] ?? 'failureValidation',
         ),
-        duration: const Duration(seconds: 3),
-      ),
+        _ => strings('settingsSaveFailed'),
+      },
     );
+    if (result.isSuccess) {
+      AppFeedback.confirm(
+        context,
+        message: message,
+        duration: const Duration(seconds: 3),
+      );
+    } else {
+      AppFeedback.failure(
+        context,
+        message: message,
+        duration: const Duration(seconds: 3),
+      );
+    }
   }
 }
 

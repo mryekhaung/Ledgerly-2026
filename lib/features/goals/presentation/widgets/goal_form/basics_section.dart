@@ -1,6 +1,7 @@
 import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Name, target and current-saved amount fields.
@@ -45,7 +46,7 @@ class GoalBasicsSection extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         // Goal Name
-        TextField(
+        AppTextField(
           controller: nameController,
           decoration: InputDecoration(
             labelText: strings('goalNameLabel'),
@@ -56,7 +57,7 @@ class GoalBasicsSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
 
         // Target Amount
-        TextField(
+        AppTextField(
           controller: targetAmountController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
@@ -69,7 +70,7 @@ class GoalBasicsSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
 
         // Current Saved Amount
-        TextField(
+        AppTextField(
           controller: currentAmountController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(

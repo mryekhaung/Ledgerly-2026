@@ -1,3 +1,6 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveListTile;
+import 'package:flutter/material.dart' as flutter_material;
 import 'package:intl/intl.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
@@ -99,18 +102,23 @@ class RecurringScheduleSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
 
         // Start Date row
-        ListTile(
-          tileColor: colors.surfaceRaised,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadius.borderMd,
-            side: BorderSide(color: colors.border.withValues(alpha: 0.5)),
+        flutter_material.Material(
+          type: flutter_material.MaterialType.transparency,
+          child: AdaptiveListTile(
+            backgroundColor: colors.surfaceRaised,
+            separatorColor: colors.border.withValues(alpha: 0.5),
+            hideBottomDivider: true,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            leading: Icon(AppIcons.calendar, color: colors.brandPrimary),
+            title: Text(strings('recurringFieldStartDate')),
+            // §7: dates render via intl for the active locale, never ISO.
+            subtitle: Text(dateFormat.format(startDate.toDateTime())),
+            trailing: const Icon(AppIcons.chevronForward, size: 14),
+            onTap: onPickStart,
           ),
-          leading: Icon(AppIcons.calendar, color: colors.brandPrimary),
-          title: Text(strings('recurringFieldStartDate')),
-          // §7: dates render via intl for the active locale, never ISO.
-          subtitle: Text(dateFormat.format(startDate.toDateTime())),
-          trailing: const Icon(AppIcons.chevronForward, size: 14),
-          onTap: onPickStart,
         ),
         const SizedBox(height: AppSpacing.sm),
 
@@ -122,17 +130,22 @@ class RecurringScheduleSection extends StatelessWidget {
         ),
 
         if (hasEndDate && endDate != null) ...<Widget>[
-          ListTile(
-            tileColor: colors.surfaceRaised,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppRadius.borderMd,
-              side: BorderSide(color: colors.border.withValues(alpha: 0.5)),
+          flutter_material.Material(
+            type: flutter_material.MaterialType.transparency,
+            child: AdaptiveListTile(
+              backgroundColor: colors.surfaceRaised,
+              separatorColor: colors.border.withValues(alpha: 0.5),
+              hideBottomDivider: true,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              leading: Icon(AppIcons.event, color: colors.moneyOut),
+              title: Text(strings('recurringFieldEndDate')),
+              subtitle: Text(dateFormat.format(endDate!.toDateTime())),
+              trailing: const Icon(AppIcons.chevronForward, size: 14),
+              onTap: onPickEnd,
             ),
-            leading: Icon(AppIcons.event, color: colors.moneyOut),
-            title: Text(strings('recurringFieldEndDate')),
-            subtitle: Text(dateFormat.format(endDate!.toDateTime())),
-            trailing: const Icon(AppIcons.chevronForward, size: 14),
-            onTap: onPickEnd,
           ),
           const SizedBox(height: AppSpacing.sm),
         ],

@@ -1,3 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveAppBarAction;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
@@ -11,6 +13,7 @@ import 'package:ledgerly/core/widgets/app_dialog.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/app_select_field.dart';
 import 'package:ledgerly/core/widgets/app_switch_tile.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account_type.dart';
 import 'package:ledgerly/features/accounts/presentation/account_catalog.dart';
@@ -182,11 +185,14 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
       title: formState.isEditing
           ? strings('accountsEditTitle')
           : strings('accountsNewTitle'),
-      actions: <Widget>[
+      adaptiveActions: <AdaptiveAppBarAction>[
         if (formState.isEditing)
-          IconButton(
-            icon: Icon(AppIcons.destructive, color: colors.warning),
-            tooltip: strings('accountDeleteTitle'),
+          AdaptiveAppBarAction(
+            iosSymbol: 'trash',
+            icon: AppIcons.destructive,
+            iconWidget: Icon(AppIcons.destructive, color: colors.warning),
+            label: strings('accountDeleteTitle'),
+            tintColor: colors.warning,
             onPressed: _handleDelete,
           ),
       ],
@@ -207,7 +213,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
           // Account Name
           FieldLabel(label: strings('accountFieldName')),
           const SizedBox(height: AppSpacing.xs),
-          TextField(
+          AppTextField(
             controller: _nameController,
             maxLength: 60,
             textInputAction: TextInputAction.next,
@@ -272,7 +278,7 @@ class _AccountFormPageState extends ConsumerState<AccountFormPage> {
           // Opening Balance
           FieldLabel(label: strings('accountFieldOpeningBalance')),
           const SizedBox(height: AppSpacing.xs),
-          TextField(
+          AppTextField(
             controller: _balanceController,
             keyboardType: const TextInputType.numberWithOptions(
               decimal: true,

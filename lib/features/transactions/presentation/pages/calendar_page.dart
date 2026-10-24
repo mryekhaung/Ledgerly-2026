@@ -1,16 +1,19 @@
 import 'dart:async';
 
-import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveAppBarAction;
 import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ledgerly/app/router/app_routes.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
 import 'package:ledgerly/app/theme/app_spacing.dart';
+import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/platform/window_size.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/utils/local_date.dart';
 import 'package:ledgerly/core/utils/month_grid_layout.dart';
+import 'package:ledgerly/core/widgets/app_floating_action_button.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/month_year_picker_page.dart';
 import 'package:ledgerly/features/settings/domain/entities/app_settings.dart';
@@ -47,6 +50,7 @@ class CalendarPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = AppStrings.of(context);
+    final colors = AppThemeColors.of(context);
     final state = ref.watch(calendarProvider);
     final notifier = ref.read(calendarProvider.notifier);
     final sizeClass = WindowSizeClass.of(context);
@@ -175,10 +179,13 @@ class CalendarPage extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: AppFloatingActionButton(
         onPressed: () =>
             unawaited(_openTransactionForm(context, state.selectedDay)),
-        child: const Icon(AppIcons.add),
+        backgroundColor: colors.brandPrimary,
+        foregroundColor: colors.textOnBrand,
+        label: strings('transactionNew'),
+        icon: AppIcons.add,
       ),
     );
   }

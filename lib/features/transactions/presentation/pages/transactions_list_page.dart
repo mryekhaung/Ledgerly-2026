@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart'
+    show AdaptiveAppBarAction;
 import 'package:cupertino_ui/cupertino_ui.dart' as cupertino;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ledgerly/app/theme/app_icons.dart';
@@ -8,6 +10,7 @@ import 'package:ledgerly/app/theme/app_theme.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_scaffold.dart';
 import 'package:ledgerly/core/widgets/app_skeleton.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:ledgerly/features/categories/domain/entities/category.dart';
 import 'package:ledgerly/features/categories/domain/entities/category_kind.dart';
 import 'package:ledgerly/features/shared/presentation/feedback/app_feedback.dart';
@@ -117,9 +120,11 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
 
     return AppScaffold(
       title: strings('transactionsTitle'),
-      actions: <Widget>[
-        IconButton(
-          icon: Stack(
+      adaptiveActions: <AdaptiveAppBarAction>[
+        AdaptiveAppBarAction(
+          iosSymbol: 'line.3.horizontal.decrease',
+          icon: AppIcons.tune,
+          iconWidget: Stack(
             clipBehavior: Clip.none,
             children: <Widget>[
               const Icon(AppIcons.tune),
@@ -138,7 +143,9 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
                 ),
             ],
           ),
-          tooltip: strings('filterTitle'),
+          label: strings('filterTitle'),
+          prominent: state.filter.isActive,
+          tintColor: state.filter.isActive ? colors.brandPrimary : null,
           onPressed: () => _openFilterSheet(state.filter),
         ),
       ],
@@ -153,7 +160,7 @@ class _TransactionsListPageState extends ConsumerState<TransactionsListPage> {
             Padding(
               padding: ResponsiveInsets.pageHorizontal(context)
                   .copyWith(top: AppSpacing.sm, bottom: AppSpacing.xs),
-              child: TextField(
+              child: AppTextField(
                 controller: _searchController,
                 onChanged: _onSearchChanged,
                 decoration: InputDecoration(

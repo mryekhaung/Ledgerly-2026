@@ -6,6 +6,7 @@ import 'package:ledgerly/app/theme/app_typography.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_button.dart';
 import 'package:ledgerly/core/widgets/app_card.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/data_transfer/domain/entities/backup_entities.dart';
 import 'package:ledgerly/features/data_transfer/presentation/providers/data_transfer_providers.dart';
@@ -92,7 +93,7 @@ class _BackupTabState extends ConsumerState<BackupTab> {
                     ?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: AppSpacing.xs),
-              TextField(
+              AppTextField(
                 controller: _restoreTextController,
                 maxLines: 4,
                 decoration: InputDecoration(

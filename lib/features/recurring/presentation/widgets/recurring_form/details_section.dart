@@ -3,6 +3,7 @@ import 'package:ledgerly/app/theme/app_spacing.dart';
 import 'package:ledgerly/core/money/currency_code.dart';
 import 'package:ledgerly/core/presentation/app_strings.dart';
 import 'package:ledgerly/core/widgets/app_select_field.dart';
+import 'package:ledgerly/core/widgets/app_text_field.dart';
 import 'package:ledgerly/core/widgets/category_gem.dart';
 import 'package:ledgerly/core/widgets/segmented_tabs.dart';
 import 'package:ledgerly/features/accounts/domain/entities/account.dart';
@@ -99,7 +100,7 @@ class RecurringDetailsSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
 
         // Amount input
-        TextField(
+        AppTextField(
           controller: amountController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
